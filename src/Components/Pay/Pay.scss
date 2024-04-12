@@ -1,0 +1,77 @@
+:root{
+    --PrimaryColor: hsl(199, 100%, 33%);
+    --SecondaryColor: hsl(187, 85%, 43%);
+    --gradientColor: linear-gradient(to right, hsl(187, 85%, 43%), hsl(199, 100%, 33%));
+    --whiteColor: hsl(0, 0%, 100%);
+    --blackColor: hsl(201, 33%, 16%);
+    --textColor: hsl(240, 4%, 36%);
+    --whiteColorDeam: hsl(0, 0%, 93%);
+    --greyText: rgb(190, 190, 190);
+    --inputColor: rgb(239, 239, 239);
+    --bodyColor: rgb(240, 240, 246);
+    --cardBG: rgb(225, 225, 235);
+    --cardHover: rgb(255, 255, 255);
+}
+
+.main{
+    width: 100%;
+    max-width: 1128px;
+    margin-inline: auto;
+    background: var(--whiteColor);
+    .payContent{
+        width: 35rem;
+        height: 35rem;
+        background: var(--whiteColor);
+        border: 1px solid #04aa6d;
+        border-top-width: 5px;
+        margin-inline: auto;
+        .imgsucces{
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            img{
+                width: 8rem;
+                padding-top: 3rem;
+            }
+        }
+        .content{
+            text-align: center;
+            padding: 3rem;
+            .titlePay{
+                font-size: 40px;
+                font-weight: 600;
+            }
+        }
+        .payMent{
+                display: flex;
+                margin-inline: auto;
+                justify-content: center;
+                gap: 2rem;
+                .btn{
+                    border-radius: .5rem;
+                    font-weight: 600;
+                }
+
+            .vnpay{
+                background-size: cover;
+                cursor: pointer;
+                background: var(--whiteColor);
+                font-size: 20px;
+                font-weight: bold;
+                border: 1px solid var(--greyText);
+                text-align: center;
+                &:hover{
+                    border: 2px solid #04aa6d;
+                }
+            }
+            .trasau{
+                width: 115px;
+                height: 44px;
+                border-radius: .5rem;
+                font-size: 15px;
+                font-weight: bold;
+                color: var(--whiteColor);
+            }
+        }
+    }
+}

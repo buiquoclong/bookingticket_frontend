@@ -1,0 +1,1078 @@
+:root{
+    --PrimaryColor: hsl(199, 100%, 33%);
+    --SecondaryColor: hsl(187, 85%, 43%);
+    --gradientColor: linear-gradient(to right, hsl(187, 85%, 43%), hsl(199, 100%, 33%));
+    --whiteColor: hsl(0, 0%, 100%);
+    --blackColor: hsl(201, 33%, 16%);
+    --textColor: hsl(240, 4%, 36%);
+    --whiteColorDeam: hsl(0, 0%, 93%);
+    --greyText: rgb(190, 190, 190);
+    --inputColor: rgb(239, 239, 239);
+    --bodyColor: rgb(240, 240, 246);
+    --cardBG: rgb(225, 225, 235);
+    --cardHover: rgb(255, 255, 255);
+}
+
+.main{
+    padding-top: 1rem;
+    width: 100%;
+    background: var(--whiteColor);
+
+    .homeContent{
+        height: max-content;
+        padding: 8rem 1.5rem 3rem;
+        display: flex;
+        row-gap: 3rem;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: center;
+        margin: auto;
+        color: var(--whiteColor);
+        z-index: 100;
+        width: 60% !important;
+        
+
+        .cardDiv{
+            position: relative;
+            padding: 2rem 1rem;
+            background: var(--whiteColor);
+            border-radius: 10px;
+            gap: 1rem;
+            border: 1px solid var(--greyText);
+            box-shadow: 0 2px 4px rgba(140,140, 141, 0.549);
+            
+
+            .radioButtons {
+                display: flex;
+                justify-content: baseline;
+                margin-bottom: 1rem;
+        
+                label {
+                    margin-right: 1rem;
+                    cursor: pointer;
+        
+                    input[type="radio"] {
+                        margin-right: 0.5rem;
+                    }
+                }
+            }
+
+            .destinationIn{
+                // width: 30rem;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between; // Đảm bảo các phần tử đều nằm cách đều nhau theo chiều ngang
+
+                .destinationInput, .dateInput {
+                    margin-bottom: 10px; // Khoảng cách giữa các hàng
+                }
+            }
+
+            .sizeOne{
+                width: 80%;
+                margin-inline: auto;
+            }
+
+            .sizeTwo{
+                width: 97%;
+            }
+
+            .destinationInp{
+                width: 97%;
+            }
+
+            label{
+                display: block;
+                color: var(--textColor);
+                color: #1b2d36;
+                padding-bottom: 10px;
+                font-size: 13px;
+                font-weight: 500;
+            }
+            
+            .input{
+                height: 40px;
+                padding: 0 1rem;
+                background: var(--inputColor);
+                border-radius: .5rem;
+
+                input{
+                    background: none;
+                    border: none;
+                    outline: none;
+                    width: 100%;
+                    font-size: 13px;
+                    font-weight: 500;
+                    &::placeholder{
+                        font-size: 13px;
+                    }
+                }
+
+                .icon{
+                    font-size: 18px;
+                    color: var(--PrimaryColor)
+                    !important;
+                    margin-left: 10px;
+                }
+
+                
+            }
+
+            .changedes{
+                width: 40px;
+                height: 40px;
+                border-radius: 1rem;
+                background: var(--whiteColor);
+                border: 1px solid #E5E5E5;
+                margin-top: 1.52rem;
+                // margin-bottom: 1rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                // transition: transform 1s;
+
+
+                .icon{
+                    color: var(--textColor);
+                    font-size: 20px;
+                    transition: transform 0.5s ease;
+
+                    &:hover{
+                        // rotate: 180deg;
+                        transform: rotate(180deg);
+                    }
+                }
+            }
+
+            
+
+            .searchOption{
+                position: absolute;
+                background-color: var(--PrimaryColor);
+                width: max-content;
+                bottom: -0.7rem;
+                column-gap: .8rem;
+                padding: 5px 1rem;
+                border-radius: 3rem;
+                left: 50%;
+                transform: translate(-50%);
+                justify-content: center;
+                cursor: pointer;
+
+                &:hover{
+                    background: var(--SecondaryColor);
+                }
+
+                .icon{
+                    font-size: 18px;
+                }
+
+                span{
+                    font-size: 13px;
+                }
+            }
+
+            
+        }
+        
+    }
+
+    .resultList{
+        flex-direction: row !important;
+        gap: 1.5rem !important;
+        align-items: initial !important;
+        // width: 55% !important;
+        // padding-top: 9rem !important;
+
+        .filterSearch{
+            width: 22rem;
+            height: 100%;
+            position: sticky;
+            top: 0;
+            height: fit-content;
+            z-index: 50;
+            padding-top: .5rem;
+            display: inline-block;
+            background: var(--whiteColor);
+
+            .cardFilter{
+                box-shadow: 0 3px 6px rgba(0,0,0,.16), 0 3px 6px rgba(0,0,0,.2);
+                border-radius: .75rem !important;
+                border: 1px solid var(--greyText);
+                
+                .filterHeader{
+                    padding: 1rem !important;
+                    justify-content: space-between !important;
+
+                    .text{
+                        font-size: 1rem !important;
+                        line-height: 1.5rem !important;
+                        text-transform: uppercase !important;
+                    }
+
+                    .deleteFilter{
+                        color: var(--PrimaryColor);
+                        gap: .5rem !important;
+                        cursor: pointer;
+                        // font-size: 18px;
+                    }
+                }
+
+                .filterHour{
+                    padding: 1rem;
+
+                    .hourCheckBox{
+                        max-height: 170px;
+                        overflow: auto;
+                        box-sizing: border-box;
+                        margin: 0;
+                        padding: 0;
+                        color: var(--textColor);
+                        font-size: 14px;
+                        font-variant: tabular-nums;
+                        line-height: 1.5715;
+                        list-style: none;
+                        font-feature-settings: "tnum";
+                        display: inline-block;
+
+                        .chekcBox{
+                            margin-top: .5rem !important;
+                            box-sizing: border-box;
+                            margin: 0;
+                            padding: 0;
+                            color: var(--blackColor);
+                            font-size: 14px;
+                            font-variant: tabular-nums;
+                            line-height: 1.5715;
+                            list-style: none;
+                            font-feature-settings: "tnum";
+                            display: inline-flex;
+                            align-items: baseline;
+                            line-height: unset;
+                            cursor: pointer;
+                            touch-action: manipulation;
+                            margin-left: 10px !important;
+                            font-weight: 400;
+                            font-size: 15px !important;
+
+                            .ant-checkbox{
+                                box-sizing: border-box;
+                                margin: 0;
+                                padding: 0;
+                                color: var(--textColor);
+                                font-size: 14px;
+                                font-variant: tabular-nums;
+                                line-height: 1.5715;
+                                list-style: none;
+                                font-feature-settings: "tnum";
+                                position: relative;
+                                top: .2rem;
+                                line-height: 1;
+                                white-space: nowrap;
+                                outline: none;
+                                cursor: pointer;
+
+                                .ant-checkbox-input{
+                                    position: absolute;
+                                    top: 0;
+                                    right: 0;
+                                    bottom: 0;
+                                    left: 0;
+                                    z-index: 1;
+                                    width: 100%;
+                                    height: 100%;
+                                    cursor: pointer;
+                                    opacity: 0;
+                                }
+
+                                .ant-checkbox-inner{
+                                    position: relative;
+                                    top: 0;
+                                    left: 0;
+                                    display: block;
+                                    width: 16px;
+                                    height: 16px;
+                                    direction: ltr;
+                                    background-color: var(--whiteColor);
+                                    border: 1px solid var(--textColor);
+                                    border-radius: 2px;
+                                    border-collapse: separate;
+                                    transition: all .3s;
+
+                                    &::after{
+                                        position: absolute;
+                                        top: 50%;
+                                        left: 21.5%;
+                                        display: table;
+                                        width: 5.71428571px;
+                                        height: 9.14285714px;
+                                        border: 2px solid #fff;
+                                        border-top: 0;
+                                        border-left: 0;
+                                        transform: rotate(45deg) scale(0) translate(-50%, -50%);
+                                        opacity: 0;
+                                        transition: all .1s cubic-bezier(.71,-.46,.88,.6), opacity .1s;
+                                        content: " ";
+                                    }
+
+                                }
+                            }
+
+                            .ant-checkbox+span{
+                                padding-right: 8px;
+                                padding-left: 8px;
+                            }
+
+                            .textHour{
+                                font-weight: 400 !important;
+                                margin-left: .25rem !important;
+                            }
+
+                            &.ant-checkbox:hover{
+                                .ant-checkbox{
+                                    color: var(--PrimaryColor);
+                                }
+                            }
+                        }
+                    }
+                    .hourCheckBox::-webkit-scrollbar {
+                        width: 10px;
+                    }
+                    
+                    .hourCheckBox::-webkit-scrollbar-track {
+                        background: #f1f1f1;
+                    }
+                    
+                    .hourCheckBox::-webkit-scrollbar-thumb {
+                        background: #888;
+                        border-radius: 10px;
+                    }
+                    
+                    .hourCheckBox::-webkit-scrollbar-thumb:hover {
+                        background: var(--SecondaryColor);
+                    }
+                }
+
+                .devide{
+                    width: 100%;
+                    background-color: var(--greyText);
+                    height: .5px;
+                }
+
+                .filterKindSeat{
+                    padding: 1rem !important;
+
+                    .filterKind{
+                        gap: .5rem !important;
+                        flex-wrap: wrap !important;
+                        display: flex;
+                        margin-top: 1rem;
+
+                        .kindItem{
+                            font-weight: 400;
+                            font-size: 14px;
+                            padding: .25rem .75rem;
+                            background-color: var(--whiteColor);
+                            border: 1px solid var(--greyText);
+                            border-radius: .375rem;
+                            cursor: pointer;
+                        }
+                    }
+                }
+
+            }
+        }
+
+        .listResultSearch{
+            flex-direction: column !important;
+            display: flex !important;
+            align-items: initial !important;
+            
+            .listHeader{
+                position: sticky;
+                top: 0;
+                height: fit-content;
+                z-index: 50;
+                padding-top: 5rem;
+                display: inline-block;
+                background: var(--whiteColor);
+    
+                h1{
+                    text-align: center;
+                    color: var(--blackColor);
+                    .icon{
+                        font-size: 1rem;
+                    }
+                }
+                
+                .lisFilter{
+                    display: flex;
+                    justify-content: space-between;
+                    padding-top: 3rem;
+                    padding-bottom: .5rem;
+                    .lineInfo{
+                        display: flex;
+                        color: var(--blackColor);
+                        align-items: center;
+                        span{
+                            font-size: 15px;
+                            padding-right: .5rem;
+                            align-items: center;
+                        }
+                        .selectChoose{
+                            select{
+                                width: 8rem;
+                                height: 2rem;
+                                background: var(--whiteColor);
+                                border-radius: .5rem;
+                                padding-left: 1rem;
+                                border: 1px solid var(--greyText);
+                                outline: none;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            .cardListResult{
+                padding-top: 1.5rem;
+                overflow: visible;
+                max-height: 100%;
+
+                .cardOneResult{
+                    box-shadow: 0 0 0 1px rgba(0,0,0,.05), inset 0 0 0 1px #d1d5db;
+                    border-radius: .75rem;
+                    padding-top: 1.5rem;
+                    background: var(--whiteColor);
+                    border: 1px solid rgb(221 226 232/ 1);
+                    flex-direction: column;
+                    width: 100%;
+                    // display: flex;
+                    margin-bottom: .5rem;
+
+                    // &:active, &:focus {
+                    //     border-color: var(--PrimaryColor);
+
+                    //     .buttonChooseRoute{
+                    //         background: var(--PrimaryColor);
+                    //         color: var(--whiteColor);
+                    //         border: 1px solid var(--gradientColor);
+                    //     }
+                    // }
+
+                    .infoResult{
+                        padding-left: 1.5rem;
+                        padding-right: 1.5rem;
+
+                        .detailInfo{
+                            gap: 2.5rem;
+                            align-items: flex-start;
+                            display: flex;
+
+                            .routeInfo{
+                                flex-direction: column;
+                                // width: 100%;
+                                // width: 29rem;
+                                display: flex;
+
+                                .nameInfo{
+                                    gap: 1rem;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                    display: flex;
+
+                                    .timestart{
+                                        font-weight: 500;
+                                        font-size: 1.5rem;
+                                        line-height: 2rem;
+                                    }
+
+                                    .timeBetween{
+                                        align-items: center;
+                                        width: 18.25rem;
+                                        display: flex;
+                                        color: var(--textColor);
+
+                                        img{
+                                            width: 16px;
+                                            height: 19px;
+                                            display: block;
+                                            // vertical-align: middle;
+                                        }
+
+                                        .dotLine{
+                                            border-style: dotted !important;
+                                            border-width: 0 !important;
+                                            border-bottom-width: 2px !important;
+                                            border-color: var(--greyText);
+                                            flex: 1 1 0%;
+                                        }
+
+                                        .numTimes{
+                                            color: var(--greyText);
+                                            line-height: 1rem;
+                                            text-align: center;
+
+                                            .location{
+                                                font-size: 13px;
+                                            }
+                                        }
+                                    }
+
+                                    .timeend{
+                                        font-weight: 500;
+                                        font-size: 1.5rem;
+                                        line-height: 2rem;
+                                    }
+                                }
+
+                                .dessInfo{
+                                    font-weight: 400;
+                                    font-size: 13px;
+                                    justify-content: space-between;
+                                    display: flex;
+                                    margin-top: .75rem;
+                                    
+                                    .desStart{
+                                        flex: 1 1 0%;
+                                        .nameStart{
+                                            font-weight: 500;
+                                            font-size: 15px;
+                                        }
+                                    }
+
+                                    .desEnd{
+                                        text-align: right;
+                                        flex: 1 1 0%;
+                                        .nameEnd{
+                                            font-weight: 500;
+                                            font-size: 15px;
+                                        }
+                                    }
+                                }
+                            }
+
+                            .seatInfo{
+                                color: var(--greyText);
+                                display: flex;
+                                align-items: center;
+                                min-width: 200px;
+                                flex-wrap: wrap;
+                                gap: .5rem;
+
+                                .dotSeat{
+                                    background-color: rgb(200 204 211/ 1);
+                                    border-radius: 9999px;
+                                    width: 6px;
+                                    height: 6px;
+                                }
+
+                                .text{
+                                    color: #00613d;
+                                }
+
+                                .price{
+                                    color: var(--PrimaryColor);
+                                    font-weight: 600;
+                                    font-size: 1.125rem;
+                                    line-height: 1.75rem;
+                                    text-align: end;
+                                    width: 100%;
+                                    margin-top: .5rem;
+                                }
+                            }
+                        }
+
+                        .devide{
+                            width: 100%;
+                            background: var(--greyText);
+                            height: .5px;
+                            margin-top: 1rem !important;
+                            margin-bottom: 1rem !important;
+                        }
+
+                    }
+                    .choseRoute{
+                        display: flex !important;
+                        width: 100%;
+                        position: relative !important;
+
+                        .chosseRouteTab{
+                            width: 100%;
+                            box-sizing: border-box;
+                            margin: 0;
+                            padding: 0;
+                            color: var(--blackColor);
+                            font-size: 14px;
+                            font-variant: tabular-nums;
+                            line-height: 1.5715;
+                            list-style: none;
+                            font-feature-settings: "tnum";
+                            display: flex;
+                            flex-direction: column;
+
+                            .tabChoose{
+                                margin-left: 1rem !important;
+                                position: relative;
+                                display: flex;
+                                flex: none;
+                                align-items: center;
+                                margin: 0 0 16px;
+
+                                .tabChoose_wrap{
+                                    position: relative;
+                                    display: inline-block;
+                                    display: flex;
+                                    flex: auto;
+                                    align-self: stretch;
+                                    overflow: hidden;
+                                    white-space: nowrap;
+                                    transform: translate(0);
+
+                                    .tabChoose_list{
+                                        transform: translate(0px, 0px);
+                                        position: relative;
+                                        display: flex;
+                                        transition: transform .3s;
+
+                                        .tabChoose_tab{
+                                            padding: 0 0 4px !important;
+                                            position: relative;
+                                            display: inline-flex;
+                                            align-items: center;
+                                            padding: 12px 0;
+                                            font-size: 14px;
+                                            background: transparent;
+                                            border: 0;
+                                            outline: none;
+                                            cursor: pointer;
+
+                                            &.active{
+                                                .btn_tabName{
+                                                    span{
+                                                        color: var(--SecondaryColor);
+                                                    }
+                                                }
+                                            }
+
+                                            .tabChoose_tab_btn{
+                                                outline: none;
+                                                transition: all .3s;
+
+                                                // &:hover, &:active{
+                                                //     color: var(--SecondaryColor);
+                                                // }
+
+                                                .btn_tabName{
+                                                    font-weight: 500 !important;
+                                                    font-size: 15px !important;
+                                                    gap: .75rem !important;
+                                                    justify-content: center !important;
+                                                    display: flex;
+                                                    
+                                                }
+                                            }
+                                        }
+
+                                        .tab1{
+                                            margin: 0 0 0 2rem !important;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        .buttonChooseRoute{
+                            position: absolute;
+                            background: #75caf1;
+                            color: var(--PrimaryColor);
+                            border: none;
+                            display: block;
+                            z-index: 10;
+                            right: 1.25rem;
+                            
+                            span{
+                                font-weight: bold;
+                            }
+
+                            &:hover, &:focus{
+                                background: var(--PrimaryColor);
+                                color: var(--whiteColor);
+                                border: 1px solid var(--gradientColor);
+                                
+                            }
+
+
+                            // 
+                        }
+
+                        .chooseTab{
+                            flex: auto;
+                            min-width: 0;
+                            min-height: 0;
+
+                            .chooseListTab{
+                                display: flex;
+                                width: 100%;
+
+                                .chooseSeatTab{
+                                    flex: none;
+                                    width: 100%;
+                                    outline: none;
+                                    .chooseSeatContent{
+                                        padding-bottom: 1rem !important;
+                                        padding-inline: .25rem !important;
+                                        border-bottom-right-radius: .75rem  !important;
+                                        border-bottom-left-radius: .75rem    !important;
+                                        overflow-y: auto !important;
+                                        justify-content: center;
+                                        height: 24rem;
+                                        display: flex ;
+                                        margin-top: .5rem !important;
+                                        .seatCenter{
+                                            align-items: center !important;
+                                            flex-direction: column !important;
+                                            width: 100%;
+
+                                            .seatLoca{
+                                                max-width: 28rem;
+                                                margin-inline: auto;
+                                                .seatLocaInfo{
+                                                    width: auto;
+                                                    margin-inline: auto !important;
+                                                    padding-inline: 1.5rem !important;
+                                                    padding-top: .25rem;
+                                                    padding-bottom: .25rem;
+                                                    flex-direction: column !important;
+                                                    max-width: 42rem;
+                                                    .seatNote{
+                                                        font-weight: 400 !important;
+                                                        font-size: 13px;
+                                                        justify-content: space-between;
+                                                        display: flex;
+                                                        .seatNote1{
+                                                            align-items: center !important;
+                                                            display: flex;
+                                                            margin-right: 2rem;
+                                                            .seatSaled{
+                                                                border-radius: .25rem;
+                                                                width: 1rem;
+                                                                height: 1rem;
+                                                                margin-right: .5rem;
+                                                                background: #D5D9DD;
+                                                            }
+                                                            .seatNonChose{
+                                                                border-radius: .25rem;
+                                                                width: 1rem;
+                                                                height: 1rem;
+                                                                margin-right: .5rem;
+                                                                background: #DEF3FF;
+                                                            }
+                                                            .seatChosing{
+                                                                border-radius: .25rem;
+                                                                width: 1rem;
+                                                                height: 1rem;
+                                                                margin-right: .5rem;
+                                                                background: #FDEDE8;
+                                                            }
+                                                        }
+                                                        .seatNote2{
+                                                            margin-right: 0;
+                                                        }
+                                                    }
+                                                    .numSeat{
+                                                        gap: 1.5rem !important;
+                                                        font-weight: 500 !important;
+                                                        text-align: center;
+                                                        justify-content: center;
+                                                        flex-direction: row;
+                                                        display: flex;
+                                                        margin-top: 1rem !important;
+                                                        margin-bottom: 1rem !important;
+                                                        .bottomSeat{
+                                                            min-width: 153px;
+                                                            flex-direction: column;
+                                                            display: flex;
+                                                            .nameBottomSeat{
+                                                                font-size: .875rem;
+                                                                line-height: 1.25rem;
+                                                                padding: .5rem;
+                                                                justify-content: center;
+                                                                width: 100%;
+                                                                display: inline;
+                                                                .icon{
+                                                                    border-radius: 2px;
+                                                                    color: var(--textColor);
+                                                                    font-size: 20px;
+                                                                    display: none;
+                                                                }
+                                                            }
+                                                            .devide{
+                                                                width: 100%;
+                                                                background: var(--greyText);
+                                                                height: .5px;
+                                                                margin-bottom: 1rem;
+                                                                display: none;
+                                                            }
+                                                            table{
+                                                                text-indent: 0;
+                                                                border-color: inherit;
+                                                                border-collapse: collapse;
+                                                                tbody{
+                                                                    .seatNum{
+                                                                        gap: .25rem;
+                                                                        justify-content: center;
+                                                                        display: flex;
+                                                                        .singleSeat{
+                                                                            text-align: center;
+                                                                            justify-content: center;
+                                                                            cursor: pointer;// chưa chọn, nếu đã chọn rồi thì về cursor: not-allowed
+                                                                            display: flex;
+                                                                            margin-top: .25rem;
+                                                                            position: relative;
+                                                                            // &:hover{
+                                                                            //     .numSeatA{
+                                                                            //         color: #EF5222;
+                                                                            //     }
+                                                                            // }
+
+                                                                            .numSeatA{ //vị trí của ghế hiển thị màu chữ theo trang thái của ghế
+                                                                                font-size: 10px !important;
+                                                                                color: rgb(51 154 244/ 1);// nếu chưa chọn có màu này, đã chọn có màu là #A2ABB3, đang chọn có màu #EF5222
+                                                                                font-weight: 600 !important;
+                                                                                line-height: 1.25rem;
+                                                                                top: .25rem;
+                                                                                position: absolute;
+                                                                            }
+                                                                            
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            .devide{
+                                                width: 100%;
+                                                background: rbga(0, 0, 0, .1);
+                                                height: .5px;
+                                                margin-bottom: .75rem;
+
+                                            }
+                                            .seatBook{
+                                                font-size: .875rem;
+                                                line-height: 1.25rem;
+                                                padding-inline: 1rem;
+                                                justify-content: space-between;
+                                                align-items: center;
+                                                width: 100%;
+                                                display: flex;
+                                                .numTicket{
+                                                    justify-content: space-between;
+                                                    align-items: center;
+                                                    display: flex;
+                                                    .numOfTicket{
+                                                        font-weight: 600 !important;
+                                                        color: var(--textColor);
+                                                        span{
+                                                            color: var(--blackColor);
+                                                        }
+                                                    }
+                                                }
+                                                .priceTicket{
+                                                    gap: .75rem;
+                                                    align-items: center;
+                                                    display: flex;
+                                                    .price{
+                                                        text-align: right;
+                                                        color: var(--blackColor);
+                                                        .totalPrice{
+                                                            color: var(--PrimaryColor);
+                                                            font-weight: 600;
+                                                            font-size: 1rem;
+                                                            line-height: 1.5rem;
+                                                        }
+                                                    }
+                                                    
+                                                    .chooseButton{
+                                                        background: #75caf1;
+                                                        color: var(--PrimaryColor);
+                                                        border: none;
+                                                        display: block;
+                                                        z-index: 10;
+                                                        right: 1.25rem;
+                                                        width: 10rem;
+                                                        
+                                                        span{
+                                                            font-weight: bold;
+                                                        }
+
+                                                        &:hover, &:focus{
+                                                            background: var(--PrimaryColor);
+                                                            color: var(--whiteColor);
+                                                            border: 1px solid var(--gradientColor);
+                                                            
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .routeCenter{
+                                            padding-bottom: 5rem !important;
+                                            overflow: auto !important;
+                                            flex-direction: column !important;
+                                            width: 100%;
+                                            display: flex;
+                                            .routePoint{
+                                                color: var(--blackColor);
+                                                font-size: 15px;
+                                                padding-inline: 1rem;
+                                                align-items: flex-start;
+                                                display: flex;
+                                                position: relative;
+                                                .dotLine{
+                                                    border-style: dotted !important;
+                                                    border-right-width: 0 !important;
+                                                    height: 100%;
+                                                    top: .5rem !important;
+                                                    left: 77px !important;
+                                                    position: absolute;
+                                                    border-color: var(--greyText);
+                                                }
+                                                img{
+                                                    margin-top: .25rem !important;
+                                                    margin-inline: 1rem !important;
+                                                    z-index: 10 !important;
+                                                    width: 16px !important;
+                                                    height: 19px !important;
+                                                    display: block !important;
+                                                }
+                                                .location{
+                                                    margin-bottom: 1rem !important;
+                                                    .addressLoca{
+                                                        color: var(--textColor);
+                                                        line-height: 1rem;
+                                                        font-size: 13px;
+
+                                                    }
+                                                }
+                                            }
+                                            .noteRoute{
+                                                font-size: 13px;
+                                                padding-top: .5rem;
+                                                padding-bottom: .5rem;
+                                                padding-inline: 1rem;
+                                                background-color: rgb(247 247 247/ 1) !important;
+                                                border-bottom-right-radius: .5rem  !important;
+                                                border-bottom-left-radius: .5rem    !important;
+                                                z-index: 20 !important;
+                                                bottom: 0;
+                                                position: absolute;
+                                                .noteRoute1{
+                                                    font-weight: 500 !important;
+                                                    font-size: 15px !important;
+                                                }
+                                            }
+                                        }
+                                        .policyCenter{
+                                            overflow: auto;
+                                            width: 45.6rem;
+                                            .policyItem{
+                                                flex-direction: column;
+                                                display: flex;
+                                                .content{
+                                                    padding-top: .5rem;
+                                                    padding-bottom: .5rem;
+                                                    padding-inline: 1rem;
+                                                    .itemContent{
+                                                        font-weight: 500;
+                                                        font-size: 1.125rem;
+                                                        line-height: 1.75rem;
+                                                        padding-bottom: .5rem;
+                                                    }
+                                                    .listpolicy{
+                                                        flex-direction: column;
+                                                        width: 100%;
+                                                        display: flex;
+                                                        .listpolicyItem{
+                                                            font-size: 15px;
+                                                            ul{
+                                                                list-style-type: disc;
+                                                                margin: 0 1rem;
+                                                                li::marker{
+                                                                    color: #a2abb3;
+                                                                    width: 6px !important;
+                                                                    height: 6px !important;
+                                                                    
+                                                                }
+                                                                li{
+                                                                    list-style: initial;
+
+                                                                    
+                                                                    ::marker{
+                                                                        color: #a2abb3 !important;
+                                                                        width: 6px !important;
+                                                                        height: 6px !important;
+                                                                    }
+                                                                    p{
+                                                                        font-size: 15px;
+                                                                        margin-bottom: 0;
+                                                                        font-weight: 500;
+                                                                        position: relative;
+                                                                        word-wrap: break-word;
+                                                                    }
+                                                                }
+                                                                
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .policyCenter::-webkit-scrollbar {
+                                            width: 10px;
+                                        }
+                                        
+                                        .policyCenter::-webkit-scrollbar-track {
+                                            // background: #f1f1f1;
+                                            background: var(--whiteColor);
+                                        }
+                                        
+                                        .policyCenter::-webkit-scrollbar-thumb {
+                                            background: #888;
+                                            border-radius: 10px;
+                                        }
+                                        
+                                        .policyCenter::-webkit-scrollbar-thumb:hover {
+                                            background: var(--SecondaryColor);
+                                        }
+                                    }
+                                    .chooseSeatContent::-webkit-scrollbar {
+                                        width: 10px;
+                                    }
+                                    
+                                    .chooseSeatContent::-webkit-scrollbar-track {
+                                        background: var(--whiteColor);
+                                    }
+                                    
+                                    .chooseSeatContent::-webkit-scrollbar-thumb {
+                                        background: #888;
+                                        border-radius: 10px;
+                                    }
+                                    
+                                    .chooseSeatContent::-webkit-scrollbar-thumb:hover {
+                                        background: var(--SecondaryColor);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+
+    
+}

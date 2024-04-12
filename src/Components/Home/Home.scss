@@ -1,0 +1,299 @@
+:root{
+    --PrimaryColor: hsl(199, 100%, 33%);
+    --SecondaryColor: hsl(187, 85%, 43%);
+    --gradientColor: linear-gradient(to right, hsl(187, 85%, 43%), hsl(199, 100%, 33%));
+    --whiteColor: hsl(0, 0%, 100%);
+    --blackColor: hsl(201, 33%, 16%);
+    --textColor: hsl(240, 4%, 36%);
+    --whiteColorDeam: hsl(0, 0%, 93%);
+    --greyText: rgb(190, 190, 190);
+    --inputColor: rgb(239, 239, 239);
+    --bodyColor: rgb(240, 240, 246);
+    --cardBG: rgb(225, 225, 235);
+}
+
+body{
+    background-color: var(--whiteColor);
+}
+
+.home{
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+
+    .overlay{
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        background: rgb(47, 106, 127);
+        top: 0;
+        bottom: 0;
+        z-index: 1;
+        mix-blend-mode: hard-light;
+    }
+
+    img{
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        bottom: 0;
+        object-fit: cover;
+    }
+
+    .homeContent{
+        width: 50%;
+        height: max-content;
+        padding: 8rem 1.5rem 3rem;
+        display: flex;
+        row-gap: 3rem;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: center;
+        margin: auto;
+        color: var(--whiteColor);
+        z-index: 100;
+        width: 60% !important;
+
+        .cardDiv{
+            position: relative;
+            padding: 2rem 1rem;
+            background: var(--whiteColor);
+            border-radius: 10px;
+            gap: 1rem;
+            
+
+            .radioButtons {
+                display: flex;
+                justify-content: baseline;
+                margin-bottom: 1rem;
+        
+                label {
+                    margin-right: 1rem;
+                    cursor: pointer;
+        
+                    input[type="radio"] {
+                        margin-right: 0.5rem;
+                    }
+                }
+            }
+
+            .destinationIn{
+                
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between; // Đảm bảo các phần tử đều nằm cách đều nhau theo chiều ngang
+
+                .destinationInput, .dateInput {
+                    margin-bottom: 10px; // Khoảng cách giữa các hàng
+                }
+            }
+
+            .sizeOne{
+                width: 75%;
+                margin-inline: auto;
+            }
+
+            .sizeTwo{
+                width: 97%;
+            }
+
+            .destinationInp{
+                width: 97%;
+            }
+
+            label{
+                display: block;
+                color: var(--textColor);
+                color: #1b2d36;
+                padding-bottom: 10px;
+                font-size: 13px;
+                font-weight: 500;
+            }
+            
+            .input{
+                height: 40px;
+                padding: 0 1rem;
+                background: var(--inputColor);
+                border-radius: .5rem;
+
+                input{
+                    background: none;
+                    border: none;
+                    outline: none;
+                    width: 100%;
+                    font-size: 13px;
+                    font-weight: 500;
+                    &::placeholder{
+                        font-size: 13px;
+                    }
+                }
+
+                .icon{
+                    font-size: 18px;
+                    color: var(--PrimaryColor)
+                    !important;
+                    margin-left: 10px;
+                }
+
+                
+            }
+
+            .changedes{
+                width: 40px;
+                height: 40px;
+                border-radius: 1rem;
+                background: var(--whiteColor);
+                border: 1px solid #E5E5E5;
+                margin-top: 1.52rem;
+                // margin-bottom: 1rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                // transition: transform 1s;
+
+
+                .icon{
+                    color: var(--textColor);
+                    font-size: 20px;
+                    transition: transform 0.5s ease;
+
+                    &:hover{
+                        // rotate: 180deg;
+                        transform: rotate(180deg);
+                    }
+                }
+            }
+
+            
+
+            .searchOption{
+                position: absolute;
+                background-color: var(--PrimaryColor);
+                width: max-content;
+                bottom: -0.7rem;
+                column-gap: .8rem;
+                padding: 5px 1rem;
+                border-radius: 3rem;
+                left: 50%;
+                transform: translate(-50%);
+                justify-content: center;
+                cursor: pointer;
+                color: var(--whiteColor);
+
+                &:hover{
+                    background: var(--SecondaryColor);
+                }
+
+                .icon{
+                    font-size: 18px;
+                }
+
+                span{
+                    font-size: 13px;
+                }
+            }
+
+            
+        }
+
+        .homeFooterIcons{
+            width: 100%;
+            justify-content: space-between;
+
+            .icon{
+                font-size: 20px;
+                margin: 0 5px;
+                color: var(--whiteColor);
+                font-weight: 600;
+                &:hover{
+                    color: var(--PrimaryColor);
+                }
+            }
+        }
+    }
+
+}
+
+// MEDIA QUERIES ============================
+@media screen and (max-width: 500px){
+    .home{
+        .homeContent{
+
+                .cardDiv{
+                    // grid-template-columns: repeat(2,1fr);
+                    .changedes{
+                        margin-top: 0;
+                        rotate:  90deg;
+                    }
+                }
+        }
+    }
+}
+
+@media screen and (max-width: 660px) {
+    .home{
+        .homeContent{
+            .cardDiv{
+                padding: 2rem 1rem;
+                // grid-template-columns: repeat(3,1fr);
+
+                .sizeTwo{
+                    .changedes{
+                        margin-top: 0;
+                        rotate:  90deg;
+                    }
+                }
+                
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 848px) {
+    .sizeOne{
+        .changedes{
+            margin-top: 0;
+            rotate:  90deg;
+    }  
+    }
+    
+}
+
+@media screen and (max-width: 940px) {
+    .home{
+        height: 70vh;
+    }
+}
+
+@media screen and (min-width: 1240px) {
+    .home{
+        height: 95vh;
+
+        .homeContent{
+            padding-left: 0;
+            padding-right: 0;
+
+            .cardDiv{
+                padding: 2rem 1rem;
+                // grid-template-columns: repeat(3,1fr);
+                justify-content: center;
+                .input{
+                    margin-bottom: 1rem;
+                }
+
+                .searchOption{
+                    bottom: -1rem;
+                    padding: 8px 1rem;
+
+                    span{
+                        font-size: 17px;
+                    }
+                }
+            }
+        }
+    }
+}

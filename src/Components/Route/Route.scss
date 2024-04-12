@@ -1,0 +1,250 @@
+:root{
+    --PrimaryColor: hsl(199, 100%, 33%);
+    --SecondaryColor: hsl(187, 85%, 43%);
+    --gradientColor: linear-gradient(to right, hsl(187, 85%, 43%), hsl(199, 100%, 33%));
+    --whiteColor: hsl(0, 0%, 100%);
+    --blackColor: hsl(201, 33%, 16%);
+    --textColor: hsl(240, 4%, 36%);
+    --whiteColorDeam: hsl(0, 0%, 93%);
+    --greyText: rgb(190, 190, 190);
+    --inputColor: rgb(239, 239, 239);
+    --bodyColor: rgb(240, 240, 246);
+    --cardBG: rgb(225, 225, 235);
+}
+body{
+    background: var(--whiteColor);
+}
+.main{
+    width: 100%;
+    position: relative;
+    // display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    background: var(--whiteColor);
+    padding-top: 5rem;
+
+    .seacrhRoute{
+        width: 100%;
+        position: relative;
+        padding: 1rem 1rem;
+        background: var(--whiteColor);
+        border-radius: 10px;
+        gap: 1rem;
+
+        .input{
+            width: 22.2rem;
+            height: 40px;
+            padding: 0 1rem;
+            background: var(--inputColor);
+            border-radius: .5rem;
+
+            input{
+                background: none;
+                border: none;
+                outline: none;
+                width: 100%;
+                font-size: 13px;
+                font-weight: 500;
+                &::placeholder{
+                    font-size: 13px;
+                }
+            }
+
+            .icon{
+                font-size: 18px;
+                color: var(--PrimaryColor)
+                !important;
+                margin-left: 10px;
+            }
+        }
+
+        .changedes{
+            width: 40px;
+            height: 40px;
+            border-radius: 1rem;
+            background: var(--whiteColor);
+            border: 1px solid #E5E5E5;
+            // margin-top: 1.52rem;
+            // margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            // transition: transform 1s;
+
+
+            .icon{
+                color: var(--textColor);
+                font-size: 20px;
+                transition: transform 0.5s ease;
+
+                &:hover{
+                    // rotate: 180deg;
+                    transform: rotate(180deg);
+                }
+            }
+        }
+
+        .seachRoute{
+            button{
+                &:hover{
+                    color: var(--whiteColor);
+                }
+            }
+        }
+    }
+
+    .routeDetails{
+        width: 100%;
+        position: relative;
+        padding: 2rem 1rem;
+        background: var(--whiteColor);
+        gap: 1rem !important;
+
+        .routeCard{
+            display: flex;
+            border: 1px solid var(--greyText);
+            border-radius: 16px;
+            max-height: 9rem;
+            padding: 1rem 0.75rem 0.75rem;
+            overflow: overlay;
+            min-width: none;
+
+            .col_2{
+                display: block;
+                flex: 0 0 8.33333333%;
+                max-width: 8.33333333%;
+                text-align: center;
+            }
+            .col_3{
+                display: block;
+                flex: 0 0 15%;
+                max-width: 15%;
+                text-align: center;
+            }
+            .col_4{
+                display: block;
+                flex: 0 0 20%;
+                max-width: 20%;
+                text-align: center;
+            }
+            .col_6{
+                display: block;
+                flex: 0 0 25%;
+                max-width: 25%;
+                text-align: center;
+            }
+
+            .routeCard_row{
+                align-items: center !important;
+                display: flex;
+                flex-flow: row wrap;
+                min-width: 0;
+
+                .routename{
+                    width: 41rem;
+
+                    .icon{
+                        font-size: 1rem;
+                        color: var(--PrimaryColor);
+                        margin-inline: .5rem;
+                    }
+                }
+
+                .seach_col{
+                    display: flex;
+                    justify-content: flex-end !important;
+                }
+                
+            }
+        }
+
+        .content{
+            margin-top: 1rem;
+            border: 1px solid var(--greyText);
+            border-radius: 16px;
+            max-height: 9rem;
+            padding: 1rem 0.75rem 0.75rem;
+            overflow: overlay;
+            min-width: none;
+
+            .col_2{
+                display: block;
+                flex: 0 0 8.33333333%;
+                max-width: 8.33333333%;
+                text-align: center;
+            }
+            .col_3{
+                display: block;
+                flex: 0 0 15%;
+                max-width: 15%;
+                text-align: center;
+            }
+            .col_4{
+                display: block;
+                flex: 0 0 20%;
+                max-width: 20%;
+                text-align: center;
+            }
+            .col_6{
+                display: block;
+                flex: 0 0 25%;
+                max-width: 25%;
+                text-align: center;
+            }
+
+            .routeCard_row{
+                align-items: center !important;
+                display: flex;
+                flex-flow: row wrap;
+                min-width: 0;
+                padding-bottom: 10px;
+
+                .routename{
+                    width: 41rem;
+
+                    .icon{
+                        font-size: 1rem;
+                        color: var(--PrimaryColor);
+                        margin-inline: .5rem;
+                    }
+                }
+
+                .seach_col{
+                    display: flex;
+                    justify-content: flex-end !important;
+
+                    .btn{
+                        &:hover{
+                            color: var(--whiteColor);
+                        }
+                    }
+                    
+                }
+
+                .col_nofound{
+                    margin-inline: auto;
+                }
+                
+            }
+        }
+
+        .content::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        .content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .content::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        
+        .content::-webkit-scrollbar-thumb:hover {
+            background: var(--SecondaryColor);
+        }
+
+    }
+}

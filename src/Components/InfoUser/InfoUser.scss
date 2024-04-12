@@ -1,0 +1,83 @@
+:root {
+    --PrimaryColor: hsl(199, 100%, 33%);
+    --SecondaryColor: hsl(187, 85%, 43%);
+    --gradientColor: linear-gradient(to right, hsl(187, 85%, 43%), hsl(199, 100%, 33%));
+    --whiteColor: hsl(0, 0%, 100%);
+    --blackColor: hsl(201, 33%, 16%);
+    --textColor: hsl(240, 4%, 36%);
+    --whiteColorDeam: hsl(0, 0%, 93%);
+    --greyText: rgb(190, 190, 190);
+    --inputColor: rgb(239, 239, 239);
+    --bodyColor: rgb(240, 240, 246);
+    --cardBG: rgb(225, 225, 235);
+}
+
+body {
+    background: var(--whiteColor);
+}
+
+.main {
+    width: 100%;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    background: var(--whiteColor);
+
+    .infoContent{
+        width: 100%;
+        .secTitle{
+            .title{
+                position: relative;
+                width: max-content;
+                color: var(--textColor);
+                margin: 1rem 0;
+                z-index: 2;
+                margin-inline: auto;
+            }
+        }
+        .infoUser{
+            width: 25rem;
+            height: 20rem;
+            // border: 1px solid var(--blackColor);
+            margin-inline: auto;
+            .lineInfo{
+                display: flex;
+                justify-content: space-between;
+                line-height: 3rem;
+                .rightInfo{
+                    width: 18rem;
+                    height: 2.5rem;
+                    background: var(--greyText);
+                    border-radius: .5rem;
+                    span{
+                        padding-left: 1rem;
+                        padding-bottom: .5rem;
+                    }
+                }
+                .Note{
+                    width: 18rem;
+                    height: 2.5rem;
+                    background: var(--whiteColor);
+                    border-radius: 1rem;
+                    padding-left: 1rem;
+                    border: 1px solid var(--greyText);
+                    outline: none;
+                }
+            }
+            .buttonSave{
+                width: 100%;
+                display: flex;
+                .save{
+                    margin-top: 1rem;
+                    margin-inline: auto;
+                    justify-content: center;
+                    font-weight: 600;
+                    color: var(--whiteColor);
+                }
+            }
+            
+        }
+    }
+    
+}

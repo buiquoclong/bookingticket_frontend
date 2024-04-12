@@ -1,0 +1,139 @@
+:root{
+    --PrimaryColor: hsl(199, 100%, 33%);
+    --SecondaryColor: hsl(187, 85%, 43%);
+    --gradientColor: linear-gradient(to right, hsl(187, 85%, 43%), hsl(199, 100%, 33%));
+    --whiteColor: hsl(0, 0%, 100%);
+    --blackColor: hsl(201, 33%, 16%);
+    --textColor: hsl(240, 4%, 36%);
+    --whiteColorDeam: hsl(0, 0%, 93%);
+    --greyText: rgb(190, 190, 190);
+    --inputColor: rgb(239, 239, 239);
+    --bodyColor: rgb(240, 240, 246);
+    --cardBG: rgb(225, 225, 235);
+    --cardHover: rgb(255, 255, 255);
+}
+
+.main{
+    width: 100%;
+    max-width: 1128px;
+    margin-inline: auto;
+
+    .bookingContent{
+        width: 100%;
+        gap: 7rem;
+        align-items: flex-start;
+        
+        .infoTicket{
+            width: 35rem;
+            height: 40rem;
+            background: var(--whiteColor);
+            border-radius: 1rem;
+            border: 1px solid var(--greyText);
+            padding: 1rem 2rem;
+            // display: flex;
+
+            .lineInfo{
+                display: flex;
+                justify-content: space-between;
+                line-height: 3rem;
+                .rightInfo{
+                    width: 18rem;
+                    height: 2.5rem;
+                    background: var(--greyText);
+                    border-radius: .5rem;
+                    span{
+                        padding-left: 1rem;
+                        padding-bottom: .5rem;
+                    }
+                }
+                .Note{
+                    width: 18rem;
+                    height: 2.5rem;
+                    background: var(--whiteColor);
+                    border-radius: .5rem;
+                    padding-left: 1rem;
+                    border: 1px solid var(--greyText);
+                    outline: none;
+                }
+                .selectChoose{
+                    select{
+                        width: 18rem;
+                        height: 2.5rem;
+                        background: var(--whiteColor);
+                        border-radius: .5rem;
+                        padding-left: 1rem;
+                        border: 1px solid var(--greyText);
+                        outline: none;
+                        
+                    }
+                }
+            }
+            .policyCheckbox{
+                width: 100%;
+                margin-top: 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .checkBox{
+                    display: flex;
+                    align-items: center;
+                    .checkbox-input{
+                        width: 20px;
+                        height: 20px;
+                        border: 1px solid var(--greyText);
+                    }
+                }
+            }
+            .buttonList{
+                padding-top: 2rem;
+                display: flex;
+                margin-inline: auto;
+                justify-content: center;
+                gap: 2rem;
+                .btn{
+                    border-radius: .5rem;
+                    font-weight: 600;
+                    color: var(--whiteColor);
+                }
+                .cancle{
+                    background: #cf1726;
+                    &:hover{
+                        background: #ea4957;
+                    }
+                }
+                .pay{
+                    background: var(--PrimaryColor);
+                    &:hover{
+                        background: var(--SecondaryColor);
+                    }
+                }
+            }
+            
+            
+        }
+        .policyInfo{
+            width: 35rem;
+            height: 18rem;
+            background: var(--whiteColor);
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 1px solid var(--greyText);
+            .titlePolicy{
+                text-align: center;
+                padding-bottom: 1rem;
+            }
+            .devide{
+                width: 100%;
+                background-color: var(--greyText);
+                height: .5px;
+            }
+            .contentPolicy{
+                text-align: center;
+                padding-top: 1rem;
+                line-height: 1.5rem;
+            }
+        }
+    }
+    
+
+}
