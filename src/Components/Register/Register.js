@@ -26,7 +26,7 @@ const Register  = () => {
                     <form  action="" className="infoLogin">
                         <h1>Đăng ký</h1>
                             <div className="form-feild">
-                                <input type="text" className="input" placeholder="Nhập số điện thoại" required/>
+                                <input type="email" className="input" placeholder="Nhập số Email" required/>
                                         
                             </div>
                             <div className="form-feild">
