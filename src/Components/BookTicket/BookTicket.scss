@@ -15,7 +15,7 @@
 
 .main{
     padding-top: 1rem;
-    width: 100%;
+    // width: 100%;
     background: var(--whiteColor);
 
     .homeContent{
@@ -465,7 +465,7 @@
                         padding-right: 1.5rem;
 
                         .detailInfo{
-                            gap: 2.5rem;
+                            gap: 1rem;
                             align-items: flex-start;
                             display: flex;
 
@@ -558,7 +558,7 @@
                                 align-items: center;
                                 min-width: 200px;
                                 flex-wrap: wrap;
-                                gap: .5rem;
+                                gap: .4rem;
 
                                 .dotSeat{
                                     background-color: rgb(200 204 211/ 1);
@@ -569,6 +569,7 @@
 
                                 .text{
                                     color: #00613d;
+                                    font-size: 14px;
                                 }
 
                                 .price{

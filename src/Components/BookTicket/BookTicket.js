@@ -1,34 +1,83 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import "./BookTicket.scss";
-import { GrLocation } from "react-icons/gr";
-import { RiArrowLeftRightFill } from "react-icons/ri";
-import { HiFilter } from "react-icons/hi";
 import pickup from "../../Assets/img/pickup.svg";
 import station from "../../Assets/img/station.svg";
 import seat_active from "../../Assets/img/seat_active.svg";
 import seat_disabled from "../../Assets/img/seat_disabled.svg";
 import seat_selecting from "../../Assets/img/seat_selecting.svg";
 import { MdArrowDropDown } from "react-icons/md";
-import { FaLongArrowAltRight } from "react-icons/fa";
+import { toast, ToastContainer, Zoom } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { Link } from 'react-router-dom';
 
 const BookTicket = () =>{
-
-    const [kind, setKind] = useState("Một chiều");
-    const [origin, setOrigin] = useState('');
-    const [destination, setDestination] = useState('');
     const [tabValues, setTabValues] = useState({});
     const [selectedSeatsById, setSelectedSeatsById] = useState({});
+    
+    const [routeName, setRouteName] = useState("");
+    const [data, setData] = useState(null);
 
-    const handleChange = (event) => {
-        setKind(event.target.value);
-    }
-    const changeDes = () => {
-        const temp = origin;
-        setOrigin(destination);
-        setDestination(temp);
-    };
+        // const diemDiId = localStorage.getItem("diemDiId");
+        // const diemDenId = localStorage.getItem("destinationId");
+        // const dayStart = localStorage.getItem("dayStart");
+        
+        // const postData = {
+        //     diemDiId: diemDiId,
+        //     diemDenId: diemDenId,
+        //     dayStart: dayStart
+        // };
+        
+        // fetch('http://localhost:8081/api/trip/search', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     },
+        //     body: JSON.stringify(postData)
+        // })
+        // .then(response => response.json())
+        // .then(data => {
+        //     console.log(data);
+        //     setData(data);
+        // })
+        // .catch(error => {
+        //     console.error('Error:', error);
+        // });
+        useEffect(() => {
+            const diemDiId = localStorage.getItem("diemDiId");
+            const diemDenId = localStorage.getItem("destinationId");
+            const dayStart = localStorage.getItem("dayStart");
+    
+            const postData = {
+                diemDiId: diemDiId,
+                diemDenId: diemDenId,
+                dayStart: dayStart
+            };
+    
+            fetch('http://localhost:8081/api/trip/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                setData(data);
+                if (data && data.length > 0 && data[0].route && data[0].route.name) {
+                    setRouteName(data[0].route.name);
+                    console.log(data[0].route.name);
+                }else{
+                    console.log('Không có dâtta')
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }, []);
+
+
     const handleTabClick = (tab, cardId) => {
         setTabValues(prevState => ({
             ...prevState,
@@ -36,841 +85,7 @@ const BookTicket = () =>{
         }));
     };
 
-    const Data1 = [
-        {
-            id: 1,
-            tentuyen: 'Sài Gòn - Đà Nẵng',
-            diemdau: 'Sài Gòn',
-            diemcuoi: 'Đà Nẵng',
-            loaixe: 'Giường',
-            thoigiandi: '20 giờ',
-            giobatdau: '08:00',
-            gioden: '16:00',
-            ghengoi: [
-                {
-                    id: 1, 
-                    tenghe: 'A01', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 2, 
-                    tenghe: 'A02', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 3, 
-                    tenghe: 'A03', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 4, 
-                    tenghe: 'A04', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 5, 
-                    tenghe: 'A05', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 6, 
-                    tenghe: 'A06', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 7, 
-                    tenghe: 'A07', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 8, 
-                    tenghe: 'A08', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 9, 
-                    tenghe: 'A09', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 10, 
-                    tenghe: 'A10', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 11, 
-                    tenghe: 'A11', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 12, 
-                    tenghe: 'A12', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 13, 
-                    tenghe: 'A13', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 14, 
-                    tenghe: 'A14', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 15, 
-                    tenghe: 'A15', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 16, 
-                    tenghe: 'A16', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 17, 
-                    tenghe: 'A17', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 18, 
-                    tenghe: 'A18', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 19, 
-                    tenghe: 'A19', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 20, 
-                    tenghe: 'A20', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 21, 
-                    tenghe: 'A21', 
-                    trangthai: 1,
-                    giave: 300000
-                }
-            ]
-        },
-        {
-            id: 2,
-            tentuyen: 'Sài Gòn - Đà Lạt',
-            diemdau: 'Sài Gòn',
-            diemcuoi: 'Đà Lạt',
-            loaixe: 'Giường ',
-            thoigiandi: '20 giờ',
-            giobatdau: '08:00',
-            gioden: '16:00', 
-            ghengoi: [
-                {
-                    id: 1, 
-                    tenghe: 'A01', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 2, 
-                    tenghe: 'A02', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 3, 
-                    tenghe: 'A03', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 4, 
-                    tenghe: 'A04', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 5, 
-                    tenghe: 'A05', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 6, 
-                    tenghe: 'A06', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 7, 
-                    tenghe: 'A07', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 8, 
-                    tenghe: 'A08', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 9, 
-                    tenghe: 'A09', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 10, 
-                    tenghe: 'A10', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 11, 
-                    tenghe: 'A11', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 12, 
-                    tenghe: 'A12', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 13, 
-                    tenghe: 'A13', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 14, 
-                    tenghe: 'A14', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 15, 
-                    tenghe: 'A15', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 16, 
-                    tenghe: 'A16', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 17, 
-                    tenghe: 'A17', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 18, 
-                    tenghe: 'A18', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 19, 
-                    tenghe: 'A19', 
-                    trangthai: 1,
-                    giave: 300000
-                },
-                {
-                    id: 20, 
-                    tenghe: 'A20', 
-                    trangthai: 0,
-                    giave: 300000
-                },
-                {
-                    id: 21, 
-                    tenghe: 'A21', 
-                    trangthai: 1,
-                    giave: 300000
-                }
-            ]
-        }
-    ]
-        // ,
-        // {
-        //     id: 3,
-        //     tentuyen: 'Đà Nẵng - Sài Gòn',
-        //     diemdau: 'Đà Nẵng',
-        //     diemcuoi: 'Sài Gòn',
-        //     loaixe: 'Giường',
-        //     thoigiandi: '20 giờ',
-        //     giobatdau: '08:00',
-        //     gioden: '16:00', 
-        //     ghengoi: [
-        //         {
-        //             id: 1, 
-        //             tenghe: 'A01', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 2, 
-        //             tenghe: 'A02', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 3, 
-        //             tenghe: 'A03', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 4, 
-        //             tenghe: 'A04', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 5, 
-        //             tenghe: 'A05', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 6, 
-        //             tenghe: 'A06', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 7, 
-        //             tenghe: 'A07', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 8, 
-        //             tenghe: 'A08', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 9, 
-        //             tenghe: 'A09', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 10, 
-        //             tenghe: 'A10', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 11, 
-        //             tenghe: 'A11', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 12, 
-        //             tenghe: 'A12', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 13, 
-        //             tenghe: 'A13', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 14, 
-        //             tenghe: 'A14', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 15, 
-        //             tenghe: 'A15', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 16, 
-        //             tenghe: 'A16', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 17, 
-        //             tenghe: 'A17', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 18, 
-        //             tenghe: 'A18', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 19, 
-        //             tenghe: 'A19', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 20, 
-        //             tenghe: 'A20', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 21, 
-        //             tenghe: 'A21', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         }
-        //     ]
-        // },
-        // {
-        //     id: 4,
-        //     tentuyen: 'Đà Nẵng - Đà Lạt',
-        //     diemdau: 'Đà Nẵng',
-        //     diemcuoi: 'Đà Lạt',
-        //     loaixe: 'Giường',
-        //     thoigiandi: '20 giờ',
-        //     giobatdau: '08:00',
-        //     gioden: '16:00', 
-        //     ghengoi: [
-        //         {
-        //             id: 1, 
-        //             tenghe: 'A01', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 2, 
-        //             tenghe: 'A02', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 3, 
-        //             tenghe: 'A03', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 4, 
-        //             tenghe: 'A04', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 5, 
-        //             tenghe: 'A05', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 6, 
-        //             tenghe: 'A06', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 7, 
-        //             tenghe: 'A07', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 8, 
-        //             tenghe: 'A08', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 9, 
-        //             tenghe: 'A09', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 10, 
-        //             tenghe: 'A10', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 11, 
-        //             tenghe: 'A11', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 12, 
-        //             tenghe: 'A12', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 13, 
-        //             tenghe: 'A13', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 14, 
-        //             tenghe: 'A14', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 15, 
-        //             tenghe: 'A15', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 16, 
-        //             tenghe: 'A16', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 17, 
-        //             tenghe: 'A17', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 18, 
-        //             tenghe: 'A18', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 19, 
-        //             tenghe: 'A19', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 20, 
-        //             tenghe: 'A20', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 21, 
-        //             tenghe: 'A21', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         }
-        //     ]
-        // },
-        // {
-        //     id: 5,
-        //     tentuyen: 'Đà Lạt - Sài Gòn',
-        //     diemdau: 'Đà Lạt',
-        //     diemcuoi: 'Sài Gòn',
-        //     loaixe: 'Limousine',
-        //     thoigiandi: '20 giờ',
-        //     giobatdau: '08:00',
-        //     gioden: '16:00', 
-        //     ghengoi: [
-        //         {
-        //             id: 1, 
-        //             tenghe: 'A01', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 2, 
-        //             tenghe: 'A02', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 3, 
-        //             tenghe: 'A03', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 4, 
-        //             tenghe: 'A04', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 5, 
-        //             tenghe: 'A05', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 6, 
-        //             tenghe: 'A06', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 7, 
-        //             tenghe: 'A07', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 8, 
-        //             tenghe: 'A08', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 9, 
-        //             tenghe: 'A09', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 10, 
-        //             tenghe: 'A10', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 11, 
-        //             tenghe: 'A11', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 12, 
-        //             tenghe: 'A12', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 13, 
-        //             tenghe: 'A13', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 14, 
-        //             tenghe: 'A14', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 15, 
-        //             tenghe: 'A15', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 16, 
-        //             tenghe: 'A16', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 17, 
-        //             tenghe: 'A17', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 18, 
-        //             tenghe: 'A18', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 19, 
-        //             tenghe: 'A19', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 20, 
-        //             tenghe: 'A20', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 21, 
-        //             tenghe: 'A21', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         }
-        //     ]
-        // },
-        // {
-        //     id: 6,
-        //     tentuyen: 'Đà Lạt - Đà Nẵng',
-        //     diemdau: 'Đà Lạt',
-        //     diemcuoi: 'Đà Nẵng',
-        //     loaixe: 'Limousine',
-        //     thoigiandi: '20 giờ',
-        //     giobatdau: '08:00',
-        //     gioden: '16:00', 
-        //     ghengoi: [
-        //         {
-        //             id: 1, 
-        //             tenghe: 'A01', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 2, 
-        //             tenghe: 'A02', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 3, 
-        //             tenghe: 'A03', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 4, 
-        //             tenghe: 'A04', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 5, 
-        //             tenghe: 'A05', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 6, 
-        //             tenghe: 'A06', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 7, 
-        //             tenghe: 'A07', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 8, 
-        //             tenghe: 'A08', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 9, 
-        //             tenghe: 'A09', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 10, 
-        //             tenghe: 'A10', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 11, 
-        //             tenghe: 'A11', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 12, 
-        //             tenghe: 'A12', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 13, 
-        //             tenghe: 'A13', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 14, 
-        //             tenghe: 'A14', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 15, 
-        //             tenghe: 'A15', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 16, 
-        //             tenghe: 'A16', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 17, 
-        //             tenghe: 'A17', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 18, 
-        //             tenghe: 'A18', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 19, 
-        //             tenghe: 'A19', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 20, 
-        //             tenghe: 'A20', 
-        //             trangthai: 0,
-        //             giave: 300000
-        //         },
-        //         {
-        //             id: 21, 
-        //             tenghe: 'A21', 
-        //             trangthai: 1,
-        //             giave: 300000
-        //         }
-        //     ]
-        // }
-    
-    
-    // const [ghengoi, setGheNgoi] = useState(Data1[0].ghengoi);
-
+        
     const getSeatImageAndStyle = (trangthai, isSelected) => {
         switch(trangthai) {
             case 1: // đã bán
@@ -882,10 +97,66 @@ const BookTicket = () =>{
         }
     }
 
+    /// bản cũ
+    // const handleClick = (seatId, tuyenId) => {
+    //     const tuyen = data.find(tuyen => tuyen.id === tuyenId);
+    //     if (tuyen) {
+    //         const ghengoiTuyen = tuyen.ghengoi;
+    //         const clickedSeat = ghengoiTuyen.find(seat => seat.id === seatId);
+    //         const isSelected = selectedSeatsById[tuyenId]?.some(seat => seat.id === seatId);
+            
+    //         if (isSelected) {
+    //             setSelectedSeatsById(prevSeats => ({
+    //                 ...prevSeats,
+    //                 [tuyenId]: prevSeats[tuyenId].filter(seat => seat.id !== seatId)
+    //             }));
+    //         } else {
+    //             if (clickedSeat.trangthai !== 1) {
+    //                 if (!selectedSeatsById[tuyenId] || selectedSeatsById[tuyenId].length < 5) {
+    //                     setSelectedSeatsById(prevSeats => ({
+    //                         ...prevSeats,
+    //                         [tuyenId]: [...(prevSeats[tuyenId] || []), clickedSeat]
+    //                     }));
+    //                 } else {
+    //                     alert('Bạn chỉ có thể chọn tối đa 5 ghế mỗi lần!');
+    //                 }
+    //             }
+    //         }
+    //     }
+    // };
+
+    // test1 ok
+    // const handleClick = (seatId, tuyenId) => {
+    //     const tuyen = data.find(tuyen => tuyen.id === tuyenId);
+    //     if (tuyen) {
+    //         const ghengoiTuyen = tuyen.vehicle.seats;
+    //         const clickedSeat = ghengoiTuyen.find(seat => seat.id === seatId);
+    //         const isSelected = selectedSeatsById[tuyenId]?.some(seat => seat.id === seatId);
+            
+    //         if (isSelected) {
+    //             setSelectedSeatsById(prevSeats => ({
+    //                 ...prevSeats,
+    //                 [tuyenId]: prevSeats[tuyenId].filter(seat => seat.id !== seatId)
+    //             }));
+    //         } else {
+    //             if (clickedSeat.status !== 1) {
+    //                 if (!selectedSeatsById[tuyenId] || selectedSeatsById[tuyenId].length < 5) {
+    //                     setSelectedSeatsById(prevSeats => ({
+    //                         ...prevSeats,
+    //                         [tuyenId]: [...(prevSeats[tuyenId] || []), clickedSeat]
+    //                     }));
+    //                 } else {
+    //                     alert('Bạn chỉ có thể chọn tối đa 5 ghế mỗi lần!');
+    //                 }
+    //             }
+    //         }
+    //     }
+    // };
+
     const handleClick = (seatId, tuyenId) => {
-        const tuyen = Data1.find(tuyen => tuyen.id === tuyenId);
+        const tuyen = data.find(tuyen => tuyen.id === tuyenId);
         if (tuyen) {
-            const ghengoiTuyen = tuyen.ghengoi;
+            const ghengoiTuyen = tuyen.vehicle.seats;
             const clickedSeat = ghengoiTuyen.find(seat => seat.id === seatId);
             const isSelected = selectedSeatsById[tuyenId]?.some(seat => seat.id === seatId);
             
@@ -895,19 +166,29 @@ const BookTicket = () =>{
                     [tuyenId]: prevSeats[tuyenId].filter(seat => seat.id !== seatId)
                 }));
             } else {
-                if (clickedSeat.trangthai !== 1) {
+                if (clickedSeat.status !== 1) {
                     if (!selectedSeatsById[tuyenId] || selectedSeatsById[tuyenId].length < 5) {
                         setSelectedSeatsById(prevSeats => ({
                             ...prevSeats,
-                            [tuyenId]: [...(prevSeats[tuyenId] || []), clickedSeat]
+                            [tuyenId]: [
+                                ...(prevSeats[tuyenId] || []),
+                                {
+                                    id: clickedSeat.id,
+                                    tenghe: clickedSeat.name,
+                                    giave: tuyen.price,
+                                    status: clickedSeat.status
+                                }
+                            ]
                         }));
                     } else {
-                        alert('Bạn chỉ có thể chọn tối đa 5 ghế mỗi lần!');
+                        toast.error('Bạn chỉ có thể chọn tối đa 5 ghế mỗi lần!');
                     }
                 }
             }
         }
     };
+    
+    
 
 
     const calculateTotalPriceById = (tuyenId) => {
@@ -930,7 +211,7 @@ const BookTicket = () =>{
                     <span className="price">
                         <span>Tổng tiền</span>
                         <br />
-                        <span className="totalPrice">{calculateTotalPriceById(tuyenId)}đ</span>
+                        <span className="totalPrice">{calculateTotalPriceById(tuyenId).toLocaleString('vi-VN')}đ</span>
                     </span>
                     <Link to="/booking-ticket"><button type="button" className="btn chooseButton"><span>Tiếp tục</span></button></Link>
                 </div>
@@ -947,12 +228,21 @@ const BookTicket = () =>{
         return chunkedArray;
     }
 
-    
+    function renderTimeWithTwoHours(trip) {
+        const startTime = new Date(`${trip.dayStart}T${trip.timeStart}`);
+        const routeTime = parseInt(trip.route.timeOfRoute, 10);
+        const endTime = new Date(startTime.getTime() + routeTime * 60 * 60 * 1000);
+        const formattedEndTime = endTime.toLocaleTimeString('en-US', { hour12: false }).slice(0, 5);
+        return formattedEndTime;
+      }
+
+      
 
     return(
         <>
             <section className="main section">
-                <div className="homeContent container">
+            
+                {/* <div className="homeContent container">
                     <div data-aos="fade-up" className="cardDiv">
                         <div className="radioButtons">
                             <label>
@@ -1037,11 +327,11 @@ const BookTicket = () =>{
                             <span>TÌM CHUYẾN</span>
                         </div>
                     </div>
-                </div>
+                </div> */}
                 <div className="resultList container flex">
                     <div className="listResultSearch flex">
                     <div className="listHeader">
-                            <h1>Chuyến Sài Gòn  <FaLongArrowAltRight  className="icon"/> Đà Nẵng</h1>
+                            <h1>Chuyến  {routeName}</h1>
                             <div className="lisFilter flex">
                                 <div className="lineInfo">
                                     <span>Chọn khung giờ đi:</span>
@@ -1078,37 +368,39 @@ const BookTicket = () =>{
                             </div>
                         </div>
                         <div className="cardListResult">
-                        {Data1.map(({ id,tentuyen, diemdau, diemcuoi, loaixe, thoigiandi, giobatdau,  gioden, ghengoi }) => (
-                            <div key={id} className="cardOneResult">
+
+                            {data ? (
+                                        data.map(trip => (
+                                            <div key={trip.id} className="cardOneResult">
                                 <div className="infoResult">    
                                     <div className="detailInfo">
                                         <div className="routeInfo">
                                             <div className="nameInfo">
-                                                <span className="timestart">{giobatdau}</span>
+                                                <span className="timestart">{trip.timeStart.slice(0, 5)}</span>
                                                 <div className="timeBetween">
                                                     <img src={pickup} alt="pickup"/>
                                                     <span className="dotLine"></span>
-                                                    <span className="numTimes">{thoigiandi}<br/><span className="location">(Asian/Ho Chi Minh)</span></span>
+                                                    <span className="numTimes">{trip.route.timeOfRoute} giờ<br/><span className="location">(Asian/Ho Chi Minh)</span></span>
                                                     <span className="dotLine"></span>
                                                     <img src={station} alt="station"/>
                                                 </div>
-                                                <span className="timeend">{gioden}</span>
+                                                <span className="timeend">{renderTimeWithTwoHours(trip)}</span>
                                             </div>
                                             <div className="dessInfo">
                                                 <div className="desStart">
-                                                    <span className="nameStart">{diemdau}</span>
+                                                    <span className="nameStart">Đà Nẵng</span>
                                                 </div>
                                                 <div className="desEnd">
-                                                    <span className="nameEnd">{diemcuoi}</span>
+                                                    <span className="nameEnd">Sài Gòn</span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="seatInfo">
                                             <div className="dotSeat"></div>
-                                            <span>{loaixe}</span>
+                                            <span>{trip.vehicle.name}</span>
                                             <div className="dotSeat"></div>
-                                            <span className="text">{ghengoi.length} chỗ trống</span>
-                                            <span className="price">{ghengoi[0].giave}đ</span>
+                                            <span className="text">{trip.vehicle.value} chỗ trống</span>
+                                            <span className="price">{trip.price.toLocaleString('vi-VN')} VND</span>
                                         </div>
                                     </div>
                                     <div className="devide"></div>
@@ -1118,14 +410,14 @@ const BookTicket = () =>{
                                         <div role="tablist" className="tabChoose">
                                             <div className="tabChoose_wrap">
                                                 <div className="tabChoose_list">
-                                                    <div className={`tabChoose_tab ${tabValues[id] === 1 ? 'active' : ''}`} onClick={() => handleTabClick(1, id)}>
+                                                    <div className={`tabChoose_tab ${tabValues[trip.id] === 1 ? 'active' : ''}`} onClick={() => handleTabClick(1, trip.id)}>
                                                         <div role="tab" className="tabChoose_tab_btn">
                                                             <div className="btn_tabName">
                                                                 <span>Chọn ghế</span>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className={`tabChoose_tab tab1 ${tabValues[id] === 3 ? 'active' : ''}`} onClick={() => handleTabClick(3, id)}>
+                                                    <div className={`tabChoose_tab tab1 ${tabValues[trip.id] === 3 ? 'active' : ''}`} onClick={() => handleTabClick(3, trip.id)}>
                                                         <div role="tab" className="tabChoose_tab_btn">
                                                             <div className="btn_tabName">
                                                                 <span>Chính sách</span>
@@ -1135,7 +427,7 @@ const BookTicket = () =>{
                                                 </div>
                                             </div>
                                         </div>
-                                            {tabValues[id] === 1 && (
+                                            {tabValues[trip.id] === 1 && (
                                                 <div className="chooseTab">
                                                     <div className="chooseListTab">
                                                         <div className="chooseSeatTab">
@@ -1157,26 +449,52 @@ const BookTicket = () =>{
                                                                                     <div className="devide"></div>
                                                                                     <table className="seatBottomnum">
                                                                                         <tbody>
-                                                                                                {chunkArray(ghengoi, 3).map((seatRow, rowIndex) => (
+                                                                                                {/* {chunkArray(trip.seats, 3).map((seatRow, rowIndex) => (
                                                                                                     <tr className="seatNum" key={rowIndex}>
                                                                                                         {seatRow.map((seat, seatIndex) => {
-                                                                                                            const { src, spanStyle } = getSeatImageAndStyle(seat.trangthai);
+                                                                                                            const { src, spanStyle } = getSeatImageAndStyle(seat.status);
                                                                                                             return (
                                                                                                                 <React.Fragment key={seat.id}>
-                                                                                                                    {/* <td className="singleSeat" style={getSeatImageAndStyle(seat.trangthai).tdStyle} onClick={() => handleClick(seat.id, id)}>
+                                                                                                                    <td className="singleSeat" style={getSeatImageAndStyle(seat.status).tdStyle} onClick={() => handleClick(seat.id, trip.id)}>
                                                                                                                         <img style={{ width: "32px" }} src={src} alt="seat icon" />
-                                                                                                                        <span className="numSeatA" style={spanStyle}>{seat.tenghe}</span>
-                                                                                                                    </td> */}
-                                                                                                                    <td className="singleSeat" style={getSeatImageAndStyle(seat.trangthai).tdStyle} onClick={() => handleClick(seat.id, id)}>
-                                                                                                                        {selectedSeatsById[id]?.find(selectedSeat => selectedSeat.id === seat.id) ? (
+                                                                                                                        <span className="numSeatA" style={spanStyle}>{seat.name}</span>
+                                                                                                                    </td>
+                                                                                                                    <td className="singleSeat" style={getSeatImageAndStyle(seat.status).tdStyle} onClick={() => handleClick(seat.id, trip.id)}>
+                                                                                                                        {selectedSeatsById[trip.id]?.find(selectedSeat => selectedSeat.id === seat.id) ? (
                                                                                                                             <>
                                                                                                                                 <img style={{ width: "32px" }} src={seat_selecting} alt="selected seat icon" />
-                                                                                                                                <span className="numSeatA" style={{color: "#EF5222" }}>{seat.tenghe}</span>
+                                                                                                                                <span className="numSeatA" style={{color: "#EF5222" }}>{seat.name}</span>
                                                                                                                             </>
                                                                                                                         ) : (
                                                                                                                             <>
                                                                                                                                 <img style={{ width: "32px" }} src={src} alt="seat icon" />
-                                                                                                                                <span className="numSeatA" style={spanStyle}>{seat.tenghe}</span>
+                                                                                                                                <span className="numSeatA" style={spanStyle}>{seat.name}</span>
+                                                                                                                            </>
+                                                                                                                        )}
+                                                                                                                    </td>
+                                                                                                                    {seatIndex < 2 && <td style={{ position: "relative", width: "1.5rem" }}></td>}
+                                                                                                                </React.Fragment>
+                                                                                                            );
+                                                                                                        })}
+                                                                                                    </tr>
+                                                                                                ))} */}
+                                                                                                {trip.vehicle.seats && trip.vehicle.seats.length > 0 && chunkArray(trip.vehicle.seats, 3).map((seatRow, rowIndex) => (
+                                                                                                    <tr className="seatNum" key={rowIndex}>
+                                                                                                        {seatRow.map((seat, seatIndex) => {
+                                                                                                            const { src, spanStyle } = getSeatImageAndStyle(seat.status);
+                                                                                                            const isSelected = selectedSeatsById[trip.id]?.some(selectedSeat => selectedSeat.id === seat.id);
+                                                                                                            return (
+                                                                                                                <React.Fragment key={seat.id}>
+                                                                                                                    <td className="singleSeat" style={getSeatImageAndStyle(seat.status).tdStyle} onClick={() => handleClick(seat.id, trip.id)}>
+                                                                                                                        {isSelected ? (
+                                                                                                                            <>
+                                                                                                                                <img style={{ width: "32px" }} src={seat_selecting} alt="selected seat icon" />
+                                                                                                                                <span className="numSeatA" style={{color: "#EF5222" }}>{seat.name}</span>
+                                                                                                                            </>
+                                                                                                                        ) : (
+                                                                                                                            <>
+                                                                                                                                <img style={{ width: "32px" }} src={src} alt="seat icon" />
+                                                                                                                                <span className="numSeatA" style={spanStyle}>{seat.name}</span>
                                                                                                                             </>
                                                                                                                         )}
                                                                                                                     </td>
@@ -1186,6 +504,7 @@ const BookTicket = () =>{
                                                                                                         })}
                                                                                                     </tr>
                                                                                                 ))}
+
                                                                                         </tbody>
                                                                                     </table>
                                                                                 </div>
@@ -1193,14 +512,14 @@ const BookTicket = () =>{
                                                                         </div>
                                                                     </div>
                                                                     <div className="devide"></div>
-                                                                    {(selectedSeatsById[id] && selectedSeatsById[id].length > 0) && renderTicketInfo(id)}
+                                                                    {(selectedSeatsById[trip.id] && selectedSeatsById[trip.id].length > 0) && renderTicketInfo(trip.id)}
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             )}
-                                            {tabValues[id] === 3 && (
+                                            {tabValues[trip.id] === 3 && (
                                                 <div className="chooseTab">
                                                 <div className="chooseListTab">
                                                     <div className="chooseSeatTab">
@@ -1325,13 +644,31 @@ const BookTicket = () =>{
                                             </div>
                                             )}
                                     </div>
-                                    <button className="btn buttonChooseRoute" onClick={() => handleTabClick(1, id)}><span>Chọn chuyến</span></button>
+                                    <button className="btn buttonChooseRoute" onClick={() => handleTabClick(1, trip.id)}><span>Chọn chuyến</span></button>
                                 </div>
                             </div>
-                        ))}
+                                        ))
+                                    ) : (
+                                        <div>
+                                            <div>Không có dữ liệu</div>
+                                        </div>
+                                    )}
+                        
+                        
                         </div>
                     </div>
                 </div>
+                <ToastContainer
+                        className="toast-container"
+                        toastClassName="toast"
+                        bodyClassName="toast-body"
+                        progressClassName="toast-progress"
+                        theme='colored'
+                        transition={Zoom}
+                        autoClose={500}
+                        hideProgressBar={true}
+                        pauseOnHover
+                    ></ToastContainer>
             </section>
         </>
     );
