@@ -1,11 +1,11 @@
 import React, {useState} from "react";
-import "./Route.scss";
+import "./SearchRoute.scss";
 import { GrLocation } from "react-icons/gr";
 import { RiArrowLeftRightFill } from "react-icons/ri";
 import { TbArrowsRight } from "react-icons/tb";
 import { Link } from 'react-router-dom';
 
-const Route  = () => {
+const SearchRoute  = () => {
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -203,4 +203,4 @@ const Route  = () => {
         
     )
 }
-export default Route;
+export default SearchRoute;

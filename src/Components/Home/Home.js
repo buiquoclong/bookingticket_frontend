@@ -24,9 +24,38 @@ const Home = () =>{
     const [kind, setKind] = useState("Một chiều");
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
+    
+    const [originId, setOriginId] = useState(null);
+    const [destinationId, setDestinationId] = useState(null);
+    
+const [dayStart, setDayStart] = useState('');
+    const [cities, setCities] = useState([]);
+
+
+    useEffect(() => {
+        // Call the API to fetch cities
+        fetchCities();
+    }, []);
+
+    const fetchCities = async () => {
+        try {
+            const response = await fetch("http://localhost:8081/api/city");
+            const data = await response.json();
+            setCities(data);
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+        }
+    };
 
     const handleChange = (event) => {
         setKind(event.target.value);
+    }
+
+    const sendData = (event) => {
+        
+        localStorage.setItem("diemDiId", originId);
+        localStorage.setItem("destinationId", destinationId);
+        localStorage.setItem("dayStart", dayStart);
     }
 
     const changeDes = () => {
@@ -36,7 +65,21 @@ const Home = () =>{
         setDestination(temp);
     };
 
-
+    const handleOriginChange = (event) => {
+        const selectedCity = cities.find(city => city.name === event.target.value);
+        if (selectedCity) {
+            setOrigin(selectedCity.name);
+            setOriginId(selectedCity.id);
+        }
+    };
+    
+    const handleDestinationChange = (event) => {
+        const selectedCity = cities.find(city => city.name === event.target.value);
+        if (selectedCity) {
+            setDestination(selectedCity.name);
+            setDestinationId(selectedCity.id);
+        }
+    };
     return(
         <section className="home">
             <div className="overlay"></div>
@@ -60,8 +103,14 @@ const Home = () =>{
                         
                         <div className="destinationInput">
                             <label htmlFor="city">Chọn địa điểm xuất phát: </label>
-                            <div className="input  flex">
-                                <input type="text" className="input1" placeholder="Chọn địa điểm xuất phát..." value={origin} onChange={(e) => setOrigin(e.target.value)}/>
+                            <div className="  flex">
+                                <select className="input" value={origin} onChange={handleOriginChange}>
+                                    <option value="">Chọn địa điểm xuất phát...</option>
+                                    {cities.map(city => (
+                                            <option key={city.id} value={city.name}>{city.name}</option>
+                                        ))}
+                                </select>
+                                {/* <input type="text" className="input1" placeholder="Chọn địa điểm xuất phát..." value={origin} onChange={(e) => setOrigin(e.target.value)}/> */}
                                 <GrLocation className="icon"/>
                             </div>
                         </div>
@@ -70,8 +119,14 @@ const Home = () =>{
                         </div>
                         <div className="destinationInput">
                             <label htmlFor="city">Chọn địa điểm đến: </label>
-                            <div className="input flex">
-                                <input type="text" placeholder="Chọn địa điểm đến..." value={destination} onChange={(e) => setDestination(e.target.value)}/>
+                            <div className="flex">
+                                <select className="input" value={destination} onChange={handleDestinationChange}>
+                                    <option value="">Chọn địa điểm muốn đến...</option>
+                                    {cities.map(city => (
+                                            <option key={city.id} value={city.name}>{city.name}</option>
+                                        ))}
+                                </select>
+                                {/* <input type="text" placeholder="Chọn địa điểm đến..." value={destination} onChange={(e) => setDestination(e.target.value)}/> */}
                                 <GrLocation className="icon"/>
                             </div>
                         </div>
@@ -79,7 +134,7 @@ const Home = () =>{
                         <div className="dateInput">
                             <label htmlFor="date">Chọn ngày đi: </label>
                             <div className="input flex">
-                                <input type="date"/>
+                                <input type="date" value={dayStart} onChange={(e) => setDayStart(e.target.value)}/>
                             </div>
                         </div> 
                     </div>
@@ -89,8 +144,13 @@ const Home = () =>{
                         <div className="destinationIn sizeTwo">
                             <div className="destinationInput">
                                 <label htmlFor="city">Chọn địa điểm xuất phát: </label>
-                                <div className="input  flex">
-                                    <input type="text" className="input1" placeholder="Chọn địa điểm xuất phát..." value={origin} onChange={(e) => setOrigin(e.target.value)}/>
+                                <div className=" flex">
+                                    <select className="input" value={origin} onChange={(e) => setOrigin(e.target.value)}>
+                                        <option value="">Chọn địa điểm xuất phát...</option>
+                                        {cities.map(city => (
+                                                <option key={city.id} value={city.name}>{city.name}</option>
+                                            ))}
+                                    </select>
                                     <GrLocation className="icon"/>
                                 </div>
                             </div>
@@ -99,8 +159,14 @@ const Home = () =>{
                             </div>
                             <div className="destinationInput">
                                 <label htmlFor="city">Chọn địa điểm đến: </label>
-                                <div className="input flex">
-                                    <input type="text" placeholder="Chọn địa điểm đến..." value={destination} onChange={(e) => setDestination(e.target.value)}/>
+                                <div className="flex">
+                                    {/* <input type="text" placeholder="Chọn địa điểm đến..." value={destination} onChange={(e) => setDestination(e.target.value)}/> */}
+                                    <select className="input" value={destination} onChange={(e) => setDestination(e.target.value)}>
+                                        <option value="">Chọn địa điểm muốn đến...</option>
+                                        {cities.map(city => (
+                                                <option key={city.id} value={city.name}>{city.name}</option>
+                                            ))}
+                                    </select>
                                     <GrLocation className="icon"/>
                                 </div>
                             </div>
@@ -122,10 +188,13 @@ const Home = () =>{
 
 
     
-                    <Link to="/book-ticket"><div className="searchOption flex">
-                        <HiFilter className="icon"/>
-                        <span>TÌM CHUYẾN</span>
-                    </div></Link>
+                    <Link
+                        to="/book-ticket">
+                        <div className="searchOption flex" onClick={sendData}>
+                            <HiFilter className="icon"/>
+                            <span>TÌM CHUYẾN</span>
+                        </div>
+                    </Link>
                     
                 </div>
 
@@ -143,7 +212,6 @@ const Home = () =>{
                 </div>
             </div>
         </section>
-
     )
 }
 export default Home
