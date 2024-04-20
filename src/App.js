@@ -24,41 +24,36 @@ import AdminRoutePage from "./Admin/page/AdminRoutePage";
 import AdminTripPage from "./Admin/page/AdminTripPage";
 import AdminSeatReservationPage from "./Admin/page/AdminSeatReservationPage";
 import AdminUserPage from "./Admin/page/AdminUserPage";
-import Navbar from "./Components/Navbar/Navbar";
-import Footer from "./Components/Footer/Footer";
-import Login from "./Components/Login/Login";
-import TicketHistory from "./Components/TicketHistory/TicketHistory";
-import SearchTicket from "./Components/SearchTicket/SearchTicket";
-import Register from "./Components/Register/Register";
-import BookingTicket from "./Components/BookingTicket/BookingTicket";
-import BookTicket from "./Components/BookTicket/BookTicket";
-import InfoUser from "./Components/InfoUser/InfoUser";
-import Paysuccess from "./Components/Paysuccess/Paysuccess";
-import News from "./Components/News/News";
-import SearchRoute from "./Components/SearchRoute/SearchRoute";
+import TicketHistoryPage from "./page/TicketHistoryPage";
+import SearchTicketPage from "./page/SearchTicketPage";
+import RegisterPage from "./page/RegisterPage";
+import InfoUserPage from "./page/InfoUserPage";
+import PaysuccessPage from "./page/PaysuccessPage";
+import NewsPage from "./page/NewsPage";
+import RoutePage from "./page/RoutePage";
+import LoginPage from "./page/LoginPage";
+import BookingTicketPage from "./page/BookingTicketPage";
+import BookTicketPage from "./page/BookTicketPage";
 
 
 
 
 const App = () => {
-    const shouldShowHeaderFooter = (path) => {
-        return !path.startsWith("/admin");
-    };
 
     const renderRoutes = () => {
         return (
             <Routes>
                 <Route path="/" element={<Homepage />} />
-                <Route path="/route" element={<SearchRoute />} />
-                <Route path="/search_ticket" element={<SearchTicket />} />
-                <Route path="/my_ticket" element={<TicketHistory />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/booking-ticket" element={<BookingTicket />} />
-                <Route path="/book-ticket" element={<BookTicket />} />
-                <Route path="/info-user" element={<InfoUser />} />
-                <Route path="/pay-success" element={<Paysuccess />} />
-                <Route path="/news" element={<News />} />
+                <Route path="/route" element={<RoutePage />} />
+                <Route path="/search_ticket" element={<SearchTicketPage />} />
+                <Route path="/my_ticket" element={<TicketHistoryPage />} />
+                <Route path="/login" element={<LoginPage/>} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/booking-ticket" element={<BookingTicketPage/>} />
+                <Route path="/book-ticket" element={<BookTicketPage />} />
+                <Route path="/info-user" element={<InfoUserPage />} />
+                <Route path="/pay-success" element={<PaysuccessPage />} />
+                <Route path="/news" element={<NewsPage />} />
                 <Route path="/admin" element={<AdminHomePage />} />
                 <Route path="/admin/booking-details" element={<AdminBookingDetailPage />} />
                 <Route path="/admin/bookings" element={<AdminBookingPage />} />
@@ -77,9 +72,7 @@ const App = () => {
 
     return (
         <BrowserRouter>
-            {shouldShowHeaderFooter(window.location.pathname) && <Navbar />}
             {renderRoutes()}
-            {shouldShowHeaderFooter(window.location.pathname) && <Footer />}
         </BrowserRouter>
     );
 };

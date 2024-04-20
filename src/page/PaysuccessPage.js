@@ -1,18 +1,18 @@
 import React from "react";
 import Navbar from "../Components/Navbar/Navbar";
-import Pay from "../Components/Pay/Pay";
 import Footer from "../Components/Footer/Footer";
+import Paysuccess from "../Components/Paysuccess/Paysuccess";
 
 
 
-const PayPage = () =>{
+const PaysuccessPage = () =>{
     return(
         <>
             <Navbar/>
-            <Pay/>
+            <Paysuccess/>
             <Footer/>
         </>
         
     );
 }
-export default PayPage
+export default PaysuccessPage

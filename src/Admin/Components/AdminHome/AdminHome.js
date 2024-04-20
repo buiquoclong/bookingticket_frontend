@@ -73,7 +73,7 @@ function AdminHome() {
     <main className='main-container'>
         <div className='dashboardContent'>
             <div className='main-title'>
-                <h3>Trang quảng trị</h3>
+                <h3>Trang quản trị</h3>
             </div>
 
             <div className='main-cards'>
