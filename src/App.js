@@ -33,7 +33,7 @@ import Register from "./Components/Register/Register";
 import BookingTicket from "./Components/BookingTicket/BookingTicket";
 import BookTicket from "./Components/BookTicket/BookTicket";
 import InfoUser from "./Components/InfoUser/InfoUser";
-import Pay from "./Components/Pay/Pay";
+import Paysuccess from "./Components/Paysuccess/Paysuccess";
 import News from "./Components/News/News";
 import SearchRoute from "./Components/SearchRoute/SearchRoute";
 
@@ -57,7 +57,7 @@ const App = () => {
                 <Route path="/booking-ticket" element={<BookingTicket />} />
                 <Route path="/book-ticket" element={<BookTicket />} />
                 <Route path="/info-user" element={<InfoUser />} />
-                <Route path="/pay" element={<Pay />} />
+                <Route path="/pay-success" element={<Paysuccess />} />
                 <Route path="/news" element={<News />} />
                 <Route path="/admin" element={<AdminHomePage />} />
                 <Route path="/admin/booking-details" element={<AdminBookingDetailPage />} />

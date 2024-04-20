@@ -10,7 +10,10 @@ import { BsListTask } from "react-icons/bs";
 import { TbApps } from "react-icons/tb";
 import { RiArrowLeftRightFill } from "react-icons/ri";
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
+import { toast, ToastContainer, Zoom } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import Aos from "aos";
 import "aos/dist/aos.css";
@@ -30,6 +33,7 @@ const Home = () =>{
     
 const [dayStart, setDayStart] = useState('');
     const [cities, setCities] = useState([]);
+    const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -52,10 +56,37 @@ const [dayStart, setDayStart] = useState('');
     }
 
     const sendData = (event) => {
+        event.preventDefault(); // Ngăn chặn việc reload trang mặc định của form
         
-        localStorage.setItem("diemDiId", originId);
-        localStorage.setItem("destinationId", destinationId);
-        localStorage.setItem("dayStart", dayStart);
+        let missingInfo = []; // Mảng lưu trữ các thông báo thiếu
+        
+        // Kiểm tra xem điểm đi, điểm đến và ngày đã được chọn chưa
+        if (!originId) {
+            missingInfo.push("Địa điểm xuất phát");
+        } 
+        if (!destinationId) {
+            missingInfo.push("Địa điểm đến");
+        } 
+        if (!dayStart) {
+            missingInfo.push("Ngày đi");
+        } 
+    
+        // Hiển thị thông báo nếu có thông tin thiếu
+        if (missingInfo.length > 0) {
+            const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+            toast.error(message);
+        } else {
+            // Nếu đã chọn đầy đủ thông tin, chuyển đến trang book-ticket
+            navigate('/book-ticket', {
+                state: {
+                    diemDiId: originId,
+                    diemDiName: origin,
+                    diemDenId: destinationId,
+                    diemDenName: destination,
+                    dayStart: dayStart, 
+                }
+            });
+        }
     }
 
     const changeDes = () => {
@@ -188,13 +219,11 @@ const [dayStart, setDayStart] = useState('');
 
 
     
-                    <Link
-                        to="/book-ticket">
+                    
                         <div className="searchOption flex" onClick={sendData}>
                             <HiFilter className="icon"/>
                             <span>TÌM CHUYẾN</span>
                         </div>
-                    </Link>
                     
                 </div>
 
@@ -211,6 +240,17 @@ const [dayStart, setDayStart] = useState('');
                     </div>
                 </div>
             </div>
+            <ToastContainer
+                        className="toast-container"
+                        toastClassName="toast"
+                        bodyClassName="toast-body"
+                        progressClassName="toast-progress"
+                        theme='colored'
+                        transition={Zoom}
+                        autoClose={2000}
+                        hideProgressBar={true}
+                        pauseOnHover
+                    ></ToastContainer>
         </section>
     )
 }

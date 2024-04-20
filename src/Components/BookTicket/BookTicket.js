@@ -9,45 +9,24 @@ import { MdArrowDropDown } from "react-icons/md";
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation  } from 'react-router-dom';
 
 const BookTicket = () =>{
+    const location = useLocation();
+    const { diemDiId, diemDiName, diemDenId, diemDenName, dayStart } = location.state || {};
+
     const [tabValues, setTabValues] = useState({});
     const [selectedSeatsById, setSelectedSeatsById] = useState({});
     
-    const [routeName, setRouteName] = useState("");
     const [data, setData] = useState(null);
-
-        // const diemDiId = localStorage.getItem("diemDiId");
-        // const diemDenId = localStorage.getItem("destinationId");
-        // const dayStart = localStorage.getItem("dayStart");
-        
-        // const postData = {
-        //     diemDiId: diemDiId,
-        //     diemDenId: diemDenId,
-        //     dayStart: dayStart
-        // };
-        
-        // fetch('http://localhost:8081/api/trip/search', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify(postData)
-        // })
-        // .then(response => response.json())
-        // .then(data => {
-        //     console.log(data);
-        //     setData(data);
-        // })
-        // .catch(error => {
-        //     console.error('Error:', error);
-        // });
-        useEffect(() => {
-            const diemDiId = localStorage.getItem("diemDiId");
-            const diemDenId = localStorage.getItem("destinationId");
-            const dayStart = localStorage.getItem("dayStart");
     
+    const navigate = useNavigate();
+
+        useEffect(() => {
+            fetchTrip();
+        }, [diemDiId, diemDenId, dayStart]);
+
+        const fetchTrip = async () => {
             const postData = {
                 diemDiId: diemDiId,
                 diemDenId: diemDenId,
@@ -65,17 +44,11 @@ const BookTicket = () =>{
             .then(data => {
                 console.log(data);
                 setData(data);
-                if (data && data.length > 0 && data[0].route && data[0].route.name) {
-                    setRouteName(data[0].route.name);
-                    console.log(data[0].route.name);
-                }else{
-                    console.log('Không có dâtta')
-                }
             })
             .catch(error => {
                 console.error('Error:', error);
             });
-        }, []);
+        };
 
 
     const handleTabClick = (tab, cardId) => {
@@ -96,62 +69,6 @@ const BookTicket = () =>{
                 return isSelected ? { src: seat_selecting, tdStyle: {}, spanStyle: { color: "#EF5222" } } : { src: seat_active, tdStyle: {}, spanStyle: {} }; // Default case
         }
     }
-
-    /// bản cũ
-    // const handleClick = (seatId, tuyenId) => {
-    //     const tuyen = data.find(tuyen => tuyen.id === tuyenId);
-    //     if (tuyen) {
-    //         const ghengoiTuyen = tuyen.ghengoi;
-    //         const clickedSeat = ghengoiTuyen.find(seat => seat.id === seatId);
-    //         const isSelected = selectedSeatsById[tuyenId]?.some(seat => seat.id === seatId);
-            
-    //         if (isSelected) {
-    //             setSelectedSeatsById(prevSeats => ({
-    //                 ...prevSeats,
-    //                 [tuyenId]: prevSeats[tuyenId].filter(seat => seat.id !== seatId)
-    //             }));
-    //         } else {
-    //             if (clickedSeat.trangthai !== 1) {
-    //                 if (!selectedSeatsById[tuyenId] || selectedSeatsById[tuyenId].length < 5) {
-    //                     setSelectedSeatsById(prevSeats => ({
-    //                         ...prevSeats,
-    //                         [tuyenId]: [...(prevSeats[tuyenId] || []), clickedSeat]
-    //                     }));
-    //                 } else {
-    //                     alert('Bạn chỉ có thể chọn tối đa 5 ghế mỗi lần!');
-    //                 }
-    //             }
-    //         }
-    //     }
-    // };
-
-    // test1 ok
-    // const handleClick = (seatId, tuyenId) => {
-    //     const tuyen = data.find(tuyen => tuyen.id === tuyenId);
-    //     if (tuyen) {
-    //         const ghengoiTuyen = tuyen.vehicle.seats;
-    //         const clickedSeat = ghengoiTuyen.find(seat => seat.id === seatId);
-    //         const isSelected = selectedSeatsById[tuyenId]?.some(seat => seat.id === seatId);
-            
-    //         if (isSelected) {
-    //             setSelectedSeatsById(prevSeats => ({
-    //                 ...prevSeats,
-    //                 [tuyenId]: prevSeats[tuyenId].filter(seat => seat.id !== seatId)
-    //             }));
-    //         } else {
-    //             if (clickedSeat.status !== 1) {
-    //                 if (!selectedSeatsById[tuyenId] || selectedSeatsById[tuyenId].length < 5) {
-    //                     setSelectedSeatsById(prevSeats => ({
-    //                         ...prevSeats,
-    //                         [tuyenId]: [...(prevSeats[tuyenId] || []), clickedSeat]
-    //                     }));
-    //                 } else {
-    //                     alert('Bạn chỉ có thể chọn tối đa 5 ghế mỗi lần!');
-    //                 }
-    //             }
-    //         }
-    //     }
-    // };
 
     const handleClick = (seatId, tuyenId) => {
         const tuyen = data.find(tuyen => tuyen.id === tuyenId);
@@ -213,12 +130,46 @@ const BookTicket = () =>{
                         <br />
                         <span className="totalPrice">{calculateTotalPriceById(tuyenId).toLocaleString('vi-VN')}đ</span>
                     </span>
-                    <Link to="/booking-ticket"><button type="button" className="btn chooseButton"><span>Tiếp tục</span></button></Link>
+                    <button type="button" className="btn chooseButton" onClick={() => handleContinueClick(tuyenId)}><span>Tiếp tục</span></button>
                 </div>
             </div>
         );
     };
 
+    // const handleContinueClick = (tuyenId) => {
+    //     const totalPrice = calculateTotalPriceById(tuyenId);
+    //     const selectedSeatsNames = formatSelectedSeatsById(tuyenId);
+
+    //     // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
+    //     navigate('/booking-ticket', {
+    //         state: {
+    //             tripId: tuyenId,
+    //             selectedSeatsNames: selectedSeatsNames,
+    //             totalPrice: totalPrice
+    //         }
+    //     });
+    // };
+
+    const getSelectedSeatIds = (tuyenId) => {
+        const selectedSeats = selectedSeatsById[tuyenId] || [];
+        return selectedSeats.map(seat => seat.id);
+    };
+    
+    const handleContinueClick = (tuyenId) => {
+        const totalPrice = calculateTotalPriceById(tuyenId);
+        const selectedSeatsNames = formatSelectedSeatsById(tuyenId);
+        const selectedSeatIds = getSelectedSeatIds(tuyenId); // Lấy danh sách ID của các ghế đã chọn
+    
+        // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
+        navigate('/booking-ticket', {
+            state: {
+                tripId: tuyenId,
+                selectedSeatsNames: selectedSeatsNames,
+                selectedSeatIds: selectedSeatIds, // Thêm ID của các ghế vào state để gửi đi
+                totalPrice: totalPrice
+            }
+        });
+    };
 
     function chunkArray(array, chunkSize) {
         const chunkedArray = [];
@@ -331,7 +282,7 @@ const BookTicket = () =>{
                 <div className="resultList container flex">
                     <div className="listResultSearch flex">
                     <div className="listHeader">
-                            <h1>Chuyến  {routeName}</h1>
+                            <h1>Chuyến  {diemDiName} - {diemDenName}</h1>
                             <div className="lisFilter flex">
                                 <div className="lineInfo">
                                     <span>Chọn khung giờ đi:</span>
@@ -388,10 +339,10 @@ const BookTicket = () =>{
                                             </div>
                                             <div className="dessInfo">
                                                 <div className="desStart">
-                                                    <span className="nameStart">Đà Nẵng</span>
+                                                    <span className="nameStart">{trip.route.diemDi.name}</span>
                                                 </div>
                                                 <div className="desEnd">
-                                                    <span className="nameEnd">Sài Gòn</span>
+                                                    <span className="nameEnd">{trip.route.diemDen.name}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -399,7 +350,7 @@ const BookTicket = () =>{
                                             <div className="dotSeat"></div>
                                             <span>{trip.vehicle.name}</span>
                                             <div className="dotSeat"></div>
-                                            <span className="text">{trip.vehicle.value} chỗ trống</span>
+                                            <span className="text">{trip.vehicle.emptySeat} chỗ trống</span>
                                             <span className="price">{trip.price.toLocaleString('vi-VN')} VND</span>
                                         </div>
                                     </div>
@@ -449,35 +400,6 @@ const BookTicket = () =>{
                                                                                     <div className="devide"></div>
                                                                                     <table className="seatBottomnum">
                                                                                         <tbody>
-                                                                                                {/* {chunkArray(trip.seats, 3).map((seatRow, rowIndex) => (
-                                                                                                    <tr className="seatNum" key={rowIndex}>
-                                                                                                        {seatRow.map((seat, seatIndex) => {
-                                                                                                            const { src, spanStyle } = getSeatImageAndStyle(seat.status);
-                                                                                                            return (
-                                                                                                                <React.Fragment key={seat.id}>
-                                                                                                                    <td className="singleSeat" style={getSeatImageAndStyle(seat.status).tdStyle} onClick={() => handleClick(seat.id, trip.id)}>
-                                                                                                                        <img style={{ width: "32px" }} src={src} alt="seat icon" />
-                                                                                                                        <span className="numSeatA" style={spanStyle}>{seat.name}</span>
-                                                                                                                    </td>
-                                                                                                                    <td className="singleSeat" style={getSeatImageAndStyle(seat.status).tdStyle} onClick={() => handleClick(seat.id, trip.id)}>
-                                                                                                                        {selectedSeatsById[trip.id]?.find(selectedSeat => selectedSeat.id === seat.id) ? (
-                                                                                                                            <>
-                                                                                                                                <img style={{ width: "32px" }} src={seat_selecting} alt="selected seat icon" />
-                                                                                                                                <span className="numSeatA" style={{color: "#EF5222" }}>{seat.name}</span>
-                                                                                                                            </>
-                                                                                                                        ) : (
-                                                                                                                            <>
-                                                                                                                                <img style={{ width: "32px" }} src={src} alt="seat icon" />
-                                                                                                                                <span className="numSeatA" style={spanStyle}>{seat.name}</span>
-                                                                                                                            </>
-                                                                                                                        )}
-                                                                                                                    </td>
-                                                                                                                    {seatIndex < 2 && <td style={{ position: "relative", width: "1.5rem" }}></td>}
-                                                                                                                </React.Fragment>
-                                                                                                            );
-                                                                                                        })}
-                                                                                                    </tr>
-                                                                                                ))} */}
                                                                                                 {trip.vehicle.seats && trip.vehicle.seats.length > 0 && chunkArray(trip.vehicle.seats, 3).map((seatRow, rowIndex) => (
                                                                                                     <tr className="seatNum" key={rowIndex}>
                                                                                                         {seatRow.map((seat, seatIndex) => {
