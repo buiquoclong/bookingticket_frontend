@@ -11,21 +11,29 @@ import 'react-toastify/dist/ReactToastify.css';
 const BookingTicket = () =>{
     
     const location = useLocation();
-    const { tripId, selectedSeatsNames, selectedSeatIds, totalPrice } = location.state || {};
-    
+    const { tripId, selectedSeatsNames, selectedSeatIds, totalPrice, tripIdReturn, selectedSeatsNamesReturn, selectedSeatIdsReturn, totalPriceReturn, kind } = location.state || {};
+    const totalAmount = totalPrice + totalPriceReturn;
     const [showLocationInput, setShowLocationInput] = useState(false);
+    const [showLocationRetrunInput, setShowLocationRetrunInput] = useState(false);
     
     const [showPaymentPopup, setShowPaymentPopup] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [note, setNote] = useState("");
     const [pickupLocation, setPickupLocation] = useState("");
     
+    const [noteReturn, setNoteReturn] = useState("");
+    const [pickupLocationReturn, setPickupLocationReturn] = useState("");
+    
     const [data, setData] = useState(null);
+    const [dataReturn, setDataReturn] = useState(null);
 
     const navigate = useNavigate();
 
     const handleSelectChange = (event) => {
         setShowLocationInput(event.target.value === 'Yes');
+    };
+    const handleSelectRetrunChange = (event) => {
+        setShowLocationRetrunInput(event.target.value === 'Yes');
     };
 
     const handleNoteChange = (event) => {
@@ -34,6 +42,14 @@ const BookingTicket = () =>{
 
     const handlePickupLocationChange = (event) => {
         setPickupLocation(event.target.value);
+    };
+
+    const handleNoteReturnChange = (event) => {
+        setNoteReturn(event.target.value);
+    };
+
+    const handlePickupLocationReturnChange = (event) => {
+        setPickupLocationReturn(event.target.value);
     };
 
     const handlePayment = () => {
@@ -48,8 +64,13 @@ const BookingTicket = () =>{
 
     useEffect(() => {
         // Call the API to fetch cities
-        fetchTripInfo();
-    }, [tripId, selectedSeatIds]);
+        if (kind === "Một chiều") {
+            fetchTripInfo();
+        } else if (kind === "Khứ hồi") {
+            fetchTripInfo();
+            fetchTripReturnInfo();
+        }
+    }, [tripId, tripIdReturn, selectedSeatIds]);
 
     const fetchTripInfo = async () => {
         
@@ -63,60 +84,143 @@ const BookingTicket = () =>{
             console.error("Error fetching:", error);
         }
     };
-
-    const handleChoosePayment = async () => {
-        const fullDateTime = `${data.dayStart}T${data.timeStart}`;
-        const orderData = {
-            trip:{id:tripId},
-            user:{id:sessionStorage.getItem("userId")},
-            dayBook: new Date().toISOString(),
-            timeStart: fullDateTime,
-            status: 0,
-            pointCatch: pickupLocation || "Tại nhà xe",
-            note: note || "Không có ghi chú",
-            kindPay:"Thanh toán trả sau",
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+    const fetchTripReturnInfo = async () => {
+        
+        console.log("Selected Seat IDs:", selectedSeatIds);
+            try {
+                const response = await fetch(`http://localhost:8081/api/trip/${tripIdReturn}`);
+                const dataReturn = await response.json();
+                setDataReturn(dataReturn);
+                console.log(dataReturn)
+            } catch (error) {
+                console.error("Error fetching:", error);
+            }
         };
 
-        try {
-            const response = await fetch(`http://localhost:8081/api/order`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(orderData)
-            });
+    const handleChoosePayment = async () => {
+        if (kind === "Một chiều") {
+            
+            const orderData = {
+                
+                user:{id:sessionStorage.getItem("userId")},
+                dayBook: new Date().toISOString(),
+                total: totalPrice,
+                kindPay:"Thanh toán trả sau",
+                status: 0,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
 
-            if (response.ok) {
-                toast.success("Đơn hàng đã được tạo!");
-                const createdOrder = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
-                // Tạo chi tiết hóa đơn với orderId là id của hóa đơn vừa tạo
-                // await createOrderDetail(createdOrder.id, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice);
-                const orderDetailId = await createOrderDetail(createdOrder.id, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice);
-                updateVehicleEmptySeat(data.vehicle.id, selectedSeatIds);
-                updateSeatStatus(selectedSeatIds);
-                insertSeatBooked(selectedSeatIds, tripId);
-                // navigate("/pay-success");
-                navigate("/pay-success", { state: { orderDetailId: orderDetailId } });
-            } else {
-                throw new Error('Something went wrong with the order creation.');
+            try {
+                const response = await fetch(`http://localhost:8081/api/order`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                if (response.ok) {
+                    toast.success("Đơn hàng đã được tạo!");
+                    const createdOrder = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
+                    // Tạo chi tiết hóa đơn với orderId là id của hóa đơn vừa tạo
+                    // await createOrderDetail(createdOrder.id, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice);
+                    await createOrderDetail(createdOrder.id, tripId, data.dayStart, data.timeStart, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice, pickupLocation, note);
+                    updateVehicleEmptySeat(data.vehicle.id, selectedSeatIds);
+                    updateSeatStatus(selectedSeatIds);
+                    insertSeatBooked(selectedSeatIds, tripId);
+                    // navigate("/pay-success");
+                    // navigate("/pay-success", { state: { orderDetailId: orderDetailId } });
+                } else {
+                    throw new Error('Something went wrong with the order creation.');
+                }
+            } catch (error) {
+                console.error("Error creating order:", error);
+                toast.error("Failed to create order.");
             }
-        } catch (error) {
-            console.error("Error creating order:", error);
-            toast.error("Failed to create order.");
+        } else if (kind === "Khứ hồi") {
+            const fullDateTimeReturn = `${dataReturn.dayStart}T${dataReturn.timeStart}`;
+            const orderData = {
+                
+                user:{id:sessionStorage.getItem("userId")},
+                dayBook: new Date().toISOString(),
+                total: totalAmount,
+                kindPay:"Thanh toán trả sau",
+                status: 0,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            const orderReturnData = {
+                trip:{id:tripIdReturn},
+                user:{id:sessionStorage.getItem("userId")},
+                dayBook: new Date().toISOString(),
+                timeStart: fullDateTimeReturn,
+                status: 0,
+                pointCatch: pickupLocationReturn || "Tại nhà xe",
+                note: noteReturn || "Không có ghi chú",
+                kindPay:"Thanh toán trả sau",
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            // Tạo hóa đơn lượt đi
+            try {
+                const response = await fetch(`http://localhost:8081/api/order`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                if (response.ok) {
+                    toast.success("Đơn hàng đã được tạo!");
+                    const createdOrder = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
+                    // Tạo chi tiết hóa đơn với orderId là id của hóa đơn vừa tạo
+                    // await createOrderDetail(createdOrder.id, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice);
+                    // tạo chi tiết và upadte lượt đi
+                    await createOrderDetail(createdOrder.id, tripId, data.dayStart, data.timeStart, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice, pickupLocation, note);
+
+                    updateVehicleEmptySeat(data.vehicle.id, selectedSeatIds);
+                    updateSeatStatus(selectedSeatIds);
+                    insertSeatBooked(selectedSeatIds, tripId);
+                    // tạo chi tiết và update lượt về
+                    await createOrderDetail(createdOrder.id, tripIdReturn, dataReturn.dayStart, dataReturn.timeStart, selectedSeatIdsReturn.length, selectedSeatsNamesReturn, dataReturn.price, totalPriceReturn, pickupLocationReturn, noteReturn);
+                    
+                    updateVehicleEmptySeat(dataReturn.vehicle.id, selectedSeatIdsReturn);
+                    updateSeatStatus(selectedSeatIdsReturn);
+                    insertSeatBooked(selectedSeatIdsReturn, tripIdReturn);
+
+                    // navigate("/pay-success", { state: { orderId: createdOrder.id } });
+                    // navigate("/pay-success");
+                } else {
+                    throw new Error('Something went wrong with the order creation.');
+                }
+            } catch (error) {
+                console.error("Error creating order:", error);
+                toast.error("Lỗi tọa hóa đơn lượt đi.");
+            }
+            
+
         }
+        
     };
 
     // Tạo chi tiết hóa đơn
-    const createOrderDetail = async (orderId, numSeat, seatNames, price, total) => {
+    const createOrderDetail = async (orderId, trip, day, time, numSeat, seatNames, price, total, pickup, note) => {
+        
+        const fullDateTime = `${day}T${time}`;
         const orderDetailData = {
             id: generateOrderId(),
             order: { id: orderId }, // Sử dụng orderId của hóa đơn chính
+            trip:{id:trip},
+            timeStart: fullDateTime,
             numSeat: numSeat, // Số ghế được chọn
             seatName: seatNames, // Tên của các ghế được chọn
             price: price, // Giá của trip
             total: total, // Tổng tiền
+            pointCatch: pickup || "Tại nhà xe",
+            note: note || "Không có ghi chú",
             createdAt: new Date().toISOString() // Thời gian tạo
         };
     
@@ -132,13 +236,13 @@ const BookingTicket = () =>{
             if (!response.ok) {
                 throw new Error('Something went wrong with the order detail creation.');
             }
-            const createdOrderDetail = await response.json();
+            // const createdOrderDetail = await response.json();
 
-            // Lấy ID của orderdetail vừa tạo
-            const orderDetailId = createdOrderDetail.id;
+            // // Lấy ID của orderdetail vừa tạo
+            // const orderDetailId = createdOrderDetail.id;
     
-            // Trả về ID của orderdetail vừa tạo
-            return orderDetailId;
+            // // Trả về ID của orderdetail vừa tạo
+            // return orderDetailId;
         } catch (error) {
             console.error("Error creating order detail:", error);
             toast.error("Failed to create order detail.");
@@ -292,94 +396,318 @@ const BookingTicket = () =>{
                     </div>
                 </div>
             )}
-            {data && (
-                <div className="bookingContent flex">
-                    <div className="infoTicket">
-                        <div className="lineInfo">
-                            <span>Tuyến:</span>
-                            <div className="rightInfo">
-                                <span>{data.route.name}</span>
-                            </div>
-                        </div>
-                        <div className="lineInfo">
-                            <span>Loại xe:</span>
-                            <div className="rightInfo">
-                                <span>{data.vehicle.name}</span>
-                            </div>
-                        </div>
-                        <div className="lineInfo">
-                            <span>Ngày:</span>
-                            <div className="rightInfo">
-                                <span>{new Date(data.dayStart).toLocaleDateString('vi-VN')}</span>
-                            </div>
-                        </div>
-                        <div className="lineInfo">
-                            <span>Thời gian:</span>
-                            <div className="rightInfo">
-                                <span>{data.timeStart.slice(0, 5)}</span>
-                            </div>
-                        </div>
-                        <div className="lineInfo">
-                            <span>Số ghế:</span>
-                            <div className="rightInfo">
-                                <span>{selectedSeatsNames}</span>
-                            </div>
-                        </div>
-                        <div className="lineInfo">
-                            <span>Giá:</span>
-                            <div className="rightInfo">
-                                <span>{totalPrice.toLocaleString('vi-VN')}VND</span>
-                            </div>
-                        </div>
-                        <div className="lineInfo">
-                            <span>Ghi chú:</span>
-                            <div >
-                                <input type="text" className="Note" placeholder="Thêm ghi chú ở đây" onChange={handleNoteChange}/>
-                            </div>
-                        </div>
-                        <div className="lineInfo">
-                            <span>Chọn điểm đón:</span>
-                            <div className="selectChoose">
-                                <select onChange={handleSelectChange}>
-                                    <option value="No">Không</option>
-                                    <option value="Yes">Có</option>
-                                </select>
-                            </div>
-                        </div>
-                        {showLocationInput && (
-                            <div className="lineInfo">
-                                <span>Nơi đón:</span>
+
+
+                            {kind === "Một chiều" && (
                                 <div>
-                                    <input type="text" className="Note" placeholder="Nhập nơi đón ở đây" onChange={handlePickupLocationChange}/>
+                                    <div className="bookingContent flex">
+                                        {data && (
+                                        <div className="infoTicket">
+                                            <div className="lineInfo">
+                                                <span>Tuyến:</span>
+                                                <div className="rightInfo">
+                                                    <span>{data.route.name}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Loại xe:</span>
+                                                <div className="rightInfo">
+                                                    <span>{data.vehicle.name}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Ngày:</span>
+                                                <div className="rightInfo">
+                                                    <span>{new Date(data.dayStart).toLocaleDateString('vi-VN')}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Thời gian:</span>
+                                                <div className="rightInfo">
+                                                    <span>{data.timeStart.slice(0, 5)}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Số ghế:</span>
+                                                <div className="rightInfo">
+                                                    <span>{selectedSeatsNames}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Giá:</span>
+                                                <div className="rightInfo">
+                                                    <span>{totalPrice.toLocaleString('vi-VN')}VND</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Ghi chú:</span>
+                                                <div >
+                                                    <input type="text" className="Note" placeholder="Thêm ghi chú ở đây" onChange={handleNoteChange}/>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Chọn điểm đón:</span>
+                                                <div className="selectChoose">
+                                                    <select onChange={handleSelectChange}>
+                                                        <option value="No">Không</option>
+                                                        <option value="Yes">Có</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            {showLocationInput && (
+                                                <div className="lineInfo">
+                                                    <span>Nơi đón:</span>
+                                                    <div>
+                                                        <input type="text" className="Note" placeholder="Nhập nơi đón ở đây" onChange={handlePickupLocationChange}/>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            <div className="policyCheckbox">
+                                                <label className="chekcBox">
+                                                    <span>
+                                                        <span><input type="checkbox" className="checkbox-input" value="1" checked={isChecked} onChange={(e) => setIsChecked(e.target.checked)}/></span>
+                                                        <span className="yes" style={{marginLeft:"10px"}}>Tôi chấp nhận với các điều khoản</span>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div className="buttonList">
+                                                <button className="btn cancle"><Link to="/">Hủy</Link></button>
+                                                <button className="btn pay" onClick={handlePayment}>Thanh toán</button>
+                                            </div>
+                                        </div>
+                                        )}
+                                        <div className="policyInfo">
+                                            <div className="titlePolicy">
+                                                <h1><span>ĐIỀU KHOẢN &</span><span style={{color:"red"}}> LƯU Ý</span></h1>
+                                            </div>
+                                            <div className="devide"></div>
+                                            <div className="contentPolicy">
+                                                <div><span style={{color:"red"}}>(*)</span> Quý khách vui lòng mang email có chứa mã vé đến văn phòng để đổi vé lên xe trước giờ xuất bến ít nhất <span style={{color:"red", fontWeight:"600"}}>20 phút</span> để thực hiện đổi vé.</div>
+                                                <div><span style={{color:"red"}}>(*)</span> Thông tin hành khách phải chính xác, nếu không sẽ không thể lên xe hoặc hủy/ đổi vé </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                        <div className="policyCheckbox">
-                            <label className="chekcBox">
-                                <span>
-                                    <span><input type="checkbox" className="checkbox-input" value="1" checked={isChecked} onChange={(e) => setIsChecked(e.target.checked)}/></span>
-                                    <span className="yes" style={{marginLeft:"10px"}}>Tôi chấp nhận với các điều khoản</span>
-                                </span>
-                            </label>
-                        </div>
-                        <div className="buttonList">
-                            <button className="btn cancle"><Link to="/">Hủy</Link></button>
-                            <button className="btn pay" onClick={handlePayment}>Thanh toán</button>
-                        </div>
-                    </div>
-                    <div className="policyInfo">
-                        <div className="titlePolicy">
-                            <h1><span>ĐIỀU KHOẢN &</span><span style={{color:"red"}}> LƯU Ý</span></h1>
-                        </div>
-                        <div className="devide"></div>
-                        <div className="contentPolicy">
-                            <div><span style={{color:"red"}}>(*)</span> Quý khách vui lòng mang email có chứa mã vé đến văn phòng để đổi vé lên xe trước giờ xuất bến ít nhất <span style={{color:"red", fontWeight:"600"}}>20 phút</span> để thực hiện đổi vé.</div>
-                            <div><span style={{color:"red"}}>(*)</span> Thông tin hành khách phải chính xác, nếu không sẽ không thể lên xe hoặc hủy/ đổi vé </div>
-                            <div><span style={{color:"red"}}>(*)</span> Chúng tôi không thể đón tại những điểm xe trung chuyển không thể đến được hoặc vượt quá bán kính 4km từ nhà xe</div>
-                        </div>
-                    </div>
-                </div>
-            )}
+                            )}
+
+                            {kind === "Khứ hồi" && (
+                                <div>
+                                    <div className="bookingContent flex">
+                                        <div>
+                                            {data && (
+                                                <div className="infoTicket" style={{height:"31rem"}}>
+                                                    <h3>Thông tin lượt đi</h3>
+                                                    <div className="lineInfo">
+                                                        <span>Tuyến:</span>
+                                                        <div className="rightInfo">
+                                                            <span>{data.route.name}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Loại xe:</span>
+                                                        <div className="rightInfo">
+                                                            <span>{data.vehicle.name}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Ngày:</span>
+                                                        <div className="rightInfo">
+                                                            <span>{new Date(data.dayStart).toLocaleDateString('vi-VN')}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Thời gian:</span>
+                                                        <div className="rightInfo">
+                                                            <span>{data.timeStart.slice(0, 5)}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Số ghế:</span>
+                                                        <div className="rightInfo">
+                                                            <span>{selectedSeatsNames}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Giá:</span>
+                                                        <div className="rightInfo">
+                                                            <span>{totalPrice.toLocaleString('vi-VN')}VND</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Ghi chú:</span>
+                                                        <div >
+                                                            <input type="text" className="Note" placeholder="Thêm ghi chú ở đây" onChange={handleNoteChange}/>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Chọn điểm đón:</span>
+                                                        <div className="selectChoose">
+                                                            <select onChange={handleSelectChange}>
+                                                                <option value="No">Không</option>
+                                                                <option value="Yes">Có</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    {showLocationInput && (
+                                                        <div className="lineInfo">
+                                                            <span>Nơi đón:</span>
+                                                            <div>
+                                                                <input type="text" className="Note" placeholder="Nhập nơi đón ở đây" onChange={handlePickupLocationChange}/>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {/* <div className="policyCheckbox">
+                                                        <label className="chekcBox">
+                                                            <span>
+                                                                <span><input type="checkbox" className="checkbox-input" value="1" checked={isChecked} onChange={(e) => setIsChecked(e.target.checked)}/></span>
+                                                                <span className="yes" style={{marginLeft:"10px"}}>Tôi chấp nhận với các điều khoản</span>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div className="buttonList">
+                                                        <button className="btn cancle"><Link to="/">Hủy</Link></button>
+                                                        <button className="btn pay" onClick={handlePayment}>Thanh toán</button>
+                                                    </div> */}
+                                                </div>
+                                            )}
+                                            <div className="policyInfo">
+                                            <div className="titlePolicy">
+                                                <h1><span>ĐIỀU KHOẢN &</span><span style={{color:"red"}}> LƯU Ý</span></h1>
+                                            </div>
+                                            <div className="devide"></div>
+                                            <div className="contentPolicy">
+                                                <div><span style={{color:"red"}}>(*)</span> Quý khách vui lòng mang email có chứa mã vé đến văn phòng để đổi vé lên xe trước giờ xuất bến ít nhất <span style={{color:"red", fontWeight:"600"}}>20 phút</span> để thực hiện đổi vé.</div>
+                                                <div><span style={{color:"red"}}>(*)</span> Thông tin hành khách phải chính xác, nếu không sẽ không thể lên xe hoặc hủy/ đổi vé </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            {dataReturn && (
+                                                <div className="infoTicket" style={{height:"31rem"}}>
+                                                    <h3>Thông tin lượt về</h3>
+                                                    <div className="lineInfo">
+                                                        <span>Tuyến:</span>
+                                                        <div className="rightInfo">
+                                                            <span>{dataReturn.route.name}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Loại xe:</span>
+                                                        <div className="rightInfo">
+                                                            <span>{dataReturn.vehicle.name}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Ngày:</span>
+                                                        <div className="rightInfo">
+                                                            <span>{new Date(dataReturn.dayStart).toLocaleDateString('vi-VN')}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Thời gian:</span>
+                                                        <div className="rightInfo">
+                                                            <span>{dataReturn.timeStart.slice(0, 5)}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Số ghế:</span>
+                                                        <div className="rightInfo">
+                                                            <span>{selectedSeatsNamesReturn}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Giá:</span>
+                                                        <div className="rightInfo">
+                                                            <span>{totalPriceReturn.toLocaleString('vi-VN')}VND</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Ghi chú:</span>
+                                                        <div >
+                                                            <input type="text" className="Note" placeholder="Thêm ghi chú ở đây" onChange={handleNoteReturnChange}/>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Chọn điểm đón:</span>
+                                                        <div className="selectChoose">
+                                                            <select onChange={handleSelectRetrunChange}>
+                                                                <option value="No">Không</option>
+                                                                <option value="Yes">Có</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    {showLocationRetrunInput && (
+                                                        <div className="lineInfo">
+                                                            <span>Nơi đón:</span>
+                                                            <div>
+                                                                <input type="text" className="Note" placeholder="Nhập nơi đón ở đây" onChange={handlePickupLocationReturnChange}/>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {/* <div className="policyCheckbox">
+                                                        <label className="chekcBox">
+                                                            <span>
+                                                                <span><input type="checkbox" className="checkbox-input" value="1" checked={isChecked} onChange={(e) => setIsChecked(e.target.checked)}/></span>
+                                                                <span className="yes" style={{marginLeft:"10px"}}>Tôi chấp nhận với các điều khoản</span>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div className="buttonList">
+                                                        <button className="btn cancle"><Link to="/">Hủy</Link></button>
+                                                        <button className="btn pay" onClick={handlePayment}>Thanh toán</button>
+                                                    </div> */}
+                                                </div>
+                                            )}
+                                            <div className="policyInfo" style={{height:"22rem"}}>
+                                                <div className="titlePolicy">
+                                                    <h1><span>Chi tiết giá</span></h1>
+                                                </div>
+                                                <div className="devide"></div>
+                                                    <div className="contentPolicy">
+                                                        <div className="lineInfo">
+                                                            <span>Tổng giá lượt đi:</span>
+                                                            <div className="rightInfo">
+                                                                <span>{totalPrice.toLocaleString('vi-VN')}VND</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="lineInfo">
+                                                        <span>Tổng giá lượt về:</span>
+                                                        <div className="rightInfo">
+                                                            <span>{totalPriceReturn.toLocaleString('vi-VN')}VND</span>
+                                                        </div>
+                                                        </div>
+                                                        <div className="devide"></div>
+                                                        <div className="lineInfo" style={{marginTop:".5rem"}}>
+                                                            <span>Tổng tiền:</span>
+                                                            <div className="rightInfo">
+                                                                <span>{totalAmount.toLocaleString('vi-VN')}VND</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="policyCheckbox">
+                                                            <label className="chekcBox">
+                                                                <span>
+                                                                    <span><input type="checkbox" className="checkbox-input" value="1" checked={isChecked} onChange={(e) => setIsChecked(e.target.checked)}/></span>
+                                                                    <span className="yes" style={{marginLeft:"10px"}}>Tôi chấp nhận với các điều khoản</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div className="buttonList">
+                                                            <button className="btn cancle"><Link to="/">Hủy</Link></button>
+                                                            <button className="btn pay" onClick={handlePayment}>Thanh toán</button>
+                                                        </div>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            )}
+
+
+
+            
+                
+            
             <ToastContainer
                         className="toast-container"
                         toastClassName="toast"

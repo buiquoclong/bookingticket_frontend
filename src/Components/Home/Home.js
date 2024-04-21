@@ -32,6 +32,7 @@ const Home = () =>{
     const [destinationId, setDestinationId] = useState(null);
     
 const [dayStart, setDayStart] = useState('');
+const [dayReturn, setDayReturn] = useState('');
     const [cities, setCities] = useState([]);
     const navigate = useNavigate();
 
@@ -60,33 +61,74 @@ const [dayStart, setDayStart] = useState('');
         
         let missingInfo = []; // Mảng lưu trữ các thông báo thiếu
         
-        // Kiểm tra xem điểm đi, điểm đến và ngày đã được chọn chưa
-        if (!originId) {
-            missingInfo.push("Địa điểm xuất phát");
-        } 
-        if (!destinationId) {
-            missingInfo.push("Địa điểm đến");
-        } 
-        if (!dayStart) {
-            missingInfo.push("Ngày đi");
-        } 
-    
-        // Hiển thị thông báo nếu có thông tin thiếu
-        if (missingInfo.length > 0) {
-            const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
-            toast.error(message);
-        } else {
-            // Nếu đã chọn đầy đủ thông tin, chuyển đến trang book-ticket
-            navigate('/book-ticket', {
-                state: {
-                    diemDiId: originId,
-                    diemDiName: origin,
-                    diemDenId: destinationId,
-                    diemDenName: destination,
-                    dayStart: dayStart, 
-                }
-            });
+        
+        if (kind === "Một chiều") {
+            // Kiểm tra xem điểm đi, điểm đến và ngày đã được chọn chưa
+            if (!originId) {
+                missingInfo.push("Địa điểm xuất phát");
+            } 
+            if (!destinationId) {
+                missingInfo.push("Địa điểm đến");
+            } 
+            if (!dayStart) {
+                missingInfo.push("Ngày đi");
+            } 
+
+            // Hiển thị thông báo nếu có thông tin thiếu
+            if (missingInfo.length > 0) {
+                const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+                toast.error(message);
+            } else {
+                // Nếu đã chọn đầy đủ thông tin, chuyển đến trang book-ticket
+                navigate('/book-ticket', {
+                    state: {
+                        diemDiId: originId,
+                        diemDiName: origin,
+                        diemDenId: destinationId,
+                        diemDenName: destination,
+                        dayStart: dayStart,
+                        dayReturn: dayReturn,
+                        kind: kind
+                    }
+                });
+            }
+
+        } else if (kind === "Khứ hồi") {
+            // Kiểm tra xem điểm đi, điểm đến và ngày đã được chọn chưa
+            if (!originId) {
+                missingInfo.push("Địa điểm xuất phát");
+            } 
+            if (!destinationId) {
+                missingInfo.push("Địa điểm đến");
+            } 
+            if (!dayStart) {
+                missingInfo.push("Ngày đi");
+            }
+            if (!dayReturn) {
+                missingInfo.push("Ngày về");
+            }
+
+            // Hiển thị thông báo nếu có thông tin thiếu
+            if (missingInfo.length > 0) {
+                const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+                toast.error(message);
+            } else {
+                // Nếu đã chọn đầy đủ thông tin, chuyển đến trang book-ticket
+                navigate('/book-ticket', {
+                    state: {
+                        diemDiId: originId,
+                        diemDiName: origin,
+                        diemDenId: destinationId,
+                        diemDenName: destination,
+                        dayStart: dayStart,
+                        dayReturn: dayReturn,
+                        kind: kind
+                    }
+                });
+            }
         }
+    
+        
     }
 
     const changeDes = () => {
@@ -176,7 +218,7 @@ const [dayStart, setDayStart] = useState('');
                             <div className="destinationInput">
                                 <label htmlFor="city">Chọn địa điểm xuất phát: </label>
                                 <div className=" flex">
-                                    <select className="input" value={origin} onChange={(e) => setOrigin(e.target.value)}>
+                                    <select className="input"  value={origin} onChange={handleOriginChange}>
                                         <option value="">Chọn địa điểm xuất phát...</option>
                                         {cities.map(city => (
                                                 <option key={city.id} value={city.name}>{city.name}</option>
@@ -192,7 +234,7 @@ const [dayStart, setDayStart] = useState('');
                                 <label htmlFor="city">Chọn địa điểm đến: </label>
                                 <div className="flex">
                                     {/* <input type="text" placeholder="Chọn địa điểm đến..." value={destination} onChange={(e) => setDestination(e.target.value)}/> */}
-                                    <select className="input" value={destination} onChange={(e) => setDestination(e.target.value)}>
+                                    <select className="input" value={destination} onChange={handleDestinationChange}>
                                         <option value="">Chọn địa điểm muốn đến...</option>
                                         {cities.map(city => (
                                                 <option key={city.id} value={city.name}>{city.name}</option>
@@ -205,13 +247,13 @@ const [dayStart, setDayStart] = useState('');
                             <div className="dateInput">
                                 <label htmlFor="date">Chọn ngày đi: </label>
                                 <div className="input flex">
-                                    <input type="date" placeholder="Chon dia diem"/>
+                                    <input type="date" value={dayStart} onChange={(e) => setDayStart(e.target.value)}/>
                                 </div>
                             </div>
                             <div className="dateInput">
                                 <label htmlFor="date">Chọn ngày về: </label>
                                 <div className="input flex">
-                                    <input type="date" placeholder="Chon dia diem"/>
+                                    <input type="date" value={dayReturn} onChange={(e) => setDayReturn(e.target.value)}/>
                                 </div>
                             </div> 
                         </div>

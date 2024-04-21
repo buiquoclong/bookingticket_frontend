@@ -1,8 +1,12 @@
 import React, {useState} from "react";
 import "./InfoUser.scss";
+import {useLocation } from 'react-router-dom';
 
 
 const InfoUser  = () => {
+    const location = useLocation();
+    const { userId } = location.state || {};
+    console.log("userId", userId);
 
     
     return (

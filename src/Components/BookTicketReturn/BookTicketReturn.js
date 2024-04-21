@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import "./BookTicket.scss";
+import "./BookTicketReturn.scss";
 import pickup from "../../Assets/img/pickup.svg";
 import station from "../../Assets/img/station.svg";
 import seat_active from "../../Assets/img/seat_active.svg";
@@ -11,11 +11,10 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { Link, useNavigate, useLocation  } from 'react-router-dom';
 
-const BookTicket = () =>{
+const BookTicketReturn = () =>{
     const location = useLocation();
-    const { diemDiId, diemDiName, diemDenId, diemDenName, dayStart, dayReturn, kind } = location.state || {};
+    const { diemDiId, diemDiName, diemDenId, diemDenName, dayStart, dayReturn, kind, tripId, selectedSeatsNames, selectedSeatIds, totalPrice } = location.state || {};
 
-    console.log(kind);
     const [tabValues, setTabValues] = useState({});
     const [selectedSeatsById, setSelectedSeatsById] = useState({});
     
@@ -25,13 +24,13 @@ const BookTicket = () =>{
 
         useEffect(() => {
             fetchTrip();
-        }, [diemDiId, diemDenId, dayStart]);
+        }, [diemDiId, diemDenId, dayReturn]);
 
         const fetchTrip = async () => {
             const postData = {
-                diemDiId: diemDiId,
-                diemDenId: diemDenId,
-                dayStart: dayStart
+                diemDiId: diemDenId,
+                diemDenId: diemDiId,
+                dayStart: dayReturn
             };
     
             fetch('http://localhost:8081/api/trip/search', {
@@ -137,61 +136,30 @@ const BookTicket = () =>{
         );
     };
 
-    // const handleContinueClick = (tuyenId) => {
-    //     const totalPrice = calculateTotalPriceById(tuyenId);
-    //     const selectedSeatsNames = formatSelectedSeatsById(tuyenId);
-
-    //     // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
-    //     navigate('/booking-ticket', {
-    //         state: {
-    //             tripId: tuyenId,
-    //             selectedSeatsNames: selectedSeatsNames,
-    //             totalPrice: totalPrice
-    //         }
-    //     });
-    // };
-
     const getSelectedSeatIds = (tuyenId) => {
         const selectedSeats = selectedSeatsById[tuyenId] || [];
         return selectedSeats.map(seat => seat.id);
     };
     
     const handleContinueClick = (tuyenId) => {
-        const totalPrice = calculateTotalPriceById(tuyenId);
-        const selectedSeatsNames = formatSelectedSeatsById(tuyenId);
-        const selectedSeatIds = getSelectedSeatIds(tuyenId); // Lấy danh sách ID của các ghế đã chọn
+        const totalPriceReturn = calculateTotalPriceById(tuyenId);
+        const selectedSeatsNamesReturn = formatSelectedSeatsById(tuyenId);
+        const selectedSeatIdsReturn = getSelectedSeatIds(tuyenId); // Lấy danh sách ID của các ghế đã chọn
     
-        
-        if(kind === "Một chiều") {
-            // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
-            navigate('/booking-ticket', {
-                state: {
-                    tripId: tuyenId,
-                    selectedSeatsNames: selectedSeatsNames,
-                    selectedSeatIds: selectedSeatIds, // Thêm ID của các ghế vào state để gửi đi
-                    totalPrice: totalPrice,
-                    dayReturn: dayReturn,
-                    kind: kind
-                }
-            }); 
-        } else if (kind === "Khứ hồi") {
-            // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
-            navigate('/book-ticketreturn', {
-                state: {
-                    diemDiId: diemDiId,
-                    diemDiName: diemDiName,
-                    diemDenId: diemDenId,
-                    diemDenName: diemDenName,
-                    dayStart: dayStart,
-                    dayReturn: dayReturn,
-                    kind: kind,
-                    tripId: tuyenId,
-                    selectedSeatsNames: selectedSeatsNames,
-                    selectedSeatIds: selectedSeatIds, // Thêm ID của các ghế vào state để gửi đi
-                    totalPrice: totalPrice,
-                }
-            }); 
-        }
+        // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
+        navigate('/booking-ticket', {
+            state: {
+                tripId: tripId,
+                selectedSeatsNames: selectedSeatsNames,
+                selectedSeatIds: selectedSeatIds, // Thêm ID của các ghế vào state để gửi đi
+                totalPrice: totalPrice,
+                tripIdReturn: tuyenId,
+                selectedSeatsNamesReturn: selectedSeatsNamesReturn,
+                selectedSeatIdsReturn: selectedSeatIdsReturn, // Thêm ID của các ghế vào state để gửi đi
+                totalPriceReturn: totalPriceReturn,
+                kind: kind
+            }
+        });
     };
 
     function chunkArray(array, chunkSize) {
@@ -227,8 +195,8 @@ const BookTicket = () =>{
 
                             {kind === "Khứ hồi" && (
                                 <div>
-                                    <h1>Chuyến:  {diemDiName} - {diemDenName} (Lượt đi)</h1>
-                                    <h1>Ngày: {new Date(dayStart).toLocaleDateString('vi-VN')}</h1>
+                                    <h1>Chuyến:  {diemDenName} - {diemDiName} (Lượt về)</h1>
+                                    <h1>Ngày: {new Date(dayReturn).toLocaleDateString('vi-VN')}</h1>
                                 </div>
                             )}
                             <div className="lisFilter flex">
@@ -543,5 +511,5 @@ const BookTicket = () =>{
         </>
     );
 }
-export default BookTicket
+export default BookTicketReturn
 

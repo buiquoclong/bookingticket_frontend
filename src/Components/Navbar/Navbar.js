@@ -3,13 +3,14 @@ import "./navbar.scss";
 import { MdTravelExplore } from "react-icons/md";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { TbGridDots } from "react-icons/tb";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () =>{
   const [active, setActive] = useState('navBar');
   const [data, setData] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
 
+  const navigate = useNavigate();
     const toggleDropdown = () => {
         setShowDropdown(!showDropdown);}
   // Function to toggle navbar
@@ -41,13 +42,17 @@ const fetchUserInfo = async () => {
 };
 
 const handleUserInfoClick = () => {
-  // Xử lý khi nhấn vào "Thông tin người dùng"
-  console.log("Hiển thị thông tin người dùng");
+  navigate('/info-user', {
+    state: {
+        userId: userId
+    }
+});
 }
 
 const handleLogoutClick = () => {
-  // Xử lý khi nhấn vào "Đăng xuất"
-  console.log("Thực hiện đăng xuất");
+  sessionStorage.removeItem("userId");
+  console.log('đã xóa user id')
+  navigate('/');
 }
     return(
       <section className="navBarSection">
@@ -81,13 +86,20 @@ const handleLogoutClick = () => {
                   </li>
                   <div className="infoUser">
                     {userId ? (
-                      <div className="dropdown-container">
+                      <div className="dropdown-container" style={{cursor:"pointer"}}>
                         <div onClick={toggleDropdown} className="dropdown-toggle">
                             {data && (
                                 <span>{data.name}</span>
                             )}
                         </div>
-                        
+                        {showDropdown && (
+                          <div className="flex flex-col dropdown">
+                              <ul className="flex flex-col gap-4">
+                                  <li onClick={handleUserInfoClick}>Thông tin người dùng</li>
+                                  <li onClick={handleLogoutClick}>Đăng xuất</li>
+                              </ul>
+                          </div>
+                        )}
                       </div>
                       
                     ) : (

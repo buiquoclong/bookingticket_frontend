@@ -130,10 +130,15 @@
         width: 100%;
         gap: 7rem;
         align-items: flex-start;
+
+        h3{
+            text-align: center;
+            padding-bottom: 1rem;
+        }
         
         .infoTicket{
-            width: 45rem;
-            height: 33rem;
+            width: 30rem;
+            height: 38rem;
             background: var(--whiteColor);
             border-radius: 1rem;
             border: 1px solid var(--greyText);
@@ -152,6 +157,7 @@
                     span{
                         padding-left: 1rem;
                         padding-bottom: .5rem;
+                        color: var(--blackColor);
                     }
                 }
                 .Note{
@@ -220,9 +226,10 @@
             
         }
         .policyInfo{
-            width: 35rem;
-            height: 18rem;
+            width: 30rem;
+            height: 15rem;
             background: var(--whiteColor);
+            margin-top: 1rem;
             padding: 1rem;
             border-radius: 1rem;
             border: 1px solid var(--greyText);
@@ -239,6 +246,83 @@
                 text-align: center;
                 padding-top: 1rem;
                 line-height: 1.5rem;
+                .lineInfo{
+                    display: flex;
+                    justify-content: space-between;
+                    line-height: 3rem;
+                    .rightInfo{
+                        width: 18rem;
+                        height: 2.5rem;
+                        background: var(--greyText);
+                        border-radius: .5rem;
+                        span{
+                            padding-left: 1rem;
+                            padding-bottom: .5rem;
+                            color: var(--blackColor);
+                        }
+                    }
+                    .Note{
+                        width: 18rem;
+                        height: 2.5rem;
+                        background: var(--whiteColor);
+                        border-radius: .5rem;
+                        padding-left: 1rem;
+                        border: 1px solid var(--greyText);
+                        outline: none;
+                    }
+                    .selectChoose{
+                        select{
+                            width: 18rem;
+                            height: 2.5rem;
+                            background: var(--whiteColor);
+                            border-radius: .5rem;
+                            padding-left: 1rem;
+                            border: 1px solid var(--greyText);
+                            outline: none;
+                            
+                        }
+                    }
+                }
+                .policyCheckbox{
+                    width: 100%;
+                    margin-top: 1rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    .checkBox{
+                        display: flex;
+                        align-items: center;
+                        .checkbox-input{
+                            width: 20px;
+                            height: 20px;
+                            border: 1px solid var(--greyText);
+                        }
+                    }
+                }
+                .buttonList{
+                    padding-top: 2rem;
+                    display: flex;
+                    margin-inline: auto;
+                    justify-content: center;
+                    gap: 2rem;
+                    .btn{
+                        border-radius: .5rem;
+                        font-weight: 600;
+                        color: var(--whiteColor);
+                    }
+                    .cancle{
+                        background: #cf1726;
+                        &:hover{
+                            background: #ea4957;
+                        }
+                    }
+                    .pay{
+                        background: var(--PrimaryColor);
+                        &:hover{
+                            background: var(--SecondaryColor);
+                        }
+                    }
+                }
             }
         }
     }

@@ -34,6 +34,7 @@ import RoutePage from "./page/RoutePage";
 import LoginPage from "./page/LoginPage";
 import BookingTicketPage from "./page/BookingTicketPage";
 import BookTicketPage from "./page/BookTicketPage";
+import BookTicketReturnPage from "./page/BookTicketReturnPage";
 
 
 
@@ -51,6 +52,7 @@ const App = () => {
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/booking-ticket" element={<BookingTicketPage/>} />
                 <Route path="/book-ticket" element={<BookTicketPage />} />
+                <Route path="/book-ticketreturn" element={<BookTicketReturnPage />} />
                 <Route path="/info-user" element={<InfoUserPage />} />
                 <Route path="/pay-success" element={<PaysuccessPage />} />
                 <Route path="/news" element={<NewsPage />} />
