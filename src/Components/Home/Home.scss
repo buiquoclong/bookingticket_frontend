@@ -58,6 +58,20 @@ body{
         z-index: 100;
         width: 60% !important;
 
+        .textDiv{
+            padding: 2rem 0;
+
+            .smallText{
+                font-size: 13px;
+                text-transform: uppercase;
+            }
+
+            .homeTitle{
+                position: relative;
+                font-size: 1.8rem;
+            }
+        }
+
         .cardDiv{
             position: relative;
             padding: 2rem 1rem;

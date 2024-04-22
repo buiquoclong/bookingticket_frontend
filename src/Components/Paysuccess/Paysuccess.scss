@@ -18,9 +18,12 @@
     max-width: 1128px;
     margin-inline: auto;
     background: var(--whiteColor);
+    // gap: 1rem;
+    // display: flex;
     .payContent{
         width: 35rem;
-        height: 68rem;
+        // height: 68rem;
+        height: auto;
         background: var(--whiteColor);
         border: 1px solid #04aa6d;
         border-top-width: 5px;
@@ -31,12 +34,12 @@
             justify-content: center;
             img{
                 width: 6rem;
-                padding-top: 3rem;
+                padding-top: 1rem;
             }
         }
         .content{
             text-align: center;
-            padding: 3rem;
+            padding: 1rem;
             .titlePay{
                 font-size: 40px;
                 font-weight: 600;
@@ -102,6 +105,7 @@
                     }
                 }
             }
+            
             .tripInfo {
                 width: 93%;
                 margin: 10px;
@@ -121,6 +125,28 @@
                     border-radius: .5rem;
                 }
             }
+            .detail{
+                width: 100%;
+                .tripInfo {
+                    width: 93%;
+                    margin: 10px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+    
+                    span{
+                        padding-bottom: .5rem;
+                    }
+        
+                    .rightInfo {
+                        text-align: center;
+                        border: 1px solid var(--greyText);
+                        padding: .5rem;
+                        width: 100%;
+                        border-radius: .5rem;
+                    }
+                }
+            }
             
             .seatInfo{
                 width: 90%;
@@ -129,6 +155,13 @@
                 justify-content: center;
                 padding: 1rem;
                 gap: 1rem;
+                .rightInfo{
+                    background: rgb(220, 231, 71);
+                    span{
+                        font-weight: bolder;
+                        padding: .5rem;
+                    }
+                }
             }
             .text{
                 width: 90%;
@@ -137,6 +170,7 @@
             }
             .back{
                 margin-top: 1rem;
+                margin-bottom: 1rem;
                 display: flex;
                 margin-inline: auto;
                 justify-content: center;

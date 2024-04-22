@@ -1,5 +1,6 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import "./SearchRoute.scss";
+import DataTable from 'react-data-table-component'
 import { GrLocation } from "react-icons/gr";
 import { RiArrowLeftRightFill } from "react-icons/ri";
 import { TbArrowsRight } from "react-icons/tb";
@@ -11,191 +12,86 @@ const SearchRoute  = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [showSearchResults, setShowSearchResults] = useState(false);
     const [showInitialResults, setShowInitialResults] = useState(true);
-
-    const changeDes = () => {
-        // Swap values between origin and destination inputs
-        const temp = origin;
-        setOrigin(destination);
-        setDestination(temp);
-    };
-
-    const handleSearch = () => {
-        let results = [];
-        
-        if (origin && destination) {
-            results = Data.filter(route => 
-                route.diemdau === origin && route.diemcuoi === destination
-            );
-        } else if (origin) {
-            results = Data.filter(route => route.diemdau === origin);
-        } else if (destination) {
-            results = Data.filter(route => route.diemcuoi === destination);
-        }
-        
-        setSearchResults(results);
-        setShowInitialResults(false); 
-        setShowSearchResults(true); 
-    };
-
-    const Data = [
+    const [data, setData] = useState([]);
+    const [records, setRecords] = useState([]);
+    const columns = [
         {
-            id: 1,
-            tentuyen: 'Sài Gòn - Đà Nẵng',
-            diemdau: 'Sài Gòn',
-            diemcuoi: 'Đà Nẵng',
-            loaixe: 'Giường nằm',
-            dodai: '959km',
-            thoigiandi: '20 giờ'
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tuyến đường</div>,
+            selector: row => row.name,
+            width: '15rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.name}</div>
         },
         {
-            id: 2,
-            tentuyen: 'Sài Gòn - Đà Lạt',
-            diemdau: 'Sài Gòn',
-            diemcuoi: 'Đà Lạt',
-            loaixe: 'Giường nằm',
-            dodai: '959km',
-            thoigiandi: '20 giờ'
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Quãng đường</div>,
+            selector: row => row.khoangCach,
+            sortable: true,
+            width: '20rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.khoangCach}</div>
         },
         {
-            id: 3,
-            tentuyen: 'Đà Nẵng - Sài Gòn',
-            diemdau: 'Đà Nẵng',
-            diemcuoi: 'Sài Gòn',
-            loaixe: 'Giường nằm',
-            dodai: '959km',
-            thoigiandi: '20 giờ'
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Thời gian đi</div>,
+            selector: row => row.timeOfRoute,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.timeOfRoute} giờ</div>
         },
         {
-            id: 4,
-            tentuyen: 'Đà Nẵng - Đà Lạt',
-            diemdau: 'Đà Nẵng',
-            diemcuoi: 'Đà Lạt',
-            loaixe: 'Giường nằm',
-            dodai: '959km',
-            thoigiandi: '20 giờ'
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Giá vé</div>,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>---</div>
         },
         {
-            id: 5,
-            tentuyen: 'Đà Lạt - Sài Gòn',
-            diemdau: 'Đà Lạt',
-            diemcuoi: 'Sài Gòn',
-            loaixe: 'Giường nằm',
-            dodai: '959km',
-            thoigiandi: '20 giờ'
-        },
-        {
-            id: 6,
-            tentuyen: 'Đà Lạt - Đà Nẵng',
-            diemdau: 'Đà Lạt',
-            diemcuoi: 'Đà Nẵng',
-            loaixe: 'Giường nằm',
-            dodai: '959km',
-            thoigiandi: '20 giờ'
+            cell: (row) => (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                    <Link to="/book-ticket"><button className="btn back" style={{padding:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer", fontWeight:"600"}}>Tìm tuyến xe</button></Link>
+                </div>
+            )
         }
     ]
 
+    useEffect(() => {
+        // Call the API to fetch cities
+        fetchRoutes();
+    }, []);
+
+    const fetchRoutes = async () => {
+        try {
+            const response = await fetch("http://localhost:8081/api/route");
+            const data = await response.json();
+            setData(data);
+            setRecords(data);
+            console.log("Routes:", data);
+        } catch (error) {
+            console.error("Error fetching routes:", error);
+        }
+    };
+    function handleStartFilter(event){
+        const newData = data.filter(row => {
+            return row.diemDi.name.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
+        })
+        setRecords(newData)
+    }
+    function handleEndFilter(event){
+        const newData = data.filter(row => {
+            return row.diemDen.name.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
+        })
+        setRecords(newData)
+    }
     return (
         <section className="main container section">
-            <div className="seacrhRoute flex">
-                <div className="destinationInput">
-                        <div className="input  flex">
-                            <input type="text" className="input1" placeholder="Chọn địa điểm xuất phát..." value={origin} onChange={(e) => setOrigin(e.target.value)}/>
-                            <GrLocation className="icon"/>
+            <div className="HisContent">
+                
+                <div className="HistoryTick">
+                    <div className="contentTikcet">
+                        <div className="title">Các chuyến đi phổ biến</div>
+                        <div className="searchRoute">
+                            <input type="text" onChange={handleStartFilter} placeholder="Tìm kiếm điểm đi" className="findTuyen"/>
+                            <input type="text" onChange={handleEndFilter} placeholder="Tìm kiếm điểm đến" className="findTuyen"/>
                         </div>
-                </div>
-                <div className="changedes" onClick={changeDes}>
-                    <RiArrowLeftRightFill  className="icon"/>
-                </div>
-                <div className="destinationInput">
-                        <div className="input flex">
-                            <input type="text" placeholder="Chọn địa điểm đến..." value={destination} onChange={(e) => setDestination(e.target.value)}/>
-                            <GrLocation className="icon"/>
-                        </div>
-                </div>
-                <div className="seachRoute">
-                    <button className="btn" onClick={handleSearch}>Tìm</button>
-                </div>
-            </div>
-
-            <div className="routeDetails">
-                <div className="routeCard">
-                    <div className="col_6">Tuyến đường</div>
-                    <div className="col_3">Loại xe</div>
-                    <div className="col_3">Quãng đường</div>
-                    <div className="col_4">Thời gian hành trình</div>
-                    <div className="col_2">Giá vé</div>
-                </div>
-                <div className="content">
-                    {showInitialResults && (
-                        <>
-                            {Data.map(({ id, diemdau, diemcuoi, loaixe, dodai, thoigiandi }) => (
-                                <div key={id} className="routeCard_row">
-                                    <div className="col_6 routename">
-                                        <span>{diemdau}</span>
-                                        <TbArrowsRight className="icon"/>
-                                        <span>{diemcuoi}</span>
-                                    </div>
-                                    <div className="col_3">{loaixe}</div>
-                                    <div className="col_3">{dodai}</div>
-                                    <div className="col_4">{thoigiandi}</div>
-                                    <div className="col_2">---</div>
-                                    <div className="seach_col">
-                                        <Link to="/book-ticket"><button className="btn">Tìm tuyến xe</button></Link>
-                                    </div>
-                                </div>
-                            ))}
-                        </>
-                    )}
-
-
-
-                    {/* {
-                        Data.map(({id, tentuyen, diemdau, diemcuoi, loaixe, dodai, thoigiandi}) => {
-                            return (
-                                <div key={id} className="routeCard_row">
-                                    <div className="col_6 routename">
-                                        <span>{diemdau}</span>
-                                        <TbArrowsRight className="icon"/>
-                                        <span>{diemcuoi}</span>
-                                    </div>
-                                    <div className="col_3">{loaixe}</div>
-                                    <div className="col_3">{dodai}</div>
-                                    <div className="col_4">{thoigiandi}</div>
-                                    <div className="col_2">---</div>
-                                    <div className="seach_col">
-                                        <button className="btn">Tìm tuyến xe</button>
-                                    </div>
-                                </div>
-                            )
-                        })
-                    } */}
-
-                    {showSearchResults && (
-                        <>
-                            {searchResults.length > 0 ? (
-                                searchResults.map(({ id, diemdau, diemcuoi, loaixe, dodai, thoigiandi }) => (
-                                    <div key={id} className="routeCard_row">
-                                        <div className="col_6 routename">
-                                            <span>{diemdau}</span>
-                                            <TbArrowsRight className="icon"/>
-                                            <span>{diemcuoi}</span>
-                                        </div>
-                                        <div className="col_3">{loaixe}</div>
-                                        <div className="col_3">{dodai}</div>
-                                        <div className="col_4">{thoigiandi}</div>
-                                        <div className="col_2">---</div>
-                                        <div className="seach_col">
-                                            <Link to="/book-ticket"><button className="btn">Tìm tuyến xe</button></Link>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="routeCard_row">
-                                    <div className="col_nofound">Không có chuyến xe phù hợp</div>
-                                </div>
-                            )}
-                        </>
-                    )}
+                    </div>
+                    <div className="devide"></div>
+                    <DataTable
+                    columns={columns}
+                    data={records}
+                    pagination
+                    ></DataTable>
                 </div>
             </div>
         </section>

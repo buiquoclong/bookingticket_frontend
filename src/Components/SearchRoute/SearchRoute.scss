@@ -24,6 +24,66 @@ body{
     background: var(--whiteColor);
     padding-top: 5rem;
 
+    .HisContent{
+        padding-top: 3rem;
+        
+        
+        .HistoryTick{
+            width: 100%;
+            // display: flex;
+            
+            border: 1px solid var(--greyText);
+            border-radius: .6rem;
+            .contentTikcet{
+                width: 100%;
+                height: 5rem;
+                display: flex;
+                justify-content: space-between;
+                border-radius: .6rem;
+                border: 1px solid var(--greyText);
+                padding-inline: 1rem;
+                margin-bottom: 2rem;
+                .title{
+                    color: var(--blackColor);
+                    font-size: 25px;
+                    font-weight: 600;
+                    margin-top: auto;
+                    margin-bottom: auto;
+                }
+                .back{
+                    border-radius: .6rem;
+                    width: 6rem;
+                    height: 3rem;
+                    padding: 0;
+                    font-weight: 600;
+                    margin-top: auto;
+                    margin-bottom: auto;
+                    color: var(--whiteColor);
+                }
+                
+                .searchRoute{
+                    margin-top: auto;
+                    margin-bottom: auto;
+                    .findTuyen{
+                        width: 18rem;
+                        height: 2.5rem;
+                        background: var(--whiteColor);
+                        border-radius: .5rem;
+                        padding-left: 1rem;
+                        border: 1px solid var(--greyText);
+                        outline: none;
+                        margin-inline: .5rem;
+                    }
+                }
+            }
+            .devide{
+                width: 100%;
+                background-color: var(--greyText);
+                height: .5px;
+            }
+        }
+    }
+
     .seacrhRoute{
         width: 100%;
         position: relative;

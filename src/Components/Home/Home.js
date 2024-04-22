@@ -158,6 +158,10 @@ const [dayReturn, setDayReturn] = useState('');
             <div className="overlay"></div>
             <img src={background} alt="card"/>   
             <div className="homeContent container">
+                <div className="textDiv">
+                    <span className="smallText"> Our package</span>
+                    <h1 className="homeTitle">Seacrh your Trip</h1>
+                </div>
 
                 <div data-aos="fade-up" className="cardDiv">
                     <div className="radioButtons">

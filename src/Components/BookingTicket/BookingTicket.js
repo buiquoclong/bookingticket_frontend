@@ -125,12 +125,12 @@ const BookingTicket = () =>{
                     const createdOrder = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
                     // Tạo chi tiết hóa đơn với orderId là id của hóa đơn vừa tạo
                     // await createOrderDetail(createdOrder.id, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice);
-                    await createOrderDetail(createdOrder.id, tripId, data.dayStart, data.timeStart, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice, pickupLocation, note);
+                    await createOrderDetail(createdOrder.id, tripId, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice, pickupLocation, note);
                     updateVehicleEmptySeat(data.vehicle.id, selectedSeatIds);
                     updateSeatStatus(selectedSeatIds);
                     insertSeatBooked(selectedSeatIds, tripId);
                     // navigate("/pay-success");
-                    // navigate("/pay-success", { state: { orderDetailId: orderDetailId } });
+                    navigate("/pay-success", { state: { orderId: createdOrder.id, kind: kind } });
                 } else {
                     throw new Error('Something went wrong with the order creation.');
                 }
@@ -179,20 +179,19 @@ const BookingTicket = () =>{
                     // Tạo chi tiết hóa đơn với orderId là id của hóa đơn vừa tạo
                     // await createOrderDetail(createdOrder.id, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice);
                     // tạo chi tiết và upadte lượt đi
-                    await createOrderDetail(createdOrder.id, tripId, data.dayStart, data.timeStart, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice, pickupLocation, note);
+                    await createOrderDetail(createdOrder.id, tripId, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice, pickupLocation, note);
 
                     updateVehicleEmptySeat(data.vehicle.id, selectedSeatIds);
                     updateSeatStatus(selectedSeatIds);
                     insertSeatBooked(selectedSeatIds, tripId);
                     // tạo chi tiết và update lượt về
-                    await createOrderDetail(createdOrder.id, tripIdReturn, dataReturn.dayStart, dataReturn.timeStart, selectedSeatIdsReturn.length, selectedSeatsNamesReturn, dataReturn.price, totalPriceReturn, pickupLocationReturn, noteReturn);
+                    await createOrderDetail(createdOrder.id, tripIdReturn, selectedSeatIdsReturn.length, selectedSeatsNamesReturn, dataReturn.price, totalPriceReturn, pickupLocationReturn, noteReturn);
                     
                     updateVehicleEmptySeat(dataReturn.vehicle.id, selectedSeatIdsReturn);
                     updateSeatStatus(selectedSeatIdsReturn);
                     insertSeatBooked(selectedSeatIdsReturn, tripIdReturn);
 
-                    // navigate("/pay-success", { state: { orderId: createdOrder.id } });
-                    // navigate("/pay-success");
+                    navigate("/pay-success", { state: { orderId: createdOrder.id, kind: kind } });
                 } else {
                     throw new Error('Something went wrong with the order creation.');
                 }
@@ -207,14 +206,13 @@ const BookingTicket = () =>{
     };
 
     // Tạo chi tiết hóa đơn
-    const createOrderDetail = async (orderId, trip, day, time, numSeat, seatNames, price, total, pickup, note) => {
-        
-        const fullDateTime = `${day}T${time}`;
+    const createOrderDetail = async (orderId, trip, numSeat, seatNames, price, total, pickup, note) => {
+        console.log("orderID", orderId)
+        const orderDetailId = generateOrderId();
         const orderDetailData = {
-            id: generateOrderId(),
-            order: { id: orderId }, // Sử dụng orderId của hóa đơn chính
+            id: orderDetailId,
+            order:{id: orderId }, // Sử dụng orderId của hóa đơn chính
             trip:{id:trip},
-            timeStart: fullDateTime,
             numSeat: numSeat, // Số ghế được chọn
             seatName: seatNames, // Tên của các ghế được chọn
             price: price, // Giá của trip

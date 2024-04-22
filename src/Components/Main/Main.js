@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import "./Main.scss";
 import sg from "../../Assets/img/sg.png";
 import dl from "../../Assets/img/dl.png";
@@ -11,85 +11,28 @@ import Aos from "aos";
 import "aos/dist/aos.css";
 
 const Main = () =>{
+    
+    const [data, setData] = useState([]);
 // add a scroll animation
 useEffect(()=>{
     Aos.init({duration: 2000});
 },[]);
 
-const Data = [
-    {
-        id: 1, 
-        imgSrc: sg,
-        tentuyen: 'Sài Gòn - Đà Nẵng',
-        diemdau: 'Sài Gòn',
-        diemcuoi: 'Đà Nẵng',
-        dodai: '959km',
-        thoigiandi: '20 giờ'
-    },
-    {
-        id: 2, 
-        imgSrc: sg,
-        tentuyen: 'Sài Gòn - Đà Nẵng',
-        diemdau: 'Sài Gòn',
-        diemcuoi: 'Đà Nẵng',
-        dodai: '959km',
-        thoigiandi: '20 giờ'
-    },
-    {
-        id: 3, 
-        imgSrc: dn,
-        tentuyen: 'Đà Nẵng - Sài Gòn',
-        diemdau: 'Sài Gòn',
-        diemcuoi: 'Đà Nẵng',
-        dodai: '959km',
-        thoigiandi: '20 giờ'
-    },
-    {
-        id: 4, 
-        imgSrc: dn,
-        tentuyen: 'Đà Nẵng - Đà Lạt',
-        diemdau: 'Sài Gòn',
-        diemcuoi: 'Đà Nẵng',
-        dodai: '959km',
-        thoigiandi: '20 giờ'
-    },
-    {
-        id: 5, 
-        imgSrc: dl,
-        tentuyen: 'Đà Lạt - Đà Nẵng',
-        diemdau: 'Sài Gòn',
-        diemcuoi: 'Đà Nẵng',
-        dodai: '959km',
-        thoigiandi: '20 giờ'
-    },
-    {
-        id: 6, 
-        imgSrc: dl,
-        tentuyen: 'Đà Lạt - Sài Gòn',
-        diemdau: 'Sài Gòn',
-        diemcuoi: 'Đà Nẵng',
-        dodai: '959km',
-        thoigiandi: '20 giờ'
-    },
-    {
-        id: 7, 
-        imgSrc: sg,
-        tentuyen: 'Sài Gòn - Đà Nẵng',
-        diemdau: 'Sài Gòn',
-        diemcuoi: 'Đà Nẵng',
-        dodai: '959km',
-        thoigiandi: '20 giờ'
-    },
-    {
-        id: 8, 
-        imgSrc: dn,
-        tentuyen: 'Sài Gòn - Đà Nẵng',
-        diemdau: 'Sài Gòn',
-        diemcuoi: 'Đà Nẵng',
-        dodai: '959km',
-        thoigiandi: '20 giờ'
+useEffect(() => {
+    // Call the API to fetch cities
+    fetchRoutes();
+}, []);
+
+const fetchRoutes = async () => {
+    try {
+        const response = await fetch("http://localhost:8081/api/route");
+        const data = await response.json();
+        setData(data);
+        console.log("Routes:", data);
+    } catch (error) {
+        console.error("Error fetching routes:", error);
     }
-] 
+};
 
 
     return(
@@ -101,34 +44,35 @@ const Data = [
             </div>
             
             <div className="secContent grid">
-                {
-                    Data.map(({id, imgSrc, tentuyen, diemdau, diemcuoi, dodai, thoigiandi}) => {
-                        return (
-                            <div key={id} data-aos="fade-up" className="singleDestination">
+            {data &&
+                data.map(route => (
+                    <div key={route.id} data-aos="fade-up" className="singleDestination">
                                 <div className="imageDiv">
-                                    <img src={imgSrc} alt={tentuyen}/>
+                                    <img src={route.diemDi.imgUrl} alt={route.name}/>
                                 </div>
 
                                     <div className="cardInfo">
-                                        <h4 className="desTitle">{tentuyen}</h4>
+                                        <h4 className="desTitle">{route.name}</h4>
                                         <span className="continent flex">
                                             <HiOutlineLocationMarker  className="icon"/>
-                                            <span className="name">{diemdau} -----</span>
+                                            <span className="name">{route.diemDi.name} -----</span>
                                             <HiOutlineLocationMarker  className="icon"/>
-                                            <span className="name">{diemcuoi}</span>
+                                            <span className="name">{route.diemDen.name}</span>
                                         </span>
 
                                         <div className="fees flex">
                                             <div className="grade">
-                                                <span>Quãng đường: {dodai}<small> +</small></span>
+                                                <span>Quãng đường: {route.khoangCach}<small> +</small></span>
                                             </div>
                                             <div className="price">
-                                                <h5>{thoigiandi}</h5>
+                                                <h5>{route.timeOfRoute} giờ</h5>
                                             </div>
                                         </div>
 
                                         <div className="desc">
-                                            <p>Quãng đường: {dodai} km</p>
+                                            <p>Tuyến đường: {route.name}</p>
+                                            <p>Quãng đường: {route.khoangCach} km</p>
+                                            <p>Thời gian đi: {route.timeOfRoute} giờ</p>
                                         </div>
 
                                         <button className="btn flex">
@@ -138,10 +82,8 @@ const Data = [
                                     </div>
                                 
                             </div>
-                        )
-                    })
-                }
-                
+                ))
+            }
             </div>
         </section>
 
