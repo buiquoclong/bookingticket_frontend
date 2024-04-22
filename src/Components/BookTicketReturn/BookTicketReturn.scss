@@ -393,7 +393,7 @@
                 top: 0;
                 height: fit-content;
                 z-index: 50;
-                padding-top: 5rem;
+                padding-top: 1rem;
                 display: inline-block;
                 background: var(--whiteColor);
     
@@ -559,6 +559,7 @@
                                 min-width: 200px;
                                 flex-wrap: wrap;
                                 gap: .4rem;
+                                margin-left: 3rem;
 
                                 .dotSeat{
                                     background-color: rgb(200 204 211/ 1);
@@ -567,9 +568,12 @@
                                     height: 6px;
                                 }
 
+                                span{
+                                    font-size: 16px;
+                                }
                                 .text{
                                     color: #00613d;
-                                    font-size: 14px;
+                                    font-size: 16px;
                                 }
 
                                 .price{

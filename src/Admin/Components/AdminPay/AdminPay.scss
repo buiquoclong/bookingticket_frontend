@@ -13,37 +13,220 @@
     --cardHover: rgb(255, 255, 255);
 }
 
-.main{
-    width: 100%;
-    max-width: 1128px;
-    margin-inline: auto;
+.main-container{
+    // width: 100%;
+    // max-width: 1128px;
+    // margin-inline: auto;
     // background: var(--whiteColor);
     // width: 0% !important;
-    .payContent{
-        width: 25rem;
-        height: 30rem;
-        background: var(--whiteColor);
-        border: 1px solid #04aa6d;
-        border-top-width: 5px;
-        margin-inline: auto;
-        .imgsucces{
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            img{
-                width: 8rem;
-                padding-top: 3rem;
+    .modal {
+        position: fixed;
+        z-index: 1000; 
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;   
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4); 
+    
+        .modal-dialog {
+            margin: 10% auto;
+            width: 40%; 
+    
+            .modal-content {
+                background-color: #fefefe;
+                padding: 20px;
+                border: 1px solid #888;
+                border-radius: 1rem;
+    
+                .modal-header, .modal-body, .modal-footer {
+                    padding: 10px;
+    
+                    .modal-title {
+                        margin: 0;
+                        color: var(--textColor);
+                        text-align: center;
+                    }
+    
+                    .close {
+                        float: right;
+                        font-size: 1.2rem;
+                        font-weight: bold;
+                        &:hover, &:focus {
+                            color: red;
+                            text-decoration: none;
+                            cursor: pointer;
+                        }
+                    }
+                }
+    
+                .modal-body {
+                    position: relative;
+                    .closePopup {
+                        position: absolute;
+                        top: -.7rem;
+                        right: -.6rem;
+                        background: none;
+                        border: none;
+                        cursor: pointer;
+                        padding: 10px;
+                        z-index: 1;
+                    
+                    }
+        
+                    .closePopup::before, .closePopup::after {
+                        content: '';
+                        position: absolute;
+                        width: 20px;
+                        height: 2px;
+                        background-color: #000;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                    }
+        
+                    .closePopup::before {
+                        // transform: rotate(45deg);
+                        transform: translate(-50%, -50%) rotate(45deg);
+                    }
+                    .closePopup::after {
+                        // transform: rotate(-45deg);
+                        transform: translate(-50%, -50%) rotate(-45deg);
+                    }
+
+
+
+                    .payContent{
+                        width: auto;
+                        height: auto;
+                        background: var(--whiteColor);
+                        border: 1px solid #04aa6d;
+                        border-top-width: 5px;
+                        margin-inline: auto;
+                        .imgsucces{
+                            width: 100%;
+                            display: flex;
+                            justify-content: center;
+                            img{
+                                width: 6rem;
+                                // padding-top: 3rem;
+                            }
+                        }
+                        .content{
+                            text-align: center;
+                            padding: 2rem;
+                            .titlePay{
+                                font-size: 40px;
+                                font-weight: 600;
+                            }
+                        }
+                        .payMent{
+                            margin-bottom: 1rem;
+                            display: flex;
+                            justify-content: center;
+                            gap: 1rem;
+                            .vnpay{
+                                background-size: cover;
+                                cursor: pointer;
+                                background: var(--whiteColor);
+                                border-radius: .5rem;
+                                font-size: 20px;
+                                font-weight: bold;
+                                border: 1px solid var(--greyText);
+                                text-align: center;
+                                &:hover{
+                                    border: 1px solid #04aa6d;
+                                }
+                            }
+                            .trasau{
+                                width: 115px;
+                                height: 44px;
+                                border-radius: .5rem;
+                                font-size: 15px;
+                                font-weight: bold;
+                                color: var(--whiteColor);
+                            }
+                        }
+                    }
+                }
             }
         }
-        .content{
+    }
+
+    .bookingContent{
+        width: 100%;
+        gap: 7rem;
+        align-items: flex-start;
+
+        h3{
             text-align: center;
-            padding: 3rem;
-            .titlePay{
-                font-size: 40px;
-                font-weight: 600;
-            }
+            padding-bottom: 1rem;
         }
-        .payMent{
+        
+        .infoTicket{
+            width: 30rem;
+            height: 38rem;
+            background: var(--whiteColor);
+            border-radius: 1rem;
+            border: 1px solid var(--greyText);
+            padding: 1rem 2rem;
+            // display: flex;
+
+            .lineInfo{
+                display: flex;
+                justify-content: space-between;
+                line-height: 3rem;
+                .rightInfo{
+                    width: 18rem;
+                    height: 2.5rem;
+                    background: var(--greyText);
+                    border-radius: .5rem;
+                    span{
+                        padding-left: 1rem;
+                        padding-bottom: .5rem;
+                        color: var(--blackColor);
+                    }
+                }
+                .Note{
+                    width: 18rem;
+                    height: 2.5rem;
+                    background: var(--whiteColor);
+                    border-radius: .5rem;
+                    padding-left: 1rem;
+                    border: 1px solid var(--greyText);
+                    outline: none;
+                }
+                .selectChoose{
+                    select{
+                        width: 18rem;
+                        height: 2.5rem;
+                        background: var(--whiteColor);
+                        border-radius: .5rem;
+                        padding-left: 1rem;
+                        border: 1px solid var(--greyText);
+                        outline: none;
+                        
+                    }
+                }
+            }
+            .policyCheckbox{
+                width: 100%;
+                margin-top: 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .checkBox{
+                    display: flex;
+                    align-items: center;
+                    .checkbox-input{
+                        width: 20px;
+                        height: 20px;
+                        border: 1px solid var(--greyText);
+                    }
+                }
+            }
+            .buttonList{
+                padding-top: 2rem;
                 display: flex;
                 margin-inline: auto;
                 justify-content: center;
@@ -51,28 +234,131 @@
                 .btn{
                     border-radius: .5rem;
                     font-weight: 600;
+                    color: var(--whiteColor);
                 }
-
-            .vnpay{
-                background-size: cover;
-                cursor: pointer;
-                background: var(--whiteColor);
-                font-size: 20px;
-                font-weight: bold;
-                border: 1px solid var(--greyText);
-                text-align: center;
-                &:hover{
-                    border: 2px solid #04aa6d;
+                .cancle{
+                    background: #cf1726;
+                    &:hover{
+                        background: #ea4957;
+                    }
+                }
+                .pay{
+                    background: var(--PrimaryColor);
+                    &:hover{
+                        background: var(--SecondaryColor);
+                    }
                 }
             }
-            .trasau{
-                width: 115px;
-                height: 44px;
-                border-radius: .5rem;
-                font-size: 15px;
-                font-weight: bold;
-                color: var(--whiteColor);
+            
+            
+        }
+        .policyInfo{
+            width: 30rem;
+            height: 15rem;
+            background: var(--whiteColor);
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 1px solid var(--greyText);
+            .titlePolicy{
+                text-align: center;
+                padding-bottom: 1rem;
+            }
+            .devide{
+                width: 100%;
+                background-color: var(--greyText);
+                height: .5px;
+            }
+            .contentPolicy{
+                text-align: center;
+                padding-top: 1rem;
+                line-height: 1.5rem;
+                .lineInfo{
+                    display: flex;
+                    justify-content: space-between;
+                    line-height: 3rem;
+                    .rightInfo{
+                        width: 18rem;
+                        height: 2.5rem;
+                        background: var(--greyText);
+                        border-radius: .5rem;
+                        span{
+                            padding-left: 1rem;
+                            padding-bottom: .5rem;
+                            color: var(--blackColor);
+                        }
+                    }
+                    .Note{
+                        width: 18rem;
+                        height: 2.5rem;
+                        background: var(--whiteColor);
+                        border-radius: .5rem;
+                        padding-left: 1rem;
+                        border: 1px solid var(--greyText);
+                        outline: none;
+                    }
+                    .selectChoose{
+                        select{
+                            width: 18rem;
+                            height: 2.5rem;
+                            background: var(--whiteColor);
+                            border-radius: .5rem;
+                            padding-left: 1rem;
+                            border: 1px solid var(--greyText);
+                            outline: none;
+                            
+                        }
+                    }
+                }
+                .policyCheckbox{
+                    width: 100%;
+                    margin-top: 1rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    .checkBox{
+                        display: flex;
+                        align-items: center;
+                        .checkbox-input{
+                            width: 20px;
+                            height: 20px;
+                            border: 1px solid var(--greyText);
+                        }
+                    }
+                }
+                .buttonList{
+                    padding-top: 2rem;
+                    display: flex;
+                    margin-inline: auto;
+                    justify-content: center;
+                    gap: 2rem;
+                    .btn{
+                        border-radius: .5rem;
+                        font-weight: 600;
+                        color: var(--whiteColor);
+                    }
+                    .cancle{
+                        background: #cf1726;
+                        &:hover{
+                            background: #ea4957;
+                        }
+                    }
+                    .pay{
+                        background: var(--PrimaryColor);
+                        &:hover{
+                            background: var(--SecondaryColor);
+                        }
+                    }
+                }
             }
         }
+    }
+
+    .toast-container {
+        position: fixed;
+        top: 50%; 
+        right: 0; 
+        transform: translateY(-50%); 
+        z-index: 9999; 
     }
 }

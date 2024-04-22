@@ -23,6 +23,7 @@ body{
     align-items: center;
     justify-content: center;
     margin: auto;
+    height: auto;
 
     .overlay{
         position: absolute;
@@ -42,11 +43,12 @@ body{
         top: 0;
         bottom: 0;
         object-fit: cover;
+        
     }
 
     .homeContent{
-        width: 50%;
-        height: max-content;
+        width: 100%;
+        height: auto;
         padding: 8rem 1.5rem 3rem;
         display: flex;
         row-gap: 3rem;
@@ -56,7 +58,7 @@ body{
         margin: auto;
         color: var(--whiteColor);
         z-index: 100;
-        width: 60% !important;
+        width: 66% !important;
 
         .textDiv{
             padding: 2rem 0;
@@ -68,7 +70,7 @@ body{
 
             .homeTitle{
                 position: relative;
-                font-size: 1.8rem;
+                font-size: 3rem;
             }
         }
 
@@ -78,6 +80,8 @@ body{
             background: var(--whiteColor);
             border-radius: 10px;
             gap: 1rem;
+            line-height: 30px;
+
             
 
             .radioButtons {
@@ -88,6 +92,7 @@ body{
                 label {
                     margin-right: 1rem;
                     cursor: pointer;
+                    font-size: 17px;
         
                     input[type="radio"] {
                         margin-right: 0.5rem;
@@ -107,16 +112,13 @@ body{
             }
 
             .sizeOne{
-                width: 75%;
+                width: 80%;
                 margin-inline: auto;
             }
 
             .sizeTwo{
                 width: 97%;
-            }
-
-            .destinationInp{
-                width: 97%;
+                margin-inline: auto;
             }
 
             label{
@@ -124,26 +126,29 @@ body{
                 color: var(--textColor);
                 color: #1b2d36;
                 padding-bottom: 10px;
-                font-size: 13px;
+                font-size: 15px;
                 font-weight: 500;
             }
             
             .input{
-                height: 40px;
+                height: 3rem;
                 padding: 0 1rem;
                 background: var(--inputColor);
                 border-radius: .5rem;
+                font-size: 18px;
+                outline: none;
 
                 input{
                     background: none;
                     border: none;
                     outline: none;
                     width: 100%;
-                    font-size: 13px;
+                    font-size: 18px;
                     font-weight: 500;
                     &::placeholder{
                         font-size: 13px;
                     }
+                    cursor: pointer;
                 }
 
                 .icon{
@@ -152,37 +157,7 @@ body{
                     !important;
                     margin-left: 10px;
                 }
-
-                
             }
-
-            .changedes{
-                width: 40px;
-                height: 40px;
-                border-radius: 1rem;
-                background: var(--whiteColor);
-                border: 1px solid #E5E5E5;
-                margin-top: 1.52rem;
-                // margin-bottom: 1rem;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                // transition: transform 1s;
-
-
-                .icon{
-                    color: var(--textColor);
-                    font-size: 20px;
-                    transition: transform 0.5s ease;
-
-                    &:hover{
-                        // rotate: 180deg;
-                        transform: rotate(180deg);
-                    }
-                }
-            }
-
-            
 
             .searchOption{
                 position: absolute;
@@ -263,10 +238,10 @@ body{
                 // grid-template-columns: repeat(3,1fr);
 
                 .sizeTwo{
-                    .changedes{
-                        margin-top: 0;
-                        rotate:  90deg;
-                    }
+                    grid-template-columns: repeat(3,1fr);
+                }
+                .sizeTwo{
+                    grid-template-columns: repeat(4,1fr);
                 }
                 
             }
@@ -304,6 +279,12 @@ body{
                 justify-content: center;
                 .input{
                     margin-bottom: 1rem;
+                }
+                .sizeTwo{
+                    grid-template-columns: repeat(3,1fr);
+                }
+                .sizeTwo{
+                    grid-template-columns: repeat(4,1fr);
                 }
 
                 .searchOption{

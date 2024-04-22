@@ -131,12 +131,6 @@ const [dayReturn, setDayReturn] = useState('');
         
     }
 
-    const changeDes = () => {
-        // Swap values between origin and destination inputs
-        const temp = origin;
-        setOrigin(destination);
-        setDestination(temp);
-    };
 
     const handleOriginChange = (event) => {
         const selectedCity = cities.find(city => city.name === event.target.value);
@@ -163,7 +157,7 @@ const [dayReturn, setDayReturn] = useState('');
                     <h1 className="homeTitle">Seacrh your Trip</h1>
                 </div>
 
-                <div data-aos="fade-up" className="cardDiv">
+                <div className="cardDiv">
                     <div className="radioButtons">
                         <label>
                             <input type="radio"  name="kind" value="Một chiều" checked={kind === "Một chiều"} onChange={handleChange}/>
@@ -177,37 +171,24 @@ const [dayReturn, setDayReturn] = useState('');
 
                     {kind === "Một chiều" && (
                     <div className="destinationIn sizeOne">
-                        
                         <div className="destinationInput">
                             <label htmlFor="city">Chọn địa điểm xuất phát: </label>
-                            <div className="  flex">
-                                <select className="input" value={origin} onChange={handleOriginChange}>
-                                    <option value="">Chọn địa điểm xuất phát...</option>
+                            <select className="input" value={origin} onChange={handleOriginChange}>
+                                <option value="">Chọn địa điểm xuất phát...</option>
                                     {cities.map(city => (
-                                            <option key={city.id} value={city.name}>{city.name}</option>
-                                        ))}
-                                </select>
-                                {/* <input type="text" className="input1" placeholder="Chọn địa điểm xuất phát..." value={origin} onChange={(e) => setOrigin(e.target.value)}/> */}
-                                <GrLocation className="icon"/>
-                            </div>
-                        </div>
-                        <div className="changedes" onClick={changeDes}>
-                            <RiArrowLeftRightFill  className="icon"/>
+                                        <option key={city.id} value={city.name}>{city.name}</option>
+                                    ))}
+                            </select>
                         </div>
                         <div className="destinationInput">
                             <label htmlFor="city">Chọn địa điểm đến: </label>
-                            <div className="flex">
-                                <select className="input" value={destination} onChange={handleDestinationChange}>
-                                    <option value="">Chọn địa điểm muốn đến...</option>
-                                    {cities.map(city => (
-                                            <option key={city.id} value={city.name}>{city.name}</option>
-                                        ))}
-                                </select>
-                                {/* <input type="text" placeholder="Chọn địa điểm đến..." value={destination} onChange={(e) => setDestination(e.target.value)}/> */}
-                                <GrLocation className="icon"/>
-                            </div>
+                            <select className="input" value={destination} onChange={handleDestinationChange}>
+                                <option value="">Chọn địa điểm muốn đến...</option>
+                                {cities.map(city => (
+                                    <option key={city.id} value={city.name}>{city.name}</option>
+                                ))}
+                            </select>
                         </div>
-
                         <div className="dateInput">
                             <label htmlFor="date">Chọn ngày đi: </label>
                             <div className="input flex">
@@ -221,22 +202,15 @@ const [dayReturn, setDayReturn] = useState('');
                         <div className="destinationIn sizeTwo">
                             <div className="destinationInput">
                                 <label htmlFor="city">Chọn địa điểm xuất phát: </label>
-                                <div className=" flex">
                                     <select className="input"  value={origin} onChange={handleOriginChange}>
                                         <option value="">Chọn địa điểm xuất phát...</option>
                                         {cities.map(city => (
                                                 <option key={city.id} value={city.name}>{city.name}</option>
                                             ))}
                                     </select>
-                                    <GrLocation className="icon"/>
-                                </div>
-                            </div>
-                            <div className="changedes" onClick={changeDes}>
-                                <RiArrowLeftRightFill  className="icon"/>
                             </div>
                             <div className="destinationInput">
                                 <label htmlFor="city">Chọn địa điểm đến: </label>
-                                <div className="flex">
                                     {/* <input type="text" placeholder="Chọn địa điểm đến..." value={destination} onChange={(e) => setDestination(e.target.value)}/> */}
                                     <select className="input" value={destination} onChange={handleDestinationChange}>
                                         <option value="">Chọn địa điểm muốn đến...</option>
@@ -244,8 +218,6 @@ const [dayReturn, setDayReturn] = useState('');
                                                 <option key={city.id} value={city.name}>{city.name}</option>
                                             ))}
                                     </select>
-                                    <GrLocation className="icon"/>
-                                </div>
                             </div>
 
                             <div className="dateInput">

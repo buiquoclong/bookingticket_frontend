@@ -1,0 +1,187 @@
+:root{
+    --PrimaryColor: hsl(199, 100%, 33%);
+    --SecondaryColor: hsl(187, 85%, 43%);
+    --gradientColor: linear-gradient(to right, hsl(187, 85%, 43%), hsl(199, 100%, 33%));
+    --whiteColor: hsl(0, 0%, 100%);
+    --blackColor: hsl(201, 33%, 16%);
+    --textColor: hsl(240, 4%, 36%);
+    --whiteColorDeam: hsl(0, 0%, 93%);
+    --greyText: rgb(190, 190, 190);
+    --inputColor: rgb(239, 239, 239);
+    --bodyColor: rgb(240, 240, 246);
+    --cardBG: rgb(225, 225, 235);
+}
+.main-container {
+    grid-area: main;
+    overflow-y: auto;
+    padding: 20px 20px;
+    // color: rgba(255, 255, 255, 0.95);
+    .payContent{
+        width: 35rem;
+        // height: 68rem;
+        height: auto;
+        background: var(--whiteColor);
+        border: 1px solid #04aa6d;
+        border-top-width: 5px;
+        margin-inline: auto;
+        .imgsucces{
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            img{
+                width: 6rem;
+                padding-top: 1rem;
+            }
+        }
+        .content{
+            text-align: center;
+            padding: 1rem;
+            .titlePay{
+                font-size: 40px;
+                font-weight: 600;
+            }
+        }
+        // .ticketInfo {
+        //     display: flex;
+        //     flex-direction: column;
+        //     justify-content: space-between; // Giúp phân bổ khoảng trống đều giữa các hàng
+        
+        //     .tripLabel {
+        //         display: flex;
+        //         flex-wrap: wrap; // Cho phép các mục bọc nếu không đủ chỗ
+        //         justify-content: space-between; // Phân bổ đều các tripInfo trên mỗi hàng
+        
+        //         .tripInfo {
+        //             flex: 1 1 45%; // Mỗi tripInfo sẽ chiếm 45% chiều rộng và có thể co giãn
+        //             display: flex;
+        //             flex-direction: column; // Các mục trong tripInfo sẽ xếp theo chiều dọc
+        //             align-items: flex-start; // Căn các mục về phía bắt đầu của container
+        
+        //             span:first-child {
+        //                 margin-bottom: 0.5rem; // Khoảng cách giữa hai span
+        //             }
+        
+        //             .rightInfo {
+        //                 text-align: left; // Căn trái cho thông tin bên phải
+        //             }
+        //         }
+        //     }
+        // }
+        .ticketInfo {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        
+            .tripLabel {
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: center;
+        
+                .tripInfo {
+                    width: 45%;
+                    margin: 10px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+
+                    span{
+                        padding-bottom: .5rem;
+                    }
+        
+                    .rightInfo {
+                        text-align: center;
+                        border: 1px solid var(--greyText);
+                        padding: .5rem;
+                        width: 100%;
+                        border-radius: .5rem;
+                    }
+                }
+            }
+            
+            .tripInfo {
+                width: 93%;
+                margin: 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+
+                span{
+                    padding-bottom: .5rem;
+                }
+    
+                .rightInfo {
+                    text-align: center;
+                    border: 1px solid var(--greyText);
+                    padding: .5rem;
+                    width: 100%;
+                    border-radius: .5rem;
+                }
+            }
+            .detail{
+                width: 100%;
+                .tripInfo {
+                    width: 93%;
+                    margin: 10px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+    
+                    span{
+                        padding-bottom: .5rem;
+                    }
+        
+                    .rightInfo {
+                        text-align: center;
+                        border: 1px solid var(--greyText);
+                        padding: .5rem;
+                        width: 100%;
+                        border-radius: .5rem;
+                    }
+                }
+            }
+            
+            .seatInfo{
+                width: 90%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1rem;
+                gap: 1rem;
+                .rightInfo{
+                    background: rgb(220, 231, 71);
+                    span{
+                        font-weight: bolder;
+                        padding: .5rem;
+                    }
+                }
+            }
+            .text{
+                width: 90%;
+                text-align: center;
+                padding: .5rem;
+            }
+            .back{
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+                display: flex;
+                margin-inline: auto;
+                justify-content: center;
+                border-radius: .5rem;
+                font-weight: 600;
+                color: var(--whiteColor);
+                background: var(--textColor);
+                    &:hover{
+                        background: #ea4957;
+                    }
+                a{
+                    font-weight: 700;
+                }
+            }
+        }
+        
+    }
+}

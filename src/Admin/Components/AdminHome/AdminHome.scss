@@ -15,7 +15,7 @@
     grid-area: main;
     overflow-y: auto;
     padding: 20px 20px;
-    color: rgba(255, 255, 255, 0.95);
+    // color: rgba(255, 255, 255, 0.95);
     .dashboardContent{
         .main-title {
             display: flex;
@@ -32,6 +32,7 @@
                 justify-content: space-around;
                 padding: 8px 15px;
                 border-radius: 5px;
+                color: rgba(255, 255, 255, 0.95);
                 &:first-child {
                     background-color: #2962ff;
                 }
@@ -75,7 +76,7 @@
             margin: auto;
             color: var(--whiteColor);
             z-index: 100;
-            width: 80% !important;
+            width: 87% !important;
             
     
             .cardDiv{
@@ -84,8 +85,9 @@
                 background: var(--whiteColor);
                 border-radius: 10px;
                 gap: 1rem;
-                border: 1px solid var(--greyText);
-                box-shadow: 0 2px 4px rgba(140,140, 141, 0.549);
+                line-height: 30px;
+                border: 1px solid var(--blackColor);
+    
                 
     
                 .radioButtons {
@@ -96,6 +98,7 @@
                     label {
                         margin-right: 1rem;
                         cursor: pointer;
+                        font-size: 17px;
             
                         input[type="radio"] {
                             margin-right: 0.5rem;
@@ -104,7 +107,7 @@
                 }
     
                 .destinationIn{
-                    // width: 30rem;
+                    
                     display: flex;
                     flex-wrap: wrap;
                     justify-content: space-between; // Đảm bảo các phần tử đều nằm cách đều nhau theo chiều ngang
@@ -121,10 +124,7 @@
     
                 .sizeTwo{
                     width: 97%;
-                }
-    
-                .destinationInp{
-                    width: 97%;
+                    margin-inline: auto;
                 }
     
                 label{
@@ -132,26 +132,29 @@
                     color: var(--textColor);
                     color: #1b2d36;
                     padding-bottom: 10px;
-                    font-size: 13px;
+                    font-size: 15px;
                     font-weight: 500;
                 }
                 
                 .input{
-                    height: 40px;
+                    height: 3rem;
                     padding: 0 1rem;
                     background: var(--inputColor);
                     border-radius: .5rem;
+                    font-size: 18px;
+                    outline: none;
     
                     input{
                         background: none;
                         border: none;
                         outline: none;
                         width: 100%;
-                        font-size: 13px;
+                        font-size: 18px;
                         font-weight: 500;
                         &::placeholder{
                             font-size: 13px;
                         }
+                        cursor: pointer;
                     }
     
                     .icon{
@@ -160,37 +163,7 @@
                         !important;
                         margin-left: 10px;
                     }
-    
-                    
                 }
-    
-                .changedes{
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 1rem;
-                    background: var(--whiteColor);
-                    border: 1px solid #E5E5E5;
-                    margin-top: 1.52rem;
-                    // margin-bottom: 1rem;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    // transition: transform 1s;
-    
-    
-                    .icon{
-                        color: var(--textColor);
-                        font-size: 20px;
-                        transition: transform 0.5s ease;
-    
-                        &:hover{
-                            // rotate: 180deg;
-                            transform: rotate(180deg);
-                        }
-                    }
-                }
-    
-                
     
                 .searchOption{
                     position: absolute;
@@ -204,6 +177,7 @@
                     transform: translate(-50%);
                     justify-content: center;
                     cursor: pointer;
+                    color: var(--whiteColor);
     
                     &:hover{
                         background: var(--SecondaryColor);
@@ -223,5 +197,11 @@
             
         }
     }
-    
+    .toast-container {
+        position: fixed;
+        top: 50%; 
+        right: 0; 
+        transform: translateY(-50%); 
+        z-index: 9999; 
+    }
 }

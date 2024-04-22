@@ -24,6 +24,7 @@ import AdminRoutePage from "./Admin/page/AdminRoutePage";
 import AdminTripPage from "./Admin/page/AdminTripPage";
 import AdminSeatReservationPage from "./Admin/page/AdminSeatReservationPage";
 import AdminUserPage from "./Admin/page/AdminUserPage";
+import AdminBookTicketReturnPage from "./Admin/page/AdminBookTicketReturnPage";
 import TicketHistoryPage from "./page/TicketHistoryPage";
 import SearchTicketPage from "./page/SearchTicketPage";
 import RegisterPage from "./page/RegisterPage";
@@ -35,6 +36,7 @@ import LoginPage from "./page/LoginPage";
 import BookingTicketPage from "./page/BookingTicketPage";
 import BookTicketPage from "./page/BookTicketPage";
 import BookTicketReturnPage from "./page/BookTicketReturnPage";
+import AdminPaySuccessPage from "./Admin/page/AdminPaySuccessPage";
 
 
 
@@ -60,6 +62,8 @@ const App = () => {
                 <Route path="/admin/booking-details" element={<AdminBookingDetailPage />} />
                 <Route path="/admin/bookings" element={<AdminBookingPage />} />
                 <Route path="/admin/find-trips" element={<AdminBookTicketPage />} />
+                <Route path="/admin/find-trips-return" element={<AdminBookTicketReturnPage />} />
+                <Route path="/admin/book-cash-payment" element={<AdminPaySuccessPage />} />
                 <Route path="/admin/cities" element={<AdminCityPage />} />
                 <Route path="/admin/booking-trip" element={<AdminPayPage />} />
                 <Route path="/admin/routes" element={<AdminRoutePage />} />

@@ -70,7 +70,7 @@ const BookingTicket = () =>{
             fetchTripInfo();
             fetchTripReturnInfo();
         }
-    }, [tripId, tripIdReturn, selectedSeatIds]);
+    });
 
     const fetchTripInfo = async () => {
         
@@ -150,19 +150,6 @@ const BookingTicket = () =>{
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             };
-            const orderReturnData = {
-                trip:{id:tripIdReturn},
-                user:{id:sessionStorage.getItem("userId")},
-                dayBook: new Date().toISOString(),
-                timeStart: fullDateTimeReturn,
-                status: 0,
-                pointCatch: pickupLocationReturn || "Tại nhà xe",
-                note: noteReturn || "Không có ghi chú",
-                kindPay:"Thanh toán trả sau",
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
-
             // Tạo hóa đơn lượt đi
             try {
                 const response = await fetch(`http://localhost:8081/api/order`, {
@@ -234,13 +221,6 @@ const BookingTicket = () =>{
             if (!response.ok) {
                 throw new Error('Something went wrong with the order detail creation.');
             }
-            // const createdOrderDetail = await response.json();
-
-            // // Lấy ID của orderdetail vừa tạo
-            // const orderDetailId = createdOrderDetail.id;
-    
-            // // Trả về ID của orderdetail vừa tạo
-            // return orderDetailId;
         } catch (error) {
             console.error("Error creating order detail:", error);
             toast.error("Failed to create order detail.");
@@ -373,24 +353,26 @@ const BookingTicket = () =>{
     return(
         <section className="main container section">
             {showPaymentPopup && (
-                <div className="overlay">
-                    <div className="popup">
-                        <button className="closePopup" onClick={() => setShowPaymentPopup(false)}></button>
-                        <div className="payContent">
-                            <div className="imgsucces">
-                                <img src={success} alt="succes"/>
-                            </div>
-                            <div className="content">
-                                <div className="titlePay">Thanh toán</div>
-                                <div>Quý khách vui lòng lựa chọn phương thức thanh toán bên dưới để thanh toán và nhận vé</div>
-                            </div>
-                            <div className="payMent">
-                                <button className="vnpay btn"><span style={{ color: "#ed3237" }}>VN</span><span style={{ color: "#0f62ac " }}>PAY</span></button>
-                                {/* <Link to="/pay-success"><button className="btn trasau" onClick={handleChoosePayment}>Trả sau</button></Link> */}
-                                <button className="btn trasau" onClick={handleChoosePayment}>Trả sau</button>
+                <div class="modal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-body">
+                                <button className="closePopup" onClick={() => setShowPaymentPopup(false)}></button>
+                                <div className="payContent">
+                                    <div className="imgsucces">
+                                        <img src={success} alt="succes"/>
+                                    </div>
+                                    <div className="content">
+                                        <div className="titlePay">Thanh toán</div>
+                                        <div>Quý khách vui lòng lựa chọn phương thức thanh toán bên dưới để thanh toán và nhận vé</div>
+                                    </div>
+                                    <div className="payMent" style={{marginBottom:"1rem"}}>
+                                        <button className="vnpay btn"><span style={{ color: "#ed3237" }}>VN</span><span style={{ color: "#0f62ac " }}>PAY</span></button>
+                                        <button className="btn trasau" onClick={handleChoosePayment}>Trả sau</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        
                     </div>
                 </div>
             )}

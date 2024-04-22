@@ -137,20 +137,6 @@ const BookTicket = () =>{
         );
     };
 
-    // const handleContinueClick = (tuyenId) => {
-    //     const totalPrice = calculateTotalPriceById(tuyenId);
-    //     const selectedSeatsNames = formatSelectedSeatsById(tuyenId);
-
-    //     // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
-    //     navigate('/booking-ticket', {
-    //         state: {
-    //             tripId: tuyenId,
-    //             selectedSeatsNames: selectedSeatsNames,
-    //             totalPrice: totalPrice
-    //         }
-    //     });
-    // };
-
     const getSelectedSeatIds = (tuyenId) => {
         const selectedSeats = selectedSeatsById[tuyenId] || [];
         return selectedSeats.map(seat => seat.id);
