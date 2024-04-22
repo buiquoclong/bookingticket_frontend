@@ -98,97 +98,122 @@ const BookingTicket = () =>{
         };
 
     const handleChoosePayment = async () => {
-        if (kind === "Một chiều") {
-            
-            const orderData = {
-                
-                user:{id:sessionStorage.getItem("userId")},
-                dayBook: new Date().toISOString(),
-                total: totalPrice,
-                kindPay:"Thanh toán trả sau",
-                status: 0,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
+        const seatsToCheck = kind === "Một chiều" ? selectedSeatIds : selectedSeatIds.concat(selectedSeatIdsReturn);
 
-            try {
-                const response = await fetch(`http://localhost:8081/api/order`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(orderData)
-                });
+        try {
+            const seatChecks = await Promise.all(
+                seatsToCheck.map(seatId =>
+                    fetch(`http://localhost:8081/api/seat/${seatId}`).then(res => res.json())
+                )
+            );
 
-                if (response.ok) {
-                    toast.success("Đơn hàng đã được tạo!");
-                    const createdOrder = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
-                    // Tạo chi tiết hóa đơn với orderId là id của hóa đơn vừa tạo
-                    // await createOrderDetail(createdOrder.id, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice);
-                    await createOrderDetail(createdOrder.id, tripId, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice, pickupLocation, note);
-                    updateVehicleEmptySeat(data.vehicle.id, selectedSeatIds);
-                    updateSeatStatus(selectedSeatIds);
-                    insertSeatBooked(selectedSeatIds, tripId);
-                    // navigate("/pay-success");
-                    navigate("/pay-success", { state: { orderId: createdOrder.id, kind: kind } });
-                } else {
-                    throw new Error('Something went wrong with the order creation.');
-                }
-            } catch (error) {
-                console.error("Error creating order:", error);
-                toast.error("Failed to create order.");
+            // Kiểm tra nếu có bất kỳ ghế nào đã được đặt (có status là 1)
+            const isAnySeatBooked = seatChecks.some(seat => seat.status === 1);
+
+            if (isAnySeatBooked) {
+                // Nếu có ghế đã được đặt (status 1), hiển thị thông báo và không tiếp tục quá trình tạo hóa đơn
+                toast.error('Một hoặc nhiều ghế đã được đặt, vui lòng chọn ghế khác.');
+                return;
             }
-        } else if (kind === "Khứ hồi") {
-            const fullDateTimeReturn = `${dataReturn.dayStart}T${dataReturn.timeStart}`;
-            const orderData = {
-                
-                user:{id:sessionStorage.getItem("userId")},
-                dayBook: new Date().toISOString(),
-                total: totalAmount,
-                kindPay:"Thanh toán trả sau",
-                status: 0,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
-            // Tạo hóa đơn lượt đi
-            try {
-                const response = await fetch(`http://localhost:8081/api/order`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(orderData)
-                });
 
-                if (response.ok) {
-                    toast.success("Đơn hàng đã được tạo!");
-                    const createdOrder = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
-                    // Tạo chi tiết hóa đơn với orderId là id của hóa đơn vừa tạo
-                    // await createOrderDetail(createdOrder.id, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice);
-                    // tạo chi tiết và upadte lượt đi
-                    await createOrderDetail(createdOrder.id, tripId, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice, pickupLocation, note);
-
-                    updateVehicleEmptySeat(data.vehicle.id, selectedSeatIds);
-                    updateSeatStatus(selectedSeatIds);
-                    insertSeatBooked(selectedSeatIds, tripId);
-                    // tạo chi tiết và update lượt về
-                    await createOrderDetail(createdOrder.id, tripIdReturn, selectedSeatIdsReturn.length, selectedSeatsNamesReturn, dataReturn.price, totalPriceReturn, pickupLocationReturn, noteReturn);
+            if (kind === "Một chiều") {
+            
+                const orderData = {
                     
-                    updateVehicleEmptySeat(dataReturn.vehicle.id, selectedSeatIdsReturn);
-                    updateSeatStatus(selectedSeatIdsReturn);
-                    insertSeatBooked(selectedSeatIdsReturn, tripIdReturn);
-
-                    navigate("/pay-success", { state: { orderId: createdOrder.id, kind: kind } });
-                } else {
-                    throw new Error('Something went wrong with the order creation.');
+                    user:{id:sessionStorage.getItem("userId")},
+                    dayBook: new Date().toISOString(),
+                    total: totalPrice,
+                    kindPay:"Thanh toán trả sau",
+                    status: 0,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+    
+                try {
+                    const response = await fetch(`http://localhost:8081/api/order`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(orderData)
+                    });
+    
+                    if (response.ok) {
+                        toast.success("Đơn hàng đã được tạo!");
+                        const createdOrder = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
+                        // Tạo chi tiết hóa đơn với orderId là id của hóa đơn vừa tạo
+                        // await createOrderDetail(createdOrder.id, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice);
+                        await createOrderDetail(createdOrder.id, tripId, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice, pickupLocation, note);
+                        updateVehicleEmptySeat(data.vehicle.id, selectedSeatIds);
+                        updateSeatStatus(selectedSeatIds);
+                        insertSeatBooked(selectedSeatIds, tripId);
+                        // navigate("/pay-success");
+                        navigate("/pay-success", { state: { orderId: createdOrder.id, kind: kind } });
+                    } else {
+                        throw new Error('Something went wrong with the order creation.');
+                    }
+                } catch (error) {
+                    console.error("Error creating order:", error);
+                    toast.error("Failed to create order.");
                 }
-            } catch (error) {
-                console.error("Error creating order:", error);
-                toast.error("Lỗi tọa hóa đơn lượt đi.");
+            } else if (kind === "Khứ hồi") {
+                const orderData = {
+                    
+                    user:{id:sessionStorage.getItem("userId")},
+                    dayBook: new Date().toISOString(),
+                    total: totalAmount,
+                    kindPay:"Thanh toán trả sau",
+                    status: 0,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                // Tạo hóa đơn lượt đi
+                try {
+                    const response = await fetch(`http://localhost:8081/api/order`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(orderData)
+                    });
+    
+                    if (response.ok) {
+                        toast.success("Đơn hàng đã được tạo!");
+                        const createdOrder = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
+                        // Tạo chi tiết hóa đơn với orderId là id của hóa đơn vừa tạo
+                        // await createOrderDetail(createdOrder.id, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice);
+                        // tạo chi tiết và upadte lượt đi
+                        await createOrderDetail(createdOrder.id, tripId, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice, pickupLocation, note);
+    
+                        updateVehicleEmptySeat(data.vehicle.id, selectedSeatIds);
+                        updateSeatStatus(selectedSeatIds);
+                        insertSeatBooked(selectedSeatIds, tripId);
+                        // tạo chi tiết và update lượt về
+                        await createOrderDetail(createdOrder.id, tripIdReturn, selectedSeatIdsReturn.length, selectedSeatsNamesReturn, dataReturn.price, totalPriceReturn, pickupLocationReturn, noteReturn);
+                        
+                        updateVehicleEmptySeat(dataReturn.vehicle.id, selectedSeatIdsReturn);
+                        updateSeatStatus(selectedSeatIdsReturn);
+                        insertSeatBooked(selectedSeatIdsReturn, tripIdReturn);
+    
+                        navigate("/pay-success", { state: { orderId: createdOrder.id, kind: kind } });
+                    } else {
+                        throw new Error('Something went wrong with the order creation.');
+                    }
+                } catch (error) {
+                    console.error("Error creating order:", error);
+                    toast.error("Lỗi tọa hóa đơn lượt đi.");
+                }
+                
+    
             }
-            
-
+        } catch (error) {
+            console.error('Error checking seat status:', error);
+            toast.error('Lỗi kiểm tra trạng thái ghế.');
         }
+
+
+
+        
         
     };
 
