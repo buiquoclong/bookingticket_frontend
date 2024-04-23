@@ -181,6 +181,7 @@
         flex-direction: row !important;
         gap: 1.5rem !important;
         align-items: initial !important;
+        justify-content: center;
         // width: 55% !important;
         // padding-top: 9rem !important;
 
@@ -1074,7 +1075,32 @@
                         }
                     }
                 }
+
+                .empty_data{
+                    height: auto;
+                    padding: 5rem;
+                    text-align: center;
+                    img{
+                        margin-bottom: 1rem;
+                    }
+                    span{
+                        color: var(--blackColor);
+                        font-size: 15px;
+                        padding-top: 2rem;
+                    }
+                    .back{
+                        margin-top: 1rem;
+                        .backbtn{
+                            padding: .7rem 1.5rem;
+                            border-radius: .5rem;
+                            // background: #75caf1;
+                            font-weight: bold;
+                            color: var(--whiteColor);
+                        }
+                    }
+                }
             }
+
         }
     }
     
