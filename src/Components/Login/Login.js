@@ -52,9 +52,9 @@ const Login  = () => {
                         const userInfo = await userInfoResponse.json();
                         // console.log(userInfo.role.id);
                         // navigate('/admin');
-                        if (userInfo.role.id  === 1) {
+                        if (userInfo.role  === 1) {
                             navigate('/');
-                        } else if (userInfo.role.id  === 2 || userInfo.role.id  === 3) {
+                        } else if (userInfo.role  === 2 || userInfo.role  === 3) {
                             navigate('/admin');
                         }
                         console.log(userInfo);

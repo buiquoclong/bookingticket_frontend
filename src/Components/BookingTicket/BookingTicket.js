@@ -70,7 +70,7 @@ const BookingTicket = () =>{
             fetchTripInfo();
             fetchTripReturnInfo();
         }
-    });
+    },[kind, tripId, tripIdReturn]);
 
     const fetchTripInfo = async () => {
         
@@ -348,6 +348,7 @@ const BookingTicket = () =>{
                     seat: { id: seatId }, // Id của ghế
                     trip: { id: tripId }, // Id của chuyến đi
                     user: { id: userId }, // Id của người dùng
+                    status: 1,
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString() // Thời gian tạo
                 };
