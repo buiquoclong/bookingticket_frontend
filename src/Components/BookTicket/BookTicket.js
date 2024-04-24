@@ -5,6 +5,7 @@ import station from "../../Assets/img/station.svg";
 import seat_active from "../../Assets/img/seat_active.svg";
 import seat_disabled from "../../Assets/img/seat_disabled.svg";
 import seat_selecting from "../../Assets/img/seat_selecting.svg";
+import empty_list from "../../Assets/img/empty_list.svg";
 import { MdArrowDropDown } from "react-icons/md";
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -254,7 +255,7 @@ const BookTicket = () =>{
                         </div>
                         <div className="cardListResult">
 
-                            {data ? (
+                            {data && data.length > 0 ? (
                                         data.map(trip => (
                                             <div key={trip.id} className="cardOneResult">
                                                 <div className="infoResult">    
@@ -505,8 +506,12 @@ const BookTicket = () =>{
                                             </div>
                                         ))
                                     ) : (
-                                        <div>
-                                            <div>Không có dữ liệu</div>
+                                        <div className="empty_data">
+                                            <img src={empty_list} alt="no data"/>
+                                            <span >Không có kết quá được tìm thấy</span>
+                                            <Link to="/"><div className="back">
+                                            <button className="btn backbtn">Trở lại</button>
+                                            </div></Link>
                                         </div>
                                     )}
                         
