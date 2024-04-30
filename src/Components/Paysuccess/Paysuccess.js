@@ -17,10 +17,10 @@ const Paysuccess = () =>{
 
     useEffect(() => {
         // Call the API to fetch cities
-        fetchOrderDetail();
+        fetchBookingDetail();
     }, [bookingId]);
 
-    const fetchOrderDetail = async () => {
+    const fetchBookingDetail = async () => {
         fetch(`http://localhost:8081/api/booking/${bookingId}`)
             .then(response => response.json())
             .then(data => {

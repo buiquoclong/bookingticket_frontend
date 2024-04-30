@@ -45,6 +45,7 @@
                 flex-direction: column !important;
                 display: flex !important;
                 align-items: initial !important;
+                margin-inline: auto;
                 
                 .listHeader{
                     position: sticky;
@@ -729,6 +730,30 @@
                                         }
                                     }
                                 }
+                            }
+                        }
+                    }
+
+                    .empty_data{
+                        height: auto;
+                        padding: 5rem;
+                        text-align: center;
+                        img{
+                            margin-bottom: 1rem;
+                        }
+                        span{
+                            color: var(--blackColor);
+                            font-size: 15px;
+                            padding-top: 2rem;
+                        }
+                        .back{
+                            margin-top: 1rem;
+                            .backbtn{
+                                padding: .7rem 1.5rem;
+                                border-radius: .5rem;
+                                // background: #75caf1;
+                                font-weight: bold;
+                                color: var(--whiteColor);
                             }
                         }
                     }

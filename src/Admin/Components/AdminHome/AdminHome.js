@@ -15,6 +15,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 
 function AdminHome() {
+    
     const [kind, setKind] = useState("Một chiều");
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
@@ -22,8 +23,8 @@ function AdminHome() {
     const [originId, setOriginId] = useState(null);
     const [destinationId, setDestinationId] = useState(null);
     
-const [dayStart, setDayStart] = useState('');
-const [dayReturn, setDayReturn] = useState('');
+    const [dayStart, setDayStart] = useState('');
+    const [dayReturn, setDayReturn] = useState('');
     const [cities, setCities] = useState([]);
     const navigate = useNavigate();
 
@@ -126,6 +127,10 @@ const [dayReturn, setDayReturn] = useState('');
     const handleOriginChange = (event) => {
         const selectedCity = cities.find(city => city.name === event.target.value);
         if (selectedCity) {
+            if (destinationId !== null && selectedCity.id === destinationId) {
+                toast.error("Điểm đi và điểm đến không được giống nhau");
+                return;
+            }
             setOrigin(selectedCity.name);
             setOriginId(selectedCity.id);
         }
@@ -134,9 +139,38 @@ const [dayReturn, setDayReturn] = useState('');
     const handleDestinationChange = (event) => {
         const selectedCity = cities.find(city => city.name === event.target.value);
         if (selectedCity) {
+            if (originId !== null && selectedCity.id === originId) {
+                toast.error("Điểm đi và điểm đến không được giống nhau");
+                return;
+            }
             setDestination(selectedCity.name);
             setDestinationId(selectedCity.id);
         }
+    };
+
+    const handleDayStartChange = (event) => {
+        const selectedDate = new Date(event.target.value);
+        const today = new Date();
+        if (selectedDate < today) {
+            toast.error("Bạn không thể chọn ngày trong quá khứ!");
+            return;
+        }
+        setDayStart(event.target.value);
+    };
+
+    const handleDayReturnChange = (event) => {
+        const selectedDate = new Date(event.target.value);
+        const today = new Date();
+        if (selectedDate < today) {
+            toast.error("Bạn không thể chọn ngày trong quá khứ!");
+            return;
+        }
+        if (new Date(dayStart) > selectedDate) {
+            toast.error("Ngày về phải là ngày sau ngày đi!");
+            return;
+        }
+        
+        setDayReturn(event.target.value);
     };
 
     const data = [
@@ -271,7 +305,7 @@ const [dayReturn, setDayReturn] = useState('');
         </div>
         <div className='sachRouteContent'>
             <div className="homeContent container">
-                <div className="cardDiv">
+            <div className="cardDiv">
                     <div className="radioButtons">
                         <label>
                             <input type="radio"  name="kind" value="Một chiều" checked={kind === "Một chiều"} onChange={handleChange}/>
@@ -306,7 +340,8 @@ const [dayReturn, setDayReturn] = useState('');
                         <div className="dateInput">
                             <label htmlFor="date">Chọn ngày đi: </label>
                             <div className="input flex">
-                                <input type="date" value={dayStart} onChange={(e) => setDayStart(e.target.value)}/>
+                                {/* <input type="date" value={dayStart} onChange={(e) => setDayStart(e.target.value)}/> */}
+                                <input type="date" value={dayStart} onChange={handleDayStartChange}/>
                             </div>
                         </div> 
                     </div>
@@ -337,13 +372,13 @@ const [dayReturn, setDayReturn] = useState('');
                             <div className="dateInput">
                                 <label htmlFor="date">Chọn ngày đi: </label>
                                 <div className="input flex">
-                                    <input type="date" value={dayStart} onChange={(e) => setDayStart(e.target.value)}/>
+                                    <input type="date" value={dayStart} onChange={handleDayStartChange}/>
                                 </div>
                             </div>
                             <div className="dateInput">
                                 <label htmlFor="date">Chọn ngày về: </label>
                                 <div className="input flex">
-                                    <input type="date" value={dayReturn} onChange={(e) => setDayReturn(e.target.value)}/>
+                                    <input type="date" value={dayReturn} onChange={handleDayReturnChange}/>
                                 </div>
                             </div> 
                         </div>

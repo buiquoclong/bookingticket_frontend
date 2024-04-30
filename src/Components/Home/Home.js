@@ -29,8 +29,8 @@ const Home = () =>{
     const [originId, setOriginId] = useState(null);
     const [destinationId, setDestinationId] = useState(null);
     
-const [dayStart, setDayStart] = useState('');
-const [dayReturn, setDayReturn] = useState('');
+    const [dayStart, setDayStart] = useState('');
+    const [dayReturn, setDayReturn] = useState('');
     const [cities, setCities] = useState([]);
     const navigate = useNavigate();
 

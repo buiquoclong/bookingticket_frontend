@@ -17,21 +17,21 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function AdminPaySuccess() {
     const location = useLocation();
-    const { orderId, kind } = location.state || {};
+    const { bookingId, kind } = location.state || {};
     console.log(kind)
     const [data, setData] = useState(null);
     // const orderId = 1;
-    console.log("orderId", orderId)
+    console.log("bookingId", bookingId)
     
     // const [orders, setsetOrders] = useState([]);
 
     useEffect(() => {
         // Call the API to fetch cities
-        fetchOrderDetail();
-    }, [orderId]);
+        fetchBookingDetail();
+    }, [bookingId]);
 
-    const fetchOrderDetail = async () => {
-        fetch(`http://localhost:8081/api/order/${orderId}`)
+    const fetchBookingDetail = async () => {
+        fetch(`http://localhost:8081/api/booking/${bookingId}`)
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -46,7 +46,7 @@ function AdminPaySuccess() {
         {kind === "Một chiều" && (
                         <div>
                             {data &&
-                                data.orderDetails.map(detail => (
+                                data.bookingDetails.map(detail => (
                                     <div className="payContent" key={detail.id}>
                                         <div className="imgsucces">
                                                 <img src={success} alt="succes"/>                    
@@ -78,7 +78,7 @@ function AdminPaySuccess() {
                                                 <div className="tripInfo">
                                                     <span>Loại xe/ Biến số:</span>
                                                     <div className="rightInfo">
-                                                        <span>{detail.trip.vehicle.name}/ {detail.trip.vehicle.vehicleNumber}</span>
+                                                        <span>{detail.trip.vehicle.kindVehicle.name}/ {detail.trip.vehicle.vehicleNumber}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -98,7 +98,7 @@ function AdminPaySuccess() {
                                             <div className="tripInfo">
                                                 <span>Tổng tiền:</span>
                                                 <div className="rightInfo">
-                                                    <span>{detail.total.toLocaleString('vi-VN')}VND</span>
+                                                    <span>{data.total.toLocaleString('vi-VN')}VND</span>
                                                 </div>
                                             </div>
                                             <div className="tripInfo">
@@ -110,7 +110,7 @@ function AdminPaySuccess() {
                                             <div className="tripInfo">
                                                 <span>Trạng thái:</span>
                                                 <div className="rightInfo">
-                                                    {data.status === 1 ? (
+                                                    {data.isPaid === 1 ? (
                                                         <span>Đã thanh toán</span>
                                                     ) : (
                                                         <span>Chưa thanh toán</span>
@@ -120,13 +120,13 @@ function AdminPaySuccess() {
                                             <div className="tripInfo">
                                                 <span>Email liên hệ:</span>
                                                 <div className="rightInfo">
-                                                    <span>{data.user.email}</span>
+                                                    <span>{data.email}</span>
                                                 </div>
                                             </div>
                                             <div className="text">
                                                 <p>Chúng tôi đã gửi một email chứa thông tin giao dịch trên. Vui lòng kiểm tra email và lưu trữ nó, khi lên xe quý khách vui lòng xuất trình email đã gửi cho nhân viên soát vé</p>
                                             </div>
-                                            <Link to="/"><button className="btn back">Trở về</button></Link>
+                                            <Link to="/admin"><button className="btn back">Trở về</button></Link>
                                         </div>
                                     </div>
                                 ))
@@ -138,14 +138,18 @@ function AdminPaySuccess() {
                         <div className="flex" style={{gap:"1rem"}}>
                             
                         {data &&
-                            data.orderDetails.map((detail, index) => (
+                            data.bookingDetails.map((detail, index) => (
                             <div className="payContent" key={detail.id}>
                                 <div className="imgsucces">
                                     <img src={success} alt="success" />
                                 </div>
                                 <div className="content">
                                     <div className="titlePay">Thành công</div>
-                                    <div>Thông tin chi tiết vé</div>
+                                    {detail.roundTrip === 1 ? (
+                                        <div>Thông tin chi tiết lượt về</div>
+                                    ) : (
+                                        <div>Thông tin chi tiết lượt đi</div>
+                                    )}
                                 </div>
                                 <div className="ticketInfo">
                                 <div className="tripLabel">
@@ -170,7 +174,7 @@ function AdminPaySuccess() {
                                     <div className="tripInfo">
                                         <span>Loại xe/ Biến số:</span>
                                         <div className="rightInfo">
-                                            <span>{detail.trip.vehicle.name}/ {detail.trip.vehicle.vehicleNumber}</span>
+                                            <span>{detail.trip.vehicle.kindVehicle.name}/ {detail.trip.vehicle.vehicleNumber}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -191,8 +195,7 @@ function AdminPaySuccess() {
                                         <div className="tripInfo">
                                             <span>Tổng tiền:</span>
                                             <div className="rightInfo">
-                                            {/* Hiển thị tổng tiền chỉ khi index === 0 */}
-                                            {index === 0 && <span>{detail.total.toLocaleString('vi-VN')}VND</span>}
+                                            <span>{data.total.toLocaleString('vi-VN')}VND</span>
                                             </div>
                                         </div>
                                         <div className="tripInfo">
@@ -204,14 +207,13 @@ function AdminPaySuccess() {
                                         <div className="tripInfo">
                                             <span>Trạng thái:</span>
                                             <div className="rightInfo">
-                                                {data.status === 1 ? <span>Đã thanh toán</span> : <span>Chưa thanh toán</span>}
+                                                {data.isPaid === 1 ? <span>Đã thanh toán</span> : <span>Chưa thanh toán</span>}
                                             </div>
                                         </div>
                                         <div className="tripInfo">
                                             <span>Email liên hệ:</span>
                                             <div className="rightInfo">
-                                                {/* Hiển thị email chỉ khi index === 0 */}
-                                                {index === 0 && <span>{data.user.email}</span>}
+                                                <span>{data.email}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -220,7 +222,7 @@ function AdminPaySuccess() {
                                 <div className="text">
                                     <p>Chúng tôi đã gửi một email chứa thông tin giao dịch trên. Vui lòng kiểm tra email và lưu trữ nó, khi lên xe quý khách vui lòng xuất trình email đã gửi cho nhân viên soát vé</p>
                                 </div>
-                                {index === 0 &&<Link to="/"><button className="btn back">Trở về</button></Link>}
+                                {index === 0 &&<Link to="/admin"><button className="btn back">Trở về</button></Link>}
                                 </div>
                             </div>
                             ))
