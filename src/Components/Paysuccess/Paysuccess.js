@@ -7,21 +7,21 @@ import { Link, useLocation } from 'react-router-dom';
 
 const Paysuccess = () =>{
     const location = useLocation();
-    const { orderId, kind } = location.state || {};
+    const { bookingId, kind } = location.state || {};
     console.log(kind)
     const [data, setData] = useState(null);
     // const orderId = 1;
-    console.log("orderId", orderId)
+    console.log("bookingId", bookingId)
     
     // const [orders, setsetOrders] = useState([]);
 
     useEffect(() => {
         // Call the API to fetch cities
         fetchOrderDetail();
-    }, [orderId]);
+    }, [bookingId]);
 
     const fetchOrderDetail = async () => {
-        fetch(`http://localhost:8081/api/order/${orderId}`)
+        fetch(`http://localhost:8081/api/booking/${bookingId}`)
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -36,7 +36,7 @@ const Paysuccess = () =>{
                     {kind === "Một chiều" && (
                         <div>
                             {data &&
-                                data.orderDetails.map(detail => (
+                                data.bookingDetails.map(detail => (
                                     <div className="payContent" key={detail.id}>
                                         <div className="imgsucces">
                                                 <img src={success} alt="succes"/>                    
@@ -68,7 +68,7 @@ const Paysuccess = () =>{
                                                 <div className="tripInfo">
                                                     <span>Loại xe/ Biến số:</span>
                                                     <div className="rightInfo">
-                                                        <span>{detail.trip.vehicle.name}/ {detail.trip.vehicle.vehicleNumber}</span>
+                                                        <span>{detail.trip.vehicle.kindVehicle.name}/ {detail.trip.vehicle.vehicleNumber}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -88,7 +88,7 @@ const Paysuccess = () =>{
                                             <div className="tripInfo">
                                                 <span>Tổng tiền:</span>
                                                 <div className="rightInfo">
-                                                    <span>{detail.total.toLocaleString('vi-VN')}VND</span>
+                                                    <span>{data.total.toLocaleString('vi-VN')}VND</span>
                                                 </div>
                                             </div>
                                             <div className="tripInfo">
@@ -100,7 +100,7 @@ const Paysuccess = () =>{
                                             <div className="tripInfo">
                                                 <span>Trạng thái:</span>
                                                 <div className="rightInfo">
-                                                    {data.status === 1 ? (
+                                                    {data.isPaid === 1 ? (
                                                         <span>Đã thanh toán</span>
                                                     ) : (
                                                         <span>Chưa thanh toán</span>
@@ -110,7 +110,7 @@ const Paysuccess = () =>{
                                             <div className="tripInfo">
                                                 <span>Email liên hệ:</span>
                                                 <div className="rightInfo">
-                                                    <span>{data.user.email}</span>
+                                                    <span>{data.email}</span>
                                                 </div>
                                             </div>
                                             <div className="text">
@@ -128,14 +128,18 @@ const Paysuccess = () =>{
                         <div className="flex" style={{gap:"1rem"}}>
                             
                         {data &&
-                            data.orderDetails.map((detail, index) => (
+                            data.bookingDetails.map((detail, index) => (
                             <div className="payContent" key={detail.id}>
                                 <div className="imgsucces">
                                     <img src={success} alt="success" />
                                 </div>
                                 <div className="content">
                                     <div className="titlePay">Thành công</div>
-                                    <div>Thông tin chi tiết vé</div>
+                                    {detail.roundTrip === 1 ? (
+                                        <div>Thông tin chi tiết lượt về</div>
+                                    ) : (
+                                        <div>Thông tin chi tiết lượt đi</div>
+                                    )}
                                 </div>
                                 <div className="ticketInfo">
                                 <div className="tripLabel">
@@ -160,7 +164,7 @@ const Paysuccess = () =>{
                                     <div className="tripInfo">
                                         <span>Loại xe/ Biến số:</span>
                                         <div className="rightInfo">
-                                            <span>{detail.trip.vehicle.name}/ {detail.trip.vehicle.vehicleNumber}</span>
+                                            <span>{detail.trip.vehicle.kindVehicle.name}/ {detail.trip.vehicle.vehicleNumber}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -181,8 +185,7 @@ const Paysuccess = () =>{
                                         <div className="tripInfo">
                                             <span>Tổng tiền:</span>
                                             <div className="rightInfo">
-                                            {/* Hiển thị tổng tiền chỉ khi index === 0 */}
-                                            {index === 0 && <span>{detail.total.toLocaleString('vi-VN')}VND</span>}
+                                            <span>{data.total.toLocaleString('vi-VN')}VND</span>
                                             </div>
                                         </div>
                                         <div className="tripInfo">
@@ -194,14 +197,13 @@ const Paysuccess = () =>{
                                         <div className="tripInfo">
                                             <span>Trạng thái:</span>
                                             <div className="rightInfo">
-                                                {data.status === 1 ? <span>Đã thanh toán</span> : <span>Chưa thanh toán</span>}
+                                                {data.isPaid === 1 ? <span>Đã thanh toán</span> : <span>Chưa thanh toán</span>}
                                             </div>
                                         </div>
                                         <div className="tripInfo">
                                             <span>Email liên hệ:</span>
                                             <div className="rightInfo">
-                                                {/* Hiển thị email chỉ khi index === 0 */}
-                                                {index === 0 && <span>{data.user.email}</span>}
+                                                <span>{data.email}</span>
                                             </div>
                                         </div>
                                     </div>

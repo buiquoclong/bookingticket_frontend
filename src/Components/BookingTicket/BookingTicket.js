@@ -15,49 +15,115 @@ const BookingTicket = () =>{
     const totalAmount = totalPrice + totalPriceReturn;
     const [showLocationInput, setShowLocationInput] = useState(false);
     const [showLocationRetrunInput, setShowLocationRetrunInput] = useState(false);
-    
     const [showPaymentPopup, setShowPaymentPopup] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [note, setNote] = useState("");
     const [pickupLocation, setPickupLocation] = useState("");
-    
     const [noteReturn, setNoteReturn] = useState("");
     const [pickupLocationReturn, setPickupLocationReturn] = useState("");
-    
     const [data, setData] = useState(null);
     const [dataReturn, setDataReturn] = useState(null);
+    const [userName, setUserName] = useState("");
+    const [email, setEmail] = useState("");
+    const [emailErrorMessage, setEmailErrorMessage] = useState('');
+    const [phone, setPhone] = useState("");
+    const [phoneErrorMessage, setPhoneErrorMessage] = useState('');
 
     const navigate = useNavigate();
+    const userId = sessionStorage.getItem("userId");
 
+    // Xử lý chọn nhập nơi đón
     const handleSelectChange = (event) => {
         setShowLocationInput(event.target.value === 'Yes');
     };
+    // Xử lý chọn nhập nơi đón cho chuyến về
     const handleSelectRetrunChange = (event) => {
         setShowLocationRetrunInput(event.target.value === 'Yes');
     };
 
+    // Xử lý input ghi chú
     const handleNoteChange = (event) => {
         setNote(event.target.value);
     };
 
+    // Xử lý input nơi đón
     const handlePickupLocationChange = (event) => {
         setPickupLocation(event.target.value);
     };
 
+    // Xử lý input ghi chú cho chuyến về
     const handleNoteReturnChange = (event) => {
         setNoteReturn(event.target.value);
     };
 
+    // Xử lý input nơi đón cho chuyến về
     const handlePickupLocationReturnChange = (event) => {
         setPickupLocationReturn(event.target.value);
     };
 
-    const handlePayment = () => {
-        if (!isChecked) {
-            toast.error('Vui lòng chấp nhận các điều khoản.');
+    // Xử lý khi input tên người dùng thay đổi
+    const handleUserNameChange = (event) => {
+        setUserName(event.target.value);
+    };
+
+    // Xử lý thay đổi cho input số điện thoại
+    const handlePhoneChange = (event) => {
+        // setPhone(event.target.value);
+        const phoneNumber = event.target.value;
+        const phonePattern = /^(0\d{9,10})$/; // Biểu thức chính quy kiểm tra số điện thoại
+        
+        // Kiểm tra xem số điện thoại nhập vào có khớp với biểu thức chính quy không
+        if (!phonePattern.test(phoneNumber)) {
+            setPhoneErrorMessage("Số điện thoại không hợp lệ.");
         } else {
-            setShowPaymentPopup(true);
+            setPhoneErrorMessage(""); // Nếu hợp lệ, xóa thông báo lỗi
         }
+        setPhone(phoneNumber);
+    };
+
+    // Xử lý thay đổi cho input email
+    const handleEmailChange = (event) => {
+        // setEmail(event.target.value);
+        const emailAddress = event.target.value;
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Biểu thức chính quy kiểm tra email
+        
+        // Kiểm tra xem email nhập vào có khớp với biểu thức chính quy không
+        if (!emailPattern.test(emailAddress)) {
+            setEmailErrorMessage("Email không hợp lệ.");
+        } else {
+            setEmailErrorMessage(""); // Nếu hợp lệ, xóa thông báo lỗi
+        }
+        setEmail(emailAddress);
+    };
+
+    const handlePayment = () => {
+        let missingInfo = [];
+        if (!userName) {
+            missingInfo.push("Họ và tên");
+        } 
+        if (!phone) {
+            missingInfo.push("Số điện thoại");
+        } else if (phoneErrorMessage) { // Kiểm tra nếu có errorMessage cho phone
+            toast.error(phoneErrorMessage); // Hiển thị errorMessage nếu có
+            return; // Dừng xử lý tiếp theo nếu có lỗi
+        }
+        if (!email) {
+            missingInfo.push("Email");
+        } else if (emailErrorMessage) { // Kiểm tra nếu có errorMessage cho email
+            toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
+            return; // Dừng xử lý tiếp theo nếu có lỗi
+        }
+        if (missingInfo.length > 0) {
+            const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+            toast.error(message);
+        } else {
+            if (!isChecked) {
+                toast.error('Vui lòng chấp nhận các điều khoản.');
+            } else {
+                setShowPaymentPopup(true);
+            }
+        }
+        
     };
 
     console.log("ui:  ",sessionStorage.getItem("userId"))
@@ -69,6 +135,19 @@ const BookingTicket = () =>{
         } else if (kind === "Khứ hồi") {
             fetchTripInfo();
             fetchTripReturnInfo();
+        }
+        // const userId = sessionStorage.getItem("userId");
+        if (userId) {
+        // Nếu có userId, thực hiện gọi API để lấy thông tin người dùng
+        fetch(`http://localhost:8081/api/user/${userId}`)
+            .then((response) => response.json())
+            .then((userData) => {
+            // Cập nhật thông tin người dùng vào các trường nhập liệu
+            setUserName(userData.name);
+            setPhone(userData.phone);
+            setEmail(userData.email);
+            })
+            .catch((error) => console.error("Error fetching user data:", error));
         }
     },[kind, tripId, tripIdReturn]);
 
@@ -98,57 +177,76 @@ const BookingTicket = () =>{
         };
 
     const handleChoosePayment = async () => {
-        const seatsToCheck = kind === "Một chiều" ? selectedSeatIds : selectedSeatIds.concat(selectedSeatIdsReturn);
-
         try {
-            const seatChecks = await Promise.all(
-                seatsToCheck.map(seatId =>
-                    fetch(`http://localhost:8081/api/seat/${seatId}`).then(res => res.json())
-                )
-            );
+            // Gửi yêu cầu để lấy danh sách các ghế đã đặt cho chuyến đi
+            const responseTrip = await fetch(`http://localhost:8081/api/seat_reservation/trip/${tripId}`);
+            const reservedSeatsTrip = await responseTrip.json();
 
-            // Kiểm tra nếu có bất kỳ ghế nào đã được đặt (có status là 1)
-            const isAnySeatBooked = seatChecks.some(seat => seat.status === 1);
+            // Kiểm tra từng seatId trong selectedSeatIds
+            const isAnySeatBookedTrip = selectedSeatIds.some(seatId => {
+                // Kiểm tra xem seatId có trong danh sách ghế đã đặt cho chuyến đi không
+                return reservedSeatsTrip.some(reservedSeat => reservedSeat.seat.id === seatId);
+            });
 
-            if (isAnySeatBooked) {
-                // Nếu có ghế đã được đặt (status 1), hiển thị thông báo và không tiếp tục quá trình tạo hóa đơn
+            // Nếu là chuyến đi đầu tiên (một chiều) và bất kỳ ghế nào đã được đặt
+            if (kind === "Một chiều" && isAnySeatBookedTrip) {
+                // Hiển thị thông báo và không tiếp tục quá trình tạo hóa đơn
                 toast.error('Một hoặc nhiều ghế đã được đặt, vui lòng chọn ghế khác.');
                 return;
             }
 
+            // Nếu là chuyến đi cuối cùng trong chuyến khứ hồi và bất kỳ ghế nào đã được đặt
+            if (kind === "Khứ hồi" && isAnySeatBookedTrip) {
+                // Gửi yêu cầu để lấy danh sách các ghế đã đặt cho chuyến về
+                const responseTripReturn = await fetch(`http://localhost:8081/api/seat_reservation/trip/${tripIdReturn}`);
+                const reservedSeatsTripReturn = await responseTripReturn.json();
+
+                // Kiểm tra từng seatId trong selectedSeatIdsReturn
+                const isAnySeatBookedTripReturn = selectedSeatIdsReturn.some(seatId => {
+                    // Kiểm tra xem seatId có trong danh sách ghế đã đặt cho chuyến về không
+                    return reservedSeatsTripReturn.some(reservedSeat => reservedSeat.seat.id === seatId);
+                });
+
+                // Nếu bất kỳ ghế nào đã được đặt cho cả chuyến đi và chuyến về
+                if (isAnySeatBookedTripReturn) {
+                    // Hiển thị thông báo và không tiếp tục quá trình tạo hóa đơn
+                    toast.error('Một hoặc nhiều ghế đã được đặt, vui lòng chọn ghế khác.');
+                    return;
+                }
+            }
+
             if (kind === "Một chiều") {
-            
-                const orderData = {
-                    
-                    user:{id:sessionStorage.getItem("userId")},
-                    dayBook: new Date().toISOString(),
+                const bookingData = {
+                    userName: userName,
+                    email: email,
+                    phone: phone,
                     total: totalPrice,
-                    kindPay:"Thanh toán trả sau",
-                    status: 0,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
+                    kindPay: "Thanh toán trả sau",
+                    isPaid: 0,
+                    roundTrip: 0,
                 };
+                
+                // Chỉ thêm userId nếu nó có giá trị
+                if (userId) {
+                    bookingData.userId =  userId ;
+                }
     
                 try {
-                    const response = await fetch(`http://localhost:8081/api/order`, {
+                    const response = await fetch(`http://localhost:8081/api/booking`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify(orderData)
+                        body: JSON.stringify(bookingData)
                     });
     
                     if (response.ok) {
                         toast.success("Đơn hàng đã được tạo!");
-                        const createdOrder = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
-                        // Tạo chi tiết hóa đơn với orderId là id của hóa đơn vừa tạo
-                        // await createOrderDetail(createdOrder.id, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice);
-                        await createOrderDetail(createdOrder.id, tripId, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice, pickupLocation, note);
-                        updateVehicleEmptySeat(data.vehicle.id, selectedSeatIds);
-                        updateSeatStatus(selectedSeatIds);
-                        insertSeatBooked(selectedSeatIds, tripId);
-                        // navigate("/pay-success");
-                        navigate("/pay-success", { state: { orderId: createdOrder.id, kind: kind } });
+                        const createdBooking = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
+                        await createBookingDetail(createdBooking.id, tripId, 0, selectedSeatIds.length, selectedSeatsNames, totalPrice, pickupLocation, note);
+                        updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds);
+                        insertSeatReservation(selectedSeatIds, tripId, createdBooking.id);
+                        navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: kind } });
                     } else {
                         throw new Error('Something went wrong with the order creation.');
                     }
@@ -157,90 +255,78 @@ const BookingTicket = () =>{
                     toast.error("Failed to create order.");
                 }
             } else if (kind === "Khứ hồi") {
-                const orderData = {
-                    
-                    user:{id:sessionStorage.getItem("userId")},
-                    dayBook: new Date().toISOString(),
+                const bookingData = {
+                    userName: userName,
+                    email: email,
+                    phone: phone,
                     total: totalAmount,
                     kindPay:"Thanh toán trả sau",
-                    status: 0,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
+                    isPaid: 0,
+                    roundTrip: 1,
                 };
+                // Chỉ thêm userId nếu nó có giá trị
+                if (userId) {
+                    bookingData.userId =  userId ;
+                }
                 // Tạo hóa đơn lượt đi
                 try {
-                    const response = await fetch(`http://localhost:8081/api/order`, {
+                    const response = await fetch(`http://localhost:8081/api/booking`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify(orderData)
+                        body: JSON.stringify(bookingData)
                     });
     
                     if (response.ok) {
                         toast.success("Đơn hàng đã được tạo!");
-                        const createdOrder = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
-                        // Tạo chi tiết hóa đơn với orderId là id của hóa đơn vừa tạo
-                        // await createOrderDetail(createdOrder.id, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice);
+                        const createdBooking = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
                         // tạo chi tiết và upadte lượt đi
-                        await createOrderDetail(createdOrder.id, tripId, selectedSeatIds.length, selectedSeatsNames, data.price, totalPrice, pickupLocation, note);
-    
-                        updateVehicleEmptySeat(data.vehicle.id, selectedSeatIds);
-                        updateSeatStatus(selectedSeatIds);
-                        insertSeatBooked(selectedSeatIds, tripId);
+                        await createBookingDetail(createdBooking.id, tripId, 0, selectedSeatIds.length, selectedSeatsNames, totalPrice, pickupLocation, note);
+                        updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds);
+                        insertSeatReservation(selectedSeatIds, tripId, createdBooking.id);
                         // tạo chi tiết và update lượt về
-                        await createOrderDetail(createdOrder.id, tripIdReturn, selectedSeatIdsReturn.length, selectedSeatsNamesReturn, dataReturn.price, totalPriceReturn, pickupLocationReturn, noteReturn);
-                        
-                        updateVehicleEmptySeat(dataReturn.vehicle.id, selectedSeatIdsReturn);
-                        updateSeatStatus(selectedSeatIdsReturn);
-                        insertSeatBooked(selectedSeatIdsReturn, tripIdReturn);
-    
-                        navigate("/pay-success", { state: { orderId: createdOrder.id, kind: kind } });
+                        await createBookingDetail(createdBooking.id, tripIdReturn, 1, selectedSeatIdsReturn.length, selectedSeatsNamesReturn, totalPriceReturn, pickupLocationReturn, noteReturn);
+                        updateTripEmptySeat(tripIdReturn, dataReturn.route.id, dataReturn.vehicle.id, dataReturn.dayStart, dataReturn.timeStart, dataReturn.price, dataReturn.driver.id, dataReturn.emptySeat, selectedSeatIdsReturn);
+                        insertSeatReservation(selectedSeatIdsReturn, tripIdReturn, createdBooking.id);
+                        navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: kind } });
                     } else {
                         throw new Error('Something went wrong with the order creation.');
                     }
                 } catch (error) {
                     console.error("Error creating order:", error);
-                    toast.error("Lỗi tọa hóa đơn lượt đi.");
+                    toast.error("Lỗi tạo hóa đơn lượt đi.");
                 }
                 
     
             }
+
         } catch (error) {
             console.error('Error checking seat status:', error);
             toast.error('Lỗi kiểm tra trạng thái ghế.');
         }
-
-
-
-        
-        
     };
 
     // Tạo chi tiết hóa đơn
-    const createOrderDetail = async (orderId, trip, numSeat, seatNames, price, total, pickup, note) => {
-        console.log("orderID", orderId)
-        const orderDetailId = generateOrderId();
-        const orderDetailData = {
-            id: orderDetailId,
-            order:{id: orderId }, // Sử dụng orderId của hóa đơn chính
-            trip:{id:trip},
-            numSeat: numSeat, // Số ghế được chọn
-            seatName: seatNames, // Tên của các ghế được chọn
-            price: price, // Giá của trip
-            total: total, // Tổng tiền
+    const createBookingDetail = async (bookingId, trip,roundTrip, numSeat, seatNames, total, pickup, note) => {
+        const bookingDetailData = {
+            bookingId: bookingId , // Sử dụng orderId của hóa đơn chính
+            tripId: trip,
+            roundTrip: roundTrip,
+            quantity: numSeat, // Số ghế được chọn
+            seatName: seatNames,// Giá của trip
+            price: total, // Tổng tiền
             pointCatch: pickup || "Tại nhà xe",
-            note: note || "Không có ghi chú",
-            createdAt: new Date().toISOString() // Thời gian tạo
+            note: note || "Không có ghi chú"
         };
     
         try {
-            const response = await fetch(`http://localhost:8081/api/orderdetail`, {
+            const response = await fetch(`http://localhost:8081/api/boking_detail`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(orderDetailData)
+                body: JSON.stringify(bookingDetailData)
             });
     
             if (!response.ok) {
@@ -252,114 +338,61 @@ const BookingTicket = () =>{
         }
     };
     
-    // Random mã vé
-    const generateOrderId = () => {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        const codeLength = 8;
-        let ticketCode = '';
-        for (let i = 0; i < codeLength; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        ticketCode += characters.charAt(randomIndex);
-        }
-        return ticketCode;
-    };
 
     // Update lại số ghế trống
-    const updateVehicleEmptySeat = async (vehicleId, selectedSeatIds) => {
+    const updateTripEmptySeat = async (trip, route, vehicleId, daystart, timestart, price, driver, emptyseat, selectedSeatIds) => {
+        const newEmptySeat = emptyseat - selectedSeatIds.length;
+        const tripUpdate = {
+            routeId: route ,
+            vehicleId: vehicleId,
+            dayStart: daystart,
+            timeStart: timestart,
+            price: price,
+            driverId: driver,
+            emptySeat: newEmptySeat
+        };
         try {
-            // Lấy thông tin chi tiết của phương tiện
-            const response = await fetch(`http://localhost:8081/api/vehicle/${vehicleId}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch vehicle details');
-            }
-            const vehicleData = await response.json();
-    
-            // Tính toán số ghế trống mới
-            const newEmptySeat = vehicleData.emptySeat - selectedSeatIds.length;
-    
-            // Cập nhật lại trường emptySeat và giữ nguyên các trường khác
-            vehicleData.emptySeat = newEmptySeat;
-    
             // Gửi yêu cầu cập nhật số ghế trống
-            const updateResponse = await fetch(`http://localhost:8081/api/vehicle/${vehicleId}`, {
+            const updateResponse = await fetch(`http://localhost:8081/api/trip/${trip}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(vehicleData),
+                body: JSON.stringify(tripUpdate),
             });
     
             if (!updateResponse.ok) {
-                throw new Error('Failed to update vehicle empty seat');
+                throw new Error('Failed to update trip empty seat');
             }
     
-            console.log('Vehicle empty seat updated successfully');
+            console.log('Trip empty seat updated successfully');
         } catch (error) {
-            console.error('Error updating vehicle empty seat:', error);
+            console.error('Error updating trip empty seat:', error);
         }
     };
     
 
-    // Update lại status ghế
-    const updateSeatStatus = async (selectedSeatIds) => {
-        try {
-            // Lặp qua từng id của ghế được chọn
-            for (const seatId of selectedSeatIds) {
-                // Lấy thông tin chi tiết của ghế
-                const response = await fetch(`http://localhost:8081/api/seat/${seatId}`);
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch seat details for seatId ${seatId}`);
-                }
-                const seatData = await response.json();
-    
-                // Cập nhật trạng thái của ghế từ 0 sang 1
-                seatData.status = 1;
-    
-                // Gửi yêu cầu cập nhật trạng thái ghế
-                const updateResponse = await fetch(`http://localhost:8081/api/seat/${seatId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(seatData),
-                });
-    
-                if (!updateResponse.ok) {
-                    throw new Error(`Failed to update seat status for seatId ${seatId}`);
-                }
-    
-                console.log(`Seat status updated successfully for seatId ${seatId}`);
-            }
-    
-        } catch (error) {
-            console.error('Error updating seat status:', error);
-        }
-    };
     
     // Insert vào ghế đã đặt 
-    const insertSeatBooked = async (selectedSeatIds, tripId) => {
-        const userId = sessionStorage.getItem('userId');
+    const insertSeatReservation = async (selectedSeatIds, trip, bookingId) => {
     
         try {
             // Lặp qua từng id của ghế được chọn
             for (const seatId of selectedSeatIds) {
                 // Tạo dữ liệu mới cho mỗi ghế được đặt
-                const seatBookedData = {
-                    seat: { id: seatId }, // Id của ghế
-                    trip: { id: tripId }, // Id của chuyến đi
-                    user: { id: userId }, // Id của người dùng
-                    status: 1,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString() // Thời gian tạo
+                const seatReservationData = {
+                    bookingId:  bookingId ,
+                    tripId: trip,
+                    seatId: seatId
                 };
     
                 // Gửi yêu cầu để thêm ghế đã đặt vào bảng SeatBooked
-                const response = await fetch(`http://localhost:8081/api/seatbooked`, {
+                const response = await fetch(`http://localhost:8081/api/seat_reservation`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(seatBookedData),
+                    body: JSON.stringify(seatReservationData),
                 });
     
                 if (!response.ok) {
@@ -404,29 +437,30 @@ const BookingTicket = () =>{
             )}
 
 
-                            {kind === "Một chiều" && (
-                                <div>
-                                    <div className="bookingContent flex">
-                                        {data && (
-                                        <div className="infoTicket">
-                                            <div className="lineInfo">
-                                                <span>Tuyến:</span>
-                                                <div className="rightInfo">
-                                                    <span>{data.route.name}</span>
-                                                </div>
-                                            </div>
-                                            <div className="lineInfo">
-                                                <span>Loại xe:</span>
-                                                <div className="rightInfo">
-                                                    <span>{data.vehicle.name}</span>
-                                                </div>
-                                            </div>
-                                            <div className="lineInfo">
-                                                <span>Ngày:</span>
-                                                <div className="rightInfo">
-                                                    <span>{new Date(data.dayStart).toLocaleDateString('vi-VN')}</span>
-                                                </div>
-                                            </div>
+            {kind === "Một chiều" && (
+                <div>
+                    <div className="bookingContent flex">
+                        {data && (
+                            <div className="infoTicket">
+                                <h3>Thông tin chuyến đi</h3>
+                                <div className="lineInfo">
+                                    <span>Tuyến:</span>
+                                    <div className="rightInfo">
+                                        <span>{data.route.name}</span>
+                                    </div>
+                                </div>
+                                <div className="lineInfo">
+                                    <span>Loại xe:</span>
+                                        <div className="rightInfo">
+                                            <span>{data.vehicle.kindVehicle.name}</span>
+                                        </div>
+                                    </div>
+                                    <div className="lineInfo">
+                                        <span>Ngày:</span>
+                                        <div className="rightInfo">
+                                            <span>{new Date(data.dayStart).toLocaleDateString('vi-VN')}</span>
+                                        </div>
+                                    </div>
                                             <div className="lineInfo">
                                                 <span>Thời gian:</span>
                                                 <div className="rightInfo">
@@ -482,21 +516,46 @@ const BookingTicket = () =>{
                                             </div>
                                         </div>
                                         )}
-                                        <div className="policyInfo">
-                                            <div className="titlePolicy">
-                                                <h1><span>ĐIỀU KHOẢN &</span><span style={{color:"red"}}> LƯU Ý</span></h1>
+                                        <div>
+                                            <div className=" infoUser" style={{height:"15rem"}}>
+                                                    <h3>Thông tin người đặt</h3>
+                                                    <div className="lineInfo">
+                                                        <span>Họ và tên<span style={{color:"red"}}>*</span>:</span>
+                                                        <div className="infoInput" >
+                                                            <input type="text" className="info" placeholder="Nhập họ và tên" value={userName} onChange={handleUserNameChange}/>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Số điện thoại<span style={{color:"red"}}>*</span>:</span>
+                                                        <div className="infoInput" >
+                                                            <input type="text" className="info" placeholder="Nhập số điện thoại" value={phone}  onChange={handlePhoneChange}/>
+                                                            {phoneErrorMessage && <p style={{ color: "red", lineHeight:"2" }}>{phoneErrorMessage}</p>}
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Email<span style={{color:"red"}}>*</span>:</span>
+                                                        <div className="infoInput" >
+                                                            <input type="text" className="info" placeholder="Nhập Email" value={email} onChange={handleEmailChange}/>
+                                                            {emailErrorMessage && <p style={{ color: "red", lineHeight:"2" }}>{emailErrorMessage}</p>}
+                                                        </div>
+                                                    </div>
                                             </div>
-                                            <div className="devide"></div>
-                                            <div className="contentPolicy">
-                                                <div><span style={{color:"red"}}>(*)</span> Quý khách vui lòng mang email có chứa mã vé đến văn phòng để đổi vé lên xe trước giờ xuất bến ít nhất <span style={{color:"red", fontWeight:"600"}}>20 phút</span> để thực hiện đổi vé.</div>
-                                                <div><span style={{color:"red"}}>(*)</span> Thông tin hành khách phải chính xác, nếu không sẽ không thể lên xe hoặc hủy/ đổi vé </div>
+                                            <div className="policyInfo">
+                                                <div className="titlePolicy">
+                                                    <h1><span>ĐIỀU KHOẢN &</span><span style={{color:"red"}}> LƯU Ý</span></h1>
+                                                </div>
+                                                <div className="devide"></div>
+                                                <div className="contentPolicy">
+                                                    <div><span style={{color:"red"}}>(*)</span> Quý khách vui lòng mang email có chứa mã vé đến văn phòng để đổi vé lên xe trước giờ xuất bến ít nhất <span style={{color:"red", fontWeight:"600"}}>20 phút</span> để thực hiện đổi vé.</div>
+                                                    <div><span style={{color:"red"}}>(*)</span> Thông tin hành khách phải chính xác, nếu không sẽ không thể lên xe hoặc hủy/ đổi vé </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            )}
+                                </div>                                
+            )}
 
-                            {kind === "Khứ hồi" && (
+            {kind === "Khứ hồi" && (
                                 <div>
                                     <div className="bookingContent flex">
                                         <div>
@@ -512,7 +571,7 @@ const BookingTicket = () =>{
                                                     <div className="lineInfo">
                                                         <span>Loại xe:</span>
                                                         <div className="rightInfo">
-                                                            <span>{data.vehicle.name}</span>
+                                                            <span>{data.vehicle.kindVehicle.name}</span>
                                                         </div>
                                                     </div>
                                                     <div className="lineInfo">
@@ -562,29 +621,40 @@ const BookingTicket = () =>{
                                                             </div>
                                                         </div>
                                                     )}
-                                                    {/* <div className="policyCheckbox">
-                                                        <label className="chekcBox">
-                                                            <span>
-                                                                <span><input type="checkbox" className="checkbox-input" value="1" checked={isChecked} onChange={(e) => setIsChecked(e.target.checked)}/></span>
-                                                                <span className="yes" style={{marginLeft:"10px"}}>Tôi chấp nhận với các điều khoản</span>
-                                                            </span>
-                                                        </label>
-                                                    </div>
-                                                    <div className="buttonList">
-                                                        <button className="btn cancle"><Link to="/">Hủy</Link></button>
-                                                        <button className="btn pay" onClick={handlePayment}>Thanh toán</button>
-                                                    </div> */}
                                                 </div>
                                             )}
+                                                <div className=" infoUser" style={{height:"15rem", marginTop:"1rem"}}>
+                                                    <h3>Thông tin người đặt</h3>
+                                                    <div className="lineInfo">
+                                                        <span>Họ và tên<span style={{color:"red"}}>*</span>:</span>
+                                                        <div  className="infoInput" >
+                                                            <input type="text" className="info" placeholder="Nhập họ và tên" value={userName} onChange={handleUserNameChange}/>
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Số điện thoại<span style={{color:"red"}}>*</span>:</span>
+                                                        <div className="infoInput">
+                                                            <input type="text" className="info" placeholder="Nhập số điện thoại" value={phone}  onChange={handlePhoneChange}/>
+                                                            {phoneErrorMessage && <p style={{ color: "red", lineHeight:"2" }}>{phoneErrorMessage}</p>}
+                                                        </div>
+                                                    </div>
+                                                    <div className="lineInfo">
+                                                        <span>Email<span style={{color:"red"}}>*</span>:</span>
+                                                        <div className="infoInput" >
+                                                            <input type="email" className="info" placeholder="Nhập Email" value={email} onChange={handleEmailChange}/>
+                                                            {emailErrorMessage && <p style={{ color: "red", lineHeight:"2" }}>{emailErrorMessage}</p>}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             <div className="policyInfo">
-                                            <div className="titlePolicy">
-                                                <h1><span>ĐIỀU KHOẢN &</span><span style={{color:"red"}}> LƯU Ý</span></h1>
-                                            </div>
-                                            <div className="devide"></div>
-                                            <div className="contentPolicy">
-                                                <div><span style={{color:"red"}}>(*)</span> Quý khách vui lòng mang email có chứa mã vé đến văn phòng để đổi vé lên xe trước giờ xuất bến ít nhất <span style={{color:"red", fontWeight:"600"}}>20 phút</span> để thực hiện đổi vé.</div>
-                                                <div><span style={{color:"red"}}>(*)</span> Thông tin hành khách phải chính xác, nếu không sẽ không thể lên xe hoặc hủy/ đổi vé </div>
-                                            </div>
+                                                <div className="titlePolicy">
+                                                    <h1><span>ĐIỀU KHOẢN &</span><span style={{color:"red"}}> LƯU Ý</span></h1>
+                                                </div>
+                                                <div className="devide"></div>
+                                                <div className="contentPolicy">
+                                                    <div><span style={{color:"red"}}>(*)</span> Quý khách vui lòng mang email có chứa mã vé đến văn phòng để đổi vé lên xe trước giờ xuất bến ít nhất <span style={{color:"red", fontWeight:"600"}}>20 phút</span> để thực hiện đổi vé.</div>
+                                                    <div><span style={{color:"red"}}>(*)</span> Thông tin hành khách phải chính xác, nếu không sẽ không thể lên xe hoặc hủy/ đổi vé </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div>
@@ -600,7 +670,7 @@ const BookingTicket = () =>{
                                                     <div className="lineInfo">
                                                         <span>Loại xe:</span>
                                                         <div className="rightInfo">
-                                                            <span>{dataReturn.vehicle.name}</span>
+                                                            <span>{dataReturn.vehicle.kindVehicle.name}</span>
                                                         </div>
                                                     </div>
                                                     <div className="lineInfo">
@@ -650,18 +720,6 @@ const BookingTicket = () =>{
                                                             </div>
                                                         </div>
                                                     )}
-                                                    {/* <div className="policyCheckbox">
-                                                        <label className="chekcBox">
-                                                            <span>
-                                                                <span><input type="checkbox" className="checkbox-input" value="1" checked={isChecked} onChange={(e) => setIsChecked(e.target.checked)}/></span>
-                                                                <span className="yes" style={{marginLeft:"10px"}}>Tôi chấp nhận với các điều khoản</span>
-                                                            </span>
-                                                        </label>
-                                                    </div>
-                                                    <div className="buttonList">
-                                                        <button className="btn cancle"><Link to="/">Hủy</Link></button>
-                                                        <button className="btn pay" onClick={handlePayment}>Thanh toán</button>
-                                                    </div> */}
                                                 </div>
                                             )}
                                             <div className="policyInfo" style={{height:"22rem"}}>
@@ -707,13 +765,7 @@ const BookingTicket = () =>{
                                         
                                     </div>
                                 </div>
-                            )}
-
-
-
-            
-                
-            
+            )}
             <ToastContainer
                         className="toast-container"
                         toastClassName="toast"

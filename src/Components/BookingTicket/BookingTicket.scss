@@ -170,11 +170,16 @@
             border: 1px solid var(--greyText);
             padding: 1rem 2rem;
             // display: flex;
-
+            h3{
+                color: var(--blackColor);
+            }
             .lineInfo{
                 display: flex;
                 justify-content: space-between;
                 line-height: 3rem;
+                span{
+                    color: var(--blackColor);
+                }
                 .rightInfo{
                     width: 18rem;
                     height: 2.5rem;
@@ -250,6 +255,37 @@
             }
             
             
+        }
+        .infoUser{
+            width: 30rem;
+            background: var(--whiteColor);
+            border-radius: 1rem;
+            border: 1px solid var(--greyText);
+            padding: 1rem 2rem;
+            h3{
+                color: var(--blackColor);
+            }
+            .lineInfo{
+                display: flex;
+                justify-content: space-between;
+                line-height: 3rem;
+                span{
+                    color: var(--blackColor);
+                }
+                .infoInput{
+                    display: grid;
+                    .info{
+                        width: 18rem;
+                        height: 2.5rem;
+                        background: var(--whiteColor);
+                        border-radius: .5rem;
+                        padding-left: 1rem;
+                        border: 1px solid var(--greyText);
+                        outline: none;
+                    }
+                }
+                
+            }
         }
         .policyInfo{
             width: 30rem;

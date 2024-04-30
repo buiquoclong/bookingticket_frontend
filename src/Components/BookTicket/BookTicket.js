@@ -21,6 +21,7 @@ const BookTicket = () =>{
     const [selectedSeatsById, setSelectedSeatsById] = useState({});
     
     const [data, setData] = useState(null);
+    const [seats, setSeats] = useState([]);
     
     const navigate = useNavigate();
 
@@ -44,7 +45,7 @@ const BookTicket = () =>{
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
+                console.log("data", data);
                 setData(data);
             })
             .catch(error => {
@@ -53,11 +54,48 @@ const BookTicket = () =>{
         };
 
 
-    const handleTabClick = (tab, cardId) => {
+    const handleTabClick = (tab, tripId, kindVehicleId) => {
         setTabValues(prevState => ({
             ...prevState,
-            [cardId]: prevState[cardId] === tab ? null : tab
+            [tripId]: prevState[tripId] === tab ? null : tab
         }));
+        if (tab === 1) {
+            console.log("tab1")
+            console.log("kindVehicleId", kindVehicleId)
+            fetch(`http://localhost:8081/api/seat/kind_vehicle/${kindVehicleId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch seats');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Lưu danh sách ghế vào state
+                    console.log(data);
+                    // Lấy danh sách các ghế đã đặt cho chuyến đi
+                    fetch(`http://localhost:8081/api/seat_reservation/trip/${tripId}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to fetch reserved seats');
+                            }
+                            return response.json();
+                        })
+                        .then(reservedSeats => {
+                            console.log('Reserved Seats:', reservedSeats);
+                            const updatedSeats = data.map(seat => ({
+                                ...seat,
+                                status: reservedSeats.some(reservedSeat => reservedSeat.seat.id === seat.id) ? 1 : 0
+                            }));
+                            setSeats(updatedSeats);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching reserved seats:', error);
+                        });
+                })
+                .catch(error => {
+                    console.error('Error fetching seats:', error);
+                });
+        }
     };
 
         
@@ -73,10 +111,10 @@ const BookTicket = () =>{
     }
 
     const handleClick = (seatId, tuyenId) => {
+        console.log(seatId)
         const tuyen = data.find(tuyen => tuyen.id === tuyenId);
         if (tuyen) {
-            const ghengoiTuyen = tuyen.vehicle.seats;
-            const clickedSeat = ghengoiTuyen.find(seat => seat.id === seatId);
+            const clickedSeat = seats?.find(seat => seat.id === seatId);
             const isSelected = selectedSeatsById[tuyenId]?.some(seat => seat.id === seatId);
             
             if (isSelected) {
@@ -85,7 +123,7 @@ const BookTicket = () =>{
                     [tuyenId]: prevSeats[tuyenId].filter(seat => seat.id !== seatId)
                 }));
             } else {
-                if (clickedSeat.status !== 1) {
+                if (clickedSeat?.status !== 1) {
                     if (!selectedSeatsById[tuyenId] || selectedSeatsById[tuyenId].length < 5) {
                         setSelectedSeatsById(prevSeats => ({
                             ...prevSeats,
@@ -195,9 +233,7 @@ const BookTicket = () =>{
         const endTime = new Date(startTime.getTime() + routeTime * 60 * 60 * 1000);
         const formattedEndTime = endTime.toLocaleTimeString('en-US', { hour12: false }).slice(0, 5);
         return formattedEndTime;
-      }
-
-      
+    }
 
     return(
         <>
@@ -283,9 +319,9 @@ const BookTicket = () =>{
                                                         </div>
                                                         <div className="seatInfo">
                                                             <div className="dotSeat"></div>
-                                                            <span>{trip.vehicle.name}</span>
+                                                            <span>{trip.vehicle.kindVehicle.name}</span>
                                                             <div className="dotSeat"></div>
-                                                            <span className="text">{trip.vehicle.emptySeat} chỗ trống</span>
+                                                            <span className="text">{trip.emptySeat} chỗ trống</span>
                                                             <span className="price">{trip.price.toLocaleString('vi-VN')} VND</span>
                                                         </div>
                                                     </div>
@@ -335,7 +371,7 @@ const BookTicket = () =>{
                                                                                                     <div className="devide"></div>
                                                                                                     <table className="seatBottomnum">
                                                                                                         <tbody>
-                                                                                                                {trip.vehicle.seats && trip.vehicle.seats.length > 0 && chunkArray(trip.vehicle.seats, 3).map((seatRow, rowIndex) => (
+                                                                                                                {seats && seats.length > 0 && chunkArray(seats, 3).map((seatRow, rowIndex) => (
                                                                                                                     <tr className="seatNum" key={rowIndex}>
                                                                                                                         {seatRow.map((seat, seatIndex) => {
                                                                                                                             const { src, spanStyle } = getSeatImageAndStyle(seat.status);
@@ -501,7 +537,7 @@ const BookTicket = () =>{
                                                             </div>
                                                             )}
                                                     </div>
-                                                    <button className="btn buttonChooseRoute" onClick={() => handleTabClick(1, trip.id)}><span>Chọn chuyến</span></button>
+                                                    <button className="btn buttonChooseRoute" onClick={() => handleTabClick(1, trip.id, trip.vehicle.kindVehicle.id)}><span>Chọn chuyến</span></button>
                                                 </div>
                                             </div>
                                         ))
