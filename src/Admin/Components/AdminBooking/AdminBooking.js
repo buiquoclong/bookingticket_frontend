@@ -1,11 +1,42 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import DataTable from 'react-data-table-component'
 import "../AdminBooking/AdminBooking.scss"
+import { toast, ToastContainer, Zoom } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const AdminBooking = () =>{
     const [isEditing, setIsEditing] = useState(false);
     const [currentCity, setCurrentCity] = useState();
+    
+    const [isDetail, setIsDetail] = useState(false);
+    const [bookingDetails, setBookingDetails] = useState(null);
+    
+    const [data, setData] = useState([]);
+    const [records, setRecords] = useState([]);
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+    function formatDate1(dateString) {
+        const date = new Date(dateString);
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+    
+        // Đảm bảo rằng các giá trị có hai chữ số
+        const formattedHours = hours < 10 ? '0' + hours : hours;
+        const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+        const formattedDay = day < 10 ? '0' + day : day;
+        const formattedMonth = month < 10 ? '0' + month : month;
+    
+        return `${formattedHours}:${formattedMinutes} ${formattedDay}/${formattedMonth}/${year}`;
+    }
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -14,74 +45,161 @@ const AdminBooking = () =>{
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.id}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Chuyến</div>,
-            selector: row => row.routeName,
-            sortable: true,
-            width: '9rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.routeName}</div>
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Người đặt</div>,
+            selector: row => row.userName,
+            width: '8rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.userName}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Người đặt</div>,
-            selector: row => row.nameUserBook,
-            width: '14rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.nameUserBook}</div>
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Email</div>,
+            selector: row => row.email,
+            width: '9rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.email}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Số điện thoại</div>,
+            selector: row => row.phone,
+            width: '6rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.phone}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Ngày đặt</div>,
-            selector: row => row.dateBook,
-            width: '6.5rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.dateBook}</div>
+            selector: row => row.dayBook,
+            width: '9rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{formatDate1(row.dayBook)}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Giờ đi</div>,
-            selector: row => row.timeStart,
-            sortable: true,
-            width: '5rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.timeStart}</div>
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tổng tiền</div>,
+            selector: row => row.total,
+            width: '8rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.total.toLocaleString('vi-VN')}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Hình thức thanh toán</div>,
+            selector: row => row.kindPay,
+            width: '10rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.kindPay}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Đặt vé</div>,
+            selector: row => row.roundTrip,
+            width: '6rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{roundTrip[row.roundTrip] || 'Unknown roundTrip'}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Trạng thái</div>,
-            selector: row => row.status,
-            width: '8rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.status}</div>
-        },
-        {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Ghi chú</div>,
-            selector: row => row.note,
-            width: '6rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.note}</div>
-        },
-        {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Nơi đón</div>,
-            selector: row => row.placeCatch,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.placeCatch}</div>
+            selector: row => row.isPaid,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{isPaid[row.isPaid] || 'Unknown isPaid'}</div>
         },
         {
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                    <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button>
+                    <button style={{background:"white", color:"blue", border:"none", cursor:"pointer"}} onClick={() => handleDetailClick(row)}> Chi tiết </button> |
+                    <button style={{background:"#3b82f6",paddingInline:".5rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button>
                 </div>
             )
         }
     ]
-    const data = [
-        { id: 1,routeName:'Sài Gòn - Đà Lạt', nameUserBook: 'a@gmail.com', dateBook:'25/05/2024', timeStart:'08:00', status:'Đã thanh toán', note:"Không có ghi chú", placeCatch:"Tại nhà xe"},
-        { id: 2,routeName:'Sài Gòn - Đà Lạt', nameUserBook: 'a@gmail.com', dateBook:'25/05/2024', timeStart:'08:00', status:'Đã thanh toán', note:"Không có ghi chú ", placeCatch:"Tại nhà xe"},
-        { id: 3,routeName:'Sài Gòn - Đà Lạt', nameUserBook: 'a@gmail.com', dateBook:'25/05/2024', timeStart:'08:00', status:'Đã thanh toán', note:"Không có ghi chú", placeCatch:"Tại nhà xe"},
-        { id: 4,routeName:'Sài Gòn - Đà Lạt', nameUserBook: 'a@gmail.com', dateBook:'25/05/2024', timeStart:'08:00', status:'Đã thanh toán', note:"Không có ghi chú", placeCatch:"Tại nhà xe"},
-        { id: 5,routeName:'Sài Gòn - Đà Lạt', nameUserBook: 'a@gmail.com', dateBook:'25/05/2024', timeStart:'08:00', status:'Đã thanh toán', note:"Không có ghi chú", placeCatch:"Tại nhà xe"},
-        { id: 6,routeName:'Sài Gòn - Đà Lạt', nameUserBook: 'a@gmail.com', dateBook:'25/05/2024', timeStart:'08:00', status:'Đã thanh toán', note:"Không có ghi chú", placeCatch:"Tại nhà xe"},
-        { id: 7,routeName:'Sài Gòn - Đà Lạt', nameUserBook: 'a@gmail.com', dateBook:'25/05/2024', timeStart:'08:00', status:'Đã thanh toán', note:"Không có ghi chú", placeCatch:"Tại nhà xe"},
-        { id: 8,routeName:'Sài Gòn - Đà Lạt', nameUserBook: 'a@gmail.com', dateBook:'25/05/2024', timeStart:'08:00', status:'Đã thanh toán', note:"Không có ghi chú", placeCatch:"Tại nhà xe"},
-        { id: 9,routeName:'Sài Gòn - Đà Lạt', nameUserBook: 'a@gmail.com', dateBook:'25/05/2024', timeStart:'08:00', status:'Đã thanh toán', note:"Không có ghi chú", placeCatch:"Tại nhà xe"},
-        { id: 10,routeName:'Sài Gòn - Đà Lạt', nameUserBook: 'a@gmail.com', dateBook:'25/05/2024', timeStart:'08:00', status:'Đã thanh toán', note:"Không có ghi chú", placeCatch:"Tại nhà xe"}
-
+    const columnDetails = [
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
+            selector: row => row.id,
+            width: '8rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.id}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Chuyến đi</div>,
+            selector: row => row.trip.route.name,
+            width: '10rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.trip.route.name}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Loại xe</div>,
+            selector: row => row.trip.vehicle.kindVehicle.name,
+            width: '9rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.trip.vehicle.kindVehicle.name}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Biển số</div>,
+            selector: row => row.trip.vehicle.vehicleNumber,
+            width: '6rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.trip.vehicle.vehicleNumber}</div>
+        },{
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Thời gian khởi hành </div>,
+            width: '10rem',
+            cell: row => (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                    {row.trip.timeStart.slice(0, 5)} - {formatDate(row.trip.dayStart)}
+                </div>
+            )
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Lượt</div>,
+            selector: row => row.roundTrip,
+            width: '9rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{kindTrip[row.roundTrip] || 'Unknown roundTrip'}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Số ghế</div>,
+            selector: row => row.quantity,
+            width: '6rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.quantity}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên ghế</div>,
+            selector: row => row.seatName,
+            width: '10rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.seatName}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tổng tiền</div>,
+            selector: row => row.price,
+            width: '8rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.price.toLocaleString('vi-VN')}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Nơi đón</div>,
+            selector: row => row.pointCatch,
+            width: '7rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.pointCatch}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Ghi chú</div>,
+            selector: row => row.note,
+            width: '7rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.note}</div>
+        }
     ]
-    
-        const [records, setRecords] = useState(data);
+    const roundTrip = {
+        0: 'Một chiều',
+        1: 'Khứ hồi'
+    };
+    const isPaid = {
+        0: 'Chưa thanh toán',
+        1: 'Đã thanh toán'
+    };
+    const kindTrip = {
+        0: 'Lượt đi',
+        1: 'Lượt về'
+    };
+    useEffect(() => {
+        // Call the API to fetch cities
+        fetchBookings();
+    }, []);
+
+    const fetchBookings = async () => {
+        try {
+            const response = await fetch("http://localhost:8081/api/booking");
+            const data = await response.json();
+            setData(data);
+            setRecords(data);
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+        }
+    };
         function handleFilter(event){
             const newData = data.filter(row => {
-                return row.nameUserBook.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
+                return row.kindPay.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
             })
             setRecords(newData)
         }
@@ -89,6 +207,17 @@ const AdminBooking = () =>{
             setCurrentCity(nameUserBook);
             setIsEditing(true);
         };
+
+        const handleDetailClick = (booking) => {
+            setBookingDetails(booking.bookingDetails);
+            setIsDetail(true);
+        };
+        const handleOutsideClick = (e) => {
+            // Đóng modal khi click vào phần tử có class 'modal'
+            if (e.target.classList.contains('modal')) {
+                setIsDetail(false);
+            }
+        }
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -100,7 +229,6 @@ const AdminBooking = () =>{
                 <div className="HistoryTick">
                     <div className="contentTikcet">
                         <div className="title">Quản lý Hóa đơn</div>
-                        <button className="btn back">Tạo hóa đơn</button>
                     </div>
                     <div className="devide"></div>
                     <DataTable
@@ -157,8 +285,40 @@ const AdminBooking = () =>{
                         </div>
                     </div>
                 </div>
-        )}
+            )}
+
+            {isDetail && (
+                <div class="modal" id="deleteModal" onClick={handleOutsideClick}>
+                    <div class="modal-dialog" style={{width:"100%"}}>
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title">Chi tiết vé</h2>
+                                {/* <button type="button" className="close" onClick={() => setIsDetail(false)}>
+                                    &times;
+                                </button> */}
+                            </div>
+                            <div class="modal-body">
+                                        <DataTable
+                                    columns={columnDetails}
+                                    data={bookingDetails}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* </section> */}
+            <ToastContainer
+                        className="toast-container"
+                        toastClassName="toast"
+                        bodyClassName="toast-body"
+                        progressClassName="toast-progress"
+                        theme='colored'
+                        transition={Zoom}
+                        autoClose={500}
+                        hideProgressBar={true}
+                        pauseOnHover
+                    ></ToastContainer>
         </div>
 
         

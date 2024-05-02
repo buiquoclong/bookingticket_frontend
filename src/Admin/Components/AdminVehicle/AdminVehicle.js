@@ -1,11 +1,25 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import DataTable from 'react-data-table-component'
 import "../AdminVehicle/AdminVehicle.scss"
+import { toast, ToastContainer, Zoom } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const AdminVehicle = () =>{
     const [isEditing, setIsEditing] = useState(false);
-    const [currentCity, setCurrentCity] = useState({ id: null, city: '', image: '' });
+    const [currentCity, setCurrentCity] = useState({ id: null, kindVehicle: {
+        id: "",
+        name: ""}, image: '' });
+
+    const [isAdd, setIsAdd] = useState(false);
+    const [data, setData] = useState([]);
+    const [records, setRecords] = useState([]);
+
+    const [name, setName] = useState('');
+    const [kindVehicle, setKindVehicle] = useState('');
+    const [vehicleNumber, setVehicleNumber] = useState('');
+    const [value, setValue] = useState('');
+    const [status, setStatus] = useState('');
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -14,11 +28,16 @@ const AdminVehicle = () =>{
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.id}</div>
         },
         {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên xe</div>,
+            selector: row => row.name,
+            width: '7rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.name}</div>
+        },
+        {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Loại xe</div>,
-            selector: row => row.kindVehicle,
-            sortable: true,
+            selector: row => row.kindVehicle.name,
             width: '20rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.kindVehicle}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.kindVehicle.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Biển số</div>,
@@ -27,8 +46,13 @@ const AdminVehicle = () =>{
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Sức chứa</div>,
-            selector: row => row.numSeat,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.numSeat}</div>
+            selector: row => row.value,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.value}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Trạng thái</div>,
+            selector: row => row.status,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{statusMap[row.status] || 'Unknown Status'}</div>
         },
         {
             cell: (row) => (
@@ -39,39 +63,125 @@ const AdminVehicle = () =>{
             )
         }
     ]
-    const data = [
-        { id: 1, kindVehicle: 'Giường nằm', vehicleNumber:'BS001', numSeat:21 },
-        { id: 2, kindVehicle: 'Limousine', vehicleNumber:'BS002', numSeat:21 },
-        { id: 3, kindVehicle: 'Giường nằm', vehicleNumber:'BS003', numSeat:21 },
-        { id: 4, kindVehicle: 'Ghế ngồi', vehicleNumber:'BS004', numSeat:21 },
-        { id: 5, kindVehicle: 'Limousine', vehicleNumber:'BS005', numSeat:21 },
-        { id: 6, kindVehicle: 'Giường nằm', vehicleNumber:'BS006', numSeat:21 },
-        { id: 7, kindVehicle: 'Limousine', vehicleNumber:'BS007', numSeat:21 },
-        { id: 8, kindVehicle: 'Giường nằm', vehicleNumber:'BS008', numSeat:21 },
-        { id: 9, kindVehicle: 'Limousine', vehicleNumber:'BS009', numSeat:21 },
-        { id: 10, kindVehicle: 'Giường nằm', vehicleNumber:'BS010', numSeat:21 },
-        { id: 11, kindVehicle: 'Limousine', vehicleNumber:'BS011', numSeat:21 },
-        { id: 12, kindVehicle: 'Giường nằm', vehicleNumber:'BS012', numSeat:21 },
-        { id: 13, kindVehicle: 'Limousine', vehicleNumber:'BS013', numSeat:21 },
-        { id: 14, kindVehicle: 'Ghế ngồi', vehicleNumber:'BS014', numSeat:21 },
-        { id: 15, kindVehicle: 'Limousine', vehicleNumber:'BS015', numSeat:21 },
-        { id: 16, kindVehicle: 'Ghế ngồi', vehicleNumber:'BS016', numSeat:21 },
-        { id: 17, kindVehicle: 'Limousine', vehicleNumber:'BS017', numSeat:21 },
-        { id: 18, kindVehicle: 'Ghế ngồi', vehicleNumber:'BS018', numSeat:21 },
-        { id: 19, kindVehicle: 'Limousine', vehicleNumber:'BS019', numSeat:21 },
-        { id: 20, kindVehicle: 'Ghế ngồi', vehicleNumber:'BS020', numSeat:21 }
-    ]
+    const statusMap = {
+        0: 'Đang hoạt động',
+        1: 'Tạm dừng hoạt động'
+    };
+    const kindVehicleMap = {
+        1: 'Giường nằm',
+        2: 'Limousine',
+        3: 'Ghế ngồi'
+    };
+    useEffect(() => {
+        // Call the API to fetch cities
+        fetchCities();
+    }, []);
+
+    const fetchCities = async () => {
+        try {
+            const response = await fetch("http://localhost:8081/api/vehicle");
+            const data = await response.json();
+            setData(data);
+            setRecords(data);
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+        }
+    };
     
-        const [records, setRecords] = useState(data);
+        // const [records, setRecords] = useState(data);
         function handleFilter(event){
             const newData = data.filter(row => {
-                return row.kindVehicle.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
+                return row.kindVehicle.name.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
             })
             setRecords(newData)
         }
         const handleEditClick = (kindVehicle) => {
             setCurrentCity(kindVehicle);
             setIsEditing(true);
+        };
+        const handleCreateClick = () => {
+            setIsAdd(true)
+        };
+
+        const handleNameChange = (event) => {
+            setName(event.target.value)
+        };
+        const handkindVehicleChange = (event) => {
+            setKindVehicle(event.target.value)
+        };
+        const handlevehicleNumberChange = (event) => {
+            setVehicleNumber(event.target.value)
+        };
+        const handleValueChange = (event) => {
+            setValue(event.target.value)
+        };
+        const handleStatusChange = (event) => {
+            setStatus(event.target.value)
+        }
+        const handleCreateVehicle = async (e) => {
+            e.preventDefault();
+            let missingInfo = [];
+            if (!name) {
+                missingInfo.push("Tên xe");
+            }
+            if (!kindVehicle) {
+                missingInfo.push("Loại xe");
+            }
+            if (!vehicleNumber) {
+                missingInfo.push("Biển số");
+            }
+            if (!value) {
+                missingInfo.push("Sức chứa");
+            }
+            if (!status) {
+                missingInfo.push("Trạng thái");
+            }
+            if (missingInfo.length > 0) {
+                const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+                toast.error(message);
+            } else {
+                try {
+                    const newVehicleData = {
+                        name: name,
+                        kindVehicleId: kindVehicle,
+                        vehicleNumber: vehicleNumber,
+                        value: value,
+                        status: status,
+                    };
+            
+                    const response = await fetch("http://localhost:8081/api/vehicle", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(newVehicleData)
+                    });
+            
+                    if (response.ok) {
+                        // Xử lý thành công
+                        console.log("User đã được tạo thành công!");
+                        toast.success("User đã được tạo thành công!");
+                        const newVehicle = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
+                        // Thêm người dùng mới vào danh sách
+                        setData(prevData => [...prevData, newVehicle]);
+                        setRecords(prevRecords => [...prevRecords, newVehicle]);
+                        // Reset form hoặc làm gì đó khác
+                        setName('');
+                        setKindVehicle('');
+                        setVehicleNumber('');
+                        setValue('');
+                        setStatus('');
+                        setIsAdd(false);
+                        // window.location.reload();
+                    } else {
+                        console.error("Có lỗi xảy ra khi tạo vehicle!");
+                        toast.error("Có lỗi xảy ra khi tạo vehicle!");
+                    }
+                } catch (error) {
+                    console.error("Lỗi:", error);
+                    toast.error("Lỗi:", error);
+                }
+            }
         };
     return(
         <div className="main-container">
@@ -84,6 +194,7 @@ const AdminVehicle = () =>{
                 <div className="HistoryTick">
                     <div className="contentTikcet">
                         <div className="title">Quản lý phương tiện</div>
+                        <button className="btn back" onClick={() => handleCreateClick()}>Thêm phương tiện</button>
                     </div>
                     <div className="devide"></div>
                     <DataTable
@@ -100,13 +211,29 @@ const AdminVehicle = () =>{
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h2 class="modal-title">Sửa Phương tiện</h2>
-                                <button className="btn back">Thêm phương tiện</button>
                             </div>
                             <div class="modal-body">
                                 <form>
                                     <div className="infoCity">
+                                        <label className="info">Tên xe:</label>
+                                        <input type="text" value={currentCity.name} onChange={(e) => setCurrentCity({ ...currentCity, name: e.target.value })} />
+                                    </div>
+                                    <div className="infoCity">
                                         <label className="info">Loại xe:</label>
-                                        <input type="text" value={currentCity.kindVehicle} onChange={(e) => setCurrentCity({ ...currentCity, kindVehicle: e.target.value })} />
+                                        {/* <input type="text" value={currentCity.kindVehicle.name} onChange={(e) => setCurrentCity({ ...currentCity, kindVehicle: e.target.value })} /> */}
+                                        <select 
+                                            className="inputValue"
+                                            value={currentCity.kindVehicle.id} onChange={(e) => setCurrentCity({ ...currentCity, kindVehicle: {
+                                                ...currentCity.kindVehicle,
+                                                id: e.target.value
+                                            } })}
+                                        >
+                                            {Object.keys(kindVehicleMap).map(key => (
+                                                <option key={key} value={key}>
+                                                    {kindVehicleMap[key]}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div className="infoCity">
                                         <label>Biển số:</label>
@@ -114,7 +241,21 @@ const AdminVehicle = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Sức chứa:</label>
-                                        <input type="text" value={currentCity.numSeat} onChange={(e) => setCurrentCity({ ...currentCity, numSeat: e.target.value })} />
+                                        <input type="text" value={currentCity.value} onChange={(e) => setCurrentCity({ ...currentCity, value: e.target.value })} />
+                                    </div>
+                                    <div className="infoCity">
+                                        <label>Trạng thái:</label>
+                                        {/* <input type="text" value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        <select 
+                                            className="inputValue"
+                                            value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })}
+                                        >
+                                            {Object.keys(statusMap).map(key => (
+                                                <option key={key} value={key}>
+                                                    {statusMap[key]}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
@@ -125,8 +266,80 @@ const AdminVehicle = () =>{
                         </div>
                     </div>
                 </div>
-        )}
+            )}
+            {isAdd && (
+                <div class="modal" id="deleteModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title">Thêm Phương tiện</h2>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div className="infoCity">
+                                        <label className="info">Tên xe:</label>
+                                        <input type="text" value={name} onChange={handleNameChange} />
+                                    </div>
+                                    <div className="infoCity">
+                                        <label className="info">Loại xe:</label>
+                                        {/* <input type="text" value={currentCity.kindVehicle.name} onChange={(e) => setCurrentCity({ ...currentCity, kindVehicle: e.target.value })} /> */}
+                                        <select 
+                                            className="inputValue"
+                                            value={kindVehicle} onChange={handkindVehicleChange}
+                                        >
+                                            <option value="">Chọn loại xe</option>
+                                            {Object.keys(kindVehicleMap).map(key => (
+                                                <option key={key} value={key}>
+                                                    {kindVehicleMap[key]}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="infoCity">
+                                        <label>Biển số:</label>
+                                        <input type="text" value={vehicleNumber} onChange={handlevehicleNumberChange} />
+                                    </div>
+                                    <div className="infoCity">
+                                        <label>Sức chứa:</label>
+                                        <input type="text" value={value} onChange={handleValueChange} />
+                                    </div>
+                                    <div className="infoCity">
+                                        <label>Trạng thái:</label>
+                                        {/* <input type="text" value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        <select 
+                                            className="inputValue"
+                                            value={status} onChange={handleStatusChange}
+                                        >
+                                            <option value="">Chọn trạng thái</option>
+                                            {Object.keys(statusMap).map(key => (
+                                                <option key={key} value={key}>
+                                                    {statusMap[key]}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="listButton">
+                                        <button type="button" onClick={() => setIsAdd(false)} className="cancel">Hủy</button>
+                                        <button type="submit" className="save" onClick={handleCreateVehicle}>Tạo</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* </section> */}
+            <ToastContainer
+                        className="toast-container"
+                        toastClassName="toast"
+                        bodyClassName="toast-body"
+                        progressClassName="toast-progress"
+                        theme='colored'
+                        transition={Zoom}
+                        autoClose={500}
+                        hideProgressBar={true}
+                        pauseOnHover
+                    ></ToastContainer>
         </div>
 
         

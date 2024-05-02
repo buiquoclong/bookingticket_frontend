@@ -133,7 +133,7 @@ body{
                                 align-items: center;
                             }
     
-                            .inputValue{
+                            input[type="text"] {
                                 width: 18rem;
                                 padding: 0.375rem 0.75rem;
                                 font-size: 1rem;
@@ -175,13 +175,6 @@ body{
                     }
                 }
             }
-        }
-        .toast-container {
-            position: fixed;
-            top: 50%; 
-            right: 0; 
-            transform: translateY(-50%); 
-            z-index: 9999; 
         }
     }
     

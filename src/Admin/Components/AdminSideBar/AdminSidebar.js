@@ -56,14 +56,34 @@ function AdminSidebar({openSidebarToggle, OpenSidebar}) {
                     <BsGrid1X2Fill className='icon'/> Hóa đơn
                 </li>
             </Link>
-            <Link to="/admin/booking-details" style={{color:"#9e9ea4"}}>
-                <li className='sidebar-list-item'>
-                    <BsGrid1X2Fill className='icon'/> Chi tiết hóa đơn
-                </li>
-            </Link>
             <Link to="/admin/seat-reservation" style={{color:"#9e9ea4"}}>
                 <li className='sidebar-list-item'>
                     <BsGrid1X2Fill className='icon'/> Ghế đặt trước
+                </li>
+            </Link>
+            <Link to="/admin/drivers" style={{color:"#9e9ea4"}}>
+                <li className='sidebar-list-item'>
+                    <BsGrid1X2Fill className='icon'/> Tài xế
+                </li>
+            </Link>
+            <Link to="/admin/promotions" style={{color:"#9e9ea4"}}>
+                <li className='sidebar-list-item'>
+                    <BsGrid1X2Fill className='icon'/> Khuyến mãi
+                </li>
+            </Link>
+            <Link to="/admin/reviews" style={{color:"#9e9ea4"}}>
+                <li className='sidebar-list-item'>
+                    <BsGrid1X2Fill className='icon'/> Đánh giá
+                </li>
+            </Link>
+            <Link to="/admin/contacts" style={{color:"#9e9ea4"}}>
+                <li className='sidebar-list-item'>
+                    <BsGrid1X2Fill className='icon'/> Liên hệ
+                </li>
+            </Link>
+            <Link to="/admin/logs" style={{color:"#9e9ea4"}}>
+                <li className='sidebar-list-item'>
+                    <BsGrid1X2Fill className='icon'/> Log
                 </li>
             </Link>
             

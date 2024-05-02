@@ -2,9 +2,9 @@ import { useState } from 'react'
 import './Admin.scss'
 import AdminHeader from '../Components/AdminHeader/AdminHeader'
 import AdminSidebar from '../Components/AdminSideBar/AdminSidebar'
-import AdminBookingDetail from '../Components/AdminBookingDetail/AdminBookingDetail'
+import AdminReview from '../Components/AdminReview/AdminReview'
 
-function AdminBookingDetailPage() {
+function AdminReviewPage() {
 const [openSidebarToggle, setOpenSidebarToggle] = useState(false)
 
 const OpenSidebar = () => {
@@ -15,9 +15,9 @@ return (
     <div className='grid-container'>
     <AdminHeader OpenSidebar={OpenSidebar}/>
     <AdminSidebar openSidebarToggle={openSidebarToggle} OpenSidebar={OpenSidebar}/>
-    <AdminBookingDetail/>
+    <AdminReview/>
     </div>
 )
 }
 
-export default AdminBookingDetailPage
+export default AdminReviewPage

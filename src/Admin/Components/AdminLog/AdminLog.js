@@ -1,58 +1,79 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import DataTable from 'react-data-table-component'
-import "../AdminBookingDetail/AdminBookingDetail.scss"
+import "../AdminLog/AdminLog.scss"
 
 
-const AdminBookingDetail = () =>{
+const AdminLog = () =>{
     const [isEditing, setIsEditing] = useState(false);
-    const [currentCity, setCurrentCity] = useState({ id: null, city: '', image: '' });
+    const [currentCity, setCurrentCity] = useState();
+    const [data, setData] = useState([]);
+    const [records, setRecords] = useState([]);
     const columns = [
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Mã vé</div>,
-            selector: row => row.mave,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.mave}</div>
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
+            selector: row => row.id,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.id}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Mã hóa đơn</div>,
-            selector: row => row.mahoadon,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.mahoadon}</div>
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên người dùng</div>,
+            selector: row => row.user.name,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.user.name}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Số lượng vé</div>,
-            selector: row => row.numTicket,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.numTicket}</div>
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Nội dung log</div>,
+            selector: row => row.message,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.message}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tổng tiền</div>,
-            selector: row => row.total,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.total}</div>
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Level</div>,
+            selector: row => row.level,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%',backgroundColor: levelColorMap[row.level] || 'transparent', padding:".3rem 0rem", borderRadius:"5px", fontWeight:"600", color:"" }}>{LevelMap[row.level] || 'Unknown Status'}</div>
         },
+        // ,
+        // {
+        //     name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tài khoản</div>,
+        //     selector: row => row.status,
+        //     width: '10rem',
+        //     cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%',backgroundColor: statusColorMap[row.status] || 'transparent', padding:".3rem 0rem", borderRadius:"5px", fontWeight:"600", color:"" }}>{statusMap[row.status] || 'Unknown Status'}</div>
+        // },
         {
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                    <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button>
+                <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
+                <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}> Xóa </button>
                 </div>
             )
         }
     ]
-    const data = [
-        { mave: 'ABC123', mahoadon: 121, numTicket: 2, total:'600.000đ' },
-        { mave: 'ABC124', mahoadon: 122, numTicket: 2, total:'600.000đ' },
-        { mave: 'ABC125', mahoadon: 123, numTicket: 2, total:'600.000đ' },
-        { mave: 'ABC126', mahoadon: 124, numTicket: 2, total:'600.000đ' },
-        { mave: 'ABC127', mahoadon: 125, numTicket: 2, total:'600.000đ' },
-        { mave: 'ABC128', mahoadon: 126, numTicket: 2, total:'600.000đ' },
-        { mave: 'ABC129', mahoadon: 127, numTicket: 2, total:'600.000đ' },
-        { mave: 'ABC130', mahoadon: 128, numTicket: 2, total:'600.000đ' },
-        { mave: 'ABC131', mahoadon: 129, numTicket: 2, total:'600.000đ' },
-        { mave: 'ABC132', mahoadon: 130, numTicket: 2, total:'600.000đ' },
-        { mave: 'ABC133', mahoadon: 131, numTicket: 2, total:'600.000đ' }
-    ]
+        const LevelMap = {
+            1: 'INFO',
+            2: 'WARNING',
+            3: 'DANGER',
+        };
+        const levelColorMap = {
+        1: '#008000b3',  // Đang làm
+        2: '#ffa9008a', // Tạm nghỉ
+        3: '#ff0000c2'     // Tạm khóa
+        };
+        useEffect(() => {
+            // Call the API to fetch cities
+            fetchLogs();
+        }, []);
     
-        const [records, setRecords] = useState(data);
+        const fetchLogs = async () => {
+            try {
+                const response = await fetch("http://localhost:8081/api/log");
+                const data = await response.json();
+                setData(data);
+                setRecords(data);
+                console.log("log:", data);
+            } catch (error) {
+                console.error("Error fetching log:", error);
+            }
+        };
         function handleFilter(event){
             const newData = data.filter(row => {
-                return row.mave.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
+                return row.name.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
             })
             setRecords(newData)
         }
@@ -123,4 +144,4 @@ const AdminBookingDetail = () =>{
         
     )
 }
-export default AdminBookingDetail
+export default AdminLog

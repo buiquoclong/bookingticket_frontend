@@ -407,7 +407,13 @@ const BookingTicket = () =>{
         }
     };
     
-    
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
 
     return(
         <section className="main container section">
@@ -458,7 +464,8 @@ const BookingTicket = () =>{
                                     <div className="lineInfo">
                                         <span>Ngày:</span>
                                         <div className="rightInfo">
-                                            <span>{new Date(data.dayStart).toLocaleDateString('vi-VN')}</span>
+                                            {/* <span>{new Date(data.dayStart).toLocaleDateString('vi-VN')}</span> */}
+                                            <span>{formatDate(data.dayStart)}</span>
                                         </div>
                                     </div>
                                             <div className="lineInfo">
@@ -577,7 +584,8 @@ const BookingTicket = () =>{
                                                     <div className="lineInfo">
                                                         <span>Ngày:</span>
                                                         <div className="rightInfo">
-                                                            <span>{new Date(data.dayStart).toLocaleDateString('vi-VN')}</span>
+                                                            {/* <span>{new Date(data.dayStart).toLocaleDateString('vi-VN')}</span> */}
+                                                            <span>{formatDate(data.dayStart)}</span>
                                                         </div>
                                                     </div>
                                                     <div className="lineInfo">
@@ -676,7 +684,8 @@ const BookingTicket = () =>{
                                                     <div className="lineInfo">
                                                         <span>Ngày:</span>
                                                         <div className="rightInfo">
-                                                            <span>{new Date(dataReturn.dayStart).toLocaleDateString('vi-VN')}</span>
+                                                            {/* <span>{new Date(dataReturn.dayStart).toLocaleDateString('vi-VN')}</span> */}
+                                                            <span>{formatDate(dataReturn.dayStart)}</span>
                                                         </div>
                                                     </div>
                                                     <div className="lineInfo">

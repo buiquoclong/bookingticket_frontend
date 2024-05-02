@@ -1,11 +1,25 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import DataTable from 'react-data-table-component'
 import "../AdminRoute/AdminRoute.scss"
+import { toast, ToastContainer, Zoom } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const AdminRoute = () =>{
     const [isEditing, setIsEditing] = useState(false);
     const [currentCity, setCurrentCity] = useState({ id: null, city: '', image: '' });
+    const [isAdd, setIsAdd] = useState(false);
+    const [data, setData] = useState([]);
+    const [records, setRecords] = useState([]);
+    const [cities, setCities] = useState([]);
+
+    const [diemDiName, setDiemDiName] = useState('');
+    const [diemDenName, setDiemDenName] = useState('');
+    const [diemDi, setDiemDi] = useState('');
+    const [diemDen, setDiemDen] = useState('');
+    const [khoangCach, setKhoangCach] = useState('');
+    const [timeOfRoute, setTimeOfRoute] = useState('');
+    const [status, setStatus] = useState('');
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -15,32 +29,35 @@ const AdminRoute = () =>{
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên tuyến</div>,
-            selector: row => row.routeName,
-            sortable: true,
-            width: '15rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.routeName}</div>
+            selector: row => row.name,
+            width: '12rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Điểm đi</div>,
-            selector: row => row.diemdi,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.diemdi}</div>
+            selector: row => row.diemDi.name,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.diemDi.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Điểm đến</div>,
-            selector: row => row.diemden,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.diemden}</div>
+            selector: row => row.diemDen.name,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.diemDen.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Khoảng cách</div>,
-            selector: row => row.khoancach,
-            sortable: true,
+            selector: row => row.khoangCach,
             width: '10rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.khoancach}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.khoangCach}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Thời gian di chuyển</div>,
-            selector: row => row.thoigiandi,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.thoigiandi}</div>
+            selector: row => row.timeOfRoute,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.timeOfRoute} giờ</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Trạng thái</div>,
+            selector: row => row.status,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{statusMap[row.status] || 'Unknown Status'}</div>
         },
         {
             cell: (row) => (
@@ -51,28 +68,135 @@ const AdminRoute = () =>{
             )
         }
     ]
-    const data = [
-        { id: 1,routeName:'Sài Gòn - Đà Lạt', diemdi: 'Sài Gòn', diemden:'Đà Lạt', khoancach:'100.0km', thoigiandi:'7 tiếng'},
-        { id: 2,routeName:'Sài Gòn - Đà Nẵng', diemdi: 'Sài Gòn', diemden:'Đà Nẵng', khoancach:'100.0km', thoigiandi:'7 tiếng'},
-        { id: 3,routeName:'Đà Lạt - Sài Gòn', diemdi: 'Đà Lạt', diemden:'Sài Gòn', khoancach:'100.0km', thoigiandi:'7 tiếng'},
-        { id: 4,routeName:'Đà Lạt - Đà Nẵng', diemdi: 'Đà Lạt', diemden:'Đà Lạt', khoancach:'100.0km', thoigiandi:'7 tiếng'},
-        { id: 5,routeName:'Đà Nẵng - Đà Lạt', diemdi: 'Đà Nẵng', diemden:'Đà Lạt', khoancach:'100.0km', thoigiandi:'7 tiếng'},
-        { id: 6,routeName:'Đà Nẵng - Sài Gòn', diemdi: 'Đà Nẵng', diemden:'Sài Gòn', khoancach:'100.0km', thoigiandi:'7 tiếng'},
-        { id: 7,routeName:'Sài Gòn - Đăk Lăk', diemdi: 'Sài Gòn', diemden:'Đăk Lăk', khoancach:'100.0km', thoigiandi:'7 tiếng'},
-        { id: 8,routeName:'Đăk Lăk - Đà Lạt', diemdi: 'Đăk Lăk', diemden:'Đà Lạt', khoancach:'100.0km', thoigiandi:'7 tiếng'}
+    const statusMap = {
+        0: 'Đang hoạt động',
+        1: 'Tạm dừng hoạt động'
+    };
+    useEffect(() => {
+        // Call the API to fetch cities
+        fetchRoutes();
+        fetchCities();
+    }, []);
 
-    ]
-    
-        const [records, setRecords] = useState(data);
+    const fetchRoutes = async () => {
+        try {
+            const response = await fetch("http://localhost:8081/api/route");
+            const data = await response.json();
+            setData(data);
+            setRecords(data);
+        } catch (error) {
+            console.error("Error fetching routes:", error);
+        }
+    };
+    const fetchCities = async () => {
+        try {
+            const response = await fetch("http://localhost:8081/api/city");
+            const data = await response.json();
+            setCities(data);
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+        }
+    };
         function handleFilter(event){
             const newData = data.filter(row => {
-                return row.routeName.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
+                return row.name.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
             })
             setRecords(newData)
         }
         const handleEditClick = (routeName) => {
             setCurrentCity(routeName);
             setIsEditing(true);
+        };
+        const handleCreateClick = () => {
+            setIsAdd(true)
+        };
+        const handleDiemDiChange = (e) => {
+            const selectedCity = cities.find(city => city.id === parseInt(e.target.value));
+            setDiemDi(selectedCity.id);
+            setDiemDiName(selectedCity.name);
+        };
+        const handleDiemDenChange = (e) => {
+            const selectedCity = cities.find(city => city.id === parseInt(e.target.value));
+            setDiemDen(selectedCity.id);
+            setDiemDenName(selectedCity.name);
+        };
+        const handleKhoangCachChange = (event) => {
+            setKhoangCach(event.target.value)
+        };
+        const handleTimeOfRouteChange = (event) => {
+            setTimeOfRoute(event.target.value)
+        };
+        const handleStatusChange = (event) => {
+            setStatus(event.target.value)
+        };
+        const nameRoute = `${diemDiName} - ${diemDenName}`;
+        const handleCreateRoute = async (e) => {
+            e.preventDefault();
+            let missingInfo = [];
+            if (!diemDi) {
+                missingInfo.push("Điểm đi");
+            }
+            if (!diemDen) {
+                missingInfo.push("Điểm đến");
+            }
+            if (!khoangCach) {
+                missingInfo.push("Khoảng cách");
+            }
+            if (!timeOfRoute) {
+                missingInfo.push("Thời gian di chuyển");
+            }
+            if (!status) {
+                missingInfo.push("Trạng thái");
+            }
+            if (missingInfo.length > 0) {
+                const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+                toast.error(message);
+            } else {
+                try {
+                    const newRouteData = {
+                        name: nameRoute,
+                        diemdi: diemDi,
+                        diemden: diemDen,
+                        khoangCach: khoangCach,
+                        timeOfRoute: timeOfRoute,
+                        status: status,
+                    };
+                    console.log("newRouteData", newRouteData);
+        
+            
+                    const response = await fetch("http://localhost:8081/api/route", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(newRouteData)
+                    });
+            
+                    if (response.ok) {
+                        // Xử lý thành công
+                        console.log("User đã được tạo thành công!");
+                        toast.success("User đã được tạo thành công!");
+                        const newRoute = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
+                        // Thêm người dùng mới vào danh sách
+                        setData(prevData => [...prevData, newRoute]);
+                        setRecords(prevRecords => [...prevRecords, newRoute]);
+                        // Reset form hoặc làm gì đó khác
+                        setDiemDi('');
+                        setDiemDen('');
+                        setKhoangCach('');
+                        setTimeOfRoute('');
+                        setStatus('');
+                        setIsAdd(false);
+                        // window.location.reload();
+                    } else {
+                        console.error("Có lỗi xảy ra khi tạo route!");
+                        toast.error("Có lỗi xảy ra khi tạo route!");
+                    }
+                } catch (error) {
+                    console.error("Lỗi:", error);
+                    toast.error("Lỗi:", error);
+                }
+            }
         };
     return(
         <div className="main-container">
@@ -85,7 +209,7 @@ const AdminRoute = () =>{
                 <div className="HistoryTick">
                     <div className="contentTikcet">
                         <div className="title">Quản lý Tuyến xe</div>
-                        <button className="btn back">Thêm tuyến xe</button>
+                        <button className="btn back" onClick={() => handleCreateClick()}>Thêm tuyến xe</button>
                     </div>
                     <div className="devide"></div>
                     <DataTable
@@ -107,23 +231,66 @@ const AdminRoute = () =>{
                                 <form>
                                     <div className="infoCity">
                                         <label>Tên tuyến:</label>
-                                        <input type="text" value={currentCity.routeName} onChange={(e) => setCurrentCity({ ...currentCity, routeName: e.target.value })} />
+                                        <input type="text" value={currentCity.name} onChange={(e) => setCurrentCity({ ...currentCity, name: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Điểm đi:</label>
-                                        <input type="text" value={currentCity.diemdi} onChange={(e) => setCurrentCity({ ...currentCity, diemdi: e.target.value })} />
+                                        {/* <input type="text" value={currentCity.diemdi} onChange={(e) => setCurrentCity({ ...currentCity, diemdi: e.target.value })} /> */}
+                                        <select 
+                                            className="inputValue"
+                                            value={currentCity.diemDi.id} 
+                                            onChange={(e) => setCurrentCity({ ...currentCity, diemDi: {
+                                                ...currentCity.diemDi,
+                                                id: e.target.value
+                                            } })}
+                                        >
+                                            {cities.map(city => (
+                                                <option key={city.id} value={city.id}>
+                                                    {city.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        
                                     </div>
                                     <div className="infoCity">
                                         <label>Điểm đến:</label>
-                                        <input type="text" value={currentCity.diemden} onChange={(e) => setCurrentCity({ ...currentCity, diemden: e.target.value })} />
+                                        {/* <input type="text" value={currentCity.diemden} onChange={(e) => setCurrentCity({ ...currentCity, diemden: e.target.value })} /> */}
+                                        <select 
+                                            className="inputValue"
+                                            value={currentCity.diemDen.id} 
+                                            onChange={(e) => setCurrentCity({ ...currentCity, diemDen: {
+                                                ...currentCity.diemDen,
+                                                id: e.target.value
+                                            } })}
+                                        >
+                                            {cities.map(city => (
+                                                <option key={city.id} value={city.id}>
+                                                    {city.name}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Khoảng cách:</label>
-                                        <input type="text" value={currentCity.khoancach} onChange={(e) => setCurrentCity({ ...currentCity, khoancach: e.target.value })} />
+                                        <input type="text" value={currentCity.khoangCach} onChange={(e) => setCurrentCity({ ...currentCity, khoangCach: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label>Thời gian di chuyển:</label>
-                                        <input type="text" value={currentCity.thoigiandi} onChange={(e) => setCurrentCity({ ...currentCity, thoigiandi: e.target.value })} />
+                                        <input type="text" value={currentCity.timeOfRoute+ " giờ"} giờ onChange={(e) => setCurrentCity({ ...currentCity, timeOfRoute: e.target.value })} />
+                                    </div>
+                                    <div className="infoCity">
+                                        <label>Trạng thái:</label>
+                                        {/* <input type="text" value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        <select 
+                                            className="inputValue"
+                                            value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })}
+                                        >
+                                            {Object.keys(statusMap).map(key => (
+                                                <option key={key} value={key}>
+                                                    {statusMap[key]}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
@@ -134,8 +301,97 @@ const AdminRoute = () =>{
                         </div>
                     </div>
                 </div>
-        )}
+            )}
+
+            {isAdd && (
+                <div class="modal" id="deleteModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title">Sửa tuyến xe</h2>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div className="infoCity">
+                                        <label>Tên tuyến:</label>
+                                        <input type="text" value={nameRoute}/>
+                                    </div>
+                                    <div className="infoCity">
+                                        <label className="info">Điểm đi:</label>
+                                        {/* <input type="text" value={currentCity.diemdi} onChange={(e) => setCurrentCity({ ...currentCity, diemdi: e.target.value })} /> */}
+                                        <select 
+                                            className="inputValue"
+                                            value={diemDi} onChange={handleDiemDiChange} 
+                                        >
+                                            <option value="">Chọn điểm đi</option>
+                                            {cities.map(city => (
+                                                <option key={city.id} value={city.id}>
+                                                    {city.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        
+                                    </div>
+                                    <div className="infoCity">
+                                        <label>Điểm đến:</label>
+                                        {/* <input type="text" value={currentCity.diemden} onChange={(e) => setCurrentCity({ ...currentCity, diemden: e.target.value })} /> */}
+                                        <select 
+                                            className="inputValue"
+                                            value={diemDen} onChange={handleDiemDenChange} 
+                                        >
+                                            <option value="">Chọn điểm đến</option>
+                                            {cities.map(city => (
+                                                <option key={city.id} value={city.id}>
+                                                    {city.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="infoCity">
+                                        <label className="info">Khoảng cách:</label>
+                                        <input type="text"value={khoangCach} onChange={handleKhoangCachChange} />
+                                    </div>
+                                    <div className="infoCity">
+                                        <label>Thời gian di chuyển:</label>
+                                        <input type="text"value={timeOfRoute} onChange={handleTimeOfRouteChange} />
+                                    </div>
+                                    <div className="infoCity">
+                                        <label>Trạng thái:</label>
+                                        {/* <input type="text" value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        <select 
+                                            className="inputValue"
+                                            value={status} onChange={handleStatusChange}
+                                        >
+                                            <option value="">Chọn trạng thái</option>
+                                            {Object.keys(statusMap).map(key => (
+                                                <option key={key} value={key}>
+                                                    {statusMap[key]}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="listButton">
+                                        <button type="button" onClick={() => setIsAdd(false)} className="cancel">Hủy</button>
+                                        <button type="submit" className="save" onClick={handleCreateRoute}>Tạo</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* </section> */}
+            <ToastContainer
+                        className="toast-container"
+                        toastClassName="toast"
+                        bodyClassName="toast-body"
+                        progressClassName="toast-progress"
+                        theme='colored'
+                        transition={Zoom}
+                        autoClose={500}
+                        hideProgressBar={true}
+                        pauseOnHover
+                    ></ToastContainer>
         </div>
 
         

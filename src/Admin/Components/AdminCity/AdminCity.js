@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const AdminCity = () =>{
     const [isEditing, setIsEditing] = useState(false);
-    const [isEAdd, setIsAdd] = useState(false);
+    const [isAdd, setIsAdd] = useState(false);
     
     const [cityName, setCityName] = useState('');
     const [cityImage, setCityImage] = useState(null);
@@ -109,6 +109,9 @@ const AdminCity = () =>{
                 if (response.ok) {
                     // Xử lý thành công
                     console.log("Thành phố đã được tạo thành công!");
+                    const newCity = await response.json();
+                    setData(prevData => [...prevData, newCity]);
+                    setRecords(prevRecords => [...prevRecords, newCity]);
                     
                 toast.success("Thành phố đã được tạo thành công!");
                     // Reset form hoặc làm gì đó khác
@@ -174,7 +177,7 @@ const AdminCity = () =>{
                 </div>
         )}
 
-            {isEAdd && (
+            {isAdd && (
                             <div class="modal" id="deleteModal">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
