@@ -110,6 +110,9 @@ body {
     background-color: rgba(255, 255, 255, 0.2);
     cursor: pointer;
   }
+  .sidebar-list-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
   
   .sidebar-list-item > a {
     text-decoration: none;
