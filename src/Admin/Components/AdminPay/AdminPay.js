@@ -404,6 +404,13 @@ const AdminPay = () =>{
             console.error('Error inserting seat booked:', error);
         }
     };
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
     
     return(
         <div className="main-container">
@@ -452,7 +459,7 @@ const AdminPay = () =>{
                                     <div className="lineInfo">
                                         <span>Ngày:</span>
                                         <div className="rightInfo">
-                                            <span>{new Date(data.dayStart).toLocaleDateString('vi-VN')}</span>
+                                            <span>{formatDate(data.dayStart)}</span>
                                         </div>
                                     </div>
                                             <div className="lineInfo">
@@ -571,7 +578,7 @@ const AdminPay = () =>{
                                                     <div className="lineInfo">
                                                         <span>Ngày:</span>
                                                         <div className="rightInfo">
-                                                            <span>{new Date(data.dayStart).toLocaleDateString('vi-VN')}</span>
+                                                            <span>{formatDate(data.dayStart)}</span>
                                                         </div>
                                                     </div>
                                                     <div className="lineInfo">
@@ -670,7 +677,7 @@ const AdminPay = () =>{
                                                     <div className="lineInfo">
                                                         <span>Ngày:</span>
                                                         <div className="rightInfo">
-                                                            <span>{new Date(dataReturn.dayStart).toLocaleDateString('vi-VN')}</span>
+                                                            <span>{formatDate(dataReturn.dayStart)}</span>
                                                         </div>
                                                     </div>
                                                     <div className="lineInfo">

@@ -24,18 +24,58 @@ const AdminBookTicketReturn = () =>{
     
     const [data, setData] = useState(null);
     const [seats, setSeats] = useState([]);
+    const [timeStartFrom, setTimeStartFrom] = useState('');
+    const [timeStartTo, setTimeStartTo] = useState('');
+    const [kindVehicleId, setKindVehicleId] = useState('');
+    const [sort, setSort] = useState('');
+        const handleTimeChange = (event) => {
+            const selectedValue = event.target.value;
+            switch (selectedValue) {
+                case '1':
+                    setTimeStartFrom('00:01');
+                    setTimeStartTo('06:00');
+                    break;
+                case '2':
+                    setTimeStartFrom('06:01');
+                    setTimeStartTo('12:00');
+                    break;
+                case '3':
+                    setTimeStartFrom('12:01');
+                    setTimeStartTo('18:00');
+                    break;
+                case '4':
+                    setTimeStartFrom('18:01');
+                    setTimeStartTo('23:59');
+                    break;
+                default:
+                    setTimeStartFrom('');
+                    setTimeStartTo('');
+            }
+        };
+        
+        const handleSortChange = (event) => {
+            setSort(event.target.value);
+        };
+        
+        const handleKindChange = (event) => {
+            setKindVehicleId(event.target.value);
+        };
     
     const navigate = useNavigate();
 
         useEffect(() => {
             fetchTrip();
-        }, [diemDiId, diemDenId, dayStart]);
+        }, [timeStartFrom, timeStartTo, sort, kindVehicleId]);
 
         const fetchTrip = async () => {
             const postData = {
                 diemDiId: diemDenId,
                 diemDenId: diemDiId,
-                dayStart: dayReturn
+                dayStart: dayReturn,
+                timeStartFrom: timeStartFrom,
+                timeStartTo: timeStartTo,
+                kindVehicleId: kindVehicleId,
+                sort: sort
             };
     
             fetch('http://localhost:8081/api/trip/search', {
@@ -220,6 +260,13 @@ const AdminBookTicketReturn = () =>{
         const formattedEndTime = endTime.toLocaleTimeString('en-US', { hour12: false }).slice(0, 5);
         return formattedEndTime;
     }
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
     return(
         <main className='main-container'>
             <div className="BookCotent">
@@ -233,46 +280,47 @@ const AdminBookTicketReturn = () =>{
                             {kind === "Một chiều" && (
                                 <div>
                                     <h1>Chuyến:  {diemDiName} - {diemDenName}</h1>
-                                    <h1>Ngày: {new Date(dayStart).toLocaleDateString('vi-VN')}</h1>
+                                    <h1>Ngày: {formatDate(dayReturn)}</h1>
                                 </div>
                             )}
 
                             {kind === "Khứ hồi" && (
                                 <div>
                                     <h1>Chuyến:  {diemDiName} - {diemDenName} (Lượt về)</h1>
-                                    <h1>Ngày: {new Date(dayStart).toLocaleDateString('vi-VN')}</h1>
+                                    <h1>Ngày: {formatDate(dayReturn)}</h1>
                                 </div>
                             )}
                             <div className="lisFilter flex">
                                 <div className="lineInfo">
                                     <span>Chọn khung giờ đi:</span>
                                     <div className="selectChoose">
-                                        <select>
-                                            <option value="0">Chọn giờ</option>
-                                            <option value="1">00:00 - 06:00</option>
-                                            <option value="2">06:00 - 12:00</option>
-                                            <option value="3">12:00 - 18:00</option>
-                                            <option value="4">18:00 - 24:00</option>
+                                        <select onChange={handleTimeChange}>
+                                            <option value="">Chọn giờ</option>
+                                            <option value="1">00:01 - 06:00</option>
+                                            <option value="2">06:01 - 12:00</option>
+                                            <option value="3">12:01 - 18:00</option>
+                                            <option value="4">18:01 - 23:59</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div className="lineInfo">
                                     <span>Xếp giá vé:</span>
                                     <div className="selectChoose">
-                                        <select>
-                                            <option value="0">Xếp giá</option>
-                                            <option value="1">Cao - thấp</option>
-                                            <option value="2">Thấp - Cao</option>
+                                        <select onChange={handleSortChange}>
+                                            <option value="">Xếp giá</option>
+                                            <option value="0">Cao - thấp</option>
+                                            <option value="1">Thấp - Cao</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div className="lineInfo">
                                     <span>Chọn xe:</span>
                                     <div className="selectChoose">
-                                        <select>
-                                            <option value="0">Loại xe</option>
+                                        <select onChange={handleKindChange}>
+                                            <option value="">Loại xe</option>
                                             <option value="1">Gường nằm</option>
                                             <option value="2">Limousine</option>
+                                            <option value="3">Ghế ngồi</option>
                                         </select>
                                     </div>
                                 </div>

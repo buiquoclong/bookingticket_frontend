@@ -31,6 +31,13 @@ const Paysuccess = () =>{
                 console.error('Error:', error);
             });
     };
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
     return(
         <section className="main container section">
                     {kind === "Một chiều" && (
@@ -56,7 +63,7 @@ const Paysuccess = () =>{
                                                 <div className="tripInfo">
                                                     <span>Ngày đi:</span>
                                                     <div className="rightInfo">
-                                                        <span>{new Date(detail.trip.dayStart).toLocaleDateString('vi-VN')}</span>
+                                                        <span>{formatDate(detail.trip.dayStart)}</span>
                                                     </div>
                                                 </div>
                                                 <div className="tripInfo">
@@ -152,7 +159,7 @@ const Paysuccess = () =>{
                                     <div className="tripInfo">
                                         <span>Ngày đi:</span>
                                         <div className="rightInfo">
-                                            <span>{new Date(detail.trip.dayStart).toLocaleDateString('vi-VN')}</span>
+                                            <span>{formatDate(detail.trip.dayStart)}</span>
                                         </div>
                                     </div>
                                     <div className="tripInfo">
