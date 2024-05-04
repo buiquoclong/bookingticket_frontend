@@ -4,7 +4,7 @@ import DataTable from 'react-data-table-component'
 import { GrLocation } from "react-icons/gr";
 import { RiArrowLeftRightFill } from "react-icons/ri";
 import { TbArrowsRight } from "react-icons/tb";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate  } from 'react-router-dom';
 
 const SearchRoute  = () => {
     const [origin, setOrigin] = useState('');
@@ -14,6 +14,7 @@ const SearchRoute  = () => {
     const [showInitialResults, setShowInitialResults] = useState(true);
     const [data, setData] = useState([]);
     const [records, setRecords] = useState([]);
+    const navigate = useNavigate();
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tuyến đường</div>,
@@ -40,7 +41,7 @@ const SearchRoute  = () => {
         {
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                    <Link to="/book-ticket"><button className="btn back" style={{padding:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer", fontWeight:"600"}}>Tìm tuyến xe</button></Link>
+                    <button className="btn back" style={{padding:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer", fontWeight:"600"}} onClick={() => handleSearchRouteClick(row.diemDi.id, row.diemDen.id)}>Tìm tuyến xe</button>
                 </div>
             )
         }
@@ -74,6 +75,16 @@ const SearchRoute  = () => {
         })
         setRecords(newData)
     }
+    const handleSearchRouteClick = (originId, destinationId) => {
+    
+        // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
+        navigate('/', {
+            state: {
+                diemdiId: originId,
+                diemdenId: destinationId
+            }
+        });
+    };
     return (
         <section className="main container section">
             <div className="HisContent">
@@ -90,7 +101,6 @@ const SearchRoute  = () => {
                     <DataTable
                     columns={columns}
                     data={records}
-                    pagination
                     ></DataTable>
                 </div>
             </div>

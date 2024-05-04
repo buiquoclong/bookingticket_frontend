@@ -17,7 +17,7 @@ const Homepage  = () => {
         <>
             <Navbar/>
             <Home/>
-            <Main/>
+            {/* <Main/> */}
             <SliderComponents/>
             <Footer/>
         </>

@@ -295,7 +295,7 @@ const AdminBookTicket = () =>{
                 <div className="resultList container flex">
                     <div className="listResultSearch flex">
                     <div className="listHeader">
-                            <Link to="/" className="backicon">
+                            <Link to="/admin" className="backicon">
                                 <div >
                                     <FaAngleLeft   className="icon"/>
                                     <span>Trở lại</span>
