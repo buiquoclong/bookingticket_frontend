@@ -7,6 +7,7 @@ import seat_disabled from "../../Assets/img/seat_disabled.svg";
 import seat_selecting from "../../Assets/img/seat_selecting.svg";
 import empty_list from "../../Assets/img/empty_list.svg";
 import { MdArrowDropDown } from "react-icons/md";
+import { FaAngleLeft } from "react-icons/fa";
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -287,7 +288,13 @@ const BookTicket = () =>{
             <section className="main section">
                 <div className="resultList container flex">
                     <div className="listResultSearch flex">
-                    <div className="listHeader">
+                        <div className="listHeader">
+                            <Link to="/" className="backicon">
+                                <div >
+                                    <FaAngleLeft   className="icon"/>
+                                    <span>Trở lại</span>
+                                </div>
+                            </Link>
                             {kind === "Một chiều" && (
                                 <div>
                                     <h1>Chuyến:  {diemDiName} - {diemDenName}</h1>

@@ -7,6 +7,7 @@ import seat_disabled from "../../Assets/img/seat_disabled.svg";
 import seat_selecting from "../../Assets/img/seat_selecting.svg";
 import empty_list from "../../Assets/img/empty_list.svg";
 import { MdArrowDropDown } from "react-icons/md";
+import { FaAngleLeft } from "react-icons/fa";
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -242,6 +243,21 @@ const BookTicketReturn = () =>{
             }
         });
     };
+    const handleBackClick = () => {
+    
+        // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
+        navigate('/book-ticket', {
+            state: {
+                diemDiId: diemDiId,
+                diemDiName: diemDiName,
+                diemDenId: diemDenId,
+                diemDenName: diemDenName,
+                dayStart: dayStart,
+                dayReturn: dayReturn,
+                kind: kind
+            }
+        });
+    };
 
     function chunkArray(array, chunkSize) {
         const chunkedArray = [];
@@ -271,7 +287,13 @@ const BookTicketReturn = () =>{
             <section className="main section">
                 <div className="resultList container flex">
                     <div className="listResultSearch flex">
-                    <div className="listHeader">
+                        <div className="listHeader">
+                            {/* <Link to="/" > */}
+                                <div className="backicon" onClick={() => handleBackClick()}>
+                                    <FaAngleLeft   className="icon"/>
+                                    <span>Trở lại</span>
+                                </div>
+                            {/* </Link> */}
                             {kind === "Một chiều" && (
                                 <div>
                                     <h1>Chuyến:  {diemDiName} - {diemDenName}</h1>

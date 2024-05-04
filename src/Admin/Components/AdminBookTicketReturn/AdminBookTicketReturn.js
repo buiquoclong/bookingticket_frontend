@@ -9,6 +9,7 @@ import empty_list from "../../Assets/img/empty_list.svg";
 import { MdArrowDropDown } from "react-icons/md";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import { BiSolidLeftArrow } from "react-icons/bi";
+import { FaAngleLeft } from "react-icons/fa";
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -244,6 +245,21 @@ const AdminBookTicketReturn = () =>{
             }
         });
     };
+    const handleBackClick = () => {
+    
+        // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
+        navigate('/admin/find-trips', {
+            state: {
+                diemDiId: diemDiId,
+                diemDiName: diemDiName,
+                diemDenId: diemDenId,
+                diemDenName: diemDenName,
+                dayStart: dayStart,
+                dayReturn: dayReturn,
+                kind: kind
+            }
+        });
+    };
 
     function chunkArray(array, chunkSize) {
         const chunkedArray = [];
@@ -270,13 +286,19 @@ const AdminBookTicketReturn = () =>{
     return(
         <main className='main-container'>
             <div className="BookCotent">
-                <Link to="/admin"><div className="back">
+                {/* <Link to="/admin"><div className="back">
                 <BiSolidLeftArrow  className="icon"/>
                     Trở lại
-                </div></Link>
+                </div></Link> */}
                 <div className="resultList container flex">
                     <div className="listResultSearch flex">
                     <div className="listHeader">
+                            {/* <Link to="/"> */}
+                                <div  className="backicon" onClick={() => handleBackClick()}>
+                                    <FaAngleLeft   className="icon"/>
+                                    <span>Trở lại</span>
+                                </div>
+                            {/* </Link> */}
                             {kind === "Một chiều" && (
                                 <div>
                                     <h1>Chuyến:  {diemDiName} - {diemDenName}</h1>

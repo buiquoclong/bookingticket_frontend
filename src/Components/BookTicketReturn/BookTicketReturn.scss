@@ -388,6 +388,27 @@
             display: flex !important;
             align-items: initial !important;
             width: 100%;
+            .backicon {
+                position: absolute;
+                top: 1.5rem;
+                left: 0;
+                color: var(--textColor);
+                z-index: 50;
+                cursor: pointer;
+                transition: .3s ease-in-out;
+                &:hover{
+                    color: var(--PrimaryColor);
+                    transform: translateX(-7px);
+                }
+
+                .icon{
+                    font-size: 20px;
+                }
+                span{
+                    font-size: 14px;
+                    font-weight: 600;
+                }
+            }
             
             .listHeader{
                 position: sticky;
