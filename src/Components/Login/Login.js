@@ -52,11 +52,17 @@ const Login  = () => {
                         const userInfo = await userInfoResponse.json();
                         // console.log(userInfo.role.id);
                         // navigate('/admin');
-                        if (userInfo.role  === 1) {
-                            navigate('/');
-                        } else if (userInfo.role  === 2 || userInfo.role  === 3) {
-                            navigate('/admin');
+                        const redirectPath = sessionStorage.getItem('redirectPath');
+                        if (redirectPath) {
+                        navigate(redirectPath);
+                        } else {
+                            if (userInfo.role  === 1) {
+                                navigate('/');
+                            } else if (userInfo.role  === 2 || userInfo.role  === 3) {
+                                navigate('/admin');
+                            }
                         }
+                        
                         console.log(userInfo);
                         console.log(userInfo.role);
                     }

@@ -1,17 +1,9 @@
 import React, {useState, useEffect} from "react";
 import "./SearchRoute.scss";
 import DataTable from 'react-data-table-component'
-import { GrLocation } from "react-icons/gr";
-import { RiArrowLeftRightFill } from "react-icons/ri";
-import { TbArrowsRight } from "react-icons/tb";
-import { Link, useNavigate  } from 'react-router-dom';
+import { useNavigate  } from 'react-router-dom';
 
 const SearchRoute  = () => {
-    const [origin, setOrigin] = useState('');
-    const [destination, setDestination] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
-    const [showSearchResults, setShowSearchResults] = useState(false);
-    const [showInitialResults, setShowInitialResults] = useState(true);
     const [data, setData] = useState([]);
     const [records, setRecords] = useState([]);
     const navigate = useNavigate();
@@ -25,7 +17,6 @@ const SearchRoute  = () => {
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Quãng đường</div>,
             selector: row => row.khoangCach,
-            sortable: true,
             width: '20rem',
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.khoangCach}</div>
         },

@@ -21,7 +21,7 @@ const Paysuccess = () =>{
     }, [bookingId]);
 
     const fetchBookingDetail = async () => {
-        fetch(`http://localhost:8081/api/booking/${bookingId}`)
+        fetch(`http://localhost:8081/api/boking_detail/booking/${bookingId}`)
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -43,7 +43,7 @@ const Paysuccess = () =>{
                     {kind === "Một chiều" && (
                         <div>
                             {data &&
-                                data.bookingDetails.map(detail => (
+                                data.map(detail => (
                                     <div className="payContent" key={detail.id}>
                                         <div className="imgsucces">
                                                 <img src={success} alt="succes"/>                    
@@ -95,19 +95,19 @@ const Paysuccess = () =>{
                                             <div className="tripInfo">
                                                 <span>Tổng tiền:</span>
                                                 <div className="rightInfo">
-                                                    <span>{data.total.toLocaleString('vi-VN')}VND</span>
+                                                    <span>{detail.booking.total.toLocaleString('vi-VN')}VND</span>
                                                 </div>
                                             </div>
                                             <div className="tripInfo">
                                                 <span>Phương thức thanh toán:</span>
                                                 <div className="rightInfo">
-                                                    <span>{data.kindPay}</span>
+                                                    <span>{detail.booking.kindPay}</span>
                                                 </div>
                                             </div>
                                             <div className="tripInfo">
                                                 <span>Trạng thái:</span>
                                                 <div className="rightInfo">
-                                                    {data.isPaid === 1 ? (
+                                                    {detail.booking.isPaid === 1 ? (
                                                         <span>Đã thanh toán</span>
                                                     ) : (
                                                         <span>Chưa thanh toán</span>
@@ -117,7 +117,7 @@ const Paysuccess = () =>{
                                             <div className="tripInfo">
                                                 <span>Email liên hệ:</span>
                                                 <div className="rightInfo">
-                                                    <span>{data.email}</span>
+                                                    <span>{detail.booking.email}</span>
                                                 </div>
                                             </div>
                                             <div className="text">
@@ -135,7 +135,7 @@ const Paysuccess = () =>{
                         <div className="flex" style={{gap:"1rem"}}>
                             
                         {data &&
-                            data.bookingDetails.map((detail, index) => (
+                            data.map((detail, index) => (
                             <div className="payContent" key={detail.id}>
                                 <div className="imgsucces">
                                     <img src={success} alt="success" />
@@ -192,29 +192,29 @@ const Paysuccess = () =>{
                                         <div className="tripInfo">
                                             <span>Tổng tiền:</span>
                                             <div className="rightInfo">
-                                            <span>{data.total.toLocaleString('vi-VN')}VND</span>
+                                            <span>{detail.booking.total.toLocaleString('vi-VN')}VND</span>
                                             </div>
                                         </div>
                                         <div className="tripInfo">
                                             <span>Phương thức thanh toán:</span>
                                             <div className="rightInfo">
-                                                <span>{data.kindPay}</span>
+                                                <span>{detail.booking.kindPay}</span>
                                             </div>
                                         </div>
                                         <div className="tripInfo">
                                             <span>Trạng thái:</span>
                                             <div className="rightInfo">
-                                                {data.isPaid === 1 ? <span>Đã thanh toán</span> : <span>Chưa thanh toán</span>}
+                                                {detail.booking.isPaid === 1 ? <span>Đã thanh toán</span> : <span>Chưa thanh toán</span>}
                                             </div>
                                         </div>
                                         <div className="tripInfo">
                                             <span>Email liên hệ:</span>
                                             <div className="rightInfo">
-                                                <span>{data.email}</span>
+                                                <span>{detail.booking.email}</span>
                                             </div>
                                         </div>
                                     </div>
-                                )}
+                                )} 
                                 
                                 <div className="text">
                                     <p>Chúng tôi đã gửi một email chứa thông tin giao dịch trên. Vui lòng kiểm tra email và lưu trữ nó, khi lên xe quý khách vui lòng xuất trình email đã gửi cho nhân viên soát vé</p>

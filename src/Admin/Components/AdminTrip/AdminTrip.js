@@ -116,9 +116,8 @@ const AdminTrip = () =>{
     ]
     const statusMap = {
         1: 'Đã xác nhận',
-        2: 'Đang diễn ra',
-        3: 'Đã hoàn thành',
-        4: 'Đã bị hủy',
+        2: 'Đã hoàn thành',
+        3: 'Đã bị hủy',
     };
     useEffect(() => {
         // Call the API to fetch cities

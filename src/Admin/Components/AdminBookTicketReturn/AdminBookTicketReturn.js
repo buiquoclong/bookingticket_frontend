@@ -330,7 +330,7 @@ const AdminBookTicketReturn = () =>{
                                     <div className="selectChoose">
                                         <select onChange={handleSortChange}>
                                             <option value="">Xếp giá</option>
-                                            <option value="0">Cao - thấp</option>
+                                            <option value="-1">Cao - thấp</option>
                                             <option value="1">Thấp - Cao</option>
                                         </select>
                                     </div>
