@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from "react";
 import DataTable from 'react-data-table-component'
 import "./TicketHistory.scss";
-    import { useNavigate  } from 'react-router-dom';
-    import StarRatings from 'react-star-ratings';
-    import { toast, ToastContainer, Zoom } from 'react-toastify';
-    import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate  } from 'react-router-dom';
+import StarRatings from 'react-star-ratings';
+import { toast, ToastContainer, Zoom } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const TicketHistory = () =>{
     const [data, setData] = useState([]);
@@ -12,6 +12,7 @@ const TicketHistory = () =>{
     const [isRating, setIsRating] = useState(false);
     const [selectedTrip, setSelectedTrip] = useState(null);
     const [rating, setRating] = useState(0);
+    const [content, setContent] = useState('');
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
@@ -163,7 +164,6 @@ const TicketHistory = () =>{
         'Rất tốt',
         'Xuất sắc'
     ];
-    const [content, setContent] = useState('');
     const handleCreateRating = async (e) => {
         e.preventDefault();
         let missingInfo = [];
@@ -230,7 +230,7 @@ const TicketHistory = () =>{
                 </div>
             </div>
             {isRating && (
-                <div class="modal" id="deleteModal">
+                <div className="modal" id="deleteModal">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">

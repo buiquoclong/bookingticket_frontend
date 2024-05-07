@@ -385,7 +385,7 @@ const Home = () =>{
                     data.map(route => (
                         <div key={route.id} data-aos="fade-up" className="singleDestination">
                                     <div className="imageDiv">
-                                        <img src={route.diemDi.imgUrl} alt={route.name}/>
+                                        <img src={"http://localhost:8081/" + route.diemDi.imgUrl} alt={route.name}/>
                                     </div>
 
                                         <div className="cardInfo">

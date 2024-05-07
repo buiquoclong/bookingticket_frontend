@@ -122,7 +122,7 @@ const AdminSeatReservation = () =>{
             </div>
             
             {isEditing && (
-                <div class="modal" id="deleteModal">
+                <div className="modal" id="deleteModal">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">

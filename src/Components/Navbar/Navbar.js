@@ -42,17 +42,16 @@ const fetchUserInfo = async () => {
 };
 
 const handleUserInfoClick = () => {
-  navigate('/info-user', {
-    state: {
-        userId: userId
-    }
-});
+  navigate('/info-user');
 }
 
 const handleLogoutClick = () => {
   sessionStorage.removeItem("userId");
   console.log('đã xóa user id')
   navigate('/');
+}
+const handleMyRatingClick = () => {
+  navigate('/my-rating');
 }
     return(
       <section className="navBarSection">
@@ -96,6 +95,7 @@ const handleLogoutClick = () => {
                           <div className="flex flex-col dropdown">
                               <ul className="flex flex-col gap-4">
                                   <li onClick={handleUserInfoClick}>Thông tin người dùng</li>
+                                  <li onClick={handleMyRatingClick}>Đánh giá của tôi</li>
                                   <li onClick={handleLogoutClick}>Đăng xuất</li>
                               </ul>
                           </div>

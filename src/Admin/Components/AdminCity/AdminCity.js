@@ -31,7 +31,7 @@ const AdminCity = () =>{
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Ảnh</div>,
             // selector: row => row.image
-            cell: row => <img height="50" alt={row.name} src={row.imgUrl} style={{paddingBottom:"1rem", paddingTop:"1rem"}} />
+            cell: row => <img height="50" alt={row.name} src={"http://localhost:8081/" + row.imgUrl} style={{paddingBottom:"1rem", paddingTop:"1rem"}} />
         },
         {
             cell: (row) => (
@@ -150,7 +150,7 @@ const AdminCity = () =>{
             </div>
             
             {isEditing && (
-                <div class="modal" id="deleteModal">
+                <div className="modal" id="deleteModal">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -178,7 +178,7 @@ const AdminCity = () =>{
         )}
 
             {isAdd && (
-                            <div class="modal" id="deleteModal">
+                            <div className="modal" id="deleteModal">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">

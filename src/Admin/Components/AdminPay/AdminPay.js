@@ -415,7 +415,7 @@ const AdminPay = () =>{
     return(
         <div className="main-container">
             {showPaymentPopup && (
-                <div class="modal">
+                <div className="modal">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-body">

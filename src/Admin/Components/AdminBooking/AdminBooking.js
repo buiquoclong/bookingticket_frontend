@@ -209,7 +209,15 @@ const AdminBooking = () =>{
         };
 
         const handleDetailClick = (booking) => {
-            setBookingDetails(booking.bookingDetails);
+            const bookingId = booking.id;
+            fetch(`http://localhost:8081/api/boking_detail/booking/${bookingId}`)
+            .then(response => response.json())
+            .then(data => {
+                setBookingDetails(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
             setIsDetail(true);
         };
         const handleOutsideClick = (e) => {
@@ -240,7 +248,7 @@ const AdminBooking = () =>{
             </div>
             
             {isEditing && (
-                <div class="modal" id="deleteModal">
+                <div className="modal" id="deleteModal">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -288,7 +296,7 @@ const AdminBooking = () =>{
             )}
 
             {isDetail && (
-                <div class="modal" id="deleteModal" onClick={handleOutsideClick}>
+                <div className="modal" id="deleteModal" onClick={handleOutsideClick}>
                     <div class="modal-dialog" style={{width:"100%"}}>
                         <div class="modal-content">
                             <div class="modal-header">

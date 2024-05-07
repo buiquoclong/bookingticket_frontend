@@ -42,6 +42,7 @@ import BookingTicketPage from "./page/BookingTicketPage";
 import BookTicketPage from "./page/BookTicketPage";
 import BookTicketReturnPage from "./page/BookTicketReturnPage";
 import AdminPaySuccessPage from "./Admin/page/AdminPaySuccessPage";
+import MyRatingPage from "./page/MyRatingPage";
 
 
 
@@ -63,6 +64,7 @@ const App = () => {
                 <Route path="/info-user" element={<InfoUserPage />} />
                 <Route path="/pay-success" element={<PaysuccessPage />} />
                 <Route path="/news" element={<NewsPage />} />
+                <Route path="/my-rating" element={<MyRatingPage />} />
                 <Route path="/admin" element={<AdminHomePage />} />
                 {/* <Route path="/admin/booking-details" element={<AdminBookingDetailPage />} /> */}
                 <Route path="/admin/bookings" element={<AdminBookingPage />} />
