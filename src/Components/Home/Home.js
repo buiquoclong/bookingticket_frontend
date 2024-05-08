@@ -348,7 +348,7 @@ const Home = () =>{
                         
                     </div>
 
-                    <div data-aos="fade-up" className="homeFooterIcons flex">
+                    <div className="homeFooterIcons flex">
                         <div className="rightIcons">
                             <FiFacebook className="icon"/>
                             <AiOutlineInstagram  className="icon"/>
@@ -375,7 +375,7 @@ const Home = () =>{
             </section>
             <section className="main container section">
                 <div className="secTitle">
-                    <h3 data-aos="fade-right" className="title">
+                    <h3 className="title">
                         TUYẾN XE PHỔ BIẾN
                     </h3>
                 </div>
@@ -383,7 +383,7 @@ const Home = () =>{
                 <div className="secContent grid">
                 {data &&
                     data.map(route => (
-                        <div key={route.id} data-aos="fade-up" className="singleDestination">
+                        <div key={route.id}className="singleDestination">
                                     <div className="imageDiv">
                                         <img src={"http://localhost:8081/" + route.diemDi.imgUrl} alt={route.name}/>
                                     </div>

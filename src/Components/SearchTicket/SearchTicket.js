@@ -33,7 +33,7 @@ const SearchTicket  = () => {
             toast.error(message);
         } else {
             try {
-                const response = await fetch(`http://localhost:8081/api/boking_detail/${ticketCode}`, {
+                const response = await fetch(`http://localhost:8081/api/booking_detail/${ticketCode}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'

@@ -52,6 +52,10 @@ const handleLogoutClick = () => {
 }
 const handleMyRatingClick = () => {
   navigate('/my-rating');
+  
+}
+const handleMyBookingClick = () => {
+  navigate('/my-booking');
 }
     return(
       <section className="navBarSection">
@@ -96,6 +100,7 @@ const handleMyRatingClick = () => {
                               <ul className="flex flex-col gap-4">
                                   <li onClick={handleUserInfoClick}>Thông tin người dùng</li>
                                   <li onClick={handleMyRatingClick}>Đánh giá của tôi</li>
+                                  <li onClick={handleMyBookingClick}>Hóa đơn của tôi</li>
                                   <li onClick={handleLogoutClick}>Đăng xuất</li>
                               </ul>
                           </div>

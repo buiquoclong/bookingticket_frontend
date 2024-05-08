@@ -321,7 +321,7 @@ const BookingTicket = () =>{
         };
     
         try {
-            const response = await fetch(`http://localhost:8081/api/boking_detail`, {
+            const response = await fetch(`http://localhost:8081/api/booking_detail`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

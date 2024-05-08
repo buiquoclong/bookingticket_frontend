@@ -97,17 +97,25 @@ const TicketHistory = () =>{
             selector: row => row.trip.status,
             width: '8rem',
             cell: row => {
-                const status = statusMap[row.trip.status] || '';
-                const statusColor = statusColorMap[row.trip.status] || 'transparent';
-                return (
-                    <div style={{ justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center", color: statusColor }}>
-                        {status}
-                        {row.trip.status === 2 && (
-                            // <button onClick={() => handleRating(row)}>Đánh giá</button>
-                            <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".2rem",paddingBottom:".2rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRating(row)}>Đánh giá</button>
-                        )}
-                    </div>
-                );
+                if (row.booking.isPaid === 2) {
+                    return (
+                        <div style={{ justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center", color: 'red' }}>
+                            Đã hủy
+                        </div>
+                    );
+                } else {
+                    const status = statusMap[row.trip.status] || '';
+                    const statusColor = statusColorMap[row.trip.status] || 'transparent';
+                    return (
+                        <div style={{ justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center", color: statusColor }}>
+                            {status}
+                            {row.trip.status === 2 && (
+                                // <button onClick={() => handleRating(row)}>Đánh giá</button>
+                                <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".2rem",paddingBottom:".2rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRating(row)}>Đánh giá</button>
+                            )}
+                        </div>
+                    );
+                }   
             }
         }
     ]
@@ -137,7 +145,7 @@ const TicketHistory = () =>{
 
     const fetchBookingDetails = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/api/boking_detail/user/${userId}/booking_details`);
+            const response = await fetch(`http://localhost:8081/api/booking_detail/user/${userId}/booking_details`);
             const data = await response.json();
             setData(data);
             setRecords(data);
@@ -209,6 +217,12 @@ const TicketHistory = () =>{
                 toast.error("Lỗi:", error);
             }
         }
+    };
+    const handleCancelRating = async (e) => {
+        e.preventDefault();
+        setRating(0);
+        setContent('');
+        setIsRating(false);
     };
     return(
         <div className="hisInfoTicket">
@@ -290,7 +304,7 @@ const TicketHistory = () =>{
                                         onChange={(e) => setContent(e.target.value)}
                                     />
                                     <div className="listButton">
-                                        <button type="button" onClick={() => setIsRating(false)} className="cancel">Hủy</button>
+                                        <button type="button"  onClick={handleCancelRating} className="cancel">Hủy</button>
                                         <button type="submit" className="save" onClick={handleCreateRating}>Đánh giá</button>
                                     </div>
                                 </form>

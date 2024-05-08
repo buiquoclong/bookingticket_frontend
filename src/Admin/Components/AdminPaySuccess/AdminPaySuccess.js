@@ -31,7 +31,7 @@ function AdminPaySuccess() {
     }, [bookingId]);
 
     const fetchBookingDetail = async () => {
-        fetch(`http://localhost:8081/api/boking_detail/booking/${bookingId}`)
+        fetch(`http://localhost:8081/api/booking_detail/booking/${bookingId}`)
             .then(response => response.json())
             .then(data => {
                 console.log(data);

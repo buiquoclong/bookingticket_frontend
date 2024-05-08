@@ -27,14 +27,14 @@ const Footer = () =>{
 
             <div className="secContent container">
                 <div className="contactDiv flex">
-                    <div data-aos="fade-up" className="text">
+                    <div className="text">
                         <small>KEEP IN TOUCH</small>
                         <h2> Booking with us</h2>
                     </div>
 
                     <div className="inputDiv flex">
-                        <input data-aos="fade-up" type="text" placeholder="Enter Email Address"/>
-                        <button data-aos="fade-up" className="btn flex" type="submit">
+                        <input type="text" placeholder="Enter Email Address"/>
+                        <button className="btn flex" type="submit">
                             SEND <FiSend className="icon"/>
                         </button>
                     </div>
@@ -46,14 +46,14 @@ const Footer = () =>{
                             <Link to="/" className="logo flex"><MdTravelExplore className="icon"/> RoadLines</Link>
                         </div>
 
-                        <div data-aos="fade-up" className="footerParagraph">
+                        <div className="footerParagraph">
                             <h2>Thông tin liên hệ</h2>
                             <h4 className="span2">Địa chỉ: Kp.6, Phường LInh Trung, TP Thủ Đức, TP. Hồ Chí Minh</h4>
                             <h4 className="span3">Email: nlu@hcmuaf.edu.vn</h4>
                             <h4 className="span4">Điện thoại: 0123456789</h4>
                         </div>
 
-                        <div data-aos="fade-up" className="footerSocials">
+                        <div className="footerSocials">
                             <AiOutlineTwitter  className="icon"/>
                             <AiFillYoutube   className="icon"/>
                             <AiFillInstagram   className="icon"/>
@@ -63,7 +63,7 @@ const Footer = () =>{
 
                     <div className="footerLinks flex">
                         {/* Group One */}
-                        <div data-aos="fade-up" data-aos-duration="3000" className="linkGroup">
+                        <div className="linkGroup">
                             <span className="groupTitile">Thông tin</span>
 
                             <li className="footerList flex">
@@ -94,7 +94,7 @@ const Footer = () =>{
                         </div>
 
                         {/* Group Two */}
-                        <div data-aos="fade-up" data-aos-duration="4000" className="linkGroup">
+                        <div className="linkGroup">
                             <span className="groupTitile">Điều hướng</span>
 
                             <li className="footerList flex">
@@ -125,7 +125,7 @@ const Footer = () =>{
                         </div>
 
                         {/* Group Three */}
-                        <div data-aos="fade-up" data-aos-duration="5000" className="linkGroup">
+                        <div className="linkGroup">
                             <span className="groupTitile">Hỗ trợ</span>
 
                             <li className="footerList flex">

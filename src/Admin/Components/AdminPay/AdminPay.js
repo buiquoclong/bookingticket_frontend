@@ -220,7 +220,7 @@ const AdminPay = () =>{
                     phone: phone,
                     total: totalPrice,
                     kindPay: "Thanh toán bằng tiền mặt",
-                    isPaid: 0,
+                    isPaid: 1,
                     roundTrip: 0,
                 };
                 
@@ -319,7 +319,7 @@ const AdminPay = () =>{
         };
     
         try {
-            const response = await fetch(`http://localhost:8081/api/boking_detail`, {
+            const response = await fetch(`http://localhost:8081/api/booking_detail`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

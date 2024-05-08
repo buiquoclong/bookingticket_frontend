@@ -43,6 +43,8 @@ import BookTicketPage from "./page/BookTicketPage";
 import BookTicketReturnPage from "./page/BookTicketReturnPage";
 import AdminPaySuccessPage from "./Admin/page/AdminPaySuccessPage";
 import MyRatingPage from "./page/MyRatingPage";
+import MyBookingPage from "./page/MyBookingPage";
+import ChangePassPage from "./page/ChangePassPage";
 
 
 
@@ -65,6 +67,8 @@ const App = () => {
                 <Route path="/pay-success" element={<PaysuccessPage />} />
                 <Route path="/news" element={<NewsPage />} />
                 <Route path="/my-rating" element={<MyRatingPage />} />
+                <Route path="/my-booking" element={<MyBookingPage />} />
+                <Route path="/change_pass" element={<ChangePassPage />} />
                 <Route path="/admin" element={<AdminHomePage />} />
                 {/* <Route path="/admin/booking-details" element={<AdminBookingDetailPage />} /> */}
                 <Route path="/admin/bookings" element={<AdminBookingPage />} />

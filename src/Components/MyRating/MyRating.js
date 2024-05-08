@@ -9,7 +9,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const MyRating = () =>{
     const [isEditing, setIsEditing] = useState(false);
-    const [currentCity, setCurrentCity] = useState();
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');

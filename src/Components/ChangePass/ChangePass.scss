@@ -36,40 +36,66 @@ body {
                 margin-inline: auto;
             }
         }
-        .infoUser{
+        .infoPassUser{
             width: 27rem;
-            height: 18rem;
+            height: 22rem;
             border: 1px solid #1b2d363d;
-            margin-inline: auto;
             border-radius: .6rem;
+            margin-inline: auto;
             padding: 1rem;
-            .lineInfo{
-                display: flex;
-                justify-content: space-between;
-                line-height: 3rem;
-                height: 4rem;
+            .passInfo{
                 span{
+                    padding-left: .3rem;
                     color: var(--blackColor);
+                    font-size: 15px;
                 }
-                .Note{
-                    width: 18rem;
-                    height: 2.5rem;
-                    background: var(--whiteColor);
-                    border-radius: .4rem;
-                    padding-left: 1rem;
-                    border: 1px solid var(--greyText);
-                    outline: none;
+                
+                .form-feild{
+                    padding: .3rem 0 1rem;
+                    position: relative;
+                    height: 4.5rem;
+    
+                    .input{
+                        
+                        border: 1px solid var(--greyText);
+                        border-radius: .4rem;
+                        width: 100%;
+                        height: 2.5rem;
+                        padding: 0 20px;
+                        transition: 0.25s ease;
+                        outline-color: var(--PrimaryColor);
+                    }
+    
+                    .icon{
+                        position: absolute;
+                        right: .5rem;
+                        top: 20%;
+                        font-size: 20px;
+                    }
                 }
             }
-            .buttonSaveInfo{
+            .buttonSave{
                 width: 100%;
-                display: flex;
                 .save{
                     margin-top: 1rem;
                     margin-inline: auto;
                     justify-content: center;
                     font-weight: 600;
                     color: var(--whiteColor);
+                    width: 100%;
+                    border-radius: .4rem;
+                }
+                .disabled {
+                    height: 2.2rem;
+                    margin-top: 1rem;
+                    margin-inline: auto;
+                    justify-content: center;
+                    font-weight: 600;
+                    width: 100%;
+                    border-radius: .4rem;
+                    background-color: #ebebf0;
+                    color: #c4c4cf;
+                    border: 1px solid #dddde3;
                 }
             }
             
