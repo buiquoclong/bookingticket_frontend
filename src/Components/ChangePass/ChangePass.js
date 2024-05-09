@@ -154,7 +154,6 @@ const ChangePass  = () => {
                         </div>
                         
                         <div className="buttonSave">
-                            {/* <button className="btn save" disabled={!canUpdatePassword} onClick={handleupdatePass}>Đổi mật khẩu</button> */}
                             <button
                                 className={canUpdatePassword ? 'btn save' : ' disabled'}
                                 disabled={!canUpdatePassword}
