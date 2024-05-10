@@ -123,7 +123,7 @@ const Login  = () => {
                                 {passErrorMessage ?<p style={{lineHeight:"1.5", fontSize:"12px", color:"red", paddingLeft:".5rem"  }}>{passErrorMessage}</p> : <p style={{lineHeight:"1.5", fontSize:"12px", color:"black", paddingLeft:".5rem" }}>Mật khẩu phải dài từ 8 đến 32 ký tự, bao gồm chữ và số</p> } 
                             </div>
                             <div className="forgot">
-                                <a href="#">Quên mật khẩu?</a>
+                                <Link to="/forget-pass" className="forgetLink"> Quên mật khẩu?</Link>
                             </div>
                             <div className="buttonSave">
                                     <button

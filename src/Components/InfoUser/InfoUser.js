@@ -114,7 +114,8 @@ const InfoUser  = () => {
                     phone: phone,
                     role: data.role,
                     status: data.status,
-                    type: data.type
+                    type: data.type, 
+                    confirmToken: data.confirmToken
                 };
                 const updateUserResponse = await fetch(`http://localhost:8081/api/user/${userId}`, {
                     method: 'PUT', // hoặc 'PATCH' tùy vào API của bạn

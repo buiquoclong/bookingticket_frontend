@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from "react";
 import "./ChangePass.scss";
+import {useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash  } from "react-icons/fa";
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -21,6 +22,7 @@ const ChangePass  = () => {
     const [newPass, setNewPass] = useState("");
     const [reNewPass, setReNewPass] = useState("");
 
+    const navigate = useNavigate();
     const toggleNowPasswordVisibility = () => {
         setShowNowPassword(!showNowPassword);
     };
@@ -90,7 +92,8 @@ const ChangePass  = () => {
                             phone: data.phone,
                             role: data.role,
                             status: data.status,
-                            type: data.type
+                            type: data.type, 
+                            confirmToken: data.confirmToken
                         };
                         const updateUserResponse = await fetch(`http://localhost:8081/api/user/${userId}`, {
                             method: 'PUT', // hoặc 'PATCH' tùy vào API của bạn
@@ -102,7 +105,9 @@ const ChangePass  = () => {
         
                         if (updateUserResponse.ok) {
                             toast.success("Bạn đã đổi mật khẩu thành công");
-                            
+                            setTimeout(() => {
+                                navigate("/login");
+                            }, 2000);
                         } else {
                             // Xử lý lỗi nếu có
                             console.error('Failed to update pass:', updateUserResponse.statusText);

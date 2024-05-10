@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import "./Register.scss";
 // import { FaPhoneAlt } from "react-icons/fa";
 import { FaEye, FaEyeSlash  } from "react-icons/fa";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -12,12 +12,15 @@ const Register  = () => {
     const [showRePassword, setShowRePassword] = useState(false);
 
     const [emailErrorMessage, setEmailErrorMessage] = useState('');
+    const [userNameErrorMessage, setUserNameErrorMessage] = useState('');
     const [newPassErrorMessage, setNewPassErrorMessage] = useState('');
     const [renewPassErrorMessage, setReNewPassErrorMessage] = useState('');
 
     const [email, setEmail] = useState("");
+    const [userName, setUserName] = useState("");
     const [newPass, setNewPass] = useState("");
     const [reNewPass, setReNewPass] = useState("");
+    const navigate = useNavigate();
     
 
     const togglePasswordVisibility = () => {
@@ -40,6 +43,9 @@ const Register  = () => {
         }
         setEmail(emailAddress);
     };
+    const handleUserNameChange = (event) => {
+        setUserName(event.target.value);
+    };
     const handleNewPassChange = (event) => {
         setNewPass(event.target.value);
     };
@@ -49,7 +55,7 @@ const Register  = () => {
     const validatePassword = (password) => {
         return password.length >= 8 && password.length <= 32 && /[a-zA-Z]/.test(password) && /[0-9]/.test(password);
     };
-    const canRegister = email && newPass && reNewPass;
+    const canRegister = email && userName && newPass && reNewPass;
     const handleRegister = async (e) => {
         e.preventDefault();
         if (newPass !== reNewPass) {
@@ -63,7 +69,7 @@ const Register  = () => {
             } else {
                 setNewPassErrorMessage('');
                     const registerUser = {
-                        name: "",
+                        name: userName,
                         password: newPass,
                         email: email,
                         phone: "",
@@ -86,8 +92,13 @@ const Register  = () => {
                                 toast.error("Email đã tồn tại");
                                 return;
                             }
-                            toast.success("Bạn đã tạo tài khoản thành công");
-                            
+                            if (isNaN(parseInt(data))) {
+                                // Nếu dữ liệu trả về không phải là một số, nó là một thông báo lỗi
+                                toast.error(data);
+                            }else {
+                                const userId = parseInt(data);
+                                navigate("/confirm-account", { state: { userId: userId } });
+                            }
                         } else {
                             // Xử lý lỗi nếu có
                             console.error('Failed to register:', regiterUserResponse.statusText);
@@ -109,6 +120,10 @@ const Register  = () => {
                             <div className="form-feild">
                                 <input type="email" className="input" placeholder="Nhập Email" required value={email} onChange={handleEmailChange}/>
                                 {emailErrorMessage && <p style={{lineHeight:"1.5", fontSize:"12px", color:"red", paddingLeft:".5rem"  }}>{emailErrorMessage}</p>}
+                                        
+                            </div>
+                            <div className="form-feild">
+                                <input type="email" className="input" placeholder="Tên người dùng" required value={userName} onChange={handleUserNameChange}/>
                                         
                             </div>
                             <div className="form-feild">

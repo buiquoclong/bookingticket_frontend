@@ -246,7 +246,10 @@ const BookingTicket = () =>{
                         await createBookingDetail(createdBooking.id, tripId, 0, selectedSeatIds.length, selectedSeatsNames, totalPrice, pickupLocation, note);
                         updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds);
                         insertSeatReservation(selectedSeatIds, tripId, createdBooking.id);
-                        navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: kind } });
+                        setTimeout(() => {
+                            navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: kind } });
+                        }, 1500);
+                        
                     } else {
                         throw new Error('Something went wrong with the order creation.');
                     }
@@ -289,7 +292,9 @@ const BookingTicket = () =>{
                         await createBookingDetail(createdBooking.id, tripIdReturn, 1, selectedSeatIdsReturn.length, selectedSeatsNamesReturn, totalPriceReturn, pickupLocationReturn, noteReturn);
                         updateTripEmptySeat(tripIdReturn, dataReturn.route.id, dataReturn.vehicle.id, dataReturn.dayStart, dataReturn.timeStart, dataReturn.price, dataReturn.driver.id, dataReturn.emptySeat, selectedSeatIdsReturn);
                         insertSeatReservation(selectedSeatIdsReturn, tripIdReturn, createdBooking.id);
-                        navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: kind } });
+                        setTimeout(() => {
+                            navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: kind } });
+                        }, 1500);
                     } else {
                         throw new Error('Something went wrong with the order creation.');
                     }
