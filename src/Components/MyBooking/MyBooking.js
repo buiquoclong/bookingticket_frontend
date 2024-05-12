@@ -87,7 +87,7 @@ const MyBooking = () =>{
                     {row.isPaid === 0 && (
                         <>
                             <button style={{ background: "white", color: "red", border: "none", cursor: "pointer" }} onClick={() => handleCancelBookingClick(row)}>Hủy</button> |
-                            <button style={{ background: "#3b82f6", paddingInline: ".5rem", paddingTop: ".5rem", paddingBottom: ".5rem", borderRadius: ".5rem", color: "white", border: "none", cursor: "pointer" }}>Thanh toán</button>
+                            <button style={{ background: "#3b82f6", paddingInline: ".5rem", paddingTop: ".5rem", paddingBottom: ".5rem", borderRadius: ".5rem", color: "white", border: "none", cursor: "pointer" }} onClick={() => handlePayBookingClick(row)}>Thanh toán</button>
                         </>
                     )}
                     {row.isPaid === 1 && (
@@ -133,7 +133,32 @@ const MyBooking = () =>{
             })
             setRecords(newData)
         }
+        const handlePayBookingClick = async (booking) => {
+            const total  = booking.total;
+            const bookingId = booking.id;
+            try {
+                // Gửi yêu cầu để nhận URL thanh toán từ API
+                const response = await fetch(`http://localhost:8081/api/payment/pay-boooking?total=${total}&bookingId=${bookingId}`, {
+                    method: 'GET', // hoặc 'PATCH' tùy vào API của bạn
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }// Cập nhật trạng thái của booking thành 'cancelled'
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to fetch payment URL');
+                }
+                localStorage.setItem('redirectPath', window.location.pathname);
+                const paymentData = await response.text();
+                // Lưu dữ liệu vào Local Storage
+                
+                // Chuyển hướng người dùng đến URL thanh toán
+                window.location.href = paymentData;
         
+            } catch (error) {
+                console.error('Error fetching payment URL:', error);
+                toast.error('Lỗi khi nhận URL thanh toán từ máy chủ.');
+            }
+        }
 
         const handleCancelBookingClick = async (booking) => {
             const bookingId = booking.id;

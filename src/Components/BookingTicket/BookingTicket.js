@@ -28,10 +28,8 @@ const BookingTicket = () =>{
     const [emailErrorMessage, setEmailErrorMessage] = useState('');
     const [phone, setPhone] = useState("");
     const [phoneErrorMessage, setPhoneErrorMessage] = useState('');
-
     const navigate = useNavigate();
     const userId = sessionStorage.getItem("userId");
-
     // Xử lý chọn nhập nơi đón
     const handleSelectChange = (event) => {
         setShowLocationInput(event.target.value === 'Yes');
@@ -176,6 +174,163 @@ const BookingTicket = () =>{
             }
         };
 
+        const handleChooseVNPAYPayment = async () => {
+            try {
+                // Gửi yêu cầu để lấy danh sách các ghế đã đặt cho chuyến đi
+                const responseTrip = await fetch(`http://localhost:8081/api/seat_reservation/trip/${tripId}`);
+                const reservedSeatsTrip = await responseTrip.json();
+    
+                // Kiểm tra từng seatId trong selectedSeatIds
+                const isAnySeatBookedTrip = selectedSeatIds.some(seatId => {
+                    // Kiểm tra xem seatId có trong danh sách ghế đã đặt cho chuyến đi không
+                    return reservedSeatsTrip.some(reservedSeat => reservedSeat.seat.id === seatId);
+                });
+    
+                // Nếu là chuyến đi đầu tiên (một chiều) và bất kỳ ghế nào đã được đặt
+                if (kind === "Một chiều" && isAnySeatBookedTrip) {
+                    // Hiển thị thông báo và không tiếp tục quá trình tạo hóa đơn
+                    toast.error('Một hoặc nhiều ghế đã được đặt, vui lòng chọn ghế khác.');
+                    return;
+                }
+    
+                // Nếu là chuyến đi cuối cùng trong chuyến khứ hồi và bất kỳ ghế nào đã được đặt
+                if (kind === "Khứ hồi" && isAnySeatBookedTrip) {
+                    // Gửi yêu cầu để lấy danh sách các ghế đã đặt cho chuyến về
+                    const responseTripReturn = await fetch(`http://localhost:8081/api/seat_reservation/trip/${tripIdReturn}`);
+                    const reservedSeatsTripReturn = await responseTripReturn.json();
+    
+                    // Kiểm tra từng seatId trong selectedSeatIdsReturn
+                    const isAnySeatBookedTripReturn = selectedSeatIdsReturn.some(seatId => {
+                        // Kiểm tra xem seatId có trong danh sách ghế đã đặt cho chuyến về không
+                        return reservedSeatsTripReturn.some(reservedSeat => reservedSeat.seat.id === seatId);
+                    });
+    
+                    // Nếu bất kỳ ghế nào đã được đặt cho cả chuyến đi và chuyến về
+                    if (isAnySeatBookedTripReturn) {
+                        // Hiển thị thông báo và không tiếp tục quá trình tạo hóa đơn
+                        toast.error('Một hoặc nhiều ghế đã được đặt, vui lòng chọn ghế khác.');
+                        return;
+                    }
+                }
+    
+                if (kind === "Một chiều") {
+                    const bookingData = {
+                        userName: userName,
+                        email: email,
+                        phone: phone,
+                        total: totalPrice,
+                        kindPay: "Thanh toán trả sau",
+                        isPaid: 0,
+                        roundTrip: 0,
+                    };
+                    
+                    // Chỉ thêm userId nếu nó có giá trị
+                    if (userId) {
+                        bookingData.userId =  userId ;
+                    }
+        
+                    try {
+                        // Gửi yêu cầu để nhận URL thanh toán từ API
+                        const response = await fetch(`http://localhost:8081/api/payment/pay?total=${totalPrice}`, {
+                            method: 'GET', // hoặc 'PATCH' tùy vào API của bạn
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }// Cập nhật trạng thái của booking thành 'cancelled'
+                        });
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch payment URL');
+                        }
+                
+                        const paymentData = await response.text();
+                        // Lưu dữ liệu vào Local Storage
+                        localStorage.setItem('bookingDetails', JSON.stringify({
+                            tripId,
+                            selectedSeatsNames,
+                            selectedSeatIds,
+                            totalPrice,
+                            tripIdReturn,
+                            selectedSeatsNamesReturn,
+                            selectedSeatIdsReturn,
+                            totalPriceReturn,
+                            kind, 
+                            userName,
+                            email, 
+                            phone,
+                            note, 
+                            pickupLocation,
+                            noteReturn,
+                            pickupLocationReturn
+                        }));
+                        // Chuyển hướng người dùng đến URL thanh toán
+                        window.location.href = paymentData;
+                
+                    } catch (error) {
+                        console.error('Error fetching payment URL:', error);
+                        toast.error('Lỗi khi nhận URL thanh toán từ máy chủ.');
+                    }
+                } else if (kind === "Khứ hồi") {
+                    const bookingData = {
+                        userName: userName,
+                        email: email,
+                        phone: phone,
+                        total: totalAmount,
+                        kindPay:"Thanh toán trả sau",
+                        isPaid: 0,
+                        roundTrip: 1,
+                    };
+                    // Chỉ thêm userId nếu nó có giá trị
+                    if (userId) {
+                        bookingData.userId =  userId ;
+                    }
+                    // Tạo hóa đơn lượt đi
+                    try {
+                        // Gửi yêu cầu để nhận URL thanh toán từ API
+                        const response = await fetch(`http://localhost:8081/api/payment/pay?total=${totalAmount}`, {
+                            method: 'GET', // hoặc 'PATCH' tùy vào API của bạn
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }// Cập nhật trạng thái của booking thành 'cancelled'
+                        });
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch payment URL');
+                        }
+                
+                        const paymentData = await response.text();
+                        // Lưu dữ liệu vào Local Storage
+                        localStorage.setItem('bookingDetails', JSON.stringify({
+                            tripId,
+                            selectedSeatsNames,
+                            selectedSeatIds,
+                            totalPrice,
+                            tripIdReturn,
+                            selectedSeatsNamesReturn,
+                            selectedSeatIdsReturn,
+                            totalPriceReturn,
+                            kind, 
+                            userName,
+                            email, 
+                            phone,
+                            note, 
+                            pickupLocation,
+                            noteReturn,
+                            pickupLocationReturn
+                        }));
+                        // Chuyển hướng người dùng đến URL thanh toán
+                        window.location.href = paymentData;
+                
+                    } catch (error) {
+                        console.error('Error fetching payment URL:', error);
+                        toast.error('Lỗi khi nhận URL thanh toán từ máy chủ.');
+                    }
+                    
+        
+                }
+    
+            } catch (error) {
+                console.error('Error checking seat status:', error);
+                toast.error('Lỗi kiểm tra trạng thái ghế.');
+            }
+        };    
     const handleChoosePayment = async () => {
         try {
             // Gửi yêu cầu để lấy danh sách các ghế đã đặt cho chuyến đi
@@ -424,9 +579,9 @@ const BookingTicket = () =>{
         <section className="main container section">
             {showPaymentPopup && (
                 <div className="modal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-body">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-body">
                                 <button className="closePopup" onClick={() => setShowPaymentPopup(false)}></button>
                                 <div className="payContent">
                                     <div className="imgsucces">
@@ -437,7 +592,7 @@ const BookingTicket = () =>{
                                         <div>Quý khách vui lòng lựa chọn phương thức thanh toán bên dưới để thanh toán và nhận vé</div>
                                     </div>
                                     <div className="payMent" style={{marginBottom:"1rem"}}>
-                                        <button className="vnpay btn"><span style={{ color: "#ed3237" }}>VN</span><span style={{ color: "#0f62ac " }}>PAY</span></button>
+                                        <button className="vnpay btn" onClick={handleChooseVNPAYPayment}><span style={{ color: "#ed3237" }}>VN</span><span style={{ color: "#0f62ac " }}>PAY</span></button>
                                         <button className="btn trasau" onClick={handleChoosePayment}>Trả sau</button>
                                     </div>
                                 </div>

@@ -47,6 +47,8 @@ import MyBookingPage from "./page/MyBookingPage";
 import ChangePassPage from "./page/ChangePassPage";
 import ConfirmAccountPage from "./page/ConfirmAccountPage";
 import ForgetPassPage from "./page/ForgetPassPage";
+import ResponseSuccessPage from "./page/ResponseSuccessPage";
+import ResponseFailedPage from "./page/ResponseFailedPage";
 
 
 
@@ -73,6 +75,8 @@ const App = () => {
                 <Route path="/change_pass" element={<ChangePassPage />} />
                 <Route path="/confirm-account" element={<ConfirmAccountPage />} />
                 <Route path="/forget-pass" element={<ForgetPassPage />} />
+                <Route path="/payment-success" element={<ResponseSuccessPage />} />
+                <Route path="/payment-failed" element={<ResponseFailedPage />} />
                 <Route path="/admin" element={<AdminHomePage />} />
                 {/* <Route path="/admin/booking-details" element={<AdminBookingDetailPage />} /> */}
                 <Route path="/admin/bookings" element={<AdminBookingPage />} />
