@@ -3,6 +3,7 @@ import DataTable from 'react-data-table-component'
 import "../AdminRoute/AdminRoute.scss"
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {Pagination, Breadcrumbs, Link} from '@mui/material';
 
 
 const AdminRoute = () =>{
@@ -20,6 +21,8 @@ const AdminRoute = () =>{
     const [khoangCach, setKhoangCach] = useState('');
     const [timeOfRoute, setTimeOfRoute] = useState('');
     const [status, setStatus] = useState('');
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -76,16 +79,17 @@ const AdminRoute = () =>{
         // Call the API to fetch cities
         fetchRoutes();
         fetchCities();
-    }, []);
+    }, [page]);
 
     const fetchRoutes = async () => {
         try {
-            const response = await fetch("http://localhost:8081/api/route");
+            const response = await fetch(`http://localhost:8081/api/route/page?page=${page}&size=10`);
             const data = await response.json();
-            setData(data);
-            setRecords(data);
+            setData(data.routes);
+            setRecords(data.routes);
+            setTotalPages(data.totalPages)
         } catch (error) {
-            console.error("Error fetching routes:", error);
+            console.error("Error fetching cities:", error);
         }
     };
     const fetchCities = async () => {
@@ -198,9 +202,24 @@ const AdminRoute = () =>{
                 }
             }
         };
+        const handleChangePage = (event, newPage) => {
+            setPage(newPage);
+        };
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
+            <Breadcrumbs aria-label="breadcrumb">
+                <Link underline="hover" color="inherit" href="/">
+                Admin
+                </Link>
+                <Link
+                underline="hover"
+                color="inherit"
+                href="/admin"
+                >
+                Tuyến
+                </Link>
+            </Breadcrumbs>
 
             <div className="HisContent">
                 <div className="searchIn">
@@ -215,8 +234,18 @@ const AdminRoute = () =>{
                     <DataTable
                     columns={columns}
                     data={records}
-                    pagination
+                    // pagination
                     ></DataTable>
+                    <Pagination 
+                        count={totalPages}
+                        boundaryCount={1}
+                        siblingCount={1} 
+                        color="primary"
+                        showFirstButton showLastButton 
+                        style={{float:"right", padding:"1rem"}}
+                        page={page}
+                        onChange={handleChangePage}
+                        /> 
                 </div>
             </div>
             

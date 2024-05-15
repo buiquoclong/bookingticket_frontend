@@ -3,6 +3,7 @@ import DataTable from 'react-data-table-component'
 import "../AdminVehicle/AdminVehicle.scss"
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {Pagination, Breadcrumbs, Link} from '@mui/material';
 
 
 const AdminVehicle = () =>{
@@ -20,6 +21,8 @@ const AdminVehicle = () =>{
     const [vehicleNumber, setVehicleNumber] = useState('');
     const [value, setValue] = useState('');
     const [status, setStatus] = useState('');
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -74,15 +77,16 @@ const AdminVehicle = () =>{
     };
     useEffect(() => {
         // Call the API to fetch cities
-        fetchCities();
-    }, []);
+        fetchVehicles();
+    }, [page]);
 
-    const fetchCities = async () => {
+    const fetchVehicles = async () => {
         try {
-            const response = await fetch("http://localhost:8081/api/vehicle");
+            const response = await fetch(`http://localhost:8081/api/vehicle/page?page=${page}&size=10`);
             const data = await response.json();
-            setData(data);
-            setRecords(data);
+            setData(data.vehicles);
+            setRecords(data.vehicles);
+            setTotalPages(data.totalPages)
         } catch (error) {
             console.error("Error fetching cities:", error);
         }
@@ -183,9 +187,24 @@ const AdminVehicle = () =>{
                 }
             }
         };
+        const handleChangePage = (event, newPage) => {
+            setPage(newPage);
+        };
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
+            <Breadcrumbs aria-label="breadcrumb">
+                <Link underline="hover" color="inherit" href="/">
+                Admin
+                </Link>
+                <Link
+                underline="hover"
+                color="inherit"
+                href="/admin"
+                >
+                Phương tiện
+                </Link>
+            </Breadcrumbs>
 
             <div className="HisContent">
                 <div className="searchIn">
@@ -200,8 +219,19 @@ const AdminVehicle = () =>{
                     <DataTable
                     columns={columns}
                     data={records}
-                    pagination
+                    // pagination
                     ></DataTable>
+                    
+                    <Pagination 
+                        count={totalPages}
+                        boundaryCount={1}
+                        siblingCount={1} 
+                        color="primary"
+                        showFirstButton showLastButton 
+                        style={{float:"right", padding:"1rem"}}
+                        page={page}
+                        onChange={handleChangePage}
+                        /> 
                 </div>
             </div>
             

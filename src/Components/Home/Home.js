@@ -182,6 +182,7 @@ const Home = () =>{
     const handleDayStartChange = (event) => {
         const selectedDate = new Date(event.target.value);
         const today = new Date();
+        today.setHours(0, 0, 0, 0);
         if (selectedDate < today) {
             toast.error("Bạn không thể chọn ngày trong quá khứ!");
             return;
@@ -244,6 +245,13 @@ const Home = () =>{
             console.log("OriginId and destinationId are already up-to-date.");
         }
     };
+    function getCurrentDateTimeLocal() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0'); // thêm '0' nếu cần
+        const day = now.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
     
 
 
@@ -295,7 +303,7 @@ const Home = () =>{
                                 <label htmlFor="date">Chọn ngày đi: </label>
                                 <div className="input flex">
                                     {/* <input type="date" value={dayStart} onChange={(e) => setDayStart(e.target.value)}/> */}
-                                    <input type="date" value={dayStart} onChange={handleDayStartChange}/>
+                                    <input type="date" value={dayStart} onChange={handleDayStartChange} min={getCurrentDateTimeLocal()}/>
                                 </div>
                             </div> 
                         </div>
@@ -326,13 +334,13 @@ const Home = () =>{
                                 <div className="dateInput">
                                     <label htmlFor="date">Chọn ngày đi: </label>
                                     <div className="input flex">
-                                        <input type="date" value={dayStart} onChange={handleDayStartChange}/>
+                                        <input type="date" value={dayStart} onChange={handleDayStartChange} min={getCurrentDateTimeLocal()}/>
                                     </div>
                                 </div>
                                 <div className="dateInput">
                                     <label htmlFor="date">Chọn ngày về: </label>
                                     <div className="input flex">
-                                        <input type="date" value={dayReturn} onChange={handleDayReturnChange}/>
+                                        <input type="date" value={dayReturn} onChange={handleDayReturnChange} min={dayStart ? dayStart : undefined}/>
                                     </div>
                                 </div> 
                             </div>

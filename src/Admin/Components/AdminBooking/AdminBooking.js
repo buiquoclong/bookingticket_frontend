@@ -3,6 +3,7 @@ import DataTable from 'react-data-table-component'
 import "../AdminBooking/AdminBooking.scss"
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {Pagination, Breadcrumbs, Link} from '@mui/material';
 
 
 const AdminBooking = () =>{
@@ -14,6 +15,8 @@ const AdminBooking = () =>{
     
     const [data, setData] = useState([]);
     const [records, setRecords] = useState([]);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
@@ -185,14 +188,15 @@ const AdminBooking = () =>{
     useEffect(() => {
         // Call the API to fetch cities
         fetchBookings();
-    }, []);
+    }, [page]);
 
     const fetchBookings = async () => {
         try {
-            const response = await fetch("http://localhost:8081/api/booking");
+            const response = await fetch(`http://localhost:8081/api/booking/page?page=${page}&size=10`);
             const data = await response.json();
-            setData(data);
-            setRecords(data);
+            setData(data.bookings);
+            setRecords(data.bookings);
+            setTotalPages(data.totalPages)
         } catch (error) {
             console.error("Error fetching cities:", error);
         }
@@ -226,9 +230,24 @@ const AdminBooking = () =>{
                 setIsDetail(false);
             }
         }
+        const handleChangePage = (event, newPage) => {
+            setPage(newPage);
+        };
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
+            <Breadcrumbs aria-label="breadcrumb">
+                <Link underline="hover" color="inherit" href="/">
+                Admin
+                </Link>
+                <Link
+                underline="hover"
+                color="inherit"
+                href="/admin"
+                >
+                Hóa đơn
+                </Link>
+            </Breadcrumbs>
 
             <div className="HisContent">
                 <div className="searchIn">
@@ -242,8 +261,18 @@ const AdminBooking = () =>{
                     <DataTable
                     columns={columns}
                     data={records}
-                    pagination
+                    // pagination
                     ></DataTable>
+                    <Pagination 
+                        count={totalPages}
+                        boundaryCount={1}
+                        siblingCount={1} 
+                        color="primary"
+                        showFirstButton showLastButton 
+                        style={{float:"right", padding:"1rem"}}
+                        page={page}
+                        onChange={handleChangePage}
+                        /> 
                 </div>
             </div>
             

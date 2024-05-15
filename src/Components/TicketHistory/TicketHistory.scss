@@ -75,6 +75,11 @@ body{
                 height: .5px;
             }
         }
+        .center-pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
     }
     .modal {
         position: fixed;

@@ -3,6 +3,7 @@ import DataTable from 'react-data-table-component'
 import "../AdminTrip/AdminTrip.scss"
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {Pagination, Breadcrumbs, Link} from '@mui/material';
 
 
 const AdminTrip = () =>{
@@ -16,6 +17,8 @@ const AdminTrip = () =>{
     const [drivers, setDrivers] = useState([]);
     const [routes, setRoutes] = useState([]);
     const [records, setRecords] = useState([]);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
@@ -125,16 +128,17 @@ const AdminTrip = () =>{
         fetchKindVehicles();
         fetchDrivers();
         fetchRoutes();
-    }, []);
+    }, [page]);
 
     const fetchTrips = async () => {
         try {
-            const response = await fetch("http://localhost:8081/api/trip");
+            const response = await fetch(`http://localhost:8081/api/trip/page?page=${page}&size=10`);
             const data = await response.json();
-            setData(data);
-            setRecords(data);
+            setData(data.trips);
+            setRecords(data.trips);
+            setTotalPages(data.totalPages)
         } catch (error) {
-            console.error("Error fetching trips:", error);
+            console.error("Error fetching cities:", error);
         }
     };
     const fetchRoutes = async () => {
@@ -223,7 +227,7 @@ const AdminTrip = () =>{
             const selectedVehicleId = e.target.value;
             console.log(selectedVehicleId)
 
-            const selectedVehicle = vehicleOfKind.find(vehicle => vehicle.id === selectedVehicleId);
+            // const selectedVehicle = vehicleOfKind.find(vehicle => vehicle.id === selectedVehicleId);
             setCurrentCity(current => ({
                 ...current,
                 vehicle: {
@@ -333,9 +337,24 @@ const AdminTrip = () =>{
                 }
             }
         };
+        const handleChangePage = (event, newPage) => {
+            setPage(newPage);
+        };
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
+            <Breadcrumbs aria-label="breadcrumb">
+                <Link underline="hover" color="inherit" href="/">
+                Admin
+                </Link>
+                <Link
+                underline="hover"
+                color="inherit"
+                href="/admin"
+                >
+                Chuyến đi
+                </Link>
+            </Breadcrumbs>
 
             <div className="HisContent">
                 <div className="searchIn">
@@ -350,8 +369,18 @@ const AdminTrip = () =>{
                     <DataTable
                     columns={columns}
                     data={records}
-                    pagination
+                    // pagination
                     ></DataTable>
+                    <Pagination 
+                        count={totalPages}
+                        boundaryCount={1}
+                        siblingCount={1} 
+                        color="primary"
+                        showFirstButton showLastButton 
+                        style={{float:"right", padding:"1rem"}}
+                        page={page}
+                        onChange={handleChangePage}
+                        /> 
                 </div>
             </div>
             

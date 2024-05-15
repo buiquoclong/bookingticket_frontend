@@ -191,6 +191,23 @@ body {
     margin-top: 60px;
     height: 300px;
   }
+
+  ::-webkit-scrollbar {
+    width: 10px; /* Chiều rộng của thanh scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background-color: var(--bodyColor); /* Màu nền của thanh scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--greyText); /* Màu của nút kéo scrollbar */
+    border-radius: 5px; /* Đường cong của nút kéo scrollbar */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--PrimaryColor); /* Màu khi di chuột qua nút kéo scrollbar */
+}
   
   /* End Main  */
   

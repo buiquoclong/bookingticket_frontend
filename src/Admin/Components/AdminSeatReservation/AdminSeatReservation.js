@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import DataTable from 'react-data-table-component'
 import "../AdminSeatReservation/AdminSeatReservation.scss"
+import {Pagination, Breadcrumbs, Link} from '@mui/material';
 
 
 const AdminSeatReservation = () =>{
@@ -15,6 +16,8 @@ const AdminSeatReservation = () =>{
     };
     const [data, setData] = useState([]);
     const [records, setRecords] = useState([]);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -78,14 +81,15 @@ const AdminSeatReservation = () =>{
     useEffect(() => {
         // Call the API to fetch cities
         fetchSeatReservations();
-    }, []);
+    }, [page]);
 
     const fetchSeatReservations = async () => {
         try {
-            const response = await fetch("http://localhost:8081/api/seat_reservation");
+            const response = await fetch(`http://localhost:8081/api/seat_reservation/page?page=${page}&size=10`);
             const data = await response.json();
-            setData(data);
-            setRecords(data);
+            setData(data.seatReservations);
+            setRecords(data.seatReservations);
+            setTotalPages(data.totalPages)
         } catch (error) {
             console.error("Error fetching cities:", error);
         }
@@ -100,9 +104,24 @@ const AdminSeatReservation = () =>{
             setCurrentCity(email);
             setIsEditing(true);
         };
+        const handleChangePage = (event, newPage) => {
+            setPage(newPage);
+        };
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
+            <Breadcrumbs aria-label="breadcrumb">
+                <Link underline="hover" color="inherit" href="/">
+                Admin
+                </Link>
+                <Link
+                underline="hover"
+                color="inherit"
+                href="/admin"
+                >
+                Ghế đặt trước
+                </Link>
+            </Breadcrumbs>
 
             <div className="HisContent">
                 <div className="searchIn">
@@ -116,8 +135,18 @@ const AdminSeatReservation = () =>{
                     <DataTable
                     columns={columns}
                     data={records}
-                    pagination
+                    // pagination
                     ></DataTable>
+                    <Pagination 
+                        count={totalPages}
+                        boundaryCount={1}
+                        siblingCount={1} 
+                        color="primary"
+                        showFirstButton showLastButton 
+                        style={{float:"right", padding:"1rem"}}
+                        page={page}
+                        onChange={handleChangePage}
+                        />
                 </div>
             </div>
             

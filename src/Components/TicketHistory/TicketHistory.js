@@ -5,6 +5,7 @@ import { useNavigate  } from 'react-router-dom';
 import StarRatings from 'react-star-ratings';
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {Pagination} from '@mui/material';
 
 const TicketHistory = () =>{
     const [data, setData] = useState([]);
@@ -13,6 +14,8 @@ const TicketHistory = () =>{
     const [selectedTrip, setSelectedTrip] = useState(null);
     const [rating, setRating] = useState(0);
     const [content, setContent] = useState('');
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
@@ -141,14 +144,15 @@ const TicketHistory = () =>{
             sessionStorage.setItem('redirectPath', window.location.pathname);
             navigate('/login');
         }
-    },[userId]);
+    },[userId, page]);
 
     const fetchBookingDetails = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/api/booking_detail/user/${userId}/booking_details`);
+            const response = await fetch(`http://localhost:8081/api/booking_detail/user/${userId}/booking_details/page?page=${page}&size=10`);
             const data = await response.json();
-            setData(data);
-            setRecords(data);
+            setData(data.bookingDetails);
+            setRecords(data.bookingDetails);
+            setTotalPages(data.totalPages)
         } catch (error) {
             console.error("Error fetching detail:", error);
         }
@@ -224,6 +228,9 @@ const TicketHistory = () =>{
         setContent('');
         setIsRating(false);
     };
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
     return(
         <div className="hisInfoTicket">
             <div className="HisContent">
@@ -239,9 +246,21 @@ const TicketHistory = () =>{
                     <DataTable
                     columns={columns}
                     data={records}
-                    pagination
+                    // pagination
                     ></DataTable>
                 </div>
+                    <div className="center-pagination">
+                        <Pagination 
+                            count={totalPages}
+                            boundaryCount={1}
+                            siblingCount={1} 
+                            color="primary"
+                            showFirstButton 
+                            showLastButton 
+                            page={page}
+                            onChange={handleChangePage}
+                        />
+                    </div>
             </div>
             {isRating && (
                 <div className="modal" id="deleteModal">

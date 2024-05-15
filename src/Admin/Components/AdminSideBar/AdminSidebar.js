@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
-import 
-{BsCart3, BsGrid1X2Fill, BsFillArchiveFill, BsFillGrid3X3GapFill, BsPeopleFill, 
-BsListCheck, BsMenuButtonWideFill, BsFillGearFill}
-from 'react-icons/bs'
+// import { SpaceDashboardIcon } from '@mui/icons-material';
+import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import LocationCityIcon from '@mui/icons-material/LocationCity';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import EventSeatIcon from '@mui/icons-material/EventSeat';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import DiscountIcon from '@mui/icons-material/Discount';
+import ReviewsIcon from '@mui/icons-material/Reviews';
+import ContactsIcon from '@mui/icons-material/Contacts';
+import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import BookOnlineIcon from '@mui/icons-material/BookOnline';
 import { Link } from 'react-router-dom';
 
 function AdminSidebar({openSidebarToggle, OpenSidebar}) {
@@ -15,7 +24,7 @@ function AdminSidebar({openSidebarToggle, OpenSidebar}) {
     <aside id="sidebar" className={openSidebarToggle ? "sidebar-responsive": ""}>
         <div className='sidebar-title'>
             <div className='sidebar-brand'>
-                <BsCart3  className='icon_header'/> SHOP
+                <BookOnlineIcon  className='icon_header'/> BOOKING
             </div>
             <span className='icon close_icon' onClick={OpenSidebar}>X</span>
         </div>
@@ -23,72 +32,72 @@ function AdminSidebar({openSidebarToggle, OpenSidebar}) {
         <ul className='sidebar-list'>
             <Link to="/admin" style={{color:"#9e9ea4"}}>
                 <li className={`sidebar-list-item ${activeTab === "dashboard" ? "active" : ""}`} onClick={() => handleTabClick("dashboard")}>
-                    <BsGrid1X2Fill className='icon'/> Dashboard
+                    <SpaceDashboardIcon  className='icon'/> Dashboard
                 </li>
             </Link>
             <Link to="/admin/users" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "users" ? "active" : ""}`} onClick={() => handleTabClick("users")}>
-                    <BsGrid1X2Fill className='icon'/> Người dùng
+                <ManageAccountsIcon  className='icon'/> Người dùng
                 </li>
             </Link>
             <Link to="/admin/cities" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "cities" ? "active" : ""}`} onClick={() => handleTabClick("cities")}>
-                    <BsGrid1X2Fill className='icon'/> Thành phố
+                <LocationCityIcon  className='icon'/> Thành phố
                 </li>
             </Link>
             <Link to="/admin/vehicles" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "vehicles" ? "active" : ""}`} onClick={() => handleTabClick("vehicles")}>
-                    <BsGrid1X2Fill className='icon'/> Phương tiện
+                    <DirectionsCarIcon className='icon'/> Phương tiện
                 </li>
             </Link>
             <Link to="/admin/seats" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "seats" ? "active" : ""}`} onClick={() => handleTabClick("seats")}>
-                    <BsGrid1X2Fill className='icon'/> Ghế ngồi
+                    <EventSeatIcon className='icon'/> Ghế ngồi
                 </li>
             </Link>
             <Link to="/admin/routes" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "routes" ? "active" : ""}`} onClick={() => handleTabClick("routes")}>
-                    <BsGrid1X2Fill className='icon'/> Tuyến đi
+                    <ScheduleIcon className='icon'/> Tuyến đi
                 </li>
             </Link>
             <Link to="/admin/trips" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "trips" ? "active" : ""}`} onClick={() => handleTabClick("trips")}>
-                    <BsGrid1X2Fill className='icon'/> Chuyến xe
+                    <DirectionsCarIcon className='icon'/> Chuyến xe
                 </li>
             </Link>
             <Link to="/admin/bookings" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "bookings" ? "active" : ""}`} onClick={() => handleTabClick("bookings")}>
-                    <BsGrid1X2Fill className='icon'/> Hóa đơn
+                    <ReceiptIcon className='icon'/> Hóa đơn
                 </li>
             </Link>
             <Link to="/admin/seat-reservation" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "seat-reservation" ? "active" : ""}`} onClick={() => handleTabClick("seat-reservation")}>
-                    <BsGrid1X2Fill className='icon'/> Ghế đặt trước
+                    <EventSeatIcon className='icon'/> Ghế đặt trước
                 </li>
             </Link>
             <Link to="/admin/drivers" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "drivers" ? "active" : ""}`} onClick={() => handleTabClick("drivers")}>
-                    <BsGrid1X2Fill className='icon'/> Tài xế
+                    <ManageAccountsIcon className='icon'/> Tài xế
                 </li>
             </Link>
             <Link to="/admin/promotions" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "promotions" ? "active" : ""}`} onClick={() => handleTabClick("promotions")}>
-                    <BsGrid1X2Fill className='icon'/> Khuyến mãi
+                    <DiscountIcon className='icon'/> Khuyến mãi
                 </li>
             </Link>
             <Link to="/admin/reviews" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "reviews" ? "active" : ""}`} onClick={() => handleTabClick("reviews")}>
-                    <BsGrid1X2Fill className='icon'/> Đánh giá
+                    <ReviewsIcon className='icon'/> Đánh giá
                 </li>
             </Link>
             <Link to="/admin/contacts" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "contacts" ? "active" : ""}`} onClick={() => handleTabClick("contacts")}>
-                    <BsGrid1X2Fill className='icon'/> Liên hệ
+                    <ContactsIcon className='icon'/> Liên hệ
                 </li>
             </Link>
             <Link to="/admin/logs" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "logs" ? "active" : ""}`} onClick={() => handleTabClick("logs")}>
-                    <BsGrid1X2Fill className='icon'/> Log
+                    <WorkHistoryIcon className='icon'/> Log
                 </li>
             </Link>
             

@@ -4,6 +4,7 @@ import "../MyBooking/MyBooking.scss"
 import { useNavigate  } from 'react-router-dom';
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {Pagination} from '@mui/material';
 
 
 const MyBooking = () =>{
@@ -27,6 +28,8 @@ const MyBooking = () =>{
     const [records, setRecords] = useState([]);
     const userId = sessionStorage.getItem("userId");
     const navigate = useNavigate();
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -114,17 +117,17 @@ const MyBooking = () =>{
             sessionStorage.setItem('redirectPath', window.location.pathname);
             navigate('/login');
         }
-    }, [userId]);
+    }, [userId, page]);
 
     const fetchReviews = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/api/booking/user/${userId}`);
+            const response = await fetch(`http://localhost:8081/api/booking/user/${userId}/page?page=${page}&size=10`);
             const data = await response.json();
-            setData(data);
-            setRecords(data);
-            console.log("Review:", data);
+            setData(data.bookings);
+            setRecords(data.bookings);
+            setTotalPages(data.totalPages)
         } catch (error) {
-            console.error("Error fetching review:", error);
+            console.error("Error fetching detail:", error);
         }
     };
         function handleFilter(event){
@@ -269,6 +272,9 @@ const MyBooking = () =>{
             
             
         };
+        const handleChangePage = (event, newPage) => {
+            setPage(newPage);
+        };
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -286,9 +292,21 @@ const MyBooking = () =>{
                     <DataTable
                     columns={columns}
                     data={records}
-                    pagination
+                    // pagination
                     ></DataTable>
                 </div>
+                    <div className="center-pagination">
+                        <Pagination 
+                            count={totalPages}
+                            boundaryCount={1}
+                            siblingCount={1} 
+                            color="primary"
+                            showFirstButton 
+                            showLastButton 
+                            page={page}
+                            onChange={handleChangePage}
+                        />
+                    </div>
             </div>
             {/* </section> */}
             <ToastContainer
