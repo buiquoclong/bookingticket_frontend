@@ -113,7 +113,7 @@ const ResponseSuccess  = () => {
     
                     if (response.ok) {
                         console.log("đã tạo booking")
-                        toast.success("Đơn hàng đã được tạo!");
+                        // toast.success("Đơn hàng đã được tạo!");
                         const createdBooking = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
                         await createBookingDetail(createdBooking.id, bookingDetails.tripId, 0, bookingDetails.selectedSeatIds.length, bookingDetails.selectedSeatsNames, bookingDetails.totalPrice, bookingDetails.pickupLocation, bookingDetails.note);
                         updateTripEmptySeat(bookingDetails.tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, bookingDetails.selectedSeatIds);
@@ -156,7 +156,7 @@ const ResponseSuccess  = () => {
                     });
     
                     if (response.ok) {
-                        toast.success("Đơn hàng đã được tạo!");
+                        // toast.success("Đơn hàng đã được tạo!");
                         const createdBooking = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
                         // tạo chi tiết và upadte lượt đi
                         await createBookingDetail(createdBooking.id, bookingDetails.tripId, 0, bookingDetails.selectedSeatIds.length, bookingDetails.selectedSeatsNames, bookingDetails.totalPrice, bookingDetails.pickupLocation, bookingDetails.note);

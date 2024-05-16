@@ -81,43 +81,39 @@ const ChangePass  = () => {
             return;
             } else {
                 setNewPassErrorMessage('');
-                if(nowPass === data.password){
                     setNowPassErrorMessage("");
                     try {
                         // Sau khi cập nhật thành công, cập nhật lại booking
-                        const updateUser = {
-                            name: data.name,
-                            password: newPass,
-                            email: data.email,
-                            phone: data.phone,
-                            role: data.role,
-                            status: data.status,
-                            type: data.type, 
-                            confirmToken: data.confirmToken
+                        const updatePass = {
+                                oldPassword: nowPass,
+                                newPassword: newPass
                         };
-                        const updateUserResponse = await fetch(`http://localhost:8081/api/user/${userId}`, {
+                        const updatePassResponse = await fetch(`http://localhost:8081/api/user/${userId}/change-password`, {
                             method: 'PUT', // hoặc 'PATCH' tùy vào API của bạn
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify(updateUser), // Cập nhật trạng thái của booking thành 'cancelled'
+                            body: JSON.stringify(updatePass), // Cập nhật trạng thái của booking thành 'cancelled'
                         });
         
-                        if (updateUserResponse.ok) {
+                        if (updatePassResponse.ok) {
+                            const data = await updatePassResponse.text();
+                            if(data === "Mật khẩu cũ không đúng"){
+                                toast.error("Mật khẩu cũ không đúng");
+                                return;
+                            }
                             toast.success("Bạn đã đổi mật khẩu thành công");
+                            sessionStorage.removeItem("userId");
                             setTimeout(() => {
                                 navigate("/login");
                             }, 2000);
                         } else {
                             // Xử lý lỗi nếu có
-                            console.error('Failed to update pass:', updateUserResponse.statusText);
+                            console.error('Failed to update pass:', updatePassResponse.statusText);
                         }
                     } catch (error) {
                         console.error("Error update:", error);
                     }
-                }else{
-                    setNowPassErrorMessage("Mật khẩu không đúng");
-                }
             }
         }
     };
