@@ -1,83 +1,83 @@
 import React, {useState, useEffect} from "react";
 import DataTable from 'react-data-table-component'
-import "../AdminSeat/AdminSeat.scss"
+// import "../AdminDriver/AdminDriver.scss"
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
 
 
-const AdminSeat = () =>{
+const AdminDriver = () =>{
     const [isEditing, setIsEditing] = useState(false);
-    const [currentCity, setCurrentCity] = useState({ id: null, kindVehicle: {
-        id: "",
-        name: ""}, image: '' });
-
     const [isAdd, setIsAdd] = useState(false);
+    const [currentCity, setCurrentCity] = useState();
     const [data, setData] = useState([]);
     const [records, setRecords] = useState([]);
-
     const [name, setName] = useState('');
-    const [kindVehicle, setKindVehicle] = useState('');
-    
+    const [email, setEmail] = useState('');
+    const [emailErrorMessage, setEmailErrorMessage] = useState('');
+    const [phone, setPhone] = useState('');
     const [status, setStatus] = useState('');
-    
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
             selector: row => row.id,
-            width: '5rem',
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.id}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên ghế</div>,
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên tài xế</div>,
             selector: row => row.name,
-            sortable: true,
-            width: '20rem',
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.name}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Loại xe</div>,
-            selector: row => row.kindVehicle.name,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.kindVehicle.name}</div>
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Email</div>,
+            selector: row => row.email,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.email}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Trạng thái</div>,
-            selector: row => row.status,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{statusMap[row.status] || 'Unknown Status'}</div>
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Số điện thoại</div>,
+            selector: row => row.phone,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.phone}</div>
         },
+        // ,
+        // {
+        //     name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tài khoản</div>,
+        //     selector: row => row.status,
+        //     width: '10rem',
+        //     cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%',backgroundColor: statusColorMap[row.status] || 'transparent', padding:".3rem 0rem", borderRadius:"5px", fontWeight:"600", color:"" }}>{statusMap[row.status] || 'Unknown Status'}</div>
+        // },
         {
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                    <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}> Xóa </button>
+                <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
+                <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}> Xóa </button>
                 </div>
             )
         }
     ]
     
-    const statusMap = {
-        0: 'Đang hoạt động',
-        1: 'Tạm dừng hoạt động'
-    };
-    const kindVehicleMap = {
-        1: 'Giường nằm',
-        2: 'Limousine',
-        3: 'Ghế ngồi'
-    };
-
+    // const statusMap = {
+    //     1: 'Đang làm',
+    //     2: 'Tạm nghỉ',
+    //     3: 'Tạm khóa',
+    // };
+    // const statusColorMap = {
+    //     1: '#008000b3',  // Đang làm
+    //     2: '#ffa9008a', // Tạm nghỉ
+    //     3: '#ff0000c2'     // Tạm khóa
+    // };
     useEffect(() => {
         // Call the API to fetch cities
-        fetchSeats();
+        fetchDrivers();
     }, [page]);
 
-    const fetchSeats = async () => {
+    const fetchDrivers = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/api/seat/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/driver/page?page=${page}&size=10`);
             const data = await response.json();
-            setData(data.seats);
-            setRecords(data.seats);
+            setData(data.drivers);
+            setRecords(data.drivers);
             setTotalPages(data.totalPages)
         } catch (error) {
             console.error("Error fetching cities:", error);
@@ -89,8 +89,8 @@ const AdminSeat = () =>{
             })
             setRecords(newData)
         }
-        const handleEditClick = (seatName) => {
-            setCurrentCity(seatName);
+        const handleEditClick = (kindVehicle) => {
+            setCurrentCity(kindVehicle);
             setIsEditing(true);
         };
         const handleCreateClick = () => {
@@ -99,62 +99,76 @@ const AdminSeat = () =>{
         const handleNameChange = (event) => {
             setName(event.target.value)
         };
-        const handkindVehicleChange = (event) => {
-            setKindVehicle(event.target.value)
+        const handleEmailChange = (event) => {
+            // setEmail(event.target.value);
+            const emailAddress = event.target.value;
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Biểu thức chính quy kiểm tra email
+            
+            // Kiểm tra xem email nhập vào có khớp với biểu thức chính quy không
+            if (!emailPattern.test(emailAddress)) {
+                setEmailErrorMessage("Email không hợp lệ.");
+            } else {
+                setEmailErrorMessage(""); // Nếu hợp lệ, xóa thông báo lỗi
+            }
+            setEmail(emailAddress);
         };
-        const handleStatusChange = (event) => {
-            setStatus(event.target.value)
-        }
-        const handleCreateSeat = async (e) => {
+        const handlePhoneChange = (event) => {
+            setPhone(event.target.value)
+        };
+        // const handleStatusChange = (event) => {
+        //     setStatus(event.target.value)
+        // };
+        const handleCreateDriver = async (e) => {
             e.preventDefault();
             let missingInfo = [];
             if (!name) {
-                missingInfo.push("Tên ghế");
+                missingInfo.push("Tên tài xế");
             }
-            if (!kindVehicle) {
-                missingInfo.push("Loại xe");
+            if (!email) {
+                missingInfo.push("Email");
+            } else if (emailErrorMessage) { // Kiểm tra nếu có errorMessage cho email
+                toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
+                return; // Dừng xử lý tiếp theo nếu có lỗi
             }
-            if (!status) {
-                missingInfo.push("Trạng thái");
+            if (!phone) {
+                missingInfo.push("Số điện thoại");
             }
             if (missingInfo.length > 0) {
                 const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
                 toast.error(message);
             } else {
                 try {
-                    const newSeatData = {
+                    const newDriverData = {
                         name: name,
-                        kindVehicleId: kindVehicle,
-                        status: status,
+                        email: email,
+                        phone: phone
                     };
             
-                    const response = await fetch("http://localhost:8081/api/seat", {
+                    const response = await fetch("http://localhost:8081/api/driver", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
                         },
-                        body: JSON.stringify(newSeatData)
+                        body: JSON.stringify(newDriverData)
                     });
             
                     if (response.ok) {
                         // Xử lý thành công
-                        console.log("Ghế đã được tạo thành công!");
-                        toast.success("Ghế đã được tạo thành công!");
-                        const newSeat = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
+                        console.log("Driver đã được tạo thành công!");
+                        toast.success("Driver đã được tạo thành công!");
+                        const newDriver = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
                         // Thêm người dùng mới vào danh sách
-                        setData(prevData => [...prevData, newSeat]);
-                        setRecords(prevRecords => [...prevRecords, newSeat]);
+                        setData(prevData => [...prevData, newDriver]);
+                        setRecords(prevRecords => [...prevRecords, newDriver]);
                         // Reset form hoặc làm gì đó khác
                         setName('');
-                        setKindVehicle('');
-                        setStatus('');
+                        setEmail('');
+                        setPhone('');
                         setIsAdd(false);
                         // window.location.reload();
                     } else {
-                        // console.error("Có lỗi xảy ra khi tạo ghế!");
-                        // toast.error("Có lỗi xảy ra khi tạo ghế!");
-                        console.error("Tên ghế đã tồn tại trong loại xe này");
-                        toast.error("Tên ghế đã tồn tại trong loại xe này");
+                        console.error("Có lỗi xảy ra khi tạo driver!");
+                        toast.error("Có lỗi xảy ra khi tạo driver!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);
@@ -162,8 +176,8 @@ const AdminSeat = () =>{
                 }
             }
         };
-        const handleChangePage = (event, value) => {
-            setPage(value);
+        const handleChangePage = (event, newPage) => {
+            setPage(newPage);
         };
     return(
         <div className="main-container">
@@ -177,7 +191,7 @@ const AdminSeat = () =>{
                 color="inherit"
                 href="/admin"
                 >
-                Ghế ngồi
+                Tài xế
                 </Link>
             </Breadcrumbs>
 
@@ -187,8 +201,8 @@ const AdminSeat = () =>{
                 </div>
                 <div className="HistoryTick">
                     <div className="contentTikcet">
-                        <div className="title">Quản lý ghế ngồi</div>
-                        <button className="btn back" onClick={() => handleCreateClick()}>Thêm ghế ngồi</button>
+                        <div className="title">Quản lý tài xế</div>
+                        <button className="btn back" onClick={() => handleCreateClick()}>Thêm tài xế</button>
                     </div>
                     <div className="devide"></div>
                     <DataTable
@@ -214,45 +228,36 @@ const AdminSeat = () =>{
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h2 class="modal-title">Sửa ghế ngồi</h2>
+                                <h2 class="modal-title">Sửa thông tin tài xế</h2>
                             </div>
                             <div class="modal-body">
                                 <form>
                                     <div className="infoCity">
-                                        <label>Tên ghế:</label>
+                                        <label className="info">Tên:</label>
                                         <input type="text" value={currentCity.name} onChange={(e) => setCurrentCity({ ...currentCity, name: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
-                                        <label className="info">Loại xe:</label>
-                                        {/* <input type="text" value={currentCity.kindVehicle} onChange={(e) => setCurrentCity({ ...currentCity, kindVehicle: e.target.value })} /> */}
-                                        <select 
-                                            className="inputValue"
-                                            value={currentCity.kindVehicle.id} onChange={(e) => setCurrentCity({ ...currentCity, kindVehicle: {
-                                                ...currentCity.kindVehicle,
-                                                id: e.target.value
-                                            } })}
-                                        >
-                                            {Object.keys(kindVehicleMap).map(key => (
-                                                <option key={key} value={key}>
-                                                    {kindVehicleMap[key]}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        <label className="info">Email:</label>
+                                        <input type="text" value={currentCity.email} onChange={(e) => setCurrentCity({ ...currentCity, email: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
-                                        <label>Trạn thái:</label>
-                                        {/* <input type="text" value={currentCity.vehicleNumber} onChange={(e) => setCurrentCity({ ...currentCity, vehicleNumber: e.target.value })} /> */}
-                                        <select 
-                                            className="inputValue"
-                                            value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })}
+                                        <label>Số điện thoại:</label>
+                                        <input type="text" value={currentCity.phone} onChange={(e) => setCurrentCity({ ...currentCity, phone: e.target.value })} />
+                                    </div>
+                                    {/* <div className="infoCity">
+                                        <label>Trạng thái:</label> */}
+                                        {/* <input type="text" className="inputValue" value={statusMap[currentCity.status] || 'Unknown Status'} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        {/* <select 
+                                            value={currentCity.status}  className="inputValue"
+                                            onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })}
                                         >
                                             {Object.keys(statusMap).map(key => (
                                                 <option key={key} value={key}>
                                                     {statusMap[key]}
                                                 </option>
                                             ))}
-                                        </select>
-                                    </div>
+                                        </select> */}
+                                    {/* </div> */}
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
                                         <button type="submit" className="save">Lưu</button>
@@ -269,35 +274,28 @@ const AdminSeat = () =>{
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h2 class="modal-title">Thêm ghế ngồi</h2>
+                                <h2 class="modal-title">Thêm tài xế</h2>
                             </div>
                             <div class="modal-body">
                                 <form>
                                     <div className="infoCity">
-                                        <label>Tên ghế:</label>
-                                        <input type="text"  value={name} onChange={handleNameChange}/>
+                                        <label className="info">Tên:</label>
+                                        <input type="text" value={name} onChange={handleNameChange} />
                                     </div>
                                     <div className="infoCity">
-                                        <label className="info">Loại xe:</label>
-                                        {/* <input type="text" value={currentCity.kindVehicle} onChange={(e) => setCurrentCity({ ...currentCity, kindVehicle: e.target.value })} /> */}
-                                        <select 
-                                            className="inputValue"
-                                            value={kindVehicle} onChange={handkindVehicleChange}
-                                        >
-                                            <option value="">Chọn loại xe</option>
-                                            {Object.keys(kindVehicleMap).map(key => (
-                                                <option key={key} value={key}>
-                                                    {kindVehicleMap[key]}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        <label className="info">Email:</label>
+                                        <input type="text" value={email} onChange={handleEmailChange} />
                                     </div>
                                     <div className="infoCity">
-                                        <label>Trạn thái:</label>
-                                        {/* <input type="text" value={currentCity.vehicleNumber} onChange={(e) => setCurrentCity({ ...currentCity, vehicleNumber: e.target.value })} /> */}
-                                        <select 
+                                        <label>Số điện thoại:</label>
+                                        <input type="text" value={phone} onChange={handlePhoneChange} />
+                                    </div>
+                                    {/* <div className="infoCity">
+                                        <label>Tài khoản:</label> */}
+                                        {/* <input type="text" className="inputValue" value={statusMap[currentCity.status] || 'Unknown Status'} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        {/* <select 
                                             className="inputValue"
-                                            value={status} onChange={handleStatusChange}
+                                            value={status} onChange={handleStatusChange} 
                                         >
                                             <option value="">Chọn trạng thái</option>
                                             {Object.keys(statusMap).map(key => (
@@ -305,11 +303,11 @@ const AdminSeat = () =>{
                                                     {statusMap[key]}
                                                 </option>
                                             ))}
-                                        </select>
-                                    </div>
+                                        </select> */}
+                                    {/* </div> */}
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsAdd(false)} className="cancel">Hủy</button>
-                                        <button type="submit" className="save" onClick={handleCreateSeat}>Tạo</button>
+                                        <button type="submit" className="save" onClick={handleCreateDriver}>Tạo</button>
                                     </div>
                                 </form>
                             </div>
@@ -334,4 +332,4 @@ const AdminSeat = () =>{
         
     )
 }
-export default AdminSeat
+export default AdminDriver

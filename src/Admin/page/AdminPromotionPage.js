@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './Admin.scss'
 import AdminHeader from '../Components/AdminHeader/AdminHeader'
 import AdminSidebar from '../Components/AdminSideBar/AdminSidebar'
-import AdminPromotion from '../Components/AdminPromotion/AdminPromotion'
+import AdminPromotion from '../Components/AdminPromotion'
 
 function AdminPromotionPage() {
 const [openSidebarToggle, setOpenSidebarToggle] = useState(false)

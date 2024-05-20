@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import DataTable from 'react-data-table-component'
-import "../AdminSeatReservation/AdminSeatReservation.scss"
+// import "../AdminSeatReservation/AdminSeatReservation.scss"
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
 
 

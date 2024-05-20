@@ -1,24 +1,21 @@
 import React, {useState, useEffect} from "react";
 import DataTable from 'react-data-table-component'
-import "../AdminContact/AdminContact.scss"
+// import "../AdminPromotion/AdminPromotion.scss"
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
 
 
-const AdminContact = () =>{
+const AdminPromotion = () =>{
     const [isEditing, setIsEditing] = useState(false);
     const [isAdd, setIsAdd] = useState(false);
     const [currentCity, setCurrentCity] = useState();
-    
     const [data, setData] = useState([]);
     const [records, setRecords] = useState([]);
-
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [emailErrorMessage, setEmailErrorMessage] = useState('');
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
+    const [description, setDescription] = useState('');
+    const [startDay, setStartDay] = useState('');
+    const [endDay, setEndDay] = useState('');
+    const [discount, setDiscount] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const columns = [
@@ -28,24 +25,29 @@ const AdminContact = () =>{
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.id}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên liên hệ</div>,
-            selector: row => row.name,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.name}</div>
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Mã giảm giá</div>,
+            selector: row => row.code,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.code}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Email</div>,
-            selector: row => row.email,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.email}</div>
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Mô tả</div>,
+            selector: row => row.description,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.description}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tiêu đề</div>,
-            selector: row => row.title,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.title}</div>
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Ngày bắt đầu</div>,
+            selector: row => row.startDay,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.startDay}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Nồij dung</div>,
-            selector: row => row.content,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.content}</div>
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Ngày kết thúc</div>,
+            selector: row => row.endDay,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.endDay}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Mức giảm giá</div>,
+            selector: row => row.discount,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.discount} %</div>
         },
         {
             cell: (row) => (
@@ -58,23 +60,38 @@ const AdminContact = () =>{
     ]
     useEffect(() => {
         // Call the API to fetch cities
-        fetchContacts();
-    }, [page]);
+        fetchPromotions();
+    }, []);
 
-    const fetchContacts = async () => {
+    const fetchPromotions = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/api/contact/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/promotion/page?page=${page}&size=10`);
             const data = await response.json();
-            setData(data.contacts);
-            setRecords(data.contacts);
+            setData(data.promotions);
+            setRecords(data.promotions);
             setTotalPages(data.totalPages)
         } catch (error) {
             console.error("Error fetching cities:", error);
         }
     };
+    // const data = [
+    //     { mave: 'ABC123', mahoadon: 121, numTicket: 2, total:'600.000đ' },
+    //     { mave: 'ABC124', mahoadon: 122, numTicket: 2, total:'600.000đ' },
+    //     { mave: 'ABC125', mahoadon: 123, numTicket: 2, total:'600.000đ' },
+    //     { mave: 'ABC126', mahoadon: 124, numTicket: 2, total:'600.000đ' },
+    //     { mave: 'ABC127', mahoadon: 125, numTicket: 2, total:'600.000đ' },
+    //     { mave: 'ABC128', mahoadon: 126, numTicket: 2, total:'600.000đ' },
+    //     { mave: 'ABC129', mahoadon: 127, numTicket: 2, total:'600.000đ' },
+    //     { mave: 'ABC130', mahoadon: 128, numTicket: 2, total:'600.000đ' },
+    //     { mave: 'ABC131', mahoadon: 129, numTicket: 2, total:'600.000đ' },
+    //     { mave: 'ABC132', mahoadon: 130, numTicket: 2, total:'600.000đ' },
+    //     { mave: 'ABC133', mahoadon: 131, numTicket: 2, total:'600.000đ' }
+    // ]
+    
+    //     const [records, setRecords] = useState(data);
         function handleFilter(event){
             const newData = data.filter(row => {
-                return row.name.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
+                return row.code.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
             })
             setRecords(newData)
         }
@@ -85,84 +102,85 @@ const AdminContact = () =>{
         const handleCreateClick = () => {
             setIsAdd(true)
         };
-        const handleNameChange = (event) => {
-            setName(event.target.value)
+        const handleDescriptionChange = (event) => {
+            setDescription(event.target.value)
         };
-        const handleEmailChange = (event) => {
-            // setEmail(event.target.value);
-            const emailAddress = event.target.value;
-            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Biểu thức chính quy kiểm tra email
-            
-            // Kiểm tra xem email nhập vào có khớp với biểu thức chính quy không
-            if (!emailPattern.test(emailAddress)) {
-                setEmailErrorMessage("Email không hợp lệ.");
-            } else {
-                setEmailErrorMessage(""); // Nếu hợp lệ, xóa thông báo lỗi
+        const handleStartDayChange = (event) => {
+            setStartDay(event.target.value)
+            if (endDay && endDay < event.target.value) {
+                setEndDay('');
             }
-            setEmail(emailAddress);
         };
-        const handleTitleChange = (event) => {
-            setTitle(event.target.value)
+        const handleEndDayChange = (event) => {
+            setEndDay(event.target.value)
         };
-        const handleContentChange = (event) => {
-            setContent(event.target.value)
+        const handleDiscountChange = (event) => {
+            setDiscount(event.target.value)
         };
-        const handleCreateContact = async (e) => {
+        function getCurrentDateTimeLocal() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0'); // thêm '0' nếu cần
+            const day = now.getDate().toString().padStart(2, '0');
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+        const handleCreatePromotion = async (e) => {
             e.preventDefault();
             let missingInfo = [];
-            if (!name) {
-                missingInfo.push("Tên tài xế");
+            if (!description) {
+                missingInfo.push("Mô tả");
             }
-            if (!email) {
-                missingInfo.push("Email");
-            } else if (emailErrorMessage) { // Kiểm tra nếu có errorMessage cho email
-                toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
-                return; // Dừng xử lý tiếp theo nếu có lỗi
+            if (!startDay) {
+                missingInfo.push("Ngày bắt đầu");
             }
-            if (!title) {
-                missingInfo.push("Tiêu đề");
+            if (!endDay) {
+                missingInfo.push("Ngày kết thúc");
             }
-            if (!content) {
-                missingInfo.push("Nội dung");
+            if (!discount) {
+                missingInfo.push("Giảm giá");
             }
             if (missingInfo.length > 0) {
                 const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
                 toast.error(message);
             } else {
                 try {
-                    const newContactData = {
-                        content: content,
-                        email: email,
-                        name: name,
-                        title: title
+                    const newPromotionData = {
+                        description: description,
+                        startDay: startDay,
+                        endDay: endDay,
+                        discount: discount,
                     };
+                    console.log("newPromotionData", newPromotionData);
+        
             
-                    const response = await fetch("http://localhost:8081/api/contact", {
+                    const response = await fetch("http://localhost:8081/api/promotion", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
                         },
-                        body: JSON.stringify(newContactData)
+                        body: JSON.stringify(newPromotionData)
                     });
             
                     if (response.ok) {
                         // Xử lý thành công
-                        console.log("Contact đã được tạo thành công!");
-                        toast.success("Contact đã được tạo thành công!");
-                        const newContact = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
+                        console.log("Mã giảm giá đã được tạo thành công!");
+                        toast.success("Mã giảm giá đã được tạo thành công!");
+                        const newPromo = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
                         // Thêm người dùng mới vào danh sách
-                        setData(prevData => [...prevData, newContact]);
-                        setRecords(prevRecords => [...prevRecords, newContact]);
+                        setData(prevData => [...prevData, newPromo]);
+                        setRecords(prevRecords => [...prevRecords, newPromo]);
                         // Reset form hoặc làm gì đó khác
-                        setName('');
-                        setEmail('');
-                        setTitle('');
-                        setContent('');
+                        setDescription('');
+                        setStartDay('');
+                        setEndDay('');
+                        setDiscount('');
                         setIsAdd(false);
                         // window.location.reload();
                     } else {
-                        console.error("Có lỗi xảy ra khi tạo contact!");
-                        toast.error("Có lỗi xảy ra khi tạo contact!");
+                        console.error("Có lỗi xảy ra khi tạo mã!");
+                        toast.error("Có lỗi xảy ra khi tạo mã!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);
@@ -185,7 +203,7 @@ const AdminContact = () =>{
                 color="inherit"
                 href="/admin"
                 >
-                Liên hệ
+                Mã giảm giá
                 </Link>
             </Breadcrumbs>
 
@@ -195,8 +213,8 @@ const AdminContact = () =>{
                 </div>
                 <div className="HistoryTick">
                     <div className="contentTikcet">
-                        <div className="title">Liên hệ</div>
-                        <button className="btn back" onClick={() => handleCreateClick()}>Tạo liên hệ</button>
+                        <div className="title">Quản lý mã giảm giá</div>
+                        <button className="btn back" onClick={() => handleCreateClick()}>Tạo mã giảm giá</button>
                     </div>
                     <div className="devide"></div>
                     <DataTable
@@ -252,34 +270,35 @@ const AdminContact = () =>{
                     </div>
                 </div>
             )}
+
             {isAdd && (
                 <div className="modal" id="deleteModal">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h2 class="modal-title">Thêm liên hệ</h2>
+                                <h2 class="modal-title">Sửa Chi tiết vé</h2>
                             </div>
                             <div class="modal-body">
                                 <form>
                                     <div className="infoCity">
-                                        <label className="info">Tên:</label>
-                                        <input type="text" value={name} onChange={handleNameChange}/>
+                                        <label className="info">Mô tả:</label>
+                                        <input type="text" value={description} onChange={handleDescriptionChange} />
                                     </div>
                                     <div className="infoCity">
-                                        <label className="info">Email:</label>
-                                        <input type="text" value={email} onChange={handleEmailChange}/>
+                                        <label className="info">ngày bắt đầu:</label>
+                                        <input className="inputValue" type="datetime-local" value={startDay} onChange={handleStartDayChange} min={getCurrentDateTimeLocal()}/>
                                     </div>
                                     <div className="infoCity">
-                                        <label>Tiêu đề:</label>
-                                        <input type="text" value={title} onChange={handleTitleChange}/>
+                                        <label>Ngày kết thúc:</label>
+                                        <input className="inputValue" type="datetime-local" value={endDay} onChange={handleEndDayChange} min={startDay ? startDay : undefined}/>
                                     </div>
                                     <div className="infoCity">
-                                        <label>Nội dung:</label>
-                                        <input type="text" value={content} onChange={handleContentChange}/>
+                                        <label>Mức giảm:</label>
+                                        <input type="text" value={discount} onChange={handleDiscountChange} />
                                     </div>
                                     <div className="listButton">
-                                        <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
-                                        <button type="submit" className="save" onClick={handleCreateContact}>Tạo</button>
+                                        <button type="button" onClick={() => setIsAdd(false)} className="cancel">Hủy</button>
+                                        <button type="submit" className="save" onClick={handleCreatePromotion}>Tạo</button>
                                     </div>
                                 </form>
                             </div>
@@ -304,4 +323,4 @@ const AdminContact = () =>{
         
     )
 }
-export default AdminContact
+export default AdminPromotion

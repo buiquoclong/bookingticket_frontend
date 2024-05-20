@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import DataTable from 'react-data-table-component'
-import "../AdminVehicle/AdminVehicle.scss"
+// import "../AdminVehicle/AdminVehicle.scss"
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Pagination, Breadcrumbs, Link} from '@mui/material';

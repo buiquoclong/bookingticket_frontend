@@ -1,12 +1,19 @@
 import React, {useState, useEffect} from "react";
 import DataTable from 'react-data-table-component'
-import "../AdminLog/AdminLog.scss"
+// import "../AdminReview/AdminReview.scss"
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
 
 
-const AdminLog = () =>{
+const AdminReview = () =>{
     const [isEditing, setIsEditing] = useState(false);
     const [currentCity, setCurrentCity] = useState();
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
     const [data, setData] = useState([]);
     const [records, setRecords] = useState([]);
     const [page, setPage] = useState(1);
@@ -15,22 +22,57 @@ const AdminLog = () =>{
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
             selector: row => row.id,
+            width: '3rem',
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.id}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên người dùng</div>,
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên</div>,
             selector: row => row.user.name,
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.user.name}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Nội dung log</div>,
-            selector: row => row.message,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.message}</div>
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Chuyến</div>,
+            selector: row => row.trip.route.name,
+            width: '10rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.trip.route.name}</div>
         },
         {
-            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Level</div>,
-            selector: row => row.level,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%',backgroundColor: levelColorMap[row.level] || 'transparent', padding:".3rem 0rem", borderRadius:"5px", fontWeight:"600", color:"" }}>{LevelMap[row.level] || 'Unknown Status'}</div>
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên xe</div>,
+            selector: row => row.trip.vehicle.name,
+            width: '7rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.trip.vehicle.name}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Loại xe</div>,
+            selector: row => row.trip.vehicle.kindVehicle.name,
+            width: '7rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.trip.vehicle.kindVehicle.name}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Biển số</div>,
+            selector: row => row.trip.vehicle.vehicleNumber,
+            width: '6rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.trip.vehicle.vehicleNumber}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Thời gian khởi hành </div>,
+            width: '10rem',
+            cell: row => (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                    {row.trip.timeStart.slice(0, 5)} - {formatDate(row.trip.dayStart)}
+                </div>
+            )
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Đánh giá</div>,
+            selector: row => row.rating,
+            width: '7rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.rating}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Nội dung</div>,
+            selector: row => row.content,
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.content}</div>
         },
         // ,
         // {
@@ -42,41 +84,31 @@ const AdminLog = () =>{
         {
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}> Xóa </button>
+                <button style={{background:"#3b82f6",paddingInline:".5rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
+                <button style={{background:"#ef4444",paddingInline:".5rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}> Xóa </button>
                 </div>
             )
         }
     ]
-        const LevelMap = {
-            1: 'INFO',
-            2: 'WARNING',
-            3: 'DANGER',
-        };
-        const levelColorMap = {
-        1: '#008000b3',  // Đang làm
-        2: '#ffa9008a', // Tạm nghỉ
-        3: '#ff0000c2'     // Tạm khóa
-        };
-        useEffect(() => {
-            // Call the API to fetch cities
-            fetchLogs();
-        }, [page]);
-    
-        const fetchLogs = async () => {
-            try {
-                const response = await fetch(`http://localhost:8081/api/log/page?page=${page}&size=10`);
-                const data = await response.json();
-                setData(data.logs);
-                setRecords(data.logs);
-                setTotalPages(data.totalPages)
-            } catch (error) {
-                console.error("Error fetching cities:", error);
-            }
-        };
+    useEffect(() => {
+        // Call the API to fetch cities
+        fetchReviews();
+    }, [page]);
+
+    const fetchReviews = async () => {
+        try {
+            const response = await fetch(`http://localhost:8081/api/review/page?page=${page}&size=10`);
+            const data = await response.json();
+            setData(data.reviews);
+            setRecords(data.reviews);
+            setTotalPages(data.totalPages)
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+        }
+    };
         function handleFilter(event){
             const newData = data.filter(row => {
-                return row.name.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
+                return row.user.name.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
             })
             setRecords(newData)
         }
@@ -99,7 +131,7 @@ const AdminLog = () =>{
                 color="inherit"
                 href="/admin"
                 >
-                Logs
+                Đánh giá
                 </Link>
             </Breadcrumbs>
 
@@ -109,8 +141,8 @@ const AdminLog = () =>{
                 </div>
                 <div className="HistoryTick">
                     <div className="contentTikcet">
-                        <div className="title">Quản lý Logs</div>
-                        <button className="btn back">Tạo Log</button>
+                        <div className="title">Đánh giá</div>
+                        {/* <button className="btn back">Tạo chi tiết hóa đơn</button> */}
                     </div>
                     <div className="devide"></div>
                     <DataTable
@@ -172,4 +204,4 @@ const AdminLog = () =>{
         
     )
 }
-export default AdminLog
+export default AdminReview

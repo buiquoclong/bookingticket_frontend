@@ -49,7 +49,7 @@ body{
     .homeContent{
         width: 100%;
         height: auto;
-        padding: 8rem 1.5rem 3rem;
+        padding: 4rem 1.5rem 3rem;
         display: flex;
         row-gap: 3rem;
         flex-direction: column;
@@ -109,6 +109,38 @@ body{
                 .destinationInput, .dateInput {
                     margin-bottom: 10px; // Khoảng cách giữa các hàng
                 }
+                .destinationInput, .dateInput{
+                    width: 100%;
+                    .input{
+                        height: 3rem;
+                        padding: 0 1rem;
+                        background: var(--inputColor);
+                        border-radius: .5rem;
+                        font-size: 18px;
+                        outline: none;
+                        width: 100%;
+
+                        input{
+                            background: none;
+                            border: none;
+                            outline: none;
+                            width: 100%;
+                            font-size: 18px;
+                            font-weight: 500;
+                            &::placeholder{
+                                font-size: 13px;
+                            }
+                            cursor: pointer;
+                        }
+
+                        .icon{
+                            font-size: 18px;
+                            color: var(--PrimaryColor)
+                            !important;
+                            margin-left: 10px;
+                        }
+                    }
+                }
             }
 
             .sizeOne{
@@ -130,34 +162,6 @@ body{
                 font-weight: 500;
             }
             
-            .input{
-                height: 3rem;
-                padding: 0 1rem;
-                background: var(--inputColor);
-                border-radius: .5rem;
-                font-size: 18px;
-                outline: none;
-
-                input{
-                    background: none;
-                    border: none;
-                    outline: none;
-                    width: 100%;
-                    font-size: 18px;
-                    font-weight: 500;
-                    &::placeholder{
-                        font-size: 13px;
-                    }
-                    cursor: pointer;
-                }
-
-                .icon{
-                    font-size: 18px;
-                    color: var(--PrimaryColor)
-                    !important;
-                    margin-left: 10px;
-                }
-            }
 
             .searchOption{
                 position: absolute;
@@ -230,44 +234,75 @@ body{
     }
 }
 
-@media screen and (max-width: 660px) {
+@media screen and (max-width: 767px) {
     .home{
         .homeContent{
             .cardDiv{
-                padding: 2rem 1rem;
-                // grid-template-columns: repeat(3,1fr);
+                .searchOption{
+                    bottom: -1.35rem;
+                    padding: 6px 1rem;
+    
+                    span{
+                        font-size: 14px;
+                    }
+                }
 
-                .sizeTwo{
-                    grid-template-columns: repeat(3,1fr);
-                }
-                .sizeTwo{
-                    grid-template-columns: repeat(4,1fr);
-                }
-                
             }
         }
     }
 }
 
-@media screen and (max-width: 848px) {
-    .sizeOne{
-        .changedes{
-            margin-top: 0;
-            rotate:  90deg;
-    }  
+@media screen and (min-width: 768px) {
+    .home{
+        .homeContent{
+            .cardDiv{
+                .searchOption{
+                    bottom: -1.35rem;
+                    padding: 6px 1rem;
+    
+                    span{
+                        font-size: 15px;
+                    }
+                }
+
+            }
+        }
     }
     
 }
 
-@media screen and (max-width: 940px) {
+@media screen and (min-width: 992px) {
     .home{
-        height: 70vh;
+        .homeContent{
+            .cardDiv{
+                .sizeOne{
+                    display: grid;
+                    grid-gap: 1rem;
+                    grid-template-columns: repeat(3,1fr);
+                }
+                .sizeTwo{
+                    display: grid;
+                    grid-gap: 1rem;
+                    grid-template-columns: repeat(4,1fr);
+                }
+                .searchOption{
+                    bottom: -1.35rem;
+                    padding: 6px 1rem;
+    
+                    span{
+                        font-size: 16px;
+                    }
+                }
+
+            }
+        }
     }
+    
 }
 
 @media screen and (min-width: 1240px) {
     .home{
-        height: 95vh;
+        height: auto;
 
         .homeContent{
             padding-left: 0;
@@ -280,15 +315,19 @@ body{
                 .input{
                     margin-bottom: 1rem;
                 }
-                .sizeTwo{
+                .sizeOne{
+                    display: grid;
+                    grid-gap: 1rem;
                     grid-template-columns: repeat(3,1fr);
                 }
                 .sizeTwo{
+                    display: grid;
+                    grid-gap: 1rem;
                     grid-template-columns: repeat(4,1fr);
                 }
 
                 .searchOption{
-                    bottom: -1rem;
+                    bottom: -1.35rem;
                     padding: 8px 1rem;
 
                     span{

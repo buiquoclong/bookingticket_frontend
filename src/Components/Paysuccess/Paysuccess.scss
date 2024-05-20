@@ -20,6 +20,230 @@
     background: var(--whiteColor);
     // gap: 1rem;
     // display: flex;
+    .paySuccess{
+        width: 100%;
+        height: auto;
+        
+        .imgsucces{
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            .icon{
+                color: #04aa6d;
+                font-size: 8rem;
+                display: flex;
+                justify-content: center;
+            }
+            
+        }
+        .content{
+            text-align: center;
+            padding: 1rem;
+            .titlePay{
+                color: #04aa6d;
+                font-size: 40px;
+                font-weight: 600;
+            }
+            .text{
+                font-size: 20px;
+            }
+        }
+        .detailbooking{
+            width: 100%;
+            height: auto;
+            border: 1px solid var(--greyText);
+            border-radius: 1rem;
+            background: #80808059;
+            .title{
+                padding: .5rem 0;
+                text-align: center;
+                color: var(--blackColor);
+                font-size: 20px;
+                font-weight: bold;
+            }
+            .info{
+                background: var(--whiteColor);
+                padding-inline: 1rem;
+                .infoBooking{
+                    display: flex;
+                    line-height: 2rem;
+                    // justify-content: space-between;
+                    .userInfo{
+                        width: 50%;
+                        .userline{
+                            display: flex;
+                            .titleuser{
+                                width: 30%;
+                            }
+                            .text{
+                                color: var(--blackColor);
+                            }
+                        }
+                    }
+                    .PayInfo{
+                        float: left;
+                        width: 50%;
+                        .payline{
+                            display: flex;
+                            .titlepay{
+                                width: 40%;
+                            }
+                            .text{
+                                color: var(--blackColor);
+                            }
+                        }
+                    }
+                }
+            }
+            .devide{
+                width: 100%;
+                background-color: var(--greyText);
+                height: 1px;
+            }
+            .infoTicket{
+                background: var(--whiteColor);
+                display: flex;
+                justify-content: center;
+                padding: 2rem;
+                .detailBoooking{
+                    display: flex;
+                    gap: 1rem;
+                .infoBookingTicket{
+                    width: 20rem;
+                    // height: 38rem;
+                    background: var(--whiteColor);
+                    border-radius: 1rem;
+                    border: 1px solid var(--greyText);
+                    padding: 1rem 1rem;
+                    // display: flex;
+                    h3{
+                        color: var(--blackColor);
+                        text-align: center;
+                    }
+                    .lineInfo{
+                        display: flex;
+                        justify-content: space-between;
+                        line-height: 3rem;
+                        // span{
+                        //     color: var(--blackColor);
+                        // }
+                        .rightInfo{
+                            // width: 18rem;
+                            height: 2.5rem;
+                            // background: var(--greyText);
+                            // border-radius: .5rem;
+                            span{
+                                padding-left: 1rem;
+                                padding-bottom: .5rem;
+                                color: var(--blackColor);
+                            }
+                        }
+                        .seatInfo{
+                            gap: 1rem;
+                            span{
+                                background: rgb(220, 231, 71);
+                                font-weight: bolder;
+                                padding: .2rem;
+                            }
+                        }
+                        .Note{
+                            // width: 18rem;
+                            height: 2.5rem;
+                            background: var(--whiteColor);
+                            border-radius: .5rem;
+                            padding-left: 1rem;
+                            border: 1px solid var(--greyText);
+                            outline: none;
+                        }
+                        .selectChoose{
+                            select{
+                                width: 10rem;
+                                height: 2.5rem;
+                                background: var(--whiteColor);
+                                border-radius: .5rem;
+                                padding-left: 1rem;
+                                border: 1px solid var(--greyText);
+                                outline: none;
+                                
+                            }
+                        }
+                    }
+                    
+                    .policyCheckbox{
+                        width: 100%;
+                        margin-top: 1rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        .checkBox{
+                            display: flex;
+                            align-items: center;
+                            .checkbox-input{
+                                width: 20px;
+                                height: 20px;
+                                border: 1px solid var(--greyText);
+                            }
+                        }
+                    }
+                    .buttonList{
+                        padding-top: 2rem;
+                        display: flex;
+                        margin-inline: auto;
+                        justify-content: center;
+                        gap: 2rem;
+                        .btn{
+                            border-radius: .5rem;
+                            font-weight: 600;
+                            color: var(--whiteColor);
+                        }
+                        .cancle{
+                            background: #cf1726;
+                            &:hover{
+                                background: #ea4957;
+                            }
+                        }
+                        .pay{
+                            background: var(--PrimaryColor);
+                            &:hover{
+                                background: var(--SecondaryColor);
+                            }
+                        }
+                    }
+                    
+                    
+                }
+
+                }
+            }
+            .backhome{
+                padding: .5rem;
+                background: var(--whiteColor);
+                border-bottom-left-radius: 1rem;
+                border-bottom-right-radius: 1rem;
+                display: flex;
+                justify-content: center;
+                .backhomebtn{
+                    background: #75caf1;
+                    color: var(--PrimaryColor);
+                    border: none;
+                    display: block;
+                    right: 1.25rem;
+                    font-weight: 600;
+                    
+                    span{
+                        font-weight: bold;
+                    }
+
+                    &:hover, &:focus{
+                        background: var(--PrimaryColor);
+                        color: var(--whiteColor);
+                        border: 1px solid var(--gradientColor);
+                        
+                    }
+                }
+            }
+        }
+    }
     .payContent{
         width: 35rem;
         // height: 68rem;

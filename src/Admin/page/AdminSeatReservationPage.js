@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './Admin.scss'
 import AdminHeader from '../Components/AdminHeader/AdminHeader'
 import AdminSidebar from '../Components/AdminSideBar/AdminSidebar'
-import AdminSeatReservation from '../Components/AdminSeatReservation/AdminSeatReservation'
+import AdminSeatReservation from '../Components/AdminSeatReservation'
 
 function AdminSeatReservationPage() {
 const [openSidebarToggle, setOpenSidebarToggle] = useState(false)

@@ -6,6 +6,8 @@ import success from "../../Assets/img/success.png";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 
 
 const BookingTicket = () =>{
@@ -30,6 +32,8 @@ const BookingTicket = () =>{
     const [phoneErrorMessage, setPhoneErrorMessage] = useState('');
     const navigate = useNavigate();
     const userId = sessionStorage.getItem("userId");
+    console.log("totalPrice", totalPrice.toLocaleString('vi-VN'));
+    console.log("totalPriceR", totalPriceReturn);
     // Xử lý chọn nhập nơi đón
     const handleSelectChange = (event) => {
         setShowLocationInput(event.target.value === 'Yes');
@@ -601,33 +605,31 @@ const BookingTicket = () =>{
                     </div>
                 </div>
             )}
-
-
-            {kind === "Một chiều" && (
-                <div>
-                    <div className="bookingContent flex">
+            <div className="bookingContent flex">
+                {kind === "Một chiều" && (
+                    <div>
+                        <div className="flex" style={{justifyContent:"center"}}>
                         {data && (
-                            <div className="infoTicket">
-                                <h3>Thông tin chuyến đi</h3>
-                                <div className="lineInfo">
-                                    <span>Tuyến:</span>
-                                    <div className="rightInfo">
-                                        <span>{data.route.name}</span>
-                                    </div>
-                                </div>
-                                <div className="lineInfo">
-                                    <span>Loại xe:</span>
-                                        <div className="rightInfo">
-                                            <span>{data.vehicle.kindVehicle.name}</span>
+                                    <div className="infoTicket">
+                                        <h3>Thông tin lượt đi</h3>
+                                        <div className="lineInfo">
+                                            <span>Tuyến:</span>
+                                            <div className="rightInfo">
+                                                <span>{data.route.name}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="lineInfo">
-                                        <span>Ngày:</span>
-                                        <div className="rightInfo">
-                                            {/* <span>{new Date(data.dayStart).toLocaleDateString('vi-VN')}</span> */}
-                                            <span>{formatDate(data.dayStart)}</span>
-                                        </div>
-                                    </div>
+                                        <div className="lineInfo">
+                                            <span>Loại xe:</span>
+                                                <div className="rightInfo">
+                                                    <span>{data.vehicle.kindVehicle.name}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Ngày:</span>
+                                                <div className="rightInfo">
+                                                    <span>{formatDate(data.dayStart)}</span>
+                                                </div>
+                                            </div>
                                             <div className="lineInfo">
                                                 <span>Thời gian:</span>
                                                 <div className="rightInfo">
@@ -636,7 +638,7 @@ const BookingTicket = () =>{
                                             </div>
                                             <div className="lineInfo">
                                                 <span>Số ghế:</span>
-                                                <div className="rightInfo">
+                                                <div className="seatInfo">
                                                     <span>{selectedSeatsNames}</span>
                                                 </div>
                                             </div>
@@ -669,272 +671,283 @@ const BookingTicket = () =>{
                                                     </div>
                                                 </div>
                                             )}
-                                            <div className="policyCheckbox">
-                                                <label className="chekcBox">
-                                                    <span>
-                                                        <span><input type="checkbox" className="checkbox-input" value="1" checked={isChecked} onChange={(e) => setIsChecked(e.target.checked)}/></span>
-                                                        <span className="yes" style={{marginLeft:"10px"}}>Tôi chấp nhận với các điều khoản</span>
-                                                    </span>
-                                                </label>
-                                            </div>
-                                            <div className="buttonList">
-                                                <button className="btn cancle"><Link to="/">Hủy</Link></button>
-                                                <button className="btn pay" onClick={handlePayment}>Thanh toán</button>
-                                            </div>
-                                        </div>
-                                        )}
-                                        <div>
-                                            <div className=" infoUser" style={{height:"15rem"}}>
-                                                    <h3>Thông tin người đặt</h3>
-                                                    <div className="lineInfo">
-                                                        <span>Họ và tên<span style={{color:"red"}}>*</span>:</span>
-                                                        <div className="infoInput" >
-                                                            <input type="text" className="info" placeholder="Nhập họ và tên" value={userName} onChange={handleUserNameChange}/>
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Số điện thoại<span style={{color:"red"}}>*</span>:</span>
-                                                        <div className="infoInput" >
-                                                            <input type="text" className="info" placeholder="Nhập số điện thoại" value={phone}  onChange={handlePhoneChange}/>
-                                                            {phoneErrorMessage && <p style={{ color: "red", lineHeight:"2" }}>{phoneErrorMessage}</p>}
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Email<span style={{color:"red"}}>*</span>:</span>
-                                                        <div className="infoInput" >
-                                                            <input type="text" className="info" placeholder="Nhập Email" value={email} onChange={handleEmailChange}/>
-                                                            {emailErrorMessage && <p style={{ color: "red", lineHeight:"2" }}>{emailErrorMessage}</p>}
-                                                        </div>
-                                                    </div>
-                                            </div>
-                                            <div className="policyInfo">
-                                                <div className="titlePolicy">
-                                                    <h1><span>ĐIỀU KHOẢN &</span><span style={{color:"red"}}> LƯU Ý</span></h1>
-                                                </div>
-                                                <div className="devide"></div>
-                                                <div className="contentPolicy">
-                                                    <div><span style={{color:"red"}}>(*)</span> Quý khách vui lòng mang email có chứa mã vé đến văn phòng để đổi vé lên xe trước giờ xuất bến ít nhất <span style={{color:"red", fontWeight:"600"}}>20 phút</span> để thực hiện đổi vé.</div>
-                                                    <div><span style={{color:"red"}}>(*)</span> Thông tin hành khách phải chính xác, nếu không sẽ không thể lên xe hoặc hủy/ đổi vé </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>                                
-            )}
+                                </div>
+                            )}
 
-            {kind === "Khứ hồi" && (
-                                <div>
-                                    <div className="bookingContent flex">
-                                        <div>
-                                            {data && (
-                                                <div className="infoTicket" style={{height:"31rem"}}>
-                                                    <h3>Thông tin lượt đi</h3>
-                                                    <div className="lineInfo">
-                                                        <span>Tuyến:</span>
-                                                        <div className="rightInfo">
-                                                            <span>{data.route.name}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Loại xe:</span>
-                                                        <div className="rightInfo">
-                                                            <span>{data.vehicle.kindVehicle.name}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Ngày:</span>
-                                                        <div className="rightInfo">
-                                                            {/* <span>{new Date(data.dayStart).toLocaleDateString('vi-VN')}</span> */}
-                                                            <span>{formatDate(data.dayStart)}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Thời gian:</span>
-                                                        <div className="rightInfo">
-                                                            <span>{data.timeStart.slice(0, 5)}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Số ghế:</span>
-                                                        <div className="rightInfo">
-                                                            <span>{selectedSeatsNames}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Giá:</span>
-                                                        <div className="rightInfo">
-                                                            <span>{totalPrice.toLocaleString('vi-VN')}VND</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Ghi chú:</span>
-                                                        <div >
-                                                            <input type="text" className="Note" placeholder="Thêm ghi chú ở đây" onChange={handleNoteChange}/>
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Chọn điểm đón:</span>
-                                                        <div className="selectChoose">
-                                                            <select onChange={handleSelectChange}>
-                                                                <option value="No">Không</option>
-                                                                <option value="Yes">Có</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    {showLocationInput && (
-                                                        <div className="lineInfo">
-                                                            <span>Nơi đón:</span>
-                                                            <div>
-                                                                <input type="text" className="Note" placeholder="Nhập nơi đón ở đây" onChange={handlePickupLocationChange}/>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                                <div className=" infoUser" style={{height:"15rem", marginTop:"1rem"}}>
-                                                    <h3>Thông tin người đặt</h3>
-                                                    <div className="lineInfo">
-                                                        <span>Họ và tên<span style={{color:"red"}}>*</span>:</span>
-                                                        <div  className="infoInput" >
-                                                            <input type="text" className="info" placeholder="Nhập họ và tên" value={userName} onChange={handleUserNameChange}/>
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Số điện thoại<span style={{color:"red"}}>*</span>:</span>
-                                                        <div className="infoInput">
-                                                            <input type="text" className="info" placeholder="Nhập số điện thoại" value={phone}  onChange={handlePhoneChange}/>
-                                                            {phoneErrorMessage && <p style={{ color: "red", lineHeight:"2" }}>{phoneErrorMessage}</p>}
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Email<span style={{color:"red"}}>*</span>:</span>
-                                                        <div className="infoInput" >
-                                                            <input type="email" className="info" placeholder="Nhập Email" value={email} onChange={handleEmailChange}/>
-                                                            {emailErrorMessage && <p style={{ color: "red", lineHeight:"2" }}>{emailErrorMessage}</p>}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            <div className="policyInfo">
-                                                <div className="titlePolicy">
-                                                    <h1><span>ĐIỀU KHOẢN &</span><span style={{color:"red"}}> LƯU Ý</span></h1>
-                                                </div>
-                                                <div className="devide"></div>
-                                                <div className="contentPolicy">
-                                                    <div><span style={{color:"red"}}>(*)</span> Quý khách vui lòng mang email có chứa mã vé đến văn phòng để đổi vé lên xe trước giờ xuất bến ít nhất <span style={{color:"red", fontWeight:"600"}}>20 phút</span> để thực hiện đổi vé.</div>
-                                                    <div><span style={{color:"red"}}>(*)</span> Thông tin hành khách phải chính xác, nếu không sẽ không thể lên xe hoặc hủy/ đổi vé </div>
-                                                </div>
+                        </div>
+                        
+                        <div className="policyInfo">
+                            <div className="titlePolicy">
+                                <h1><span>ĐIỀU KHOẢN &</span><span style={{color:"red"}}> LƯU Ý</span></h1>
+                            </div>
+                            <div className="devide"></div>
+                            <div className="contentPolicy">
+                                <div><span style={{color:"red"}}>(*)</span> Quý khách vui lòng mang email có chứa mã vé đến văn phòng để đổi vé lên xe trước giờ xuất bến ít nhất <span style={{color:"red", fontWeight:"600"}}>20 phút</span> để thực hiện đổi vé.</div>
+                                <div><span style={{color:"red"}}>(*)</span> Thông tin hành khách phải chính xác, nếu không sẽ không thể lên xe hoặc hủy/ đổi vé </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                {kind === "Khứ hồi" && (
+                    <div>
+                        <div className="flex" style={{gap:"1rem"}}>
+                        <div>
+                            {data && (
+                                    <div className="infoTicket">
+                                        <h3>Thông tin lượt đi</h3>
+                                        <div className="lineInfo">
+                                            <span>Tuyến:</span>
+                                            <div className="rightInfo">
+                                                <span>{data.route.name}</span>
                                             </div>
                                         </div>
-                                        <div>
-                                            {dataReturn && (
-                                                <div className="infoTicket" style={{height:"31rem"}}>
-                                                    <h3>Thông tin lượt về</h3>
-                                                    <div className="lineInfo">
-                                                        <span>Tuyến:</span>
-                                                        <div className="rightInfo">
-                                                            <span>{dataReturn.route.name}</span>
-                                                        </div>
+                                        <div className="lineInfo">
+                                            <span>Loại xe:</span>
+                                                <div className="rightInfo">
+                                                    <span>{data.vehicle.kindVehicle.name}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Ngày:</span>
+                                                <div className="rightInfo">
+                                                    <span>{formatDate(data.dayStart)}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Thời gian:</span>
+                                                <div className="rightInfo">
+                                                    <span>{data.timeStart.slice(0, 5)}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Số ghế:</span>
+                                                <div className="seatInfo">
+                                                    <span>{selectedSeatsNames}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Giá:</span>
+                                                <div className="rightInfo">
+                                                    <span>{totalPrice.toLocaleString('vi-VN')}VND</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Ghi chú:</span>
+                                                <div >
+                                                    <input type="text" className="Note" placeholder="Thêm ghi chú ở đây" onChange={handleNoteChange}/>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Chọn điểm đón:</span>
+                                                <div className="selectChoose">
+                                                    <select onChange={handleSelectChange}>
+                                                        <option value="No">Không</option>
+                                                        <option value="Yes">Có</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            {showLocationInput && (
+                                                <div className="lineInfo">
+                                                    <span>Nơi đón:</span>
+                                                    <div>
+                                                        <input type="text" className="Note" placeholder="Nhập nơi đón ở đây" onChange={handlePickupLocationChange}/>
                                                     </div>
-                                                    <div className="lineInfo">
-                                                        <span>Loại xe:</span>
-                                                        <div className="rightInfo">
-                                                            <span>{dataReturn.vehicle.kindVehicle.name}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Ngày:</span>
-                                                        <div className="rightInfo">
-                                                            {/* <span>{new Date(dataReturn.dayStart).toLocaleDateString('vi-VN')}</span> */}
-                                                            <span>{formatDate(dataReturn.dayStart)}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Thời gian:</span>
-                                                        <div className="rightInfo">
-                                                            <span>{dataReturn.timeStart.slice(0, 5)}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Số ghế:</span>
-                                                        <div className="rightInfo">
-                                                            <span>{selectedSeatsNamesReturn}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Giá:</span>
-                                                        <div className="rightInfo">
-                                                            <span>{totalPriceReturn.toLocaleString('vi-VN')}VND</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Ghi chú:</span>
-                                                        <div >
-                                                            <input type="text" className="Note" placeholder="Thêm ghi chú ở đây" onChange={handleNoteReturnChange}/>
-                                                        </div>
-                                                    </div>
-                                                    <div className="lineInfo">
-                                                        <span>Chọn điểm đón:</span>
-                                                        <div className="selectChoose">
-                                                            <select onChange={handleSelectRetrunChange}>
-                                                                <option value="No">Không</option>
-                                                                <option value="Yes">Có</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    {showLocationRetrunInput && (
-                                                        <div className="lineInfo">
-                                                            <span>Nơi đón:</span>
-                                                            <div>
-                                                                <input type="text" className="Note" placeholder="Nhập nơi đón ở đây" onChange={handlePickupLocationReturnChange}/>
-                                                            </div>
-                                                        </div>
-                                                    )}
                                                 </div>
                                             )}
-                                            <div className="policyInfo" style={{height:"22rem"}}>
-                                                <div className="titlePolicy">
-                                                    <h1><span>Chi tiết giá</span></h1>
-                                                </div>
-                                                <div className="devide"></div>
-                                                    <div className="contentPolicy">
-                                                        <div className="lineInfo">
-                                                            <span>Tổng giá lượt đi:</span>
-                                                            <div className="rightInfo">
-                                                                <span>{totalPrice.toLocaleString('vi-VN')}VND</span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="lineInfo">
-                                                        <span>Tổng giá lượt về:</span>
-                                                        <div className="rightInfo">
-                                                            <span>{totalPriceReturn.toLocaleString('vi-VN')}VND</span>
-                                                        </div>
-                                                        </div>
-                                                        <div className="devide"></div>
-                                                        <div className="lineInfo" style={{marginTop:".5rem"}}>
-                                                            <span>Tổng tiền:</span>
-                                                            <div className="rightInfo">
-                                                                <span>{totalAmount.toLocaleString('vi-VN')}VND</span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="policyCheckbox">
-                                                            <label className="chekcBox">
-                                                                <span>
-                                                                    <span><input type="checkbox" className="checkbox-input" value="1" checked={isChecked} onChange={(e) => setIsChecked(e.target.checked)}/></span>
-                                                                    <span className="yes" style={{marginLeft:"10px"}}>Tôi chấp nhận với các điều khoản</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                        <div className="buttonList">
-                                                            <button className="btn cancle"><Link to="/">Hủy</Link></button>
-                                                            <button className="btn pay" onClick={handlePayment}>Thanh toán</button>
-                                                        </div>
-                                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            {dataReturn && (
+                                    <div className="infoTicket">
+                                        <h3>Thông tin lượt về</h3>
+                                        <div className="lineInfo">
+                                            <span>Tuyến:</span>
+                                            <div className="rightInfo">
+                                                <span>{dataReturn.route.name}</span>
                                             </div>
                                         </div>
-                                        
+                                        <div className="lineInfo">
+                                            <span>Loại xe:</span>
+                                                <div className="rightInfo">
+                                                    <span>{dataReturn.vehicle.kindVehicle.name}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Ngày:</span>
+                                                <div className="rightInfo">
+                                                    <span>{formatDate(dataReturn.dayStart)}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Thời gian:</span>
+                                                <div className="rightInfo">
+                                                    <span>{dataReturn.timeStart.slice(0, 5)}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Số ghế:</span>
+                                                <div className="seatInfo">
+                                                    <span>{selectedSeatsNamesReturn}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Giá:</span>
+                                                <div className="rightInfo">
+                                                    <span>{totalPriceReturn.toLocaleString('vi-VN')}VND</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Ghi chú:</span>
+                                                <div >
+                                                    <input type="text" className="Note" placeholder="Thêm ghi chú ở đây" onChange={handleNoteReturnChange}/>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Chọn điểm đón:</span>
+                                                <div className="selectChoose">
+                                                    <select onChange={handleSelectRetrunChange}>
+                                                        <option value="No">Không</option>
+                                                        <option value="Yes">Có</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            {showLocationRetrunInput && (
+                                                <div className="lineInfo">
+                                                    <span>Nơi đón:</span>
+                                                    <div>
+                                                        <input type="text" className="Note" placeholder="Nhập nơi đón ở đây" onChange={handlePickupLocationReturnChange}/>
+                                                    </div>
+                                                </div>
+                                            )}
+                                </div>
+                            )}
+                        </div>
+                        
+                    </div>
+                        <div className="policyInfo">
+                            <div className="titlePolicy">
+                                <h1><span>ĐIỀU KHOẢN &</span><span style={{color:"red"}}> LƯU Ý</span></h1>
+                            </div>
+                            <div className="devide"></div>
+                            <div className="contentPolicy">
+                                <div><span style={{color:"red"}}>(*)</span> Quý khách vui lòng mang email có chứa mã vé đến văn phòng để đổi vé lên xe trước giờ xuất bến ít nhất <span style={{color:"red", fontWeight:"600"}}>20 phút</span> để thực hiện đổi vé.</div>
+                                <div><span style={{color:"red"}}>(*)</span> Thông tin hành khách phải chính xác, nếu không sẽ không thể lên xe hoặc hủy/ đổi vé </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                )}
+                <div>
+                    <div className=" infoUser" style={{height:"15rem", marginTop:"1rem"}}>
+                        <h3>Thông tin người đặt</h3>
+                        <div className="lineInfo">
+                            <span>Họ và tên<span style={{color:"red"}}>*</span>:</span>
+                            <div className="infoInput" >
+                                <input type="text" className="info" placeholder="Nhập họ và tên" value={userName} onChange={handleUserNameChange}/>
+                            </div>
+                        </div>
+                        <div className="lineInfo">
+                            <span>Số điện thoại<span style={{color:"red"}}>*</span>:</span>
+                            <div className="infoInput" >
+                                <input type="text" className="info" placeholder="Nhập số điện thoại" value={phone}  onChange={handlePhoneChange}/>
+                                {phoneErrorMessage && <p style={{lineHeight:"1.5", fontSize:"12px", color:"red", paddingLeft:".5rem"  }}>{phoneErrorMessage}</p>}
+                            </div>
+                        </div>
+                        <div className="lineInfo">
+                            <span>Email<span style={{color:"red"}}>*</span>:</span>
+                            <div className="infoInput" >
+                                <input type="text" className="info" placeholder="Nhập Email" value={email} onChange={handleEmailChange}/>
+                                {emailErrorMessage && <p style={{lineHeight:"1.5", fontSize:"12px", color:"red", paddingLeft:".5rem"  }}>{emailErrorMessage}</p>}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="discount" >
+                        <TextField id="" label="Mã giảm giá" size="small" className="textdiscount"/>
+                        <Button variant="contained">Áp dụng</Button>
+                    </div>
+                    <div className="policyInfo">
+                        <div className="titlePolicy">
+                                <h1><span>Chi tiết giá</span></h1>
+                        </div>
+                        <div className="devide"></div>
+                        {kind === "Một chiều" && (
+                            <div className="contentPolicy">
+                                <div className="lineInfo">
+                                    <span>Giá vé lượt đi:</span>
+                                    <div className="rightInfo">
+                                        <span>{totalPrice.toLocaleString('vi-VN')}VND</span>
                                     </div>
                                 </div>
-            )}
+                                <div className="lineInfo">
+                                    <span>Phí thanh toán:</span>
+                                    <div className="rightInfo">
+                                        <span>0VND</span>
+                                    </div>
+                                </div>
+                                <div className="devide"></div>
+                                <div className="lineInfo" style={{marginTop:".5rem"}}>
+                                    <span>Tổng tiền:</span>
+                                    <div className="rightInfo">
+                                        <span>{totalPrice.toLocaleString('vi-VN')}VND</span>
+                                    </div>
+                                </div>
+                                <div className="policyCheckbox">
+                                    <label className="chekcBox">
+                                        <span>
+                                            <span><input type="checkbox" className="checkbox-input" value="1" checked={isChecked} onChange={(e) => setIsChecked(e.target.checked)}/></span>
+                                            <span className="yes" style={{marginLeft:"10px"}}>Tôi chấp nhận với các điều khoản</span>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div className="buttonList">
+                                    <button className="btn cancle"><Link to="/">Hủy</Link></button>
+                                    <button className="btn pay" onClick={handlePayment}>Thanh toán</button>
+                                </div>
+                            </div>
+                        )}
+                        {kind === "Khứ hồi" && (
+                            <div className="contentPolicy">
+                                <div className="lineInfo">
+                                    <span>Tổng giá lượt đi:</span>
+                                    <div className="rightInfo">
+                                        <span>{totalPrice.toLocaleString('vi-VN')}VND</span>
+                                    </div>
+                                </div>
+                                <div className="lineInfo">
+                                    <span>Tổng giá lượt về:</span>
+                                    <div className="rightInfo">
+                                        <span>{totalPriceReturn.toLocaleString('vi-VN')}VND</span>
+                                    </div>
+                                </div>
+                                <div className="devide"></div>
+                                <div className="lineInfo" style={{marginTop:".5rem"}}>
+                                    <span>Tổng tiền:</span>
+                                    <div className="rightInfo">
+                                        <span>{totalAmount.toLocaleString('vi-VN')}VND</span>
+                                    </div>
+                                </div>
+                                <div className="policyCheckbox">
+                                    <label className="chekcBox">
+                                        <span>
+                                            <span><input type="checkbox" className="checkbox-input" value="1" checked={isChecked} onChange={(e) => setIsChecked(e.target.checked)}/></span>
+                                            <span className="yes" style={{marginLeft:"10px"}}>Tôi chấp nhận với các điều khoản</span>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div className="buttonList">
+                                    <button className="btn cancle"><Link to="/">Hủy</Link></button>
+                                    <button className="btn pay" onClick={handlePayment}>Thanh toán</button>
+                                </div>
+                            </div>
+                        )}
+                        </div>
+                </div>
+                                            
+            </div>
+
+
+            
             <ToastContainer
                         className="toast-container"
                         toastClassName="toast"
