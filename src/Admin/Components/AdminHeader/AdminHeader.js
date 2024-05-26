@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, {useState, useEffect} from "react";
 import { Menu, MenuItem, styled, Box, Hidden } from '@mui/material';
 import 
 { BsJustify, BsSearch}
 from 'react-icons/bs'
-import { Link  } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import {
     Home,
@@ -35,6 +35,9 @@ const StyledItem = styled(MenuItem)(({ theme }) => ({
 }));
 function AdminHeader({OpenSidebar}) {
     const [anchorEl, setAnchorEl] = useState(null);
+    
+    const [data, setData] = useState(null);
+    const navigate = useNavigate();
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -43,6 +46,27 @@ function AdminHeader({OpenSidebar}) {
     const handleClose = () => {
         setAnchorEl(null);
     };
+    const userId = sessionStorage.getItem("userId");
+    useEffect(() => {
+        // Call the API to fetch cities
+        if (userId) {
+            fetchUserInfo();
+        }
+    }, [userId]);
+    const fetchUserInfo = async () => {
+        try {
+            const response = await fetch(`http://localhost:8081/api/user/${userId}`);
+            const data = await response.json();
+            setData(data);
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+        }
+    };
+    const handleLogoutClick = () => {
+        sessionStorage.removeItem("userId");
+        console.log('đã xóa user id')
+        navigate('/');
+    }
 
     return (
     <header className='header'>
@@ -57,7 +81,9 @@ function AdminHeader({OpenSidebar}) {
                 onClick={handleClick}>
                 <Hidden xsDown>
                     <span>
-                        Hi <strong>abc</strong>
+                            {data && (
+                                <strong>Xin chào {data.name}</strong>
+                            )}
                     </span>
                 </Hidden>
             </UserMenu>
@@ -86,7 +112,7 @@ function AdminHeader({OpenSidebar}) {
                     <span>Cài đặt</span>
                 </MenuItem>
 
-                <StyledItem onClick={handleClose}>
+                <StyledItem  onClick={handleLogoutClick}>
                     <PowerSettingsNew />
                     <span>Đăng xuất</span>
                 </StyledItem>

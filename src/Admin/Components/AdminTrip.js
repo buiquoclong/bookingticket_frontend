@@ -8,7 +8,17 @@ import {Pagination, Breadcrumbs, Link} from '@mui/material';
 
 const AdminTrip = () =>{
     const [isEditing, setIsEditing] = useState(false);
-    const [currentCity, setCurrentCity] = useState({});
+    const [currentTrip, setcurrentTrip] = useState({
+        id: null,
+        route: { id: "", name: "" },
+        vehicle: { id: "", name: "" },
+        dayStart: "",
+        timeStart: "",
+        price: "",
+        driver: { id: "", name: "" },
+        emptySeat: 0,
+        status: 0
+    });
     const [isAdd, setIsAdd] = useState(false);
     const [data, setData] = useState([]);
     const [kindVehicledata, setKindVehicledata] = useState([]);
@@ -112,7 +122,7 @@ const AdminTrip = () =>{
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                     <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}> Xóa </button>
+                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
                 </div>
             )
         }
@@ -176,7 +186,8 @@ const AdminTrip = () =>{
         }
         const handleEditClick = (row) => {
             if (row && row.route && row.vehicle && row.driver) {
-                setCurrentCity({
+                setcurrentTrip({
+                    id: row.id,
                     route: {
                         id: row.route.id,
                         name: row.route.name
@@ -195,7 +206,9 @@ const AdminTrip = () =>{
                     driver: {
                         id: row.driver.id,
                         name: row.driver.name
-                    }
+                    }, 
+                    emptySeat: row.emptySeat,
+                    status: row.status
                 });
                 setIsEditing(true);
 
@@ -205,7 +218,7 @@ const AdminTrip = () =>{
         
         const handleKindVehicleChange = (e) => {
             const selectedKindVehicleId = e.target.value;
-            setCurrentCity(current => ({
+            setcurrentTrip(current => ({
                 ...current,
                 kindVehicle: {
                     ...current.kindVehicle,
@@ -228,7 +241,7 @@ const AdminTrip = () =>{
             console.log(selectedVehicleId)
 
             // const selectedVehicle = vehicleOfKind.find(vehicle => vehicle.id === selectedVehicleId);
-            setCurrentCity(current => ({
+            setcurrentTrip(current => ({
                 ...current,
                 vehicle: {
                     ...current.vehicle,
@@ -337,6 +350,113 @@ const AdminTrip = () =>{
                 }
             }
         };
+        const handleUpdateTrip = async (e) => {
+            e.preventDefault();
+            let missingInfo = [];
+            if (!currentTrip.route) {
+                missingInfo.push("Tuyến");
+            }
+            if (!currentTrip.vehicle) {
+                missingInfo.push("Phương tiện");
+            }
+            if (!currentTrip.dayStart) {
+                missingInfo.push("Ngày khởi hành");
+            }
+            if (!currentTrip.timeStart) {
+                missingInfo.push("Thời gian khởi hành");
+            }
+            if (!currentTrip.price) {
+                missingInfo.push("Giá vé");
+            }
+            if (!currentTrip.driver) {
+                missingInfo.push("Tài xế");
+            }
+            if (currentTrip.status === null || currentTrip.status === undefined) {
+                missingInfo.push("Trạng thái");
+            }
+            if (missingInfo.length > 0) {
+                const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+                toast.error(message);
+            } else {
+                try {
+                    const newTripData = {
+                        routeId: currentTrip.route.id,
+                        vehicleId: currentTrip.vehicle.id,
+                        dayStart: currentTrip.dayStart,
+                        timeStart: currentTrip.timeStart,
+                        price: currentTrip.price,
+                        driverId: currentTrip.driver.id,
+                        emptySeat: currentTrip.emptySeat,
+                        status: currentTrip.status,
+                    };
+                    console.log("newTripData", newTripData);
+        
+            
+                    const response = await fetch(`http://localhost:8081/api/trip/${currentTrip.id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(newTripData)
+                    });
+            
+                    if (response.ok) {
+                        // Xử lý thành công
+                        console.log("trip đã được cập nhật thành công!");
+                        toast.success("trip đã được cập nhật thành công!");
+                        const updatedTrip = await response.json();
+                        const updatedTrips = records.map(trip => {
+                            if (trip.id === updatedTrip.id) {
+                                return updatedTrip;
+                            }
+                            return trip;
+                        });
+                        setRecords(updatedTrips);
+                        // Reset form hoặc làm gì đó khác
+                        setcurrentTrip({
+                            id: null,
+                            route: { id: "", name: "" },
+                            vehicle: { id: "", name: "" },
+                            dayStart: "",
+                            timeStart: "",
+                            price: "",
+                            driver: { id: "", name: "" },
+                            emptySeat: 0,
+                            status: 0
+                        });
+                        setIsEditing(false);
+                        // window.location.reload();
+                    } else {
+                        console.error("Có lỗi xảy ra khi cập nhật trip!");
+                        toast.error("Có lỗi xảy ra khi cập nhật trip!");
+                    }
+                } catch (error) {
+                    console.error("Lỗi:", error);
+                    toast.error("Lỗi:", error);
+                }
+            }
+        };
+        const handleRemoveClick = async (trip) => {
+            const tripId = trip.id;
+            try {
+                const response = await fetch(`http://localhost:8081/api/trip/${tripId}`, {
+                method: "DELETE"
+            });
+                if (response.ok) {
+                    
+                    // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
+                    const updateTrip = records.filter(record => record.id !== tripId);
+                    setRecords(updateTrip);
+                    toast.success("trip đã được xóa thành công!");
+                } else {
+                    console.error("Có lỗi xảy ra khi xóa trip!");
+                    toast.error("Có lỗi xảy ra khi xóa trip!");
+                }
+            } catch (error) {
+                console.error("Lỗi:", error);
+                toast.error("Lỗi:", error.message);
+            }
+        };
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
@@ -395,13 +515,13 @@ const AdminTrip = () =>{
                                 <form>
                                     <div className="infoCity">
                                         <label>Tên chuyến:</label>
-                                        <input type="text" value={currentCity.route.name} onChange={(e) => setCurrentCity({ ...currentCity, route: {...currentCity.route, name: e.target.value }})} />
+                                        <input type="text" value={currentTrip.route.name} onChange={(e) => setcurrentTrip({ ...currentTrip, route: {...currentTrip.route, name: e.target.value }})} />
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Loại xe:</label>
                                         <select
                                             className="inputValue"
-                                            value={currentCity.kindVehicle ? currentCity.kindVehicle.id : ''}
+                                            value={currentTrip.kindVehicle ? currentTrip.kindVehicle.id : ''}
                                             onChange={handleKindVehicleChange}
                                         >
                                             {kindVehicledata.map(kind => (
@@ -415,8 +535,8 @@ const AdminTrip = () =>{
                                     <div className="infoCity">
                                         <label>Tên xe:</label>
                                         <select  className="inputValue"
-                                            value={currentCity.vehicle.id || ''}
-                                            // onChange={(e) => setCurrentCity({...currentCity, vehicle: {...currentCity.vehicle, id: e.target.value }})}
+                                            value={currentTrip.vehicle.id || ''}
+                                            // onChange={(e) => setcurrentTrip({...currentTrip, vehicle: {...currentTrip.vehicle, id: e.target.value }})}
                                             onChange={handleVehicleChange}
                                         >
                                                 <option value="">Chọn tên xe</option>
@@ -429,23 +549,23 @@ const AdminTrip = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Giờ khởi hành:</label>
-                                        <input className="inputValue" type="time" value={currentCity.timeStart && currentCity.timeStart.slice(0, 5)} onChange={(e) => setCurrentCity({ ...currentCity, timeStart: e.target.value })}/>
+                                        <input className="inputValue" type="time" value={currentTrip.timeStart && currentTrip.timeStart.slice(0, 5)} onChange={(e) => setcurrentTrip({ ...currentTrip, timeStart: e.target.value })}/>
                                         
                                     </div>
                                     <div className="infoCity">
-                                        <label className="info">Giờ khởi hành:</label>
-                                        <input className="inputValue" type="date" value={currentCity.dayStart} onChange={(e) => setCurrentCity({ ...currentCity, dayStart: e.target.value })} />
+                                        <label className="info">Ngày khởi hành:</label>
+                                        <input className="inputValue" type="date" value={currentTrip.dayStart} onChange={(e) => setcurrentTrip({ ...currentTrip, dayStart: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label>Giá vé:</label>
-                                        <input type="text" value={currentCity.price.toLocaleString('vi-VN')} onChange={(e) => setCurrentCity({ ...currentCity, price: e.target.value })} />
+                                        <input type="text" value={currentTrip.price} onChange={(e) => setcurrentTrip({ ...currentTrip, price: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Tài xế:</label>
                                         <select 
                                             className="inputValue"
-                                            value={currentCity.driver ? currentCity.driver.id : ''} 
-                                            onChange={(e) => setCurrentCity(current => ({
+                                            value={currentTrip.driver ? currentTrip.driver.id : ''} 
+                                            onChange={(e) => setcurrentTrip(current => ({
                                                 ...current,
                                                 driver: {
                                                     ...current.driver,
@@ -462,10 +582,10 @@ const AdminTrip = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Trạng thái:</label>
-                                        {/* <input type="text" value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentTrip.status} onChange={(e) => setcurrentTrip({ ...currentTrip, status: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
-                                            value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })}
+                                            value={currentTrip.status} onChange={(e) => setcurrentTrip({ ...currentTrip, status: e.target.value })}
                                         >
                                             {Object.keys(statusMap).map(key => (
                                                 <option key={key} value={key}>
@@ -476,7 +596,7 @@ const AdminTrip = () =>{
                                     </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
-                                        <button type="submit" className="save">Lưu</button>
+                                        <button type="submit" className="save" onClick={handleUpdateTrip}>Lưu</button>
                                     </div>
                                 </form>
                             </div>
@@ -496,7 +616,7 @@ const AdminTrip = () =>{
                                 <form>
                                     <div className="infoCity">
                                         <label>Tên chuyến:</label>
-                                        {/* <input type="text" value={currentCity.route.name} onChange={(e) => setCurrentCity({ ...currentCity, route: {...currentCity.route, name: e.target.value }})} /> */}
+                                        {/* <input type="text" value={currentTrip.route.name} onChange={(e) => setcurrentTrip({ ...currentTrip, route: {...currentTrip.route, name: e.target.value }})} /> */}
                                         <select 
                                             className="inputValue"
                                             value={route} onChange={handleRouteChange} 
@@ -513,7 +633,7 @@ const AdminTrip = () =>{
                                         <label className="info">Loại xe:</label>
                                         <select
                                             className="inputValue"
-                                            value={currentCity.kindVehicle ? currentCity.kindVehicle.id : ''}
+                                            value={currentTrip.kindVehicle ? currentTrip.kindVehicle.id : ''}
                                             onChange={handleKindVehicleChange}
                                         >
                                             {kindVehicledata.map(kind => (
@@ -528,7 +648,7 @@ const AdminTrip = () =>{
                                         <label>Tên xe:</label>
                                         <select  className="inputValue"
                                             value={vehicle}
-                                            // onChange={(e) => setCurrentCity({...currentCity, vehicle: {...currentCity.vehicle, id: e.target.value }})}
+                                            // onChange={(e) => setcurrentTrip({...currentTrip, vehicle: {...currentTrip.vehicle, id: e.target.value }})}
                                             onChange={handleVehicle1Change}
                                         >
                                                 <option value="">Chọn tên xe</option>
@@ -569,7 +689,7 @@ const AdminTrip = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Trạng thái:</label>
-                                        {/* <input type="text" value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentTrip.status} onChange={(e) => setcurrentTrip({ ...currentTrip, status: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
                                             value={status} onChange={handleStatusChange}

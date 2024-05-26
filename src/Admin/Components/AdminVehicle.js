@@ -4,13 +4,13 @@ import DataTable from 'react-data-table-component'
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
+import { type } from "@testing-library/user-event/dist/type";
 
 
 const AdminVehicle = () =>{
     const [isEditing, setIsEditing] = useState(false);
-    const [currentCity, setCurrentCity] = useState({ id: null, kindVehicle: {
-        id: "",
-        name: ""}, image: '' });
+    const [currentVehicle, setcurrentVehicle] = useState({
+    });
 
     const [isAdd, setIsAdd] = useState(false);
     const [data, setData] = useState([]);
@@ -61,7 +61,7 @@ const AdminVehicle = () =>{
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                     <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}> Xóa </button>
+                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
                 </div>
             )
         }
@@ -100,7 +100,7 @@ const AdminVehicle = () =>{
             setRecords(newData)
         }
         const handleEditClick = (kindVehicle) => {
-            setCurrentCity(kindVehicle);
+            setcurrentVehicle(kindVehicle);
             setIsEditing(true);
         };
         const handleCreateClick = () => {
@@ -187,6 +187,96 @@ const AdminVehicle = () =>{
                 }
             }
         };
+        const handleUpdateVehicle = async (e) => {
+            e.preventDefault();
+            let missingInfo = [];
+            if (!currentVehicle.name) {
+                missingInfo.push("Tên xe");
+            }
+            if (!currentVehicle.kindVehicle) {
+                missingInfo.push("Loại xe");
+            }
+            if (!currentVehicle.vehicleNumber) {
+                missingInfo.push("Biển số");
+            }
+            if (!currentVehicle.value) {
+                missingInfo.push("Sức chứa");
+            }
+            if (currentVehicle.status === null || currentVehicle.status === undefined) {
+                missingInfo.push("Trạng thái");
+            }
+            if (missingInfo.length > 0) {
+                const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+                toast.error(message);
+            } else {
+                try {
+                    const updateVehicleData = {
+                        name: currentVehicle.name,
+                        kindVehicleId: currentVehicle.kindVehicle.id,
+                        vehicleNumber: currentVehicle.vehicleNumber,
+                        value: currentVehicle.value,
+                        status: currentVehicle.status,
+                    };
+            
+                    const response = await fetch(`http://localhost:8081/api/vehicle/${currentVehicle.id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(updateVehicleData)
+                    });
+            
+                    if (response.ok) {
+                        // Xử lý thành công
+                        console.log("Vehicle đã được cập nhật thành công!");
+                        toast.success("Vehicle đã được cập nhật thành công!");
+                        const updatedVehicle = await response.json();
+                        const updatedVehicles = records.map(vehicle => {
+                            if (vehicle.id === updatedVehicle.id) {
+                                return updatedVehicle;
+                            }
+                            return vehicle;
+                        });
+                        setRecords(updatedVehicles);
+                        // Reset form hoặc làm gì đó khác
+                        setName('');
+                        setKindVehicle('');
+                        setVehicleNumber('');
+                        setValue('');
+                        setStatus('');
+                        setIsEditing(false);
+                        // window.location.reload();
+                    } else {
+                        console.error("Có lỗi xảy ra khi cập nhật vehicle!");
+                        toast.error("Có lỗi xảy ra khi cập nhật vehicle!");
+                    }
+                } catch (error) {
+                    console.error("Lỗi:", error);
+                    toast.error("Lỗi:", error);
+                }
+            }
+        };
+        const handleRemoveClick = async (vehicle) => {
+            const vehicleId = vehicle.id;
+            try {
+                const response = await fetch(`http://localhost:8081/api/vehicle/${vehicleId}`, {
+                method: "DELETE"
+            });
+                if (response.ok) {
+                    
+                    // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
+                    const updateVehicle = records.filter(record => record.id !== vehicleId);
+                    setRecords(updateVehicle);
+                    toast.success("vehicle đã được xóa thành công!");
+                } else {
+                    console.error("Có lỗi xảy ra khi xóa vehicle!");
+                    toast.error("Có lỗi xảy ra khi xóa vehicle!");
+                }
+            } catch (error) {
+                console.error("Lỗi:", error);
+                toast.error("Lỗi:", error.message);
+            }
+        };
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
@@ -237,24 +327,24 @@ const AdminVehicle = () =>{
             
             {isEditing && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Sửa Phương tiện</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Sửa Phương tiện</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
                                         <label className="info">Tên xe:</label>
-                                        <input type="text" value={currentCity.name} onChange={(e) => setCurrentCity({ ...currentCity, name: e.target.value })} />
+                                        <input type="text" value={currentVehicle.name} onChange={(e) => setcurrentVehicle({ ...currentVehicle, name: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Loại xe:</label>
-                                        {/* <input type="text" value={currentCity.kindVehicle.name} onChange={(e) => setCurrentCity({ ...currentCity, kindVehicle: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentVehicle.kindVehicle.name} onChange={(e) => setcurrentVehicle({ ...currentVehicle, kindVehicle: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
-                                            value={currentCity.kindVehicle.id} onChange={(e) => setCurrentCity({ ...currentCity, kindVehicle: {
-                                                ...currentCity.kindVehicle,
+                                            value={currentVehicle.kindVehicle.id} onChange={(e) => setcurrentVehicle({ ...currentVehicle, kindVehicle: {
+                                                ...currentVehicle.kindVehicle,
                                                 id: e.target.value
                                             } })}
                                         >
@@ -267,18 +357,18 @@ const AdminVehicle = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Biển số:</label>
-                                        <input type="text" value={currentCity.vehicleNumber} onChange={(e) => setCurrentCity({ ...currentCity, vehicleNumber: e.target.value })} />
+                                        <input type="text" value={currentVehicle.vehicleNumber} onChange={(e) => setcurrentVehicle({ ...currentVehicle, vehicleNumber: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label>Sức chứa:</label>
-                                        <input type="text" value={currentCity.value} onChange={(e) => setCurrentCity({ ...currentCity, value: e.target.value })} />
+                                        <input type="text" value={currentVehicle.value} onChange={(e) => setcurrentVehicle({ ...currentVehicle, value: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label>Trạng thái:</label>
-                                        {/* <input type="text" value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentVehicle.status} onChange={(e) => setcurrentVehicle({ ...currentVehicle, status: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
-                                            value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })}
+                                            value={currentVehicle.status} onChange={(e) => setcurrentVehicle({ ...currentVehicle, status: e.target.value })}
                                         >
                                             {Object.keys(statusMap).map(key => (
                                                 <option key={key} value={key}>
@@ -289,7 +379,7 @@ const AdminVehicle = () =>{
                                     </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
-                                        <button type="submit" className="save">Lưu</button>
+                                        <button type="submit" className="save" onClick={handleUpdateVehicle}>Lưu</button>
                                     </div>
                                 </form>
                             </div>
@@ -299,12 +389,12 @@ const AdminVehicle = () =>{
             )}
             {isAdd && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Thêm Phương tiện</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Thêm Phương tiện</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
                                         <label className="info">Tên xe:</label>
@@ -312,7 +402,7 @@ const AdminVehicle = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Loại xe:</label>
-                                        {/* <input type="text" value={currentCity.kindVehicle.name} onChange={(e) => setCurrentCity({ ...currentCity, kindVehicle: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentVehicle.kindVehicle.name} onChange={(e) => setcurrentVehicle({ ...currentVehicle, kindVehicle: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
                                             value={kindVehicle} onChange={handkindVehicleChange}
@@ -335,7 +425,7 @@ const AdminVehicle = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Trạng thái:</label>
-                                        {/* <input type="text" value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentVehicle.status} onChange={(e) => setcurrentVehicle({ ...currentVehicle, status: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
                                             value={status} onChange={handleStatusChange}

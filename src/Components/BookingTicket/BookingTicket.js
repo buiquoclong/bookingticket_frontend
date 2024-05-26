@@ -11,7 +11,7 @@ import Button from '@mui/material/Button';
 
 
 const BookingTicket = () =>{
-    
+    const [isLoading, setIsLoading] = useState(false);
     const location = useLocation();
     const { tripId, selectedSeatsNames, selectedSeatIds, totalPrice, tripIdReturn, selectedSeatsNamesReturn, selectedSeatIdsReturn, totalPriceReturn, kind } = location.state || {};
     const totalAmount = totalPrice + totalPriceReturn;
@@ -373,6 +373,8 @@ const BookingTicket = () =>{
                     return;
                 }
             }
+            setIsLoading(true);
+            setShowPaymentPopup(false)
 
             if (kind === "Một chiều") {
                 const bookingData = {
@@ -405,6 +407,7 @@ const BookingTicket = () =>{
                         await createBookingDetail(createdBooking.id, tripId, 0, selectedSeatIds.length, selectedSeatsNames, totalPrice, pickupLocation, note);
                         updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds);
                         insertSeatReservation(selectedSeatIds, tripId, createdBooking.id);
+                        await sendMail(createdBooking.id);
                         setTimeout(() => {
                             navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: kind } });
                         }, 1500);
@@ -451,6 +454,7 @@ const BookingTicket = () =>{
                         await createBookingDetail(createdBooking.id, tripIdReturn, 1, selectedSeatIdsReturn.length, selectedSeatsNamesReturn, totalPriceReturn, pickupLocationReturn, noteReturn);
                         updateTripEmptySeat(tripIdReturn, dataReturn.route.id, dataReturn.vehicle.id, dataReturn.dayStart, dataReturn.timeStart, dataReturn.price, dataReturn.driver.id, dataReturn.emptySeat, selectedSeatIdsReturn);
                         insertSeatReservation(selectedSeatIdsReturn, tripIdReturn, createdBooking.id);
+                        await sendMail(createdBooking.id);
                         setTimeout(() => {
                             navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: kind } });
                         }, 1500);
@@ -468,6 +472,23 @@ const BookingTicket = () =>{
         } catch (error) {
             console.error('Error checking seat status:', error);
             toast.error('Lỗi kiểm tra trạng thái ghế.');
+        }
+    };
+
+    // send mail
+    const sendMail = async (bookingId) => {
+        try {
+            const response = await fetch(`http://localhost:8081/api/booking/sendBookingEmail/${bookingId}`, {
+                method: 'POST',
+            });
+            if (response.ok) {
+                console.log("Email sent successfully!");
+            } else {
+                throw new Error('Failed to send email: Server responded with status ' + response.status);
+            }
+        } catch (error) {
+            console.error("Error sendmail:", error);
+            toast.error("Failed to sendmail.");
         }
     };
 
@@ -578,9 +599,17 @@ const BookingTicket = () =>{
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
+    function LoadingOverlay() {
+        return (
+            <div className="loading-overlay">
+                <div className="loader"></div>
+            </div>
+        );
+    }
 
     return(
         <section className="main container section">
+            {isLoading && <LoadingOverlay />}
             {showPaymentPopup && (
                 <div className="modal">
                     <div className="modal-dialog">
@@ -597,7 +626,7 @@ const BookingTicket = () =>{
                                     </div>
                                     <div className="payMent" style={{marginBottom:"1rem"}}>
                                         <button className="vnpay btn" onClick={handleChooseVNPAYPayment}><span style={{ color: "#ed3237" }}>VN</span><span style={{ color: "#0f62ac " }}>PAY</span></button>
-                                        <button className="btn trasau" onClick={handleChoosePayment}>Trả sau</button>
+                                        <button className="btn trasau " onClick={handleChoosePayment}>Trả sau</button>
                                     </div>
                                 </div>
                             </div>

@@ -8,7 +8,7 @@ import {Pagination, Breadcrumbs, Link} from '@mui/material';
 
 const AdminSeat = () =>{
     const [isEditing, setIsEditing] = useState(false);
-    const [currentCity, setCurrentCity] = useState({ id: null, kindVehicle: {
+    const [currentSeat, setcurrentSeat] = useState({ id: null, kindVehicle: {
         id: "",
         name: ""}, image: '' });
 
@@ -51,7 +51,7 @@ const AdminSeat = () =>{
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                     <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}> Xóa </button>
+                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
                 </div>
             )
         }
@@ -90,7 +90,7 @@ const AdminSeat = () =>{
             setRecords(newData)
         }
         const handleEditClick = (seatName) => {
-            setCurrentCity(seatName);
+            setcurrentSeat(seatName);
             setIsEditing(true);
         };
         const handleCreateClick = () => {
@@ -162,6 +162,92 @@ const AdminSeat = () =>{
                 }
             }
         };
+        const handleUpdateSeat = async (e) => {
+            e.preventDefault();
+            let missingInfo = [];
+            if (!currentSeat.name) {
+                missingInfo.push("Tên ghế");
+            }
+            if (!currentSeat.kindVehicle) {
+                missingInfo.push("Loại xe");
+            }
+            if (currentSeat.status === null || currentSeat.status === undefined) {
+                missingInfo.push("Trạng thái");
+            }
+            if (missingInfo.length > 0) {
+                const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+                toast.error(message);
+            } else {
+                try {
+                    const updateSeatData = {
+                        name: currentSeat.name,
+                        kindVehicleId: currentSeat.kindVehicle.id,
+                        status: currentSeat.status,
+                    };
+            
+                    const response = await fetch(`http://localhost:8081/api/seat/${currentSeat.id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(updateSeatData)
+                    });
+            
+                    if (response.ok) {
+                        // Xử lý thành công
+                        console.log("Ghế đã được cập nhật thành công!");
+                        toast.success("Ghế đã được cập nhật thành công!");
+                        const updatedSeat = await response.json();
+                        const updatedSeats = records.map(seat => {
+                            if (seat.id === updatedSeat.id) {
+                                return updatedSeat;
+                            }
+                            return seat;
+                        });
+                        setRecords(updatedSeats);
+                        // Reset form hoặc làm gì đó khác
+                        setcurrentSeat({
+                            id: null, 
+                            kindSeat: { id: "", name: "" },
+                            name: "",
+                            seatNumber: "",
+                            value: "",
+                            status: ""
+                        });
+                        setIsEditing(false);
+                        // window.location.reload();
+                    } else {
+                        console.error("Có lỗi xảy ra khi cập nhật ghế!");
+                        toast.error("Có lỗi xảy ra khi cập nhật ghế!");
+                    }
+                } catch (error) {
+                    console.error("Lỗi:", error);
+                    toast.error("Lỗi:", error);
+                }
+            }
+        };
+        
+        const handleRemoveClick = async (seat) => {
+            const seatId = seat.id;
+            try {
+                const response = await fetch(`http://localhost:8081/api/seat/${seatId}`, {
+                method: "DELETE"
+            });
+                if (response.ok) {
+                    
+                    // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
+                    const updateSeat = records.filter(record => record.id !== seatId);
+                    setRecords(updateSeat);
+                    toast.success("seat đã được xóa thành công!");
+                } else {
+                    console.error("Có lỗi xảy ra khi xóa seat!");
+                    toast.error("Có lỗi xảy ra khi xóa seat!");
+                }
+            } catch (error) {
+                console.error("Lỗi:", error);
+                toast.error("Lỗi:", error.message);
+            }
+        };
         const handleChangePage = (event, value) => {
             setPage(value);
         };
@@ -211,24 +297,24 @@ const AdminSeat = () =>{
             
             {isEditing && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Sửa ghế ngồi</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Sửa ghế ngồi</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
                                         <label>Tên ghế:</label>
-                                        <input type="text" value={currentCity.name} onChange={(e) => setCurrentCity({ ...currentCity, name: e.target.value })} />
+                                        <input type="text" value={currentSeat.name} onChange={(e) => setcurrentSeat({ ...currentSeat, name: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Loại xe:</label>
-                                        {/* <input type="text" value={currentCity.kindVehicle} onChange={(e) => setCurrentCity({ ...currentCity, kindVehicle: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentSeat.kindVehicle} onChange={(e) => setcurrentSeat({ ...currentSeat, kindVehicle: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
-                                            value={currentCity.kindVehicle.id} onChange={(e) => setCurrentCity({ ...currentCity, kindVehicle: {
-                                                ...currentCity.kindVehicle,
+                                            value={currentSeat.kindVehicle.id} onChange={(e) => setcurrentSeat({ ...currentSeat, kindVehicle: {
+                                                ...currentSeat.kindVehicle,
                                                 id: e.target.value
                                             } })}
                                         >
@@ -241,10 +327,10 @@ const AdminSeat = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Trạn thái:</label>
-                                        {/* <input type="text" value={currentCity.vehicleNumber} onChange={(e) => setCurrentCity({ ...currentCity, vehicleNumber: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentSeat.vehicleNumber} onChange={(e) => setcurrentSeat({ ...currentSeat, vehicleNumber: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
-                                            value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })}
+                                            value={currentSeat.status} onChange={(e) => setcurrentSeat({ ...currentSeat, status: e.target.value })}
                                         >
                                             {Object.keys(statusMap).map(key => (
                                                 <option key={key} value={key}>
@@ -255,7 +341,7 @@ const AdminSeat = () =>{
                                     </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
-                                        <button type="submit" className="save">Lưu</button>
+                                        <button type="submit" className="save" onClick={handleUpdateSeat}>Lưu</button>
                                     </div>
                                 </form>
                             </div>
@@ -266,12 +352,12 @@ const AdminSeat = () =>{
 
             {isAdd && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Thêm ghế ngồi</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Thêm ghế ngồi</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
                                         <label>Tên ghế:</label>
@@ -279,7 +365,7 @@ const AdminSeat = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Loại xe:</label>
-                                        {/* <input type="text" value={currentCity.kindVehicle} onChange={(e) => setCurrentCity({ ...currentCity, kindVehicle: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentSeat.kindVehicle} onChange={(e) => setcurrentSeat({ ...currentSeat, kindVehicle: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
                                             value={kindVehicle} onChange={handkindVehicleChange}
@@ -294,7 +380,7 @@ const AdminSeat = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Trạn thái:</label>
-                                        {/* <input type="text" value={currentCity.vehicleNumber} onChange={(e) => setCurrentCity({ ...currentCity, vehicleNumber: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentSeat.vehicleNumber} onChange={(e) => setcurrentSeat({ ...currentSeat, vehicleNumber: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
                                             value={status} onChange={handleStatusChange}

@@ -44,6 +44,9 @@ const fetchUserInfo = async () => {
 const handleUserInfoClick = () => {
   navigate('/info-user');
 }
+const handleAdminClick = () => {
+  navigate('/admin');
+}
 
 const handleLogoutClick = () => {
   sessionStorage.removeItem("userId");
@@ -52,7 +55,6 @@ const handleLogoutClick = () => {
 }
 const handleMyRatingClick = () => {
   navigate('/my-rating');
-  
 }
 const handleMyBookingClick = () => {
   navigate('/my-booking');
@@ -98,6 +100,9 @@ const handleMyBookingClick = () => {
                         {showDropdown && (
                           <div className="flex flex-col dropdown">
                               <ul className="flex flex-col gap-4">
+                                {data && (
+                                    <li onClick={handleAdminClick}>Admin</li>
+                                )}
                                   <li onClick={handleUserInfoClick}>Thông tin người dùng</li>
                                   <li onClick={handleMyRatingClick}>Đánh giá của tôi</li>
                                   <li onClick={handleMyBookingClick}>Hóa đơn của tôi</li>

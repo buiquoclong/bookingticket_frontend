@@ -8,7 +8,7 @@ import {Pagination, Breadcrumbs, Link} from '@mui/material';
 
 const AdminBooking = () =>{
     const [isEditing, setIsEditing] = useState(false);
-    const [currentCity, setCurrentCity] = useState();
+    const [currentBooking, setcurrentBooking] = useState();
     
     const [isDetail, setIsDetail] = useState(false);
     const [bookingDetails, setBookingDetails] = useState(null);
@@ -208,7 +208,7 @@ const AdminBooking = () =>{
             setRecords(newData)
         }
         const handleEditClick = (nameUserBook) => {
-            setCurrentCity(nameUserBook);
+            setcurrentBooking(nameUserBook);
             setIsEditing(true);
         };
 
@@ -232,6 +232,66 @@ const AdminBooking = () =>{
         }
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
+        };
+        
+        const handleUpdateBooking = async (e) => {
+            e.preventDefault();
+            let missingInfo = [];
+            if (!currentBooking.userName) {
+                missingInfo.push("Người đặt");
+            }
+            if (!currentBooking.email) {
+                missingInfo.push("Email");
+            }
+            if (!currentBooking.phone) {
+                missingInfo.push("Số điện thoại");
+            }
+            if (!currentBooking.isPaid) {
+                missingInfo.push("Trạng thái");
+            }
+            if (missingInfo.length > 0) {
+                const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+                toast.error(message);
+            } else {
+                try {
+                    const newUserData = {
+                        userName: currentBooking.userName,
+                        email: currentBooking.email,
+                        phone: currentBooking.phone,
+                        isPaid: currentBooking.isPaid
+                    };
+            
+                    const response = await fetch(`http://localhost:8081/api/booking/${currentBooking.id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(newUserData)
+                    });
+            
+                    if (response.ok) {
+                        // Xử lý thành công
+                        console.log("User đã được tạo thành công!");
+                        console.log("Booking đã được cập nhật thành công!");
+                        toast.success("Booking đã được cập nhật thành công!");
+                        const updatedBooking = await response.json();
+                        const updatedBookings = records.map(booking => {
+                            if (booking.id === updatedBooking.id) {
+                                return updatedBooking;
+                            }
+                            return booking;
+                        });
+                        setRecords(updatedBookings);
+                        setIsEditing(false);
+                    } else {
+                        console.error("Có lỗi xảy ra khi cập nhật user!");
+                        toast.error("Có lỗi xảy ra khi cập nhật user!");
+                    }
+                } catch (error) {
+                    console.error("Lỗi:", error);
+                    toast.error("Lỗi:", error);
+                }
+            }
         };
     return(
         <div className="main-container">
@@ -286,36 +346,34 @@ const AdminBooking = () =>{
                             <div class="modal-body">
                                 <form>
                                     <div className="infoCity">
-                                        <label>Tên tuyến:</label>
-                                        <input type="text" value={currentCity.routeName} onChange={(e) => setCurrentCity({ ...currentCity, routeName: e.target.value })} />
-                                    </div>
-                                    <div className="infoCity">
                                         <label className="info">Người đặt:</label>
-                                        <input type="text" value={currentCity.nameUserBook} onChange={(e) => setCurrentCity({ ...currentCity, nameUserBook: e.target.value })} />
+                                        <input type="text" value={currentBooking.userName} onChange={(e) => setcurrentBooking({ ...currentBooking, userName: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
-                                        <label>Ngày đặt:</label>
-                                        <input type="text" value={currentCity.dateBook} onChange={(e) => setCurrentCity({ ...currentCity, dateBook: e.target.value })} />
+                                        <label>Email:</label>
+                                        <input type="text" value={currentBooking.email} onChange={(e) => setcurrentBooking({ ...currentBooking, email: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
-                                        <label className="info">Giờ khởi hành:</label>
-                                        <input type="text" value={currentCity.timeStart} onChange={(e) => setCurrentCity({ ...currentCity, timeStart: e.target.value })} />
+                                        <label className="info">Số điện thoại:</label>
+                                        <input type="text" value={currentBooking.phone} onChange={(e) => setcurrentBooking({ ...currentBooking, phone: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label>Trạng thái:</label>
-                                        <input type="text" value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} />
-                                    </div>
-                                    <div className="infoCity">
-                                        <label>Ghi chú:</label>
-                                        <input type="text" value={currentCity.note} onChange={(e) => setCurrentCity({ ...currentCity, note: e.target.value })} />
-                                    </div>
-                                    <div className="infoCity">
-                                        <label>Nơi đón:</label>
-                                        <input type="text" value={currentCity.placeCatch} onChange={(e) => setCurrentCity({ ...currentCity, placeCatch: e.target.value })} />
+                                        {/* <input type="text" value={currentTrip.status} onChange={(e) => setcurrentTrip({ ...currentTrip, status: e.target.value })} /> */}
+                                        <select 
+                                            className="inputValue"
+                                            value={currentBooking.isPaid} onChange={(e) => setcurrentBooking({ ...currentBooking, isPaid: e.target.value })}
+                                        >
+                                            {Object.keys(isPaid).map(key => (
+                                                <option key={key} value={key}>
+                                                    {isPaid[key]}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
-                                        <button type="submit" className="save">Lưu</button>
+                                        <button type="submit" className="save" onClick={handleUpdateBooking}>Lưu</button>
                                     </div>
                                 </form>
                             </div>
@@ -334,12 +392,15 @@ const AdminBooking = () =>{
                                     &times;
                                 </button> */}
                             </div>
-                            <div class="modal-body">
-                                        <DataTable
-                                    columns={columnDetails}
-                                    data={bookingDetails}
-                                />
-                            </div>
+                            {bookingDetails && (
+                                <div class="modal-body">
+                                            <DataTable
+                                        columns={columnDetails}
+                                        data={bookingDetails}
+                                    />
+                                </div>
+                            )}
+                            
                         </div>
                     </div>
                 </div>

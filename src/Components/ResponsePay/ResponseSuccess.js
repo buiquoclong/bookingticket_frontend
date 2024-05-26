@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const ResponseSuccess  = () => {
     
+    const [isLoading, setIsLoading] = useState(false);
     const [data, setData] = useState(null);
     const [dataReturn, setDataReturn] = useState(null);
     const navigate = useNavigate();
@@ -48,6 +49,7 @@ const ResponseSuccess  = () => {
 
     const handleChoosePayment = async (event) => {
         event.preventDefault();
+        setIsLoading(true);
         try {
             // Gửi yêu cầu để lấy danh sách các ghế đã đặt cho chuyến đi
             const responseTrip = await fetch(`http://localhost:8081/api/seat_reservation/trip/${bookingDetails.tripId}`);
@@ -118,6 +120,7 @@ const ResponseSuccess  = () => {
                         await createBookingDetail(createdBooking.id, bookingDetails.tripId, 0, bookingDetails.selectedSeatIds.length, bookingDetails.selectedSeatsNames, bookingDetails.totalPrice, bookingDetails.pickupLocation, bookingDetails.note);
                         updateTripEmptySeat(bookingDetails.tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, bookingDetails.selectedSeatIds);
                         insertSeatReservation(bookingDetails.selectedSeatIds, bookingDetails.tripId, createdBooking.id);
+                        await sendMail(createdBooking.id);
                         setTimeout(() => {
                             navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: bookingDetails.kind } });
                         }, 1500);
@@ -166,7 +169,7 @@ const ResponseSuccess  = () => {
                         await createBookingDetail(createdBooking.id, bookingDetails.tripIdReturn, 1, bookingDetails.selectedSeatIdsReturn.length, bookingDetails.selectedSeatsNamesReturn, bookingDetails.totalPriceReturn, bookingDetails.pickupLocationReturn, bookingDetails.noteReturn);
                         updateTripEmptySeat(bookingDetails.tripIdReturn, dataReturn.route.id, dataReturn.vehicle.id, dataReturn.dayStart, dataReturn.timeStart, dataReturn.price, dataReturn.driver.id, dataReturn.emptySeat, bookingDetails.selectedSeatIdsReturn);
                         insertSeatReservation(bookingDetails.selectedSeatIdsReturn, bookingDetails.tripIdReturn, createdBooking.id);
-
+                        await sendMail(createdBooking.id);
                         setTimeout(() => {
                             navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: bookingDetails.kind } });
                         }, 1500);
@@ -185,6 +188,22 @@ const ResponseSuccess  = () => {
         } catch (error) {
             console.error('Error checking seat status:', error);
             toast.error('Lỗi kiểm tra trạng thái ghế.');
+        }
+    };
+    // send mail
+    const sendMail = async (bookingId) => {
+        try {
+            const response = await fetch(`http://localhost:8081/api/booking/sendBookingEmail/${bookingId}`, {
+                method: 'POST',
+            });
+            if (response.ok) {
+                console.log("Email sent successfully!");
+            } else {
+                throw new Error('Failed to send email: Server responded with status ' + response.status);
+            }
+        } catch (error) {
+            console.error("Error sendmail:", error);
+            toast.error("Failed to sendmail.");
         }
     };
     // Tạo chi tiết hóa đơn
@@ -286,9 +305,17 @@ const ResponseSuccess  = () => {
             console.error('Error inserting seat booked:', error);
         }
     };
+    function LoadingOverlay() {
+        return (
+            <div className="loading-overlay">
+                <div className="loader"></div>
+            </div>
+        );
+    }
 
     return (
             <section className="main container section">
+            {isLoading && <LoadingOverlay />}
                 <div className="reponseInfo ">
                     <div className="secTitle">
                         <p>Thanh toán thành công</p>

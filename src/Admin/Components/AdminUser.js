@@ -8,7 +8,15 @@ import {Pagination, Breadcrumbs, Link} from '@mui/material';
 
 const AdminUser = () =>{
     const [isEditing, setIsEditing] = useState(false);
-    const [currentCity, setCurrentCity] = useState();
+    const [currentUser, setcurrentUser] = useState({
+        name: "",
+        password: "",
+        email: "",
+        phone: "",
+        role: "",
+        status: "",
+        type: ""
+    });
     
     const [isAdd, setIsAdd] = useState(false);
     const [data, setData] = useState([]);
@@ -71,7 +79,8 @@ const AdminUser = () =>{
         {
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                    <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button>
+                    <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
+                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
                 </div>
             )
         }
@@ -113,8 +122,8 @@ const AdminUser = () =>{
             })
             setRecords(newData)
         }
-        const handleEditClick = (name) => {
-            setCurrentCity(name);
+        const handleEditClick = (user) => {
+            setcurrentUser(user);
             setIsEditing(true);
         };
         const handleCreateClick = () => {
@@ -148,8 +157,7 @@ const AdminUser = () =>{
         const handleTypeChange = (event) => {
             setType(event.target.value)
         };
-        const handleCreateUser = async (e) => {
-            e.preventDefault();
+        const handleCreateUser = async () => {
             let missingInfo = [];
             if (!userName) {
                 missingInfo.push("Họ và tên");
@@ -179,7 +187,7 @@ const AdminUser = () =>{
                 try {
                     const newUserData = {
                         name: userName,
-                        password: "12345678", 
+                        password: "abc12345", 
                         email: email,
                         phone: phone,
                         role: role,
@@ -198,11 +206,10 @@ const AdminUser = () =>{
                     if (response.ok) {
                         // Xử lý thành công
                         console.log("User đã được tạo thành công!");
-                        toast.success("User đã được tạo thành công!");
-                        const newUser = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
+                        // const newUser = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
                         // Thêm người dùng mới vào danh sách
-                        setData(prevData => [...prevData, newUser]);
-                        setRecords(prevRecords => [...prevRecords, newUser]);
+                        // setData(prevData => [...prevData, newUser]);
+                        // setRecords(prevRecords => [...prevRecords, newUser]);
                         // Reset form hoặc làm gì đó khác
                         setuserName('');
                         setEmail('');
@@ -211,7 +218,8 @@ const AdminUser = () =>{
                         setStatus('');
                         setType('');
                         setIsAdd(false);
-                        // window.location.reload();
+                        window.location.reload();
+                        toast.success("User đã được tạo thành công!");
                     } else {
                         console.error("Có lỗi xảy ra khi tạo user!");
                         toast.error("Có lỗi xảy ra khi tạo user!");
@@ -220,6 +228,106 @@ const AdminUser = () =>{
                     console.error("Lỗi:", error);
                     toast.error("Lỗi:", error);
                 }
+            }
+        };
+        const handleUpdateUser = async (e) => {
+            e.preventDefault();
+            let missingInfo = [];
+            if (!currentUser.name) {
+                missingInfo.push("Họ và tên");
+            }
+            if (!currentUser.email) {
+                missingInfo.push("Email");
+            } else if (emailErrorMessage) { // Kiểm tra nếu có errorMessage cho email
+                toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
+                return; // Dừng xử lý tiếp theo nếu có lỗi
+            }
+            if (!currentUser.phone) {
+                missingInfo.push("Số điện thoại");
+            }
+            if (!currentUser.role) {
+                missingInfo.push("Quyền");
+            }
+            if (!currentUser.status) {
+                missingInfo.push("Status");
+            }
+            if (!currentUser.type) {
+                missingInfo.push("Loại tài khoản");
+            }
+            if (missingInfo.length > 0) {
+                const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+                toast.error(message);
+            } else {
+                try {
+                    const updateUserData = {
+                        name: currentUser.name,
+                        password: currentUser.password, 
+                        email: currentUser.email,
+                        phone: currentUser.phone,
+                        role: currentUser.role,
+                        status: currentUser.status,
+                        type: currentUser.type,
+                    };
+                    console.log("updateUserData", updateUserData)
+            
+                    const response = await fetch(`http://localhost:8081/api/user/${currentUser.id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(updateUserData)
+                    });
+            
+                    if (response.ok) {
+                        // Xử lý thành công
+                        console.log("User đã được cập nhật thành công!");
+                        toast.success("User đã được cập nhật thành công!");
+                        const updatedUser = await response.json();
+                        const updatedUsers = records.map(user => {
+                            if (user.id === updatedUser.id) {
+                                return updatedUser;
+                            }
+                            return user;
+                        });
+                        setRecords(updatedUsers);
+                        // Reset form hoặc làm gì đó khác
+                        setuserName('');
+                        setEmail('');
+                        setPhone('');
+                        setRole('');
+                        setStatus('');
+                        setType('');
+                        setIsEditing(false);
+                        // window.location.reload();
+                    } else {
+                        console.error("Có lỗi xảy ra khi cập nhật user!");
+                        toast.error("Có lỗi xảy ra khi cập nhật user!");
+                    }
+                } catch (error) {
+                    console.error("Lỗi:", error);
+                    toast.error("Lỗi:", error);
+                }
+            }
+        };
+        const handleRemoveClick = async (user) => {
+            const userId = user.id;
+            try {
+                const response = await fetch(`http://localhost:8081/api/user/${userId}`, {
+                method: "DELETE"
+            });
+                if (response.ok) {
+                    
+                    // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
+                    const updatedUser = records.filter(record => record.id !== userId);
+                    setRecords(updatedUser);
+                    toast.success("User đã được xóa thành công!");
+                } else {
+                    console.error("Có lỗi xảy ra khi xóa User!");
+                    toast.error("Có lỗi xảy ra khi xóa User!");
+                }
+            } catch (error) {
+                console.error("Lỗi:", error);
+                toast.error("Lỗi:", error.message);
             }
         };
         const handleChangePage = (event, newPage) => {
@@ -271,31 +379,31 @@ const AdminUser = () =>{
             
             {isEditing && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Sửa Người dùng</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Sửa Người dùng</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
                                         <label>Họ tên:</label>
-                                        <input type="text" className="inputValue" value={currentCity.name} onChange={(e) => setCurrentCity({ ...currentCity, name: e.target.value })} />
+                                        <input type="text" className="inputValue" value={currentUser.name} onChange={(e) => setcurrentUser({ ...currentUser, name: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label>Email:</label>
-                                        <input type="text" className="inputValue" value={currentCity.email} onChange={(e) => setCurrentCity({ ...currentCity, email: e.target.value })} />
+                                        <input type="text" className="inputValue" value={currentUser.email} onChange={(e) => setcurrentUser({ ...currentUser, email: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Điện thoại:</label>
-                                        <input type="text" className="inputValue" value={currentCity.phone} onChange={(e) => setCurrentCity({ ...currentCity, phone: e.target.value })} />
+                                        <input type="text" className="inputValue" value={currentUser.phone} onChange={(e) => setcurrentUser({ ...currentUser, phone: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label>Quyền:</label>
-                                        {/* <input type="text" value={roleMap[currentCity.role] || 'Unknown Role'} onChange={(e) => setCurrentCity({ ...currentCity, role: e.target.value })} /> */}
+                                        {/* <input type="text" value={roleMap[currentUser.role] || 'Unknown Role'} onChange={(e) => setcurrentUser({ ...currentUser, role: e.target.value })} /> */}
                                         <select 
-                                            value={currentCity.role}  className="inputValue"
-                                            onChange={(e) => setCurrentCity({ ...currentCity, role: e.target.value })}
+                                            value={currentUser.role}  className="inputValue"
+                                            onChange={(e) => setcurrentUser({ ...currentUser, role: e.target.value })}
                                         >
                                             {Object.keys(roleMap).map(key => (
                                                 <option key={key} value={key}>
@@ -306,10 +414,10 @@ const AdminUser = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Tài khoản:</label>
-                                        {/* <input type="text" className="inputValue" value={statusMap[currentCity.status] || 'Unknown Status'} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        {/* <input type="text" className="inputValue" value={statusMap[currentUser.status] || 'Unknown Status'} onChange={(e) => setcurrentUser({ ...currentUser, status: e.target.value })} /> */}
                                         <select 
-                                            value={currentCity.status}  className="inputValue"
-                                            onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })}
+                                            value={currentUser.status}  className="inputValue"
+                                            onChange={(e) => setcurrentUser({ ...currentUser, status: e.target.value })}
                                         >
                                             {Object.keys(statusMap).map(key => (
                                                 <option key={key} value={key}>
@@ -320,11 +428,11 @@ const AdminUser = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Phương thức:</label>
-                                        <input type="text" className="inputValue" value={currentCity.type} onChange={(e) => setCurrentCity({ ...currentCity, type: e.target.value })} />
+                                        <input type="text" className="inputValue" value={currentUser.type} onChange={(e) => setcurrentUser({ ...currentUser, type: e.target.value })} />
                                     </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
-                                        <button type="submit" className="save">Lưu</button>
+                                        <button type="submit" className="save" onClick={handleUpdateUser}>Lưu</button>
                                     </div>
                                 </form>
                             </div>
@@ -335,12 +443,12 @@ const AdminUser = () =>{
 
             {isAdd && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Thêm Người dùng</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Thêm Người dùng</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
                                         <label>Họ tên:</label>
@@ -356,7 +464,7 @@ const AdminUser = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Quyền:</label>
-                                        {/* <input type="text" value={roleMap[currentCity.role] || 'Unknown Role'} onChange={(e) => setCurrentCity({ ...currentCity, role: e.target.value })} /> */}
+                                        {/* <input type="text" value={roleMap[currentUser.role] || 'Unknown Role'} onChange={(e) => setcurrentUser({ ...currentUser, role: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
                                             value={role} onChange={handleRoleChange} 
@@ -371,7 +479,7 @@ const AdminUser = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Tài khoản:</label>
-                                        {/* <input type="text" className="inputValue" value={statusMap[currentCity.status] || 'Unknown Status'} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        {/* <input type="text" className="inputValue" value={statusMap[currentUser.status] || 'Unknown Status'} onChange={(e) => setcurrentUser({ ...currentUser, status: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
                                             value={status} onChange={handleStatusChange} 

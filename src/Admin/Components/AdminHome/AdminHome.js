@@ -3,7 +3,7 @@ import
 { BsFillArchiveFill, BsFillGrid3X3GapFill, BsPeopleFill}
 from 'react-icons/bs'
 import 
-{ BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } 
+{ BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie } 
 from 'recharts';
 import { GrLocation } from "react-icons/gr";
 import { RiArrowLeftRightFill } from "react-icons/ri";
@@ -27,12 +27,36 @@ function AdminHome() {
     const [dayReturn, setDayReturn] = useState('');
     const [cities, setCities] = useState([]);
     const navigate = useNavigate();
+    const [totalAll, setTotalAll] = useState(null);
+    const [totalDay, setTotalDay] = useState(null);
+    const [totalMonth, setTotalMonth] = useState(null);
+    const [totalUser, setTotalUser] = useState(null);
+    const [totalNineMonth, setTotalNineMonth] = useState([]);
+    // lấy ngày hiện tại
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+    const day = String(today.getDate()).padStart(2, '0');
+    const currentDate = `${year}-${month}-${day}`;
+    const currentMonth = `${year}-${month}`;
+    
+
+
 
 
     useEffect(() => {
         // Call the API to fetch cities
         fetchCities();
-    }, []);
+        if(currentDate){
+            fetchtoTalByday();
+        }
+        if(currentMonth){
+            fetchtoTalByMonth();
+        }
+        fetchTotalUser();
+        fetchTotalNineMonth();
+        fetchTotalAll();
+    }, [currentDate, currentMonth]);
 
     const fetchCities = async () => {
         try {
@@ -41,6 +65,51 @@ function AdminHome() {
             setCities(data);
         } catch (error) {
             console.error("Error fetching cities:", error);
+        }
+    };
+    const fetchtoTalByday = async () => {
+        try {
+            const response = await fetch(`http://localhost:8081/api/booking/total-by-day?date=${currentDate}`);
+            const data = await response.json();
+            setTotalDay(data);
+        } catch (error) {
+            console.error("Error fetching totalDay:", error);
+        }
+    };
+    const fetchtoTalByMonth = async () => {
+        try {
+            const response = await fetch(`http://localhost:8081/api/booking/total-by-month?yearMonth=${currentMonth}`);
+            const data = await response.json();
+            setTotalMonth(data);
+        } catch (error) {
+            console.error("Error fetching totalDay:", error);
+        }
+    };
+    const fetchTotalUser = async () => {
+        try {
+            const response = await fetch(`http://localhost:8081/api/user/totalUser`);
+            const data = await response.json();
+            setTotalUser(data);
+        } catch (error) {
+            console.error("Error fetching totalDay:", error);
+        }
+    };
+    const fetchTotalAll = async () => {
+        try {
+            const response = await fetch(`http://localhost:8081/api/booking/totalAll`);
+            const data = await response.json();
+            setTotalAll(data);
+        } catch (error) {
+            console.error("Error fetching totalDay:", error);
+        }
+    };
+    const fetchTotalNineMonth = async () => {
+        try {
+            const response = await fetch(`http://localhost:8081/api/booking/total/lastNineMonths`);
+            const data = await response.json();
+            setTotalNineMonth(data);
+        } catch (error) {
+            console.error("Error fetching totalDay:", error);
         }
     };
 
@@ -172,51 +241,13 @@ function AdminHome() {
         
         setDayReturn(event.target.value);
     };
-
-    const data = [
-        {
-        name: 'Page A',
-        uv: 4000,
-        pv: 2400,
-        amt: 2400,
-        },
-        {
-        name: 'Page B',
-        uv: 3000,
-        pv: 1398,
-        amt: 2210,
-        },
-        {
-        name: 'Page C',
-        uv: 2000,
-        pv: 9800,
-        amt: 2290,
-        },
-        {
-        name: 'Page D',
-        uv: 2780,
-        pv: 3908,
-        amt: 2000,
-        },
-        {
-        name: 'Page E',
-        uv: 1890,
-        pv: 4800,
-        amt: 2181,
-        },
-        {
-        name: 'Page F',
-        uv: 2390,
-        pv: 3800,
-        amt: 2500,
-        },
-        {
-        name: 'Page G',
-        uv: 3490,
-        pv: 4300,
-        amt: 2100,
-        },
-    ];
+    const transformedData = totalNineMonth.map(item => ({
+        ...item,
+        name: `T${item.month}-${item.year}`,
+    }));
+    const formatYAxis = (tickItem) => {
+        return tickItem >= 1000000 ? `${(tickItem / 1000000).toFixed(1)}M` : `${(tickItem / 1000000).toFixed(1)}M`;
+    };
 
 
     return (
@@ -232,21 +263,21 @@ function AdminHome() {
                         <h3>Hôm nay</h3>
                         <BsFillArchiveFill className='card_icon'/>
                     </div>
-                    <h1>0đ</h1>
+                        <h1>{totalDay ? `${totalDay.toLocaleString('vi-VN')}đ` : '0đ'}</h1>
                 </div>
                 <div className='card'>
                     <div className='card-inner'>
-                        <h3>Doanh thu</h3>
+                        <h3>Tổng doanh thu</h3>
                         <BsFillGrid3X3GapFill className='card_icon'/>
                     </div>
-                    <h1>1.000.000đ</h1>
+                    <h1>{totalAll ? `${totalAll.toLocaleString('vi-VN')}đ` : '0đ'}</h1>
                 </div>
                 <div className='card'>
                     <div className='card-inner'>
                         <h3>Người dùng</h3>
                         <BsPeopleFill className='card_icon'/>
                     </div>
-                    <h1>33</h1>
+                    <h1>{totalUser ? totalUser : '0'}</h1>
                 </div>
                 {/* <div className='card'>
                     <div className='card-inner'>
@@ -256,51 +287,37 @@ function AdminHome() {
                     <h1>42</h1>
                 </div> */}
             </div>
-
-            <div className='charts'>
-                <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                width={500}
-                height={300}
-                data={data}
-                margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
-                }}
-                >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="pv" fill="#8884d8" />
-                    <Bar dataKey="uv" fill="#82ca9d" />
-                    </BarChart>
-                </ResponsiveContainer>
-
-                <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
+            <div className='totalMain'>
+                <div className="titleTot">Doanh số </div>
+                <div className='charts'>
+                    <div className='monthlyTotal'>
+                        <div className='totalMonthly'>
+                            <h3>Doanh thu tháng này</h3>
+                            <h1>{totalMonth ? `${totalMonth.toLocaleString('vi-VN')}đ` : '0đ'}</h1>
+                        </div>
+                    </div>
+                    <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
                     width={500}
                     height={300}
-                    data={data}
+                    data={transformedData}
                     margin={{
                         top: 5,
                         right: 30,
                         left: 20,
-                        bottom: 5,
+                        bottom: 50,
                     }}
                     >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
-                    <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
-                    </LineChart>
-                </ResponsiveContainer>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name"  angle={-45} textAnchor="end"/>
+                        <YAxis tickFormatter={formatYAxis} />
+                        <Tooltip formatter={(value) => `${(value / 1000000).toFixed(1)}M`}/>
+                        <Legend  verticalAlign="top" align="center" wrapperStyle={{ paddingBottom: '20px' }} />
+                        <Bar dataKey="revenue" name="Lợi nhuận theo tháng"  fill="#8884d8"  barSize={30}/>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+
             </div>
         </div>
         <div className='sachRouteContent'>

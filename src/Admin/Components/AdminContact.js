@@ -9,7 +9,7 @@ import {Pagination, Breadcrumbs, Link} from '@mui/material';
 const AdminContact = () =>{
     const [isEditing, setIsEditing] = useState(false);
     const [isAdd, setIsAdd] = useState(false);
-    const [currentCity, setCurrentCity] = useState();
+    const [currentContact, setcurrentContact] = useState();
     
     const [data, setData] = useState([]);
     const [records, setRecords] = useState([]);
@@ -50,8 +50,8 @@ const AdminContact = () =>{
         {
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}> Xóa </button>
+                    <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
+                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
                 </div>
             )
         }
@@ -79,7 +79,7 @@ const AdminContact = () =>{
             setRecords(newData)
         }
         const handleEditClick = (kindVehicle) => {
-            setCurrentCity(kindVehicle);
+            setcurrentContact(kindVehicle);
             setIsEditing(true);
         };
         const handleCreateClick = () => {
@@ -170,6 +170,94 @@ const AdminContact = () =>{
                 }
             }
         };
+        const handleUpdateContact = async (e) => {
+            e.preventDefault();
+            let missingInfo = [];
+            if (!currentContact.name) {
+                missingInfo.push("Tên tài xế");
+            }
+            if (!currentContact.email) {
+                missingInfo.push("Email");
+            } else if (emailErrorMessage) { // Kiểm tra nếu có errorMessage cho email
+                toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
+                return; // Dừng xử lý tiếp theo nếu có lỗi
+            }
+            if (!currentContact.title) {
+                missingInfo.push("Tiêu đề");
+            }
+            if (!currentContact.content) {
+                missingInfo.push("Nội dung");
+            }
+            if (missingInfo.length > 0) {
+                const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+                toast.error(message);
+            } else {
+                try {
+                    const newContactData = {
+                        content: currentContact.content,
+                        email: currentContact.email,
+                        name: currentContact.name,
+                        title: currentContact.title
+                    };
+            
+                    const response = await fetch(`http://localhost:8081/api/contact/${currentContact.id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(newContactData)
+                    });
+            
+                    if (response.ok) {
+                        // Xử lý thành công
+                        console.log("Contact đã được cập nhật thành công!");
+                        toast.success("Contact đã được cập nhật thành công!");
+                        const updatedContact = await response.json();
+                        const updatedContacts = records.map(contact => {
+                            if (contact.id === updatedContact.id) {
+                                return updatedContact;
+                            }
+                            return contact;
+                        });
+                        setRecords(updatedContacts);
+                        // Reset form hoặc làm gì đó khác
+                        // setName('');
+                        // setEmail('');
+                        // setTitle('');
+                        // setContent('');
+                        setIsEditing(false);
+                        // window.location.reload();
+                    } else {
+                        console.error("Có lỗi xảy ra khi cập nhật contact!");
+                        toast.error("Có lỗi xảy ra khi cập nhật contact!");
+                    }
+                } catch (error) {
+                    console.error("Lỗi:", error);
+                    toast.error("Lỗi:", error);
+                }
+            }
+        };
+        const handleRemoveClick = async (contact) => {
+            const contactId = contact.id;
+            try {
+                const response = await fetch(`http://localhost:8081/api/contact/${contactId}`, {
+                method: "DELETE"
+            });
+                if (response.ok) {
+                    
+                    // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
+                    const updatedContact = records.filter(record => record.id !== contactId);
+                    setRecords(updatedContact);
+                    toast.success("contact đã được xóa thành công!");
+                } else {
+                    console.error("Có lỗi xảy ra khi xóa contact!");
+                    toast.error("Có lỗi xảy ra khi xóa contact!");
+                }
+            } catch (error) {
+                console.error("Lỗi:", error);
+                toast.error("Lỗi:", error.message);
+            }
+        };
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
@@ -219,32 +307,32 @@ const AdminContact = () =>{
             
             {isEditing && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Sửa Chi tiết vé</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Sửa Liên hệ</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
-                                        <label className="info">Mã vé:</label>
-                                        <input type="text" value={currentCity.mave} onChange={(e) => setCurrentCity({ ...currentCity, mave: e.target.value })} />
+                                        <label className="info">Tên liên hệ:</label>
+                                        <input type="text" value={currentContact.name} onChange={(e) => setcurrentContact({ ...currentContact, name: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
-                                        <label className="info">Mã hóa đơn:</label>
-                                        <input type="text" value={currentCity.mahoadon} onChange={(e) => setCurrentCity({ ...currentCity, mahoadon: e.target.value })} />
+                                        <label className="info">Email:</label>
+                                        <input type="text" value={currentContact.email} onChange={(e) => setcurrentContact({ ...currentContact, email: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
-                                        <label>Số lượng vé:</label>
-                                        <input type="text" value={currentCity.numTicket} onChange={(e) => setCurrentCity({ ...currentCity, numTicket: e.target.value })} />
+                                        <label>Tiêu đề:</label>
+                                        <input type="text" value={currentContact.title} onChange={(e) => setcurrentContact({ ...currentContact, title: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
-                                        <label>Tổng tiền:</label>
-                                        <input type="text" value={currentCity.total} onChange={(e) => setCurrentCity({ ...currentCity, total: e.target.value })} />
+                                        <label>Nội dung:</label>
+                                        <input type="text" value={currentContact.content} onChange={(e) => setcurrentContact({ ...currentContact, content: e.target.value })} />
                                     </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
-                                        <button type="submit" className="save">Lưu</button>
+                                        <button type="submit" className="save" onClick={handleUpdateContact}>Lưu</button>
                                     </div>
                                 </form>
                             </div>
@@ -254,12 +342,12 @@ const AdminContact = () =>{
             )}
             {isAdd && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Thêm liên hệ</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Thêm liên hệ</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
                                         <label className="info">Tên:</label>

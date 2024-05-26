@@ -8,7 +8,7 @@ import {Pagination, Breadcrumbs, Link} from '@mui/material';
 
 const AdminRoute = () =>{
     const [isEditing, setIsEditing] = useState(false);
-    const [currentCity, setCurrentCity] = useState({ id: null, city: '', image: '' });
+    const [currentRoute, setcurrentRoute] = useState({ id: null, city: '', image: '' });
     const [isAdd, setIsAdd] = useState(false);
     const [data, setData] = useState([]);
     const [records, setRecords] = useState([]);
@@ -66,7 +66,7 @@ const AdminRoute = () =>{
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                     <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}> Xóa </button>
+                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
                 </div>
             )
         }
@@ -108,7 +108,7 @@ const AdminRoute = () =>{
             setRecords(newData)
         }
         const handleEditClick = (routeName) => {
-            setCurrentCity(routeName);
+            setcurrentRoute(routeName);
             setIsEditing(true);
         };
         const handleCreateClick = () => {
@@ -202,6 +202,100 @@ const AdminRoute = () =>{
                 }
             }
         };
+        const handleUpdateRoute = async (e) => {
+            e.preventDefault();
+            let missingInfo = [];
+            if (!currentRoute.diemDi) {
+                missingInfo.push("Điểm đi");
+            }
+            if (!currentRoute.diemDen) {
+                missingInfo.push("Điểm đến");
+            }
+            if (!currentRoute.khoangCach) {
+                missingInfo.push("Khoảng cách");
+            }
+            if (!currentRoute.timeOfRoute) {
+                missingInfo.push("Thời gian di chuyển");
+            }
+            if (!currentRoute.status === null || currentRoute.status === undefined) {
+                missingInfo.push("Trạng thái");
+            }
+            if (missingInfo.length > 0) {
+                const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+                toast.error(message);
+            } else {
+                try {
+                    const newRouteData = {
+                        name: currentRoute.name,
+                        diemdi: currentRoute.diemDi.id,
+                        diemden: currentRoute.diemDen.id,
+                        khoangCach: currentRoute.khoangCach,
+                        timeOfRoute: currentRoute.timeOfRoute,
+                        status: currentRoute.status,
+                    };
+                    console.log("newRouteData", newRouteData);
+        
+            
+                    const response = await fetch(`http://localhost:8081/api/route/${currentRoute.id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(newRouteData)
+                    });
+            
+                    if (response.ok) {
+                        // Xử lý thành công
+                        console.log("route đã được tạo thành công!");
+                        toast.success("route đã được tạo thành công!");
+                        const updatedRoute = await response.json();
+                        const updatedRoutes = records.map(route => {
+                            if (route.id === updatedRoute.id) {
+                                return updatedRoute;
+                            }
+                            return route;
+                        });
+                        
+                        setRecords(updatedRoutes);
+                        // Reset form hoặc làm gì đó khác
+                        setDiemDi('');
+                        setDiemDen('');
+                        setKhoangCach('');
+                        setTimeOfRoute('');
+                        setStatus('');
+                        setIsEditing(false);
+                        // window.location.reload();
+                    } else {
+                        console.error("Có lỗi xảy ra khi tạo route!");
+                        toast.error("Có lỗi xảy ra khi tạo route!");
+                    }
+                } catch (error) {
+                    console.error("Lỗi:", error);
+                    toast.error("Lỗi:", error);
+                }
+            }
+        };
+        const handleRemoveClick = async (route) => {
+            const routeId = route.id;
+            try {
+                const response = await fetch(`http://localhost:8081/api/route/${routeId}`, {
+                method: "DELETE"
+            });
+                if (response.ok) {
+                    
+                    // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
+                    const updatedRoute = records.filter(record => record.id !== routeId);
+                    setRecords(updatedRoute);
+                    toast.success("route đã được xóa thành công!");
+                } else {
+                    console.error("Có lỗi xảy ra khi xóa route!");
+                    toast.error("Có lỗi xảy ra khi xóa route!");
+                }
+            } catch (error) {
+                console.error("Lỗi:", error);
+                toast.error("Lỗi:", error.message);
+            }
+        };
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
@@ -251,25 +345,25 @@ const AdminRoute = () =>{
             
             {isEditing && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Sửa tuyến xe</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Sửa tuyến xe</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
                                         <label>Tên tuyến:</label>
-                                        <input type="text" value={currentCity.name} onChange={(e) => setCurrentCity({ ...currentCity, name: e.target.value })} />
+                                        <input type="text" value={currentRoute.name} onChange={(e) => setcurrentRoute({ ...currentRoute, name: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Điểm đi:</label>
-                                        {/* <input type="text" value={currentCity.diemdi} onChange={(e) => setCurrentCity({ ...currentCity, diemdi: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentRoute.diemdi} onChange={(e) => setcurrentRoute({ ...currentRoute, diemdi: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
-                                            value={currentCity.diemDi.id} 
-                                            onChange={(e) => setCurrentCity({ ...currentCity, diemDi: {
-                                                ...currentCity.diemDi,
+                                            value={currentRoute.diemDi.id} 
+                                            onChange={(e) => setcurrentRoute({ ...currentRoute, diemDi: {
+                                                ...currentRoute.diemDi,
                                                 id: e.target.value
                                             } })}
                                         >
@@ -283,12 +377,12 @@ const AdminRoute = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Điểm đến:</label>
-                                        {/* <input type="text" value={currentCity.diemden} onChange={(e) => setCurrentCity({ ...currentCity, diemden: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentRoute.diemden} onChange={(e) => setcurrentRoute({ ...currentRoute, diemden: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
-                                            value={currentCity.diemDen.id} 
-                                            onChange={(e) => setCurrentCity({ ...currentCity, diemDen: {
-                                                ...currentCity.diemDen,
+                                            value={currentRoute.diemDen.id} 
+                                            onChange={(e) => setcurrentRoute({ ...currentRoute, diemDen: {
+                                                ...currentRoute.diemDen,
                                                 id: e.target.value
                                             } })}
                                         >
@@ -301,18 +395,18 @@ const AdminRoute = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Khoảng cách:</label>
-                                        <input type="text" value={currentCity.khoangCach} onChange={(e) => setCurrentCity({ ...currentCity, khoangCach: e.target.value })} />
+                                        <input type="text" value={currentRoute.khoangCach} onChange={(e) => setcurrentRoute({ ...currentRoute, khoangCach: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label>Thời gian di chuyển:</label>
-                                        <input type="text" value={currentCity.timeOfRoute+ " giờ"} giờ onChange={(e) => setCurrentCity({ ...currentCity, timeOfRoute: e.target.value })} />
+                                        <input type="text" value={currentRoute.timeOfRoute} giờ onChange={(e) => setcurrentRoute({ ...currentRoute, timeOfRoute: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label>Trạng thái:</label>
-                                        {/* <input type="text" value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentRoute.status} onChange={(e) => setcurrentRoute({ ...currentRoute, status: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
-                                            value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })}
+                                            value={currentRoute.status} onChange={(e) => setcurrentRoute({ ...currentRoute, status: e.target.value })}
                                         >
                                             {Object.keys(statusMap).map(key => (
                                                 <option key={key} value={key}>
@@ -323,7 +417,7 @@ const AdminRoute = () =>{
                                     </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
-                                        <button type="submit" className="save">Lưu</button>
+                                        <button type="submit" className="save" onClick={handleUpdateRoute}>Lưu</button>
                                     </div>
                                 </form>
                             </div>
@@ -334,12 +428,12 @@ const AdminRoute = () =>{
 
             {isAdd && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Sửa tuyến xe</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Sửa tuyến xe</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
                                         <label>Tên tuyến:</label>
@@ -347,7 +441,7 @@ const AdminRoute = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Điểm đi:</label>
-                                        {/* <input type="text" value={currentCity.diemdi} onChange={(e) => setCurrentCity({ ...currentCity, diemdi: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentRoute.diemdi} onChange={(e) => setcurrentRoute({ ...currentRoute, diemdi: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
                                             value={diemDi} onChange={handleDiemDiChange} 
@@ -363,7 +457,7 @@ const AdminRoute = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Điểm đến:</label>
-                                        {/* <input type="text" value={currentCity.diemden} onChange={(e) => setCurrentCity({ ...currentCity, diemden: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentRoute.diemden} onChange={(e) => setcurrentRoute({ ...currentRoute, diemden: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
                                             value={diemDen} onChange={handleDiemDenChange} 
@@ -386,7 +480,7 @@ const AdminRoute = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Trạng thái:</label>
-                                        {/* <input type="text" value={currentCity.status} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        {/* <input type="text" value={currentRoute.status} onChange={(e) => setcurrentRoute({ ...currentRoute, status: e.target.value })} /> */}
                                         <select 
                                             className="inputValue"
                                             value={status} onChange={handleStatusChange}

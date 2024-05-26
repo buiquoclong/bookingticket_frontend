@@ -9,7 +9,7 @@ import {Pagination, Breadcrumbs, Link} from '@mui/material';
 const AdminDriver = () =>{
     const [isEditing, setIsEditing] = useState(false);
     const [isAdd, setIsAdd] = useState(false);
-    const [currentCity, setCurrentCity] = useState();
+    const [currentDriver, setcurrentDriver] = useState();
     const [data, setData] = useState([]);
     const [records, setRecords] = useState([]);
     const [name, setName] = useState('');
@@ -42,7 +42,7 @@ const AdminDriver = () =>{
         },
         // ,
         // {
-        //     name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tài khoản</div>,
+        //     name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Trạng thái</div>,
         //     selector: row => row.status,
         //     width: '10rem',
         //     cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%',backgroundColor: statusColorMap[row.status] || 'transparent', padding:".3rem 0rem", borderRadius:"5px", fontWeight:"600", color:"" }}>{statusMap[row.status] || 'Unknown Status'}</div>
@@ -50,8 +50,8 @@ const AdminDriver = () =>{
         {
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}> Xóa </button>
+                    <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
+                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
                 </div>
             )
         }
@@ -90,7 +90,7 @@ const AdminDriver = () =>{
             setRecords(newData)
         }
         const handleEditClick = (kindVehicle) => {
-            setCurrentCity(kindVehicle);
+            setcurrentDriver(kindVehicle);
             setIsEditing(true);
         };
         const handleCreateClick = () => {
@@ -176,6 +176,94 @@ const AdminDriver = () =>{
                 }
             }
         };
+        const handleUpdateDriver = async (e) => {
+            e.preventDefault();
+            let missingInfo = [];
+            if (!currentDriver.name) {
+                missingInfo.push("Tên tài xế");
+            }
+            if (!currentDriver.email) {
+                missingInfo.push("Email");
+            } else if (emailErrorMessage) { // Kiểm tra nếu có errorMessage cho email
+                toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
+                return; // Dừng xử lý tiếp theo nếu có lỗi
+            }
+            if (!currentDriver.phone) {
+                missingInfo.push("Số điện thoại");
+            }
+            // if (currentDriver.status === null || currentDriver.status === undefined) {
+            //     missingInfo.push("Trạng thái");
+            // }
+            if (missingInfo.length > 0) {
+                const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+                toast.error(message);
+            } else {
+                try {
+                    const newDriverData = {
+                        name: currentDriver.name,
+                        email: currentDriver.email,
+                        phone: currentDriver.phone
+                        // ,
+                        // status: currentDriver.status
+                    };
+            
+                    const response = await fetch(`http://localhost:8081/api/driver/${currentDriver.id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(newDriverData)
+                    });
+            
+                    if (response.ok) {
+                        // Xử lý thành công
+                        console.log("Driver đã được cập nhật thành công!");
+                        toast.success("Driver đã được cập nhật thành công!");
+                        const updatedDriver = await response.json();
+                        const updatedDrivers = records.map(driver => {
+                            if (driver.id === updatedDriver.id) {
+                                return updatedDriver;
+                            }
+                            return driver;
+                        });
+                        setRecords(updatedDrivers);
+                        // Reset form hoặc làm gì đó khác
+                        setName('');
+                        setEmail('');
+                        setPhone('');
+                        setIsEditing(false);
+                        // window.location.reload();
+                    } else {
+                        console.error("Có lỗi xảy ra khi cập nhật driver!");
+                        toast.error("Có lỗi xảy ra khi cập nhật driver!");
+                    }
+                } catch (error) {
+                    console.error("Lỗi:", error);
+                    toast.error("Lỗi:", error);
+                }
+            }
+        };
+        const handleRemoveClick = async (driver) => {
+            const driverId = driver.id;
+            try {
+                const response = await fetch(`http://localhost:8081/api/driver/${driverId}`, {
+                method: "DELETE"
+            });
+                if (response.ok) {
+                    
+                    // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
+                    const updatedDriver = records.filter(record => record.id !== driverId);
+                    setRecords(updatedDriver);
+                    toast.success("Driver đã được xóa thành công!");
+                } else {
+                    console.error("Có lỗi xảy ra khi xóa Driver!");
+                    toast.error("Có lỗi xảy ra khi xóa Driver!");
+                }
+            } catch (error) {
+                console.error("Lỗi:", error);
+                toast.error("Lỗi:", error.message);
+            }
+        };
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
@@ -234,22 +322,22 @@ const AdminDriver = () =>{
                                 <form>
                                     <div className="infoCity">
                                         <label className="info">Tên:</label>
-                                        <input type="text" value={currentCity.name} onChange={(e) => setCurrentCity({ ...currentCity, name: e.target.value })} />
+                                        <input type="text" value={currentDriver.name} onChange={(e) => setcurrentDriver({ ...currentDriver, name: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Email:</label>
-                                        <input type="text" value={currentCity.email} onChange={(e) => setCurrentCity({ ...currentCity, email: e.target.value })} />
+                                        <input type="text" value={currentDriver.email} onChange={(e) => setcurrentDriver({ ...currentDriver, email: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label>Số điện thoại:</label>
-                                        <input type="text" value={currentCity.phone} onChange={(e) => setCurrentCity({ ...currentCity, phone: e.target.value })} />
+                                        <input type="text" value={currentDriver.phone} onChange={(e) => setcurrentDriver({ ...currentDriver, phone: e.target.value })} />
                                     </div>
                                     {/* <div className="infoCity">
                                         <label>Trạng thái:</label> */}
-                                        {/* <input type="text" className="inputValue" value={statusMap[currentCity.status] || 'Unknown Status'} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        {/* <input type="text" className="inputValue" value={statusMap[currentDriver.status] || 'Unknown Status'} onChange={(e) => setcurrentDriver({ ...currentDriver, status: e.target.value })} /> */}
                                         {/* <select 
-                                            value={currentCity.status}  className="inputValue"
-                                            onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })}
+                                            value={currentDriver.status}  className="inputValue"
+                                            onChange={(e) => setcurrentDriver({ ...currentDriver, status: e.target.value })}
                                         >
                                             {Object.keys(statusMap).map(key => (
                                                 <option key={key} value={key}>
@@ -260,7 +348,7 @@ const AdminDriver = () =>{
                                     {/* </div> */}
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
-                                        <button type="submit" className="save">Lưu</button>
+                                        <button type="submit" className="save" onClick={handleUpdateDriver}>Lưu</button>
                                     </div>
                                 </form>
                             </div>
@@ -292,7 +380,7 @@ const AdminDriver = () =>{
                                     </div>
                                     {/* <div className="infoCity">
                                         <label>Tài khoản:</label> */}
-                                        {/* <input type="text" className="inputValue" value={statusMap[currentCity.status] || 'Unknown Status'} onChange={(e) => setCurrentCity({ ...currentCity, status: e.target.value })} /> */}
+                                        {/* <input type="text" className="inputValue" value={statusMap[currentDriver.status] || 'Unknown Status'} onChange={(e) => setcurrentDriver({ ...currentDriver, status: e.target.value })} /> */}
                                         {/* <select 
                                             className="inputValue"
                                             value={status} onChange={handleStatusChange} 

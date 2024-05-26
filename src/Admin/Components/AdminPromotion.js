@@ -9,7 +9,7 @@ import {Pagination, Breadcrumbs, Link} from '@mui/material';
 const AdminPromotion = () =>{
     const [isEditing, setIsEditing] = useState(false);
     const [isAdd, setIsAdd] = useState(false);
-    const [currentCity, setCurrentCity] = useState();
+    const [currentPromotion, setcurrentPromotion] = useState();
     const [data, setData] = useState([]);
     const [records, setRecords] = useState([]);
     const [description, setDescription] = useState('');
@@ -18,6 +18,17 @@ const AdminPromotion = () =>{
     const [discount, setDiscount] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const formatDateTime = (dateString) => {
+        const date = new Date(dateString);
+    
+        const optionsDate = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        const optionsTime = { hour: '2-digit', minute: '2-digit' };
+    
+        const formattedDate = date.toLocaleDateString('vi-VN', optionsDate).replace(/\//g, '/');
+        const formattedTime = date.toLocaleTimeString('vi-VN', optionsTime).replace(/:/g, ':');
+    
+        return `${formattedTime} ${formattedDate}`;
+    };
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -37,12 +48,12 @@ const AdminPromotion = () =>{
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Ngày bắt đầu</div>,
             selector: row => row.startDay,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.startDay}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{formatDateTime(row.startDay)}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Ngày kết thúc</div>,
             selector: row => row.endDay,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.endDay}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{formatDateTime(row.endDay)}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Mức giảm giá</div>,
@@ -52,8 +63,8 @@ const AdminPromotion = () =>{
         {
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}> Xóa </button>
+                    <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
+                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
                 </div>
             )
         }
@@ -95,8 +106,8 @@ const AdminPromotion = () =>{
             })
             setRecords(newData)
         }
-        const handleEditClick = (kindVehicle) => {
-            setCurrentCity(kindVehicle);
+        const handleEditClick = (promo) => {
+            setcurrentPromotion(promo);
             setIsEditing(true);
         };
         const handleCreateClick = () => {
@@ -188,6 +199,97 @@ const AdminPromotion = () =>{
                 }
             }
         };
+        const handleUpdatePromotion = async (e) => {
+            e.preventDefault();
+            let missingInfo = [];
+            if (!currentPromotion.code) {
+                missingInfo.push("Mã giảm giá");
+            }
+            if (!currentPromotion.description) {
+                missingInfo.push("Mô tả");
+            }
+            if (!currentPromotion.startDay) {
+                missingInfo.push("Ngày bắt đầu");
+            }
+            if (!currentPromotion.endDay) {
+                missingInfo.push("Ngày kết thúc");
+            }
+            if (!currentPromotion.discount) {
+                missingInfo.push("Giảm giá");
+            }
+            if (missingInfo.length > 0) {
+                const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+                toast.error(message);
+            } else {
+                try {
+                    const newPromotionData = {
+                        code: currentPromotion.code,
+                        description: currentPromotion.description,
+                        startDay: currentPromotion.startDay,
+                        endDay: currentPromotion.endDay,
+                        discount: currentPromotion.discount,
+                    };
+                    console.log("newPromotionData", newPromotionData);
+        
+            
+                    const response = await fetch(`http://localhost:8081/api/promotion/${currentPromotion.id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(newPromotionData)
+                    });
+            
+                    if (response.ok) {
+                        // Xử lý thành công
+                        console.log("Mã giảm giá đã được cập nhật thành công!");
+                        toast.success("Mã giảm giá đã được cập nhật thành công!");
+                        const updatedPromo = await response.json();
+                        const updatedPromos = records.map(promo => {
+                            if (promo.id === updatedPromo.id) {
+                                return updatedPromo;
+                            }
+                            return promo;
+                        });
+                        setRecords(updatedPromos);
+                        // Reset form hoặc làm gì đó khác
+                        setDescription('');
+                        setStartDay('');
+                        setEndDay('');
+                        setDiscount('');
+                        setIsEditing(false);
+                        // window.location.reload();
+                    } else {
+                        console.error("Có lỗi xảy ra khi cập nhật mã!");
+                        toast.error("Có lỗi xảy ra khi cập nhật mã!");
+                    }
+                } catch (error) {
+                    console.error("Lỗi:", error);
+                    toast.error("Lỗi:", error);
+                }
+            }
+        };
+        const handleRemoveClick = async (promotion) => {
+            const promotionId = promotion.id;
+            try {
+                const response = await fetch(`http://localhost:8081/api/promotion/${promotionId}`, {
+                method: "DELETE"
+            });
+                if (response.ok) {
+                    
+                    // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
+                    const updatedPromo = records.filter(record => record.id !== promotionId);
+                    setRecords(updatedPromo);
+                    toast.success("Promotion đã được xóa thành công!");
+                } else {
+                    console.error("Có lỗi xảy ra khi xóa Promotion!");
+                    toast.error("Có lỗi xảy ra khi xóa Promotion!");
+                }
+            } catch (error) {
+                console.error("Lỗi:", error);
+                toast.error("Lỗi:", error.message);
+            }
+        };
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
@@ -237,32 +339,36 @@ const AdminPromotion = () =>{
             
             {isEditing && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Sửa Chi tiết vé</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Sửa Chi mã giảm giá</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
-                                        <label className="info">Mã vé:</label>
-                                        <input type="text" value={currentCity.mave} onChange={(e) => setCurrentCity({ ...currentCity, mave: e.target.value })} />
+                                        <label className="info">Mã giảm giá:</label>
+                                        <input type="text" value={currentPromotion.code} onChange={(e) => setcurrentPromotion({ ...currentPromotion, code: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
-                                        <label className="info">Mã hóa đơn:</label>
-                                        <input type="text" value={currentCity.mahoadon} onChange={(e) => setCurrentCity({ ...currentCity, mahoadon: e.target.value })} />
+                                        <label className="info">Mô tả:</label>
+                                        <input type="text" value={currentPromotion.description} onChange={(e) => setcurrentPromotion({ ...currentPromotion, description: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
-                                        <label>Số lượng vé:</label>
-                                        <input type="text" value={currentCity.numTicket} onChange={(e) => setCurrentCity({ ...currentCity, numTicket: e.target.value })} />
+                                        <label className="info">Ngày bắt đầu:</label>
+                                        <input className="inputValue" type="datetime-local" value={currentPromotion.startDay} onChange={(e) => setcurrentPromotion({ ...currentPromotion, startDay: e.target.value })} min={getCurrentDateTimeLocal()}/>
                                     </div>
                                     <div className="infoCity">
-                                        <label>Tổng tiền:</label>
-                                        <input type="text" value={currentCity.total} onChange={(e) => setCurrentCity({ ...currentCity, total: e.target.value })} />
+                                        <label>Ngày kết thúc:</label>
+                                        <input className="inputValue" type="datetime-local" value={currentPromotion.endDay} onChange={(e) => setcurrentPromotion({ ...currentPromotion, endDay: e.target.value })} min={startDay ? startDay : undefined}/>
+                                    </div>
+                                    <div className="infoCity">
+                                        <label>Mức giảm:</label>
+                                        <input className="inputValue" type="number" value={currentPromotion.discount} onChange={(e) => setcurrentPromotion({ ...currentPromotion, discount: e.target.value })} />
                                     </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
-                                        <button type="submit" className="save">Lưu</button>
+                                        <button type="submit" className="save" onClick={handleUpdatePromotion}>Lưu</button>
                                     </div>
                                 </form>
                             </div>
@@ -273,12 +379,12 @@ const AdminPromotion = () =>{
 
             {isAdd && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Sửa Chi tiết vé</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Thêm mã giảm giá</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
                                         <label className="info">Mô tả:</label>

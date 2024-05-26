@@ -40,7 +40,7 @@ const AdminCity = () =>{
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                     <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}> Xóa </button>
+                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
                 </div>
             )
         }
@@ -73,6 +73,27 @@ const AdminCity = () =>{
             setCurrentCity(city);
             setIsEditing(true);
         };
+        const handleRemoveClick = async (city) => {
+            const cityId = city.id;
+            try {
+                const response = await fetch(`http://localhost:8081/api/city/${cityId}`, {
+                method: "DELETE"
+            });
+                if (response.ok) {
+                    
+                    // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
+                    const updatedCities = records.filter(record => record.id !== cityId);
+                    setRecords(updatedCities);
+                    toast.success("Thành phố đã được xóa thành công!");
+                } else {
+                    console.error("Có lỗi xảy ra khi xóa thành phố!");
+                    toast.error("Có lỗi xảy ra khi xóa thành phố!");
+                }
+            } catch (error) {
+                console.error("Lỗi:", error);
+                toast.error("Lỗi:", error.message);
+            }
+        };
 
         const handleCreateClick = () => {
             setIsAdd(true)
@@ -90,29 +111,75 @@ const AdminCity = () =>{
                 console.log(imageUrl)
             }
         };
-        
-
-        const handleCreateCity = async () => {
+        const handCancel = () => {
+            setIsAdd(false);
+            setIsEditing(false);
+            setCityImage(null);
+        };
+        const handleUpdateCity = async (e) => {
+            e.preventDefault();
             try {
+                const formData = new FormData();
+                formData.append('city', new Blob([JSON.stringify({ name: currentCity.name })], { type: 'application/json' }));
+                if (cityImage) {
+                    const fileField = document.querySelector('input[type="file"]');
+                    formData.append('file', fileField.files[0]);
+                }
+        
+                const response = await fetch(`http://localhost:8081/api/city/${currentCity.id}`, {
+                    method: "PUT",
+                    body: formData
+                });
+        
+                if (response.ok) {
+                    // Xử lý thành công
+                    const updatedCity = await response.json();
+                    const updatedCities = records.map(city => {
+                        if (city.id === updatedCity.id) {
+                            return updatedCity;
+                        }
+                        return city;
+                    });
+                    setRecords(updatedCities);
+                    
+                    toast.success("Thành phố đã được cập nhật thành công!");
+                    // Reset form hoặc làm gì đó khác
+                    setCityName('');
+                    setCityImage(null);
+                    setIsEditing(false);
+                } else {
+                    console.error("Có lỗi xảy ra khi cập nhật thành phố!");
+                    toast.error("Có lỗi xảy ra khi cập nhật thành phố!");
+                }
+            } catch (error) {
+                console.error("Lỗi:", error);
+                toast.error("Lỗi:", error);
+            }
+        };
+
+        const handleCreateCity = async (e) => {
+            e.preventDefault();
+            try {
+                const formData = new FormData();
                 const newCityData = {
-                    name: cityName,
-                    imgUrl: cityImage, 
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
+                    name: cityName
                 };
+                formData.append('city', new Blob([JSON.stringify(newCityData)], { type: 'application/json' }));
+                if (cityImage) {
+                    const fileField = document.querySelector('input[type="file"]');
+                    formData.append('file', fileField.files[0]);
+                }
         
                 const response = await fetch("http://localhost:8081/api/city", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(newCityData)
+                    body: formData
                 });
         
                 if (response.ok) {
                     // Xử lý thành công
                     console.log("Thành phố đã được tạo thành công!");
                     const newCity = await response.json();
+                    newCity.imgUrl = `http://localhost:8081${newCity.imgUrl}`; // Update the URL to be absolute
                     setData(prevData => [...prevData, newCity]);
                     setRecords(prevRecords => [...prevRecords, newCity]);
                     
@@ -179,12 +246,12 @@ const AdminCity = () =>{
             
             {isEditing && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Sửa Thành Phố</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Sửa Thành Phố</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
                                         <label className="info">Tên Thành Phố:</label>
@@ -192,11 +259,19 @@ const AdminCity = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Hình Ảnh:</label>
-                                        <input type="text" value={currentCity.imgUrl} onChange={(e) => setCurrentCity({ ...currentCity, imgUrl: e.target.value })} />
+                                        <div style={{ width: "18rem" }}>
+                                            {cityImage && (
+                                                <img className="inputValue" src={cityImage} alt="City" style={{ width: "18rem", height: "140px" }} />
+                                            )}
+                                            {!cityImage && currentCity.imgUrl && (
+                                                <img className="inputValue" src={"http://localhost:8081/" + currentCity.imgUrl} alt="City" style={{ width: "18rem", height: "140px" }} />
+                                            )}
+                                            <input className="inputValue" type="file" accept="image/*" onChange={handleImageChange} />
+                                        </div>
                                     </div>
                                     <div className="listButton">
-                                        <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
-                                        <button type="submit" className="save">Lưu</button>
+                                        <button type="button"  onClick={handCancel} className="cancel">Hủy</button>
+                                        <button type="submit" className="save" onClick={handleUpdateCity}>Lưu</button>
                                     </div>
                                 </form>
                             </div>
@@ -207,12 +282,12 @@ const AdminCity = () =>{
 
             {isAdd && (
                             <div className="modal" id="deleteModal">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h2 class="modal-title">Thêm Thành Phố</h2>
+                                <div className="modal-dialog">
+                                    <div className="modal-content">
+                                        <div className="modal-header">
+                                            <h2 className="modal-title">Thêm Thành Phố</h2>
                                         </div>
-                                        <div class="modal-body">
+                                        <div className="modal-body">
                                             <form>
                                                 <div className="infoCity">
                                                     <label className="info">Tên Thành Phố:</label>
@@ -221,11 +296,15 @@ const AdminCity = () =>{
                                                 <div className="infoCity">
                                                     <label>Hình Ảnh:</label>
                                                     {/* <input type="text" value={cityImage} onChange={(e) => setCityImage(e.target.value)} /> */}
-                                                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                                                    <img src={cityImage} alt="City" style={{width:"360px", height:"140px"}}/>
+                                                    <div style={{width:"18rem"}}>
+                                                        {cityImage &&(
+                                                            <img className="inputValue" src={cityImage} alt="City" style={{width:"18rem", height:"140px"}}/>
+                                                        )}
+                                                        <input className="inputValue" type="file" accept="image/*" onChange={handleImageChange} />
+                                                    </div>
                                                 </div>
                                                 <div className="listButton">
-                                                    <button type="button" onClick={() => setIsAdd(false)} className="cancel">Hủy</button>
+                                                    <button type="button" onClick={handCancel} className="cancel">Hủy</button>
                                                     <button className="save" onClick={handleCreateCity}>Tạo</button>
                                                 </div>
                                             </form>

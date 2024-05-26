@@ -2,11 +2,14 @@ import React, {useState, useEffect} from "react";
 import DataTable from 'react-data-table-component'
 // import "../AdminReview/AdminReview.scss"
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
+import StarRatings from 'react-star-ratings';
+import { toast, ToastContainer, Zoom } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const AdminReview = () =>{
     const [isEditing, setIsEditing] = useState(false);
-    const [currentCity, setCurrentCity] = useState();
+    const [currentReview, setcurrentReview] = useState();
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
@@ -67,7 +70,18 @@ const AdminReview = () =>{
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Đánh giá</div>,
             selector: row => row.rating,
             width: '7rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.rating}</div>
+            cell: row => (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                    {[...Array(5)].map((_, index) => (
+                        <span 
+                            key={index} 
+                            style={{ color: index < row.rating ? 'gold' : 'grey', fontSize:"20px" }}
+                        >
+                            ★
+                        </span>
+                    ))}
+                </div>
+            )
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Nội dung</div>,
@@ -84,12 +98,19 @@ const AdminReview = () =>{
         {
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                <button style={{background:"#3b82f6",paddingInline:".5rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                <button style={{background:"#ef4444",paddingInline:".5rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}> Xóa </button>
+                    <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
+                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
                 </div>
             )
         }
     ]
+    const ratingsDescription = [
+        'Tệ',
+        'Trung bình',
+        'Tốt',
+        'Rất tốt',
+        'Xuất sắc'
+    ];
     useEffect(() => {
         // Call the API to fetch cities
         fetchReviews();
@@ -113,12 +134,81 @@ const AdminReview = () =>{
             setRecords(newData)
         }
         const handleEditClick = (kindVehicle) => {
-            setCurrentCity(kindVehicle);
+            setcurrentReview(kindVehicle);
             setIsEditing(true);
         };
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
+        const handleUpdateRating = async (e) => {
+            e.preventDefault();
+            let missingInfo = [];
+            if (!currentReview.rating) {
+                missingInfo.push("Đánh giá");
+            }
+            if (missingInfo.length > 0) {
+                const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+                toast.error(message);
+            } else {
+                try {
+                    const newRating = {
+                        rating: currentReview.rating,
+                        content: currentReview.content
+                    };
+            
+                    const response = await fetch(`http://localhost:8081/api/review/${currentReview.id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(newRating)
+                    });
+            
+                    if (response.ok) {
+                        // Xử lý thành công
+                        toast.success("Bạn đã cập nhật đánh giá thành công");
+                       // Cập nhật danh sách đánh giá sau khi cập nhật thành công
+                        const updatedReview = await response.json();
+                        const updatedReviews = records.map(review => {
+                            if (review.id === updatedReview.id) {
+                                return updatedReview;
+                            }
+                            return review;
+                        });
+                        setRecords(updatedReviews);
+                        setIsEditing(false);
+                        // window.location.reload();
+                    } else {
+                        toast.error("Có lỗi xảy ra khi tạo đánh giá!");
+                    }
+                } catch (error) {
+                    console.error("Lỗi:", error);
+                    toast.error("Lỗi:", error);
+                }
+            }
+        };
+        const handleRemoveClick = async (review) => {
+            const reviewId = review.id;
+            try {
+                const response = await fetch(`http://localhost:8081/api/review/${reviewId}`, {
+                method: "DELETE"
+            });
+                if (response.ok) {
+                    
+                    // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
+                    const updatedReview = records.filter(record => record.id !== reviewId);
+                    setRecords(updatedReview);
+                    toast.success("Review đã được xóa thành công!");
+                } else {
+                    console.error("Có lỗi xảy ra khi xóa Review!");
+                    toast.error("Có lỗi xảy ra khi xóa Review!");
+                }
+            } catch (error) {
+                console.error("Lỗi:", error);
+                toast.error("Lỗi:", error.message);
+            }
+        };
+        
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -165,32 +255,67 @@ const AdminReview = () =>{
             
             {isEditing && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Sửa Chi tiết vé</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Sửa Chi tiết vé</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
+                                <div className="tripLabel">
+                                    <div className="tripInfo">
+                                        <span>Tuyến đi:</span>
+                                        <div className="rightInfo">
+                                            <span>{currentReview.trip.route.name}</span>
+                                        </div>
+                                    </div>
+                                    <div className="tripInfo">
+                                        <span>Ngày đi:</span>
+                                        <div className="rightInfo">
+                                            <span>{formatDate(currentReview.trip.dayStart)}</span>
+                                        </div>
+                                    </div>
+                                    <div className="tripInfo">
+                                        <span>Giờ khởi hành:</span>
+                                        <div className="rightInfo">
+                                            <span>{currentReview.trip.timeStart.slice(0, 5)}</span>
+                                        </div>
+                                    </div>
+                                    <div className="tripInfo">
+                                        <span>Loại xe/ Biến số:</span>
+                                        <div className="rightInfo">
+                                            <span>{currentReview.trip.vehicle.kindVehicle.name}/ {currentReview.trip.vehicle.vehicleNumber}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="devide"></div>
+                                <h3 className="modal-title">Chi tiết Đánh giá</h3>
                                 <form>
-                                    <div className="infoCity">
-                                        <label className="info">Mã vé:</label>
-                                        <input type="text" value={currentCity.mave} onChange={(e) => setCurrentCity({ ...currentCity, mave: e.target.value })} />
+                                    <div className="ratingStars">
+                                        <StarRatings
+                                        rating={currentReview.rating}
+                                        starRatedColor="#ffe600"
+                                        changeRating={(newRating) => setcurrentReview({ ...currentReview, rating: newRating })}
+                                        numberOfStars={5}
+                                        name='rating'
+                                        starHoverColor="#ffe600"
+                                        starDimension="35px"
+                                        />
+                                        <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                                            <p style={{ color: currentReview.rating >= 4 ? '#ffe600' : 'inherit' }}>
+                                                {currentReview.rating > 0 ? ratingsDescription[currentReview.rating - 1] : ''}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="infoCity">
-                                        <label className="info">Mã hóa đơn:</label>
-                                        <input type="text" value={currentCity.mahoadon} onChange={(e) => setCurrentCity({ ...currentCity, mahoadon: e.target.value })} />
-                                    </div>
-                                    <div className="infoCity">
-                                        <label>Số lượng vé:</label>
-                                        <input type="text" value={currentCity.numTicket} onChange={(e) => setCurrentCity({ ...currentCity, numTicket: e.target.value })} />
-                                    </div>
-                                    <div className="infoCity">
-                                        <label>Tổng tiền:</label>
-                                        <input type="text" value={currentCity.total} onChange={(e) => setCurrentCity({ ...currentCity, total: e.target.value })} />
-                                    </div>
+                                    <textarea
+                                        className="contentTextarea"
+                                        style={{ width: '100%', height: '150px' }}
+                                        placeholder="Nhập nội dung đánh giá"
+                                        value={currentReview.content}
+                                        onChange={(e) => setcurrentReview({ ...currentReview, content: e.target.value })}
+                                    />
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
-                                        <button type="submit" className="save">Lưu</button>
+                                        <button type="submit" className="save" onClick={handleUpdateRating}>Sửa đánh giá</button>
                                     </div>
                                 </form>
                             </div>
@@ -199,6 +324,18 @@ const AdminReview = () =>{
                 </div>
         )}
             {/* </section> */}
+            <ToastContainer
+                        className="toast-container"
+                        toastClassName="toast"
+                        bodyClassName="toast-body"
+                        progressClassName="toast-progress"
+                        theme='colored'
+                        transition={Zoom}
+                        autoClose={500}
+                        hideProgressBar={true}
+                        pauseOnHover
+                    ></ToastContainer>
+            
         </div>
 
         

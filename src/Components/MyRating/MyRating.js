@@ -183,8 +183,6 @@ const MyRating = () =>{
             } else {
                 try {
                     const newRating = {
-                        tripId: reviewId,
-                        userId: userId, 
                         rating: rating,
                         content: content
                     };
