@@ -28,7 +28,7 @@ const AdminPay = () =>{
     const [phoneErrorMessage, setPhoneErrorMessage] = useState('');
 
     const navigate = useNavigate();
-    const userId = sessionStorage.getItem("userId");
+    const userId = localStorage.getItem("userId");
 
     // Xử lý chọn nhập nơi đón
     const handleSelectChange = (event) => {
@@ -124,7 +124,7 @@ const AdminPay = () =>{
         
     };
 
-    console.log("ui:  ",sessionStorage.getItem("userId"))
+    console.log("ui:  ",localStorage.getItem("userId"))
 
     useEffect(() => {
         // Call the API to fetch cities
@@ -134,7 +134,7 @@ const AdminPay = () =>{
             fetchTripInfo();
             fetchTripReturnInfo();
         }
-        // const userId = sessionStorage.getItem("userId");
+        // const userId = localStorage.getItem("userId");
         if (userId) {
         // Nếu có userId, thực hiện gọi API để lấy thông tin người dùng
         fetch(`http://localhost:8081/api/user/${userId}`)

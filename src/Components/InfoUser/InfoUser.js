@@ -15,7 +15,7 @@ const InfoUser  = () => {
     const [phone, setPhone] = useState("");
     const [phoneErrorMessage, setPhoneErrorMessage] = useState('');
     const navigate = useNavigate();
-    const userId = sessionStorage.getItem("userId");
+    const userId = localStorage.getItem("userId");
         useEffect(() => {
             if (userId) {
             fetchUserInfo();

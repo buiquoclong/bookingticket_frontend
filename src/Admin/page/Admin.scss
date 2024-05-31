@@ -102,7 +102,8 @@ body {
   }
   
   .sidebar-list-item {
-    padding: 20px 20px 20px 20px;
+    // padding: 20px 20px 20px 20px;
+    padding: 16px;
     font-size: 18px;
   }
   
@@ -438,6 +439,38 @@ body {
       display: inline;
     }
   }
+  .not-found-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    p{
+      padding-top: 2rem;
+      font-size: 1.5rem;
+    }
+    .back{
+      margin-top: 1rem;
+      .backbtn{
+          padding: .7rem 1.5rem;
+          border-radius: .5rem;
+          // background: #75caf1;
+          font-weight: bold;
+          color: var(--whiteColor);
+      }
+  }
+}
+
+.not-found-image {
+    width: 600px; /* Kích thước ảnh cố định */
+    height: auto;
+}
+
+.not-found-link {
+    margin-top: 20px;
+    text-decoration: none;
+    color: #007bff; /* Màu liên kết */
+}
   /* Small <= 768px */
     
   @media screen and (max-width: 768px) {

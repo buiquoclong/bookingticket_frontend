@@ -4,11 +4,13 @@ import { MdTravelExplore } from "react-icons/md";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { TbGridDots } from "react-icons/tb";
 import { Link, useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 const Navbar = () =>{
   const [active, setActive] = useState('navBar');
   const [data, setData] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
 
   const navigate = useNavigate();
     const toggleDropdown = () => {
@@ -17,13 +19,20 @@ const Navbar = () =>{
   const showNav = ()=>{
     setActive('navBar activeNavbar')
   }
-  const userId = sessionStorage.getItem("userId");
+  // const userId = localStorage.getItem("userId");
 
   // Function to remove navbar
   const removeNavbar = ()=>{
     setActive('navBar')
   }
-  
+
+  useEffect(() => {
+    // Chỉ thực hiện fetchToken nếu googleLogin là true
+    const googleLogin = localStorage.getItem("googleLogin") === "true";
+    if (googleLogin && !userId) {
+      fetchToken();
+    }
+  }, [userId, navigate]);
   useEffect(() => {
     // Call the API to fetch cities
     if (userId) {
@@ -40,6 +49,25 @@ const fetchUserInfo = async () => {
         console.error("Error fetching cities:", error);
     }
 };
+const fetchToken = async () => {
+  try {
+    const response = await fetch("http://localhost:8081/api/user/token", {
+      method: "GET",
+      credentials: "include",
+    });
+    if (response.ok) {
+      const token = await response.text();
+      localStorage.setItem("token", token);
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.userId;
+      localStorage.setItem("userId", userId);
+      setUserId(userId);
+    }
+  } catch (error) {
+    console.error("Error fetching token:", error);
+    navigate("/login");
+  }
+};
 
 const handleUserInfoClick = () => {
   navigate('/info-user');
@@ -49,9 +77,14 @@ const handleAdminClick = () => {
 }
 
 const handleLogoutClick = () => {
-  sessionStorage.removeItem("userId");
-  console.log('đã xóa user id')
-  navigate('/');
+  localStorage.removeItem("token");
+  localStorage.removeItem("userId"); 
+  localStorage.removeItem("googleLogin");
+  if (window.location.pathname === '/') {
+    window.location.reload();
+} else {
+    navigate('/');
+}
 }
 const handleMyRatingClick = () => {
   navigate('/my-rating');
@@ -100,8 +133,8 @@ const handleMyBookingClick = () => {
                         {showDropdown && (
                           <div className="flex flex-col dropdown">
                               <ul className="flex flex-col gap-4">
-                                {data && (
-                                    <li onClick={handleAdminClick}>Admin</li>
+                                {data && (data.role === 2 || data.role === 3) && (
+                                  <li onClick={handleAdminClick}>Admin</li>
                                 )}
                                   <li onClick={handleUserInfoClick}>Thông tin người dùng</li>
                                   <li onClick={handleMyRatingClick}>Đánh giá của tôi</li>

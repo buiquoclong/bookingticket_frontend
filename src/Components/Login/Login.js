@@ -5,6 +5,7 @@ import { FaEye, FaEyeSlash  } from "react-icons/fa";
 import { Link, useNavigate   } from 'react-router-dom';
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { jwtDecode } from 'jwt-decode';
 
 
 const Login  = () => {
@@ -39,6 +40,28 @@ const Login  = () => {
     const validatePassword = (password) => {
         return password.length >= 8 && password.length <= 32 && /[a-zA-Z]/.test(password) && /[0-9]/.test(password);
     };
+    const handleError = (token) => {
+        if (token.includes(",")) {
+            const [userId, status] = token.split(",");
+            if (status === "VERIFY") {
+                navigate("/confirm-account", { state: { userId } });
+                return;
+            }
+        }
+        switch (token) {
+            case "NULL":
+                toast.error("Không tìm thấy người dùng");
+                break;
+            case "LOCK":
+                toast.error("Người dùng đã bị khóa");
+                break;
+            case "PASSWORD":
+                toast.error("Sai mật khẩu");
+                break;
+            default:
+                toast.error("Lỗi không xác định");
+        }
+    };
     const canLogin = email && pass;
     const ProceedLogin = async (e) => {
         e.preventDefault();
@@ -54,7 +77,7 @@ const Login  = () => {
                 setPassErrorMessage('');
                 const loginDTO = {
                     email: email,
-                    password: pass // Thay đổi pass thành password
+                    pass: pass // Thay đổi pass thành password
                 };
             
                 try {
@@ -65,22 +88,22 @@ const Login  = () => {
                     });
             
                     if (response.ok) {
-                        const data = await response.text();
-                        if (isNaN(parseInt(data))) {
-                            // Nếu dữ liệu trả về không phải là một số, nó là một thông báo lỗi
-                            toast.error(data);
-                        }else {
-                            const userId = parseInt(data);
-                            sessionStorage.setItem('userId', userId);
-                            if (!isNaN(userId)) {
-                                sessionStorage.setItem('userId', userId);
-                                const userInfoResponse = await fetch(`http://localhost:8081/api/user/${userId}`, {
+                        const token = await response.text();
+                        console.log("token", token);
+                        if (token === "NULL" || token === "LOCK" || token === "PASSWORD" || token.includes(",")) {
+                            handleError(token); // Hiển thị thông báo lỗi tùy theo mã lỗi
+                        } else{
+                            localStorage.setItem('token', token);
+                            // Giải mã token để lấy userId
+                            const decodedToken = jwtDecode(token);
+                            const userId = decodedToken.userId;
+
+                            localStorage.setItem('userId', userId);
+                            const userInfoResponse = await fetch(`http://localhost:8081/api/user/${userId}`, {
                                     method: "GET",
                                     headers: {'content-type': 'application/json'}
                                 });
                                 const userInfo = await userInfoResponse.json();
-                                // console.log(userInfo.role.id);
-                                // navigate('/admin');
                                 const redirectPath = sessionStorage.getItem('redirectPath');
                                 if (redirectPath) {
                                 navigate(redirectPath);
@@ -91,8 +114,6 @@ const Login  = () => {
                                         navigate('/admin');
                                     }
                                 }
-                            }
-                            
                         }
                     } else {
                         toast.error('Failed: ' + response.status);
@@ -103,6 +124,10 @@ const Login  = () => {
                 }
             }
         }
+    };
+    const googleLogin = () => {
+        localStorage.setItem("googleLogin", "true"); 
+        window.location.href = 'http://localhost:8081/oauth2/authorization/google';
     };
     
     
@@ -142,7 +167,7 @@ const Login  = () => {
                             </div>
                     </form>
 
-                    <button className="btn" >Tiếp tục với Google</button>
+                    <button className="btn"onClick={googleLogin} >Tiếp tục với Google</button>
                                     
                     <div className="register-link">
                         <p>Bạn chưa có tài khoản

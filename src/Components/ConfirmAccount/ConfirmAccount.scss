@@ -87,21 +87,26 @@ body {
                 }
             }
             }
-            
-            .search{
-                font-weight: 600;
-                color: var(--whiteColor);
-            }
-            button{
-                display: block;
-                margin-top: 1rem;
-                margin-inline: auto;
-                padding-inline: 4rem;
-
-                &:hover{
+            .button-group{
+                display: flex;
+                justify-content: center; 
+                
+                .search{
+                    font-weight: 600;
                     color: var(--whiteColor);
                 }
+                button{
+                    display: block;
+                    margin-top: 1rem;
+                    margin-inline: 2rem;
+                    padding-inline: 4rem;
+
+                    &:hover{
+                        color: var(--whiteColor);
+                    }
+                }
             }
+            
         }
     }
     .modal1 {

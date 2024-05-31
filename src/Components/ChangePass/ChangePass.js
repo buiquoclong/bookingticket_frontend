@@ -34,7 +34,7 @@ const ChangePass  = () => {
     const toggleReNewPasswordVisibility = () => {
         setShowReNewPassword(!showReNewPassword);
     };
-    const userId = sessionStorage.getItem("userId");
+    const userId = localStorage.getItem("userId");
         useEffect(() => {
             if (userId) {
             fetchUserInfo();
@@ -103,7 +103,7 @@ const ChangePass  = () => {
                                 return;
                             }
                             toast.success("Bạn đã đổi mật khẩu thành công");
-                            sessionStorage.removeItem("userId");
+                            localStorage.removeItem("userId");
                             setTimeout(() => {
                                 navigate("/login");
                             }, 2000);

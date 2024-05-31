@@ -108,6 +108,42 @@ const fetchUserInfo = async () => {
         }
         setConfirmCode(confirmCode);
     };
+    const changeConfirm = async (event) => {
+        event.preventDefault();
+        
+                try {
+                    // Sau khi cập nhật thành công, cập nhật lại booking
+                    const changeData = {
+                        userId: userId
+                    };
+                    const changeConfirmResponse = await fetch(`http://localhost:8081/api/user/change-confirm`, {
+                        method: 'POST', // hoặc 'PATCH' tùy vào API của bạn
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(changeData), // Cập nhật trạng thái của booking thành 'cancelled'
+                    });
+    
+                    if (changeConfirmResponse.ok) {
+                        const data = await changeConfirmResponse.text();
+                        if(data === "FAIL"){
+                            toast.error("Lỗi không thể gửi mã xác thực");
+                            return;
+                        }
+                        toast.success("Mã xác thực mới đã được gửi đến email của bạn");
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        // Xử lý lỗi nếu có
+                        console.error('Failed to update pass:', changeConfirmResponse.statusText);
+                    }
+                } catch (error) {
+                    console.error("Error update:", error);
+                }
+            
+        
+    };
 
     return (
             <section className="main container section">
@@ -116,19 +152,24 @@ const fetchUserInfo = async () => {
                         <h3 data-aos="fade-right" className="title">
                             XÁC THỰC TÀI KHOẢN
                         </h3>
-                        <p>Chúng tôi đã gửi mã xác nhận và email mà bạn đã đăng ký. Vui lòng nhập mã xác nhận để xác thực tài khoản</p>
+                        {data &&(
+                            <p>Chúng tôi đã gửi mã xác nhận vào email: <strong>{data.email}</strong> mà bạn đã đăng ký. Vui lòng nhập mã xác nhận để xác thực tài khoản</p>
+                        )}
+                        
                     </div>
 
                     <form className="infoTicket">
                         <div className="infoT">
                             <div className="form-feild">
                                 <input type="text" className="input" placeholder=" " value={confirmCode} onChange={handleconfirmCodeChange}/>
-                                <label for="name" className="label"> Nhập mã xác nhận</label>
+                                <label htmlFor="name" className="label"> Nhập mã xác nhận</label>
                             </div>
                             {confirmCodeErrorMessage && <p style={{ color: "red", lineHeight:"2", paddingLeft:"1rem", fontSize:"12px" }}>{confirmCodeErrorMessage}</p>}
                         </div>
-                        
-                        <button className="btn search" onClick={handleSearch}>Xác nhận</button>
+                        <div className="button-group">
+                            <button className="btn search" onClick={changeConfirm}>Gửi lại mã xác nhận</button>
+                            <button className="btn search" onClick={handleSearch}>Xác nhận</button>
+                        </div>
                     </form>
                 </div>
                 <ToastContainer

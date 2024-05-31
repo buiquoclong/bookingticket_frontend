@@ -34,7 +34,7 @@ const MyRating = () =>{
     }
     const [data, setData] = useState([]);
     const [records, setRecords] = useState([]);
-    const userId = sessionStorage.getItem("userId");
+    const userId = localStorage.getItem("userId");
     const [selectedReview, setSelectedReview] = useState(null);
     const [rating, setRating] = useState(0);
     const [content, setContent] = useState('');
@@ -142,7 +142,7 @@ const MyRating = () =>{
         if (userId) {
             fetchReviews();
         }else{
-            sessionStorage.setItem('redirectPath', window.location.pathname);
+            localStorage.setItem('redirectPath', window.location.pathname);
             navigate('/login');
         }
     }, [userId]);

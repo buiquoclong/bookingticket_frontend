@@ -1,16 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./app.css";
-import { BrowserRouter,Routes, Route } from 'react-router-dom';
+import { BrowserRouter,Routes, Route} from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 import Homepage from "./page/Homepage";
-
-
-
-
-
-
-
-
-
 
 import AdminHomePage from "./Admin/page/AdminHomePage";
 // import AdminBookingDetailPage from "./Admin/page/AdminBookingDetailPage";
@@ -49,14 +41,57 @@ import ConfirmAccountPage from "./page/ConfirmAccountPage";
 import ForgetPassPage from "./page/ForgetPassPage";
 import ResponseSuccessPage from "./page/ResponseSuccessPage";
 import ResponseFailedPage from "./page/ResponseFailedPage";
+import NotFoundPage from "./Admin/page/NotFoundPage";
 
 
 
 
 const App = () => {
-
+    const [userRole, setUserRole] = useState(null);
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+                if (token) {
+                    const decodedToken = jwtDecode(token);
+                    setUserRole(decodedToken.role);
+                    
+                console.log("Set UserRole:", decodedToken.role);
+                } else {
+                    setUserRole(null);
+                }
+    }, []);
     const renderRoutes = () => {
-        return (
+        if (userRole === 2 || userRole === 3) {
+            return (
+                <>
+                    <Route path="/admin" element={<AdminHomePage />} />
+                    <Route path="/admin/bookings" element={<AdminBookingPage />} />
+                    <Route path="/admin/find-trips" element={<AdminBookTicketPage />} />
+                    <Route path="/admin/find-trips-return" element={<AdminBookTicketReturnPage />} />
+                    <Route path="/admin/book-cash-payment" element={<AdminPaySuccessPage />} />
+                    <Route path="/admin/cities" element={<AdminCityPage />} />
+                    <Route path="/admin/booking-trip" element={<AdminPayPage />} />
+                    <Route path="/admin/routes" element={<AdminRoutePage />} />
+                    <Route path="/admin/vehicles" element={<AdminVehiclePage />} />
+                    <Route path="/admin/seats" element={<AdminSeatPage />} />
+                    <Route path="/admin/trips" element={<AdminTripPage />} />
+                    <Route path="/admin/seat-reservation" element={<AdminSeatReservationPage />} />
+                    <Route path="/admin/users" element={userRole === 3 ? <AdminUserPage /> : <NotFoundPage />} />
+                    <Route path="/admin/drivers" element={<AdminDriverPage />} />
+                    <Route path="/admin/contacts" element={<AdminContactPage />} />
+                    <Route path="/admin/logs" element={<AdminLogPage />} />
+                    <Route path="/admin/promotions" element={<AdminPromotionPage />} />
+                    <Route path="/admin/reviews" element={<AdminReviewPage />} />
+                </>
+            );
+        } else {
+            return (
+                <Route path="*" element={<NotFoundPage />} />
+            );
+        }
+    };
+
+    return (
+        <BrowserRouter>
             <Routes>
                 <Route path="/" element={<Homepage />} />
                 <Route path="/route" element={<RoutePage />} />
@@ -77,8 +112,8 @@ const App = () => {
                 <Route path="/forget-pass" element={<ForgetPassPage />} />
                 <Route path="/payment-success" element={<ResponseSuccessPage />} />
                 <Route path="/payment-failed" element={<ResponseFailedPage />} />
-                <Route path="/admin" element={<AdminHomePage />} />
-                {/* <Route path="/admin/booking-details" element={<AdminBookingDetailPage />} /> */}
+                {renderRoutes()}
+                {/* <Route path="/admin" element={<AdminHomePage />} />
                 <Route path="/admin/bookings" element={<AdminBookingPage />} />
                 <Route path="/admin/find-trips" element={<AdminBookTicketPage />} />
                 <Route path="/admin/find-trips-return" element={<AdminBookTicketReturnPage />} />
@@ -90,19 +125,14 @@ const App = () => {
                 <Route path="/admin/seats" element={<AdminSeatPage />} />
                 <Route path="/admin/trips" element={<AdminTripPage />} />
                 <Route path="/admin/seat-reservation" element={<AdminSeatReservationPage />} />
-                <Route path="/admin/users" element={<AdminUserPage />} />
+                <Route path="/admin/users" element={userRole === 3 ? <AdminUserPage /> : <NotFoundPage />} />
                 <Route path="/admin/drivers" element={<AdminDriverPage />} />
                 <Route path="/admin/contacts" element={<AdminContactPage />} />
                 <Route path="/admin/logs" element={<AdminLogPage />} />
                 <Route path="/admin/promotions" element={<AdminPromotionPage />} />
-                <Route path="/admin/reviews" element={<AdminReviewPage />} />
+                <Route path="/admin/reviews" element={<AdminReviewPage />} /> */}
+                <Route path="*" element={<NotFoundPage />} />
             </Routes>
-        );
-    };
-
-    return (
-        <BrowserRouter>
-            {renderRoutes()}
         </BrowserRouter>
     );
 };

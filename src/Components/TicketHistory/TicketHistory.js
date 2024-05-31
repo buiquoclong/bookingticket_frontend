@@ -25,7 +25,7 @@ const TicketHistory = () =>{
     };
     
     const navigate = useNavigate();
-    const userId = sessionStorage.getItem("userId");
+    const userId = localStorage.getItem("userId");
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Mã vé</div>,

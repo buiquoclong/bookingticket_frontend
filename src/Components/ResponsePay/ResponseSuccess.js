@@ -11,7 +11,7 @@ const ResponseSuccess  = () => {
     const [data, setData] = useState(null);
     const [dataReturn, setDataReturn] = useState(null);
     const navigate = useNavigate();
-    const userId = sessionStorage.getItem("userId");
+    const userId = localStorage.getItem("userId");
     
     const bookingDetails = JSON.parse(localStorage.getItem('bookingDetails'));
     const totalAmount = bookingDetails.totalPrice + bookingDetails.totalPriceReturn;

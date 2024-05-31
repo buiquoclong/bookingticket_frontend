@@ -26,7 +26,7 @@ const MyBooking = () =>{
     }
     const [data, setData] = useState([]);
     const [records, setRecords] = useState([]);
-    const userId = sessionStorage.getItem("userId");
+    const userId = localStorage.getItem("userId");
     const navigate = useNavigate();
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);

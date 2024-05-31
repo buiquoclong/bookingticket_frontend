@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 // import { SpaceDashboardIcon } from '@mui/icons-material';
 import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
@@ -16,9 +16,27 @@ import { Link } from 'react-router-dom';
 
 function AdminSidebar({openSidebarToggle, OpenSidebar}) {
     const [activeTab, setActiveTab] = useState(null);
+    const [data, setData] = useState(null);
+    const userId = localStorage.getItem("userId");
 
     const handleTabClick = (tabName) => {
         setActiveTab((prevTab) => (prevTab === tabName ? null : tabName));
+    };
+    useEffect(() => {
+        // Call the API to fetch cities
+        if (userId) {
+            fetchUserInfo();
+        }
+    }, [userId]);
+    
+    const fetchUserInfo = async () => {
+        try {
+            const response = await fetch(`http://localhost:8081/api/user/${userId}`);
+            const data = await response.json();
+            setData(data);
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+        }
     };
     return (
     <aside id="sidebar" className={openSidebarToggle ? "sidebar-responsive": ""}>
@@ -35,11 +53,14 @@ function AdminSidebar({openSidebarToggle, OpenSidebar}) {
                     <SpaceDashboardIcon  className='icon'/> Dashboard
                 </li>
             </Link>
-            <Link to="/admin/users" style={{color:"#9e9ea4"}}>
-            <li className={`sidebar-list-item ${activeTab === "users" ? "active" : ""}`} onClick={() => handleTabClick("users")}>
-                <ManageAccountsIcon  className='icon'/> Người dùng
-                </li>
-            </Link>
+            {data && (data.role === 3) && (
+                <Link to="/admin/users" style={{color:"#9e9ea4"}}>
+                <li className={`sidebar-list-item ${activeTab === "users" ? "active" : ""}`} onClick={() => handleTabClick("users")}>
+                    <ManageAccountsIcon  className='icon'/> Người dùng
+                    </li>
+                </Link>
+            )}
+            
             <Link to="/admin/cities" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "cities" ? "active" : ""}`} onClick={() => handleTabClick("cities")}>
                 <LocationCityIcon  className='icon'/> Thành phố

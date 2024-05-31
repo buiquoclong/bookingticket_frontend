@@ -46,7 +46,7 @@ function AdminHeader({OpenSidebar}) {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const userId = sessionStorage.getItem("userId");
+    const userId = localStorage.getItem("userId");
     useEffect(() => {
         // Call the API to fetch cities
         if (userId) {
@@ -63,9 +63,9 @@ function AdminHeader({OpenSidebar}) {
         }
     };
     const handleLogoutClick = () => {
-        sessionStorage.removeItem("userId");
-        console.log('đã xóa user id')
-        navigate('/');
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId"); 
+        navigate('/login');
     }
 
     return (
@@ -82,7 +82,11 @@ function AdminHeader({OpenSidebar}) {
                 <Hidden xsDown>
                     <span>
                             {data && (
-                                <strong>Xin chào {data.name}</strong>
+                                <strong>
+                                    Xin chào {data.name}
+                                    {data.role === 2 && ' (Employee)'}
+                                    {data.role === 3 && ' (Admin)'}
+                                </strong>
                             )}
                     </span>
                 </Hidden>
