@@ -180,299 +180,371 @@ const BookingTicket = () =>{
 
         const handleChooseVNPAYPayment = async () => {
             try {
-                // Gửi yêu cầu để lấy danh sách các ghế đã đặt cho chuyến đi
-                const responseTrip = await fetch(`http://localhost:8081/api/seat_reservation/trip/${tripId}`);
-                const reservedSeatsTrip = await responseTrip.json();
+                // Gửi yêu cầu để lấy danh sách các ghế đang chờ cho chuyến đi
+                const responseWaitingTrip = await fetch(`http://localhost:8081/api/waiting_seat/trip/${tripId}`);
+                const reservedSeatsWaitingTrip = await responseWaitingTrip.json();
     
                 // Kiểm tra từng seatId trong selectedSeatIds
-                const isAnySeatBookedTrip = selectedSeatIds.some(seatId => {
-                    // Kiểm tra xem seatId có trong danh sách ghế đã đặt cho chuyến đi không
-                    return reservedSeatsTrip.some(reservedSeat => reservedSeat.seat.id === seatId);
+                const isAnySeatWaitingBookedTrip = selectedSeatIds.some(seatId => {
+                    // Kiểm tra xem seatId có trong danh sách ghế đang chờ đặt cho chuyến đi không
+                    return reservedSeatsWaitingTrip.some(reservedSeat => reservedSeat.seat.id === seatId);
                 });
     
-                // Nếu là chuyến đi đầu tiên (một chiều) và bất kỳ ghế nào đã được đặt
-                if (kind === "Một chiều" && isAnySeatBookedTrip) {
+                // Nếu là chuyến đi đầu tiên (một chiều) và bất kỳ ghế nào đang chờ đặt
+                if (kind === "Một chiều" && isAnySeatWaitingBookedTrip) {
                     // Hiển thị thông báo và không tiếp tục quá trình tạo hóa đơn
                     toast.error('Một hoặc nhiều ghế đã được đặt, vui lòng chọn ghế khác.');
                     return;
                 }
     
-                // Nếu là chuyến đi cuối cùng trong chuyến khứ hồi và bất kỳ ghế nào đã được đặt
-                if (kind === "Khứ hồi" && isAnySeatBookedTrip) {
+                // Nếu là chuyến đi cuối cùng trong chuyến khứ hồi và bất kỳ ghế nào đang chờ đặt
+                if (kind === "Khứ hồi" && isAnySeatWaitingBookedTrip) {
                     // Gửi yêu cầu để lấy danh sách các ghế đã đặt cho chuyến về
-                    const responseTripReturn = await fetch(`http://localhost:8081/api/seat_reservation/trip/${tripIdReturn}`);
-                    const reservedSeatsTripReturn = await responseTripReturn.json();
+                    const responseWaitingTripReturn = await fetch(`http://localhost:8081/api/waiting_seat/trip/${tripIdReturn}`);
+                    const reservedSeatsTripReturn = await responseWaitingTripReturn.json();
     
                     // Kiểm tra từng seatId trong selectedSeatIdsReturn
-                    const isAnySeatBookedTripReturn = selectedSeatIdsReturn.some(seatId => {
+                    const isAnyresponseWaitingTripReturnSeatBookedTripReturn = selectedSeatIdsReturn.some(seatId => {
                         // Kiểm tra xem seatId có trong danh sách ghế đã đặt cho chuyến về không
                         return reservedSeatsTripReturn.some(reservedSeat => reservedSeat.seat.id === seatId);
                     });
     
-                    // Nếu bất kỳ ghế nào đã được đặt cho cả chuyến đi và chuyến về
-                    if (isAnySeatBookedTripReturn) {
+                    // Nếu bất kỳ ghế nào đang chờ đặt cho cả chuyến đi và chuyến về
+                    if (isAnyresponseWaitingTripReturnSeatBookedTripReturn) {
                         // Hiển thị thông báo và không tiếp tục quá trình tạo hóa đơn
                         toast.error('Một hoặc nhiều ghế đã được đặt, vui lòng chọn ghế khác.');
                         return;
                     }
                 }
+                // không có ghế nào đang được đặt
+                    try {
+                        // Gửi yêu cầu để lấy danh sách các ghế đã đặt cho chuyến đi
+                        const responseTrip = await fetch(`http://localhost:8081/api/seat_reservation/trip/${tripId}`);
+                        const reservedSeatsTrip = await responseTrip.json();
+            
+                        // Kiểm tra từng seatId trong selectedSeatIds
+                        const isAnySeatBookedTrip = selectedSeatIds.some(seatId => {
+                            // Kiểm tra xem seatId có trong danh sách ghế đã đặt cho chuyến đi không
+                            return reservedSeatsTrip.some(reservedSeat => reservedSeat.seat.id === seatId);
+                        });
+            
+                        // Nếu là chuyến đi đầu tiên (một chiều) và bất kỳ ghế nào đã được đặt
+                        if (kind === "Một chiều" && isAnySeatBookedTrip) {
+                            // Hiển thị thông báo và không tiếp tục quá trình tạo hóa đơn
+                            toast.error('Một hoặc nhiều ghế đã được đặt, vui lòng chọn ghế khác.');
+                            return;
+                        }
+            
+                        // Nếu là chuyến đi cuối cùng trong chuyến khứ hồi và bất kỳ ghế nào đã được đặt
+                        if (kind === "Khứ hồi" && isAnySeatBookedTrip) {
+                            // Gửi yêu cầu để lấy danh sách các ghế đã đặt cho chuyến về
+                            const responseTripReturn = await fetch(`http://localhost:8081/api/seat_reservation/trip/${tripIdReturn}`);
+                            const reservedSeatsTripReturn = await responseTripReturn.json();
+            
+                            // Kiểm tra từng seatId trong selectedSeatIdsReturn
+                            const isAnySeatBookedTripReturn = selectedSeatIdsReturn.some(seatId => {
+                                // Kiểm tra xem seatId có trong danh sách ghế đã đặt cho chuyến về không
+                                return reservedSeatsTripReturn.some(reservedSeat => reservedSeat.seat.id === seatId);
+                            });
+            
+                            // Nếu bất kỳ ghế nào đã được đặt cho cả chuyến đi và chuyến về
+                            if (isAnySeatBookedTripReturn) {
+                                // Hiển thị thông báo và không tiếp tục quá trình tạo hóa đơn
+                                toast.error('Một hoặc nhiều ghế đã được đặt, vui lòng chọn ghế khác.');
+                                return;
+                            }
+                        }
+            
+                        if (kind === "Một chiều") {
+                            // Gửi yêu cầu để thêm ghế đang chờ cho chuyến đi
+                            insertWaitingSeat(selectedSeatIds, tripId);
+                            try {
+                                // Gửi yêu cầu để nhận URL thanh toán từ API
+                                const response = await fetch(`http://localhost:8081/api/payment/pay?total=${totalPrice}`, {
+                                    method: 'GET', // hoặc 'PATCH' tùy vào API của bạn
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    }// Cập nhật trạng thái của booking thành 'cancelled'
+                                });
+                                if (!response.ok) {
+                                    throw new Error('Failed to fetch payment URL');
+                                }
+                        
+                                const paymentData = await response.text();
+                                // Lưu dữ liệu vào Local Storage
+                                localStorage.setItem('bookingDetails', JSON.stringify({
+                                    tripId,
+                                    selectedSeatsNames,
+                                    selectedSeatIds,
+                                    totalPrice,
+                                    tripIdReturn,
+                                    selectedSeatsNamesReturn,
+                                    selectedSeatIdsReturn,
+                                    totalPriceReturn,
+                                    kind, 
+                                    userName,
+                                    email, 
+                                    phone,
+                                    note, 
+                                    pickupLocation,
+                                    noteReturn,
+                                    pickupLocationReturn
+                                }));
+                                // Chuyển hướng người dùng đến URL thanh toán
+                                window.location.href = paymentData;
+                        
+                            } catch (error) {
+                                console.error('Error fetching payment URL:', error);
+                                toast.error('Lỗi khi nhận URL thanh toán từ máy chủ.');
+                            }
+                        } else if (kind === "Khứ hồi") {
+                            
+                            // Gửi yêu cầu để thêm ghế đang chờ cho chuyến đi
+                            insertWaitingSeat(selectedSeatIds, tripId);
+                            insertWaitingSeat(selectedSeatIds, tripIdReturn);
+                            // Tạo hóa đơn lượt đi
+                            try {
+                                // Gửi yêu cầu để nhận URL thanh toán từ API
+                                const response = await fetch(`http://localhost:8081/api/payment/pay?total=${totalAmount}`, {
+                                    method: 'GET', // hoặc 'PATCH' tùy vào API của bạn
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    }// Cập nhật trạng thái của booking thành 'cancelled'
+                                });
+                                if (!response.ok) {
+                                    throw new Error('Failed to fetch payment URL');
+                                }
+                        
+                                const paymentData = await response.text();
+                                // Lưu dữ liệu vào Local Storage
+                                localStorage.setItem('bookingDetails', JSON.stringify({
+                                    tripId,
+                                    selectedSeatsNames,
+                                    selectedSeatIds,
+                                    totalPrice,
+                                    tripIdReturn,
+                                    selectedSeatsNamesReturn,
+                                    selectedSeatIdsReturn,
+                                    totalPriceReturn,
+                                    kind, 
+                                    userName,
+                                    email, 
+                                    phone,
+                                    note, 
+                                    pickupLocation,
+                                    noteReturn,
+                                    pickupLocationReturn
+                                }));
+                                // Chuyển hướng người dùng đến URL thanh toán
+                                window.location.href = paymentData;
+                        
+                            } catch (error) {
+                                console.error('Error fetching payment URL:', error);
+                                toast.error('Lỗi khi nhận URL thanh toán từ máy chủ.');
+                            }
+                            
+                
+                        }
+            
+                    } catch (error) {
+                        console.error('Error checking seat status:', error);
+                        toast.error('Lỗi kiểm tra trạng thái ghế đang chờ đặt.');
+                    }
     
-                if (kind === "Một chiều") {
-                    const bookingData = {
-                        userName: userName,
-                        email: email,
-                        phone: phone,
-                        total: totalPrice,
-                        kindPay: "Thanh toán trả sau",
-                        isPaid: 0,
-                        roundTrip: 0,
-                    };
-                    
-                    // Chỉ thêm userId nếu nó có giá trị
-                    if (userId) {
-                        bookingData.userId =  userId ;
-                    }
-        
-                    try {
-                        // Gửi yêu cầu để nhận URL thanh toán từ API
-                        const response = await fetch(`http://localhost:8081/api/payment/pay?total=${totalPrice}`, {
-                            method: 'GET', // hoặc 'PATCH' tùy vào API của bạn
-                            headers: {
-                                'Content-Type': 'application/json',
-                            }// Cập nhật trạng thái của booking thành 'cancelled'
-                        });
-                        if (!response.ok) {
-                            throw new Error('Failed to fetch payment URL');
-                        }
                 
-                        const paymentData = await response.text();
-                        // Lưu dữ liệu vào Local Storage
-                        localStorage.setItem('bookingDetails', JSON.stringify({
-                            tripId,
-                            selectedSeatsNames,
-                            selectedSeatIds,
-                            totalPrice,
-                            tripIdReturn,
-                            selectedSeatsNamesReturn,
-                            selectedSeatIdsReturn,
-                            totalPriceReturn,
-                            kind, 
-                            userName,
-                            email, 
-                            phone,
-                            note, 
-                            pickupLocation,
-                            noteReturn,
-                            pickupLocationReturn
-                        }));
-                        // Chuyển hướng người dùng đến URL thanh toán
-                        window.location.href = paymentData;
-                
-                    } catch (error) {
-                        console.error('Error fetching payment URL:', error);
-                        toast.error('Lỗi khi nhận URL thanh toán từ máy chủ.');
-                    }
-                } else if (kind === "Khứ hồi") {
-                    const bookingData = {
-                        userName: userName,
-                        email: email,
-                        phone: phone,
-                        total: totalAmount,
-                        kindPay:"Thanh toán trả sau",
-                        isPaid: 0,
-                        roundTrip: 1,
-                    };
-                    // Chỉ thêm userId nếu nó có giá trị
-                    if (userId) {
-                        bookingData.userId =  userId ;
-                    }
-                    // Tạo hóa đơn lượt đi
-                    try {
-                        // Gửi yêu cầu để nhận URL thanh toán từ API
-                        const response = await fetch(`http://localhost:8081/api/payment/pay?total=${totalAmount}`, {
-                            method: 'GET', // hoặc 'PATCH' tùy vào API của bạn
-                            headers: {
-                                'Content-Type': 'application/json',
-                            }// Cập nhật trạng thái của booking thành 'cancelled'
-                        });
-                        if (!response.ok) {
-                            throw new Error('Failed to fetch payment URL');
-                        }
-                
-                        const paymentData = await response.text();
-                        // Lưu dữ liệu vào Local Storage
-                        localStorage.setItem('bookingDetails', JSON.stringify({
-                            tripId,
-                            selectedSeatsNames,
-                            selectedSeatIds,
-                            totalPrice,
-                            tripIdReturn,
-                            selectedSeatsNamesReturn,
-                            selectedSeatIdsReturn,
-                            totalPriceReturn,
-                            kind, 
-                            userName,
-                            email, 
-                            phone,
-                            note, 
-                            pickupLocation,
-                            noteReturn,
-                            pickupLocationReturn
-                        }));
-                        // Chuyển hướng người dùng đến URL thanh toán
-                        window.location.href = paymentData;
-                
-                    } catch (error) {
-                        console.error('Error fetching payment URL:', error);
-                        toast.error('Lỗi khi nhận URL thanh toán từ máy chủ.');
-                    }
-                    
-        
-                }
     
             } catch (error) {
                 console.error('Error checking seat status:', error);
                 toast.error('Lỗi kiểm tra trạng thái ghế.');
             }
+
+
+            
         };    
     const handleChoosePayment = async () => {
         try {
-            // Gửi yêu cầu để lấy danh sách các ghế đã đặt cho chuyến đi
-            const responseTrip = await fetch(`http://localhost:8081/api/seat_reservation/trip/${tripId}`);
-            const reservedSeatsTrip = await responseTrip.json();
+            // Gửi yêu cầu để lấy danh sách các ghế đang chờ cho chuyến đi
+            const responseWaitingTrip = await fetch(`http://localhost:8081/api/waiting_seat/trip/${tripId}`);
+            const reservedSeatsWaitingTrip = await responseWaitingTrip.json();
 
             // Kiểm tra từng seatId trong selectedSeatIds
-            const isAnySeatBookedTrip = selectedSeatIds.some(seatId => {
-                // Kiểm tra xem seatId có trong danh sách ghế đã đặt cho chuyến đi không
-                return reservedSeatsTrip.some(reservedSeat => reservedSeat.seat.id === seatId);
+            const isAnySeatWaitingBookedTrip = selectedSeatIds.some(seatId => {
+                // Kiểm tra xem seatId có trong danh sách ghế đang chờ đặt cho chuyến đi không
+                return reservedSeatsWaitingTrip.some(reservedSeat => reservedSeat.seat.id === seatId);
             });
 
-            // Nếu là chuyến đi đầu tiên (một chiều) và bất kỳ ghế nào đã được đặt
-            if (kind === "Một chiều" && isAnySeatBookedTrip) {
+            // Nếu là chuyến đi đầu tiên (một chiều) và bất kỳ ghế nào đang chờ đặt
+            if (kind === "Một chiều" && isAnySeatWaitingBookedTrip) {
                 // Hiển thị thông báo và không tiếp tục quá trình tạo hóa đơn
                 toast.error('Một hoặc nhiều ghế đã được đặt, vui lòng chọn ghế khác.');
                 return;
             }
 
-            // Nếu là chuyến đi cuối cùng trong chuyến khứ hồi và bất kỳ ghế nào đã được đặt
-            if (kind === "Khứ hồi" && isAnySeatBookedTrip) {
+            // Nếu là chuyến đi cuối cùng trong chuyến khứ hồi và bất kỳ ghế nào đang chờ đặt
+            if (kind === "Khứ hồi" && isAnySeatWaitingBookedTrip) {
                 // Gửi yêu cầu để lấy danh sách các ghế đã đặt cho chuyến về
-                const responseTripReturn = await fetch(`http://localhost:8081/api/seat_reservation/trip/${tripIdReturn}`);
-                const reservedSeatsTripReturn = await responseTripReturn.json();
+                const responseWaitingTripReturn = await fetch(`http://localhost:8081/api/waiting_seat/trip/${tripIdReturn}`);
+                const reservedSeatsTripReturn = await responseWaitingTripReturn.json();
 
                 // Kiểm tra từng seatId trong selectedSeatIdsReturn
-                const isAnySeatBookedTripReturn = selectedSeatIdsReturn.some(seatId => {
+                const isAnyresponseWaitingTripReturnSeatBookedTripReturn = selectedSeatIdsReturn.some(seatId => {
                     // Kiểm tra xem seatId có trong danh sách ghế đã đặt cho chuyến về không
                     return reservedSeatsTripReturn.some(reservedSeat => reservedSeat.seat.id === seatId);
                 });
 
-                // Nếu bất kỳ ghế nào đã được đặt cho cả chuyến đi và chuyến về
-                if (isAnySeatBookedTripReturn) {
+                // Nếu bất kỳ ghế nào đang chờ đặt cho cả chuyến đi và chuyến về
+                if (isAnyresponseWaitingTripReturnSeatBookedTripReturn) {
                     // Hiển thị thông báo và không tiếp tục quá trình tạo hóa đơn
                     toast.error('Một hoặc nhiều ghế đã được đặt, vui lòng chọn ghế khác.');
                     return;
                 }
             }
-            setIsLoading(true);
-            setShowPaymentPopup(false)
-
-            if (kind === "Một chiều") {
-                const bookingData = {
-                    userName: userName,
-                    email: email,
-                    phone: phone,
-                    total: totalPrice,
-                    kindPay: "Thanh toán trả sau",
-                    isPaid: 0,
-                    roundTrip: 0,
-                };
-                
-                // Chỉ thêm userId nếu nó có giá trị
-                if (userId) {
-                    bookingData.userId =  userId ;
-                }
-    
+            // không có ghế nào đang được đặt
                 try {
-                    const response = await fetch(`http://localhost:8081/api/booking`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(bookingData)
+                    // Gửi yêu cầu để lấy danh sách các ghế đã đặt cho chuyến đi
+                    const responseTrip = await fetch(`http://localhost:8081/api/seat_reservation/trip/${tripId}`);
+                    const reservedSeatsTrip = await responseTrip.json();
+        
+                    // Kiểm tra từng seatId trong selectedSeatIds
+                    const isAnySeatBookedTrip = selectedSeatIds.some(seatId => {
+                        // Kiểm tra xem seatId có trong danh sách ghế đã đặt cho chuyến đi không
+                        return reservedSeatsTrip.some(reservedSeat => reservedSeat.seat.id === seatId);
                     });
-    
-                    if (response.ok) {
-                        toast.success("Đơn hàng đã được tạo!");
-                        const createdBooking = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
-                        await createBookingDetail(createdBooking.id, tripId, 0, selectedSeatIds.length, selectedSeatsNames, totalPrice, pickupLocation, note);
-                        updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds);
-                        insertSeatReservation(selectedSeatIds, tripId, createdBooking.id);
-                        await sendMail(createdBooking.id);
-                        setTimeout(() => {
-                            navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: kind } });
-                        }, 1500);
+        
+                    // Nếu là chuyến đi đầu tiên (một chiều) và bất kỳ ghế nào đã được đặt
+                    if (kind === "Một chiều" && isAnySeatBookedTrip) {
+                        // Hiển thị thông báo và không tiếp tục quá trình tạo hóa đơn
+                        toast.error('Một hoặc nhiều ghế đã được đặt, vui lòng chọn ghế khác.');
+                        return;
+                    }
+        
+                    // Nếu là chuyến đi cuối cùng trong chuyến khứ hồi và bất kỳ ghế nào đã được đặt
+                    if (kind === "Khứ hồi" && isAnySeatBookedTrip) {
+                        // Gửi yêu cầu để lấy danh sách các ghế đã đặt cho chuyến về
+                        const responseTripReturn = await fetch(`http://localhost:8081/api/seat_reservation/trip/${tripIdReturn}`);
+                        const reservedSeatsTripReturn = await responseTripReturn.json();
+        
+                        // Kiểm tra từng seatId trong selectedSeatIdsReturn
+                        const isAnySeatBookedTripReturn = selectedSeatIdsReturn.some(seatId => {
+                            // Kiểm tra xem seatId có trong danh sách ghế đã đặt cho chuyến về không
+                            return reservedSeatsTripReturn.some(reservedSeat => reservedSeat.seat.id === seatId);
+                        });
+        
+                        // Nếu bất kỳ ghế nào đã được đặt cho cả chuyến đi và chuyến về
+                        if (isAnySeatBookedTripReturn) {
+                            // Hiển thị thông báo và không tiếp tục quá trình tạo hóa đơn
+                            toast.error('Một hoặc nhiều ghế đã được đặt, vui lòng chọn ghế khác.');
+                            return;
+                        }
+                    }
+                    setIsLoading(true);
+                    setShowPaymentPopup(false)
+        
+                    if (kind === "Một chiều") {
+                        const bookingData = {
+                            userName: userName,
+                            email: email,
+                            phone: phone,
+                            total: totalPrice,
+                            kindPay: "Thanh toán trả sau",
+                            isPaid: 0,
+                            roundTrip: 0,
+                        };
                         
-                    } else {
-                        throw new Error('Something went wrong with the order creation.');
+                        // Chỉ thêm userId nếu nó có giá trị
+                        if (userId) {
+                            bookingData.userId =  userId ;
+                        }
+            
+                        try {
+                            const response = await fetch(`http://localhost:8081/api/booking`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(bookingData)
+                            });
+            
+                            if (response.ok) {
+                                toast.success("Đơn hàng đã được tạo!");
+                                const createdBooking = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
+                                await createBookingDetail(createdBooking.id, tripId, 0, selectedSeatIds.length, selectedSeatsNames, totalPrice, pickupLocation, note);
+                                updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds);
+                                insertSeatReservation(selectedSeatIds, tripId, createdBooking.id);
+                                await sendMail(createdBooking.id);
+                                setTimeout(() => {
+                                    navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: kind } });
+                                }, 1500);
+                                
+                            } else {
+                                throw new Error('Something went wrong with the order creation.');
+                            }
+                        } catch (error) {
+                            console.error("Error creating order:", error);
+                            toast.error("Failed to create order.");
+                        }
+                    } else if (kind === "Khứ hồi") {
+                        const bookingData = {
+                            userName: userName,
+                            email: email,
+                            phone: phone,
+                            total: totalAmount,
+                            kindPay:"Thanh toán trả sau",
+                            isPaid: 0,
+                            roundTrip: 1,
+                        };
+                        // Chỉ thêm userId nếu nó có giá trị
+                        if (userId) {
+                            bookingData.userId =  userId ;
+                        }
+                        // Tạo hóa đơn lượt đi
+                        try {
+                            const response = await fetch(`http://localhost:8081/api/booking`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(bookingData)
+                            });
+            
+                            if (response.ok) {
+                                toast.success("Đơn hàng đã được tạo!");
+                                const createdBooking = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
+                                // tạo chi tiết và upadte lượt đi
+                                await createBookingDetail(createdBooking.id, tripId, 0, selectedSeatIds.length, selectedSeatsNames, totalPrice, pickupLocation, note);
+                                updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds);
+                                insertSeatReservation(selectedSeatIds, tripId, createdBooking.id);
+                                // tạo chi tiết và update lượt về
+                                await createBookingDetail(createdBooking.id, tripIdReturn, 1, selectedSeatIdsReturn.length, selectedSeatsNamesReturn, totalPriceReturn, pickupLocationReturn, noteReturn);
+                                updateTripEmptySeat(tripIdReturn, dataReturn.route.id, dataReturn.vehicle.id, dataReturn.dayStart, dataReturn.timeStart, dataReturn.price, dataReturn.driver.id, dataReturn.emptySeat, selectedSeatIdsReturn);
+                                insertSeatReservation(selectedSeatIdsReturn, tripIdReturn, createdBooking.id);
+                                await sendMail(createdBooking.id);
+                                setTimeout(() => {
+                                    navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: kind } });
+                                }, 1500);
+                            } else {
+                                throw new Error('Something went wrong with the order creation.');
+                            }
+                        } catch (error) {
+                            console.error("Error creating order:", error);
+                            toast.error("Lỗi tạo hóa đơn lượt đi.");
+                        }
+                        
+            
                     }
+        
                 } catch (error) {
-                    console.error("Error creating order:", error);
-                    toast.error("Failed to create order.");
+                    console.error('Error checking seat status:', error);
+                    toast.error('Lỗi kiểm tra trạng thái ghế đang chờ đặt.');
                 }
-            } else if (kind === "Khứ hồi") {
-                const bookingData = {
-                    userName: userName,
-                    email: email,
-                    phone: phone,
-                    total: totalAmount,
-                    kindPay:"Thanh toán trả sau",
-                    isPaid: 0,
-                    roundTrip: 1,
-                };
-                // Chỉ thêm userId nếu nó có giá trị
-                if (userId) {
-                    bookingData.userId =  userId ;
-                }
-                // Tạo hóa đơn lượt đi
-                try {
-                    const response = await fetch(`http://localhost:8081/api/booking`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(bookingData)
-                    });
-    
-                    if (response.ok) {
-                        toast.success("Đơn hàng đã được tạo!");
-                        const createdBooking = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
-                        // tạo chi tiết và upadte lượt đi
-                        await createBookingDetail(createdBooking.id, tripId, 0, selectedSeatIds.length, selectedSeatsNames, totalPrice, pickupLocation, note);
-                        updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds);
-                        insertSeatReservation(selectedSeatIds, tripId, createdBooking.id);
-                        // tạo chi tiết và update lượt về
-                        await createBookingDetail(createdBooking.id, tripIdReturn, 1, selectedSeatIdsReturn.length, selectedSeatsNamesReturn, totalPriceReturn, pickupLocationReturn, noteReturn);
-                        updateTripEmptySeat(tripIdReturn, dataReturn.route.id, dataReturn.vehicle.id, dataReturn.dayStart, dataReturn.timeStart, dataReturn.price, dataReturn.driver.id, dataReturn.emptySeat, selectedSeatIdsReturn);
-                        insertSeatReservation(selectedSeatIdsReturn, tripIdReturn, createdBooking.id);
-                        await sendMail(createdBooking.id);
-                        setTimeout(() => {
-                            navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: kind } });
-                        }, 1500);
-                    } else {
-                        throw new Error('Something went wrong with the order creation.');
-                    }
-                } catch (error) {
-                    console.error("Error creating order:", error);
-                    toast.error("Lỗi tạo hóa đơn lượt đi.");
-                }
-                
-    
-            }
+
+            
 
         } catch (error) {
             console.error('Error checking seat status:', error);
             toast.error('Lỗi kiểm tra trạng thái ghế.');
         }
+        
     };
 
     // send mail
@@ -555,7 +627,38 @@ const BookingTicket = () =>{
             console.error('Error updating trip empty seat:', error);
         }
     };
+    // Insert vào ghế chờ đặt
+    const insertWaitingSeat = async (selectedSeatIds, trip) => {
     
+        try {
+            // Lặp qua từng id của ghế được chọn
+            for (const seatId of selectedSeatIds) {
+                // Tạo dữ liệu mới cho mỗi ghế được đặt
+                const waitingSeatData = {
+                    tripId: trip,
+                    seatId: seatId
+                };
+    
+                // Gửi yêu cầu để thêm ghế đã đặt vào bảng SeatBooked
+                const response = await fetch(`http://localhost:8081/api/waiting_seat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(waitingSeatData),
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`Failed to insert seat waiting for seatId ${seatId}`);
+                }
+    
+                console.log(`Seat waiting inserted successfully for seatId ${seatId}`);
+            }
+    
+        } catch (error) {
+            console.error('Error inserting seat waiting:', error);
+        }
+    };
 
     
     // Insert vào ghế đã đặt 
@@ -591,6 +694,8 @@ const BookingTicket = () =>{
             console.error('Error inserting seat booked:', error);
         }
     };
+
+
     
     const formatDate = (dateString) => {
         const date = new Date(dateString);

@@ -111,6 +111,11 @@ const MyBooking = () =>{
     };
     useEffect(() => {
         // Call the API to fetch cities
+        const redirectPath = sessionStorage.getItem('redirectPath');
+        const currentPath = window.location.pathname;
+        if (redirectPath === currentPath) {
+            sessionStorage.removeItem('redirectPath'); 
+        }
         if (userId) {
             fetchReviews();
         }else{

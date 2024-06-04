@@ -121,6 +121,7 @@ const ResponseSuccess  = () => {
                         updateTripEmptySeat(bookingDetails.tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, bookingDetails.selectedSeatIds);
                         insertSeatReservation(bookingDetails.selectedSeatIds, bookingDetails.tripId, createdBooking.id);
                         await sendMail(createdBooking.id);
+                        deleteWaitingSeat(bookingDetails.selectedSeatIds, bookingDetails.tripId);
                         setTimeout(() => {
                             navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: bookingDetails.kind } });
                         }, 1500);
@@ -165,10 +166,12 @@ const ResponseSuccess  = () => {
                         await createBookingDetail(createdBooking.id, bookingDetails.tripId, 0, bookingDetails.selectedSeatIds.length, bookingDetails.selectedSeatsNames, bookingDetails.totalPrice, bookingDetails.pickupLocation, bookingDetails.note);
                         updateTripEmptySeat(bookingDetails.tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, bookingDetails.selectedSeatIds);
                         insertSeatReservation(bookingDetails.selectedSeatIds, bookingDetails.tripId, createdBooking.id);
+                        deleteWaitingSeat(bookingDetails.selectedSeatIds, bookingDetails.tripId);
                         // tạo chi tiết và update lượt về
                         await createBookingDetail(createdBooking.id, bookingDetails.tripIdReturn, 1, bookingDetails.selectedSeatIdsReturn.length, bookingDetails.selectedSeatsNamesReturn, bookingDetails.totalPriceReturn, bookingDetails.pickupLocationReturn, bookingDetails.noteReturn);
                         updateTripEmptySeat(bookingDetails.tripIdReturn, dataReturn.route.id, dataReturn.vehicle.id, dataReturn.dayStart, dataReturn.timeStart, dataReturn.price, dataReturn.driver.id, dataReturn.emptySeat, bookingDetails.selectedSeatIdsReturn);
                         insertSeatReservation(bookingDetails.selectedSeatIdsReturn, bookingDetails.tripIdReturn, createdBooking.id);
+                        deleteWaitingSeat(bookingDetails.selectedSeatIdsReturn, bookingDetails.tripIdReturn);
                         await sendMail(createdBooking.id);
                         setTimeout(() => {
                             navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: bookingDetails.kind } });
@@ -312,6 +315,38 @@ const ResponseSuccess  = () => {
             </div>
         );
     }
+    // xóa ghế chờ đặt
+    const deleteWaitingSeat = async (selectedSeatIds, trip) => {
+    
+        try {
+            // Lặp qua từng id của ghế được chọn
+            for (const seatId of selectedSeatIds) {
+                // Tạo dữ liệu mới cho mỗi ghế được đặt
+                const waitingSeatData = {
+                    tripId: trip,
+                    seatId: seatId
+                };
+    
+                // Gửi yêu cầu để thêm ghế đã đặt vào bảng SeatBooked
+                const response = await fetch(`http://localhost:8081/api/waiting_seat`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(waitingSeatData),
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`Failed to delete seat waiting for seatId ${seatId}`);
+                }
+    
+                console.log(`Seat waiting delete successfully for seatId ${seatId}`);
+            }
+    
+        } catch (error) {
+            console.error('Error delete seat waiting:', error);
+        }
+    };
 
     return (
             <section className="main container section">
