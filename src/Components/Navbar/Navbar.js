@@ -79,12 +79,13 @@ const handleAdminClick = () => {
 const handleLogoutClick = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("userId"); 
+  localStorage.removeItem("userRole");
   localStorage.removeItem("googleLogin");
   if (window.location.pathname === '/') {
     window.location.reload();
-} else {
-    navigate('/');
-}
+  } else {
+      navigate('/');
+  }
 }
 const handleMyRatingClick = () => {
   navigate('/my-rating');
@@ -117,10 +118,10 @@ const handleMyBookingClick = () => {
                     <Link to="/my_ticket" className="navLink">VÉ CỦA TÔI</Link>
                   </li>
                   <li className="navItem">
-                    <Link to="/" className="navLink">LIÊN HỆ</Link>
+                    <Link to="/contact" className="navLink">LIÊN HỆ</Link>
                   </li>
                   <li className="navItem">
-                    <Link to="/" className="navLink">VỀ CHÚNG TÔI</Link>
+                    <Link to="/aboutUs" className="navLink">VỀ CHÚNG TÔI</Link>
                   </li>
                   <div className="infoUser">
                     {userId ? (

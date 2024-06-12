@@ -32,8 +32,6 @@ const BookingTicket = () =>{
     const [phoneErrorMessage, setPhoneErrorMessage] = useState('');
     const navigate = useNavigate();
     const userId = localStorage.getItem("userId");
-    console.log("totalPrice", totalPrice.toLocaleString('vi-VN'));
-    console.log("totalPriceR", totalPriceReturn);
     // Xử lý chọn nhập nơi đón
     const handleSelectChange = (event) => {
         setShowLocationInput(event.target.value === 'Yes');
@@ -128,8 +126,6 @@ const BookingTicket = () =>{
         
     };
 
-    console.log("ui:  ",localStorage.getItem("userId"))
-
     useEffect(() => {
         // Call the API to fetch cities
         if (kind === "Một chiều") {
@@ -154,8 +150,6 @@ const BookingTicket = () =>{
     },[kind, tripId, tripIdReturn]);
 
     const fetchTripInfo = async () => {
-        
-    console.log("Selected Seat IDs:", selectedSeatIds);
         try {
             const response = await fetch(`http://localhost:8081/api/trip/${tripId}`);
             const data = await response.json();
@@ -610,7 +604,7 @@ const BookingTicket = () =>{
         };
         try {
             // Gửi yêu cầu cập nhật số ghế trống
-            const updateResponse = await fetch(`http://localhost:8081/api/trip/${trip}`, {
+            const updateResponse = await fetch(`http://localhost:8081/api/trip/p1/${trip}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -973,7 +967,7 @@ const BookingTicket = () =>{
                     
                 )}
                 <div>
-                    <div className=" infoUser" style={{height:"15rem", marginTop:"1rem"}}>
+                    <div className=" infoUser">
                         <h3>Thông tin người đặt</h3>
                         <div className="lineInfo">
                             <span>Họ và tên<span style={{color:"red"}}>*</span>:</span>

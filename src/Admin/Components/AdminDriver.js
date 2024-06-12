@@ -19,6 +19,8 @@ const AdminDriver = () =>{
     const [status, setStatus] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
+    const [driverToDelete, setDriverToDelete] = useState(null);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -126,9 +128,9 @@ const AdminDriver = () =>{
             }
             if (!email) {
                 missingInfo.push("Email");
-            } else if (emailErrorMessage) { // Kiểm tra nếu có errorMessage cho email
-                toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
-                return; // Dừng xử lý tiếp theo nếu có lỗi
+            } else if (emailErrorMessage) {
+                toast.error(emailErrorMessage);
+                return;
             }
             if (!phone) {
                 missingInfo.push("Số điện thoại");
@@ -138,44 +140,108 @@ const AdminDriver = () =>{
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token"); // Lấy token từ local storage
                     const newDriverData = {
                         name: name,
                         email: email,
                         phone: phone
                     };
-            
+                
                     const response = await fetch("http://localhost:8081/api/driver", {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}` // Thêm token vào header
                         },
                         body: JSON.stringify(newDriverData)
                     });
-            
+                
                     if (response.ok) {
-                        // Xử lý thành công
                         console.log("Driver đã được tạo thành công!");
                         toast.success("Driver đã được tạo thành công!");
-                        const newDriver = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
-                        // Thêm người dùng mới vào danh sách
+                        const newDriver = await response.json();
                         setData(prevData => [...prevData, newDriver]);
                         setRecords(prevRecords => [...prevRecords, newDriver]);
-                        // Reset form hoặc làm gì đó khác
                         setName('');
                         setEmail('');
                         setPhone('');
                         setIsAdd(false);
-                        // window.location.reload();
                     } else {
                         console.error("Có lỗi xảy ra khi tạo driver!");
                         toast.error("Có lỗi xảy ra khi tạo driver!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);
-                    toast.error("Lỗi:", error);
+                    toast.error("Lỗi:", error.message);
                 }
             }
         };
+        //     e.preventDefault();
+        //     let missingInfo = [];
+        //     if (!currentDriver.name) {
+        //         missingInfo.push("Tên tài xế");
+        //     }
+        //     if (!currentDriver.email) {
+        //         missingInfo.push("Email");
+        //     } else if (emailErrorMessage) { // Kiểm tra nếu có errorMessage cho email
+        //         toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
+        //         return; // Dừng xử lý tiếp theo nếu có lỗi
+        //     }
+        //     if (!currentDriver.phone) {
+        //         missingInfo.push("Số điện thoại");
+        //     }
+        //     // if (currentDriver.status === null || currentDriver.status === undefined) {
+        //     //     missingInfo.push("Trạng thái");
+        //     // }
+        //     if (missingInfo.length > 0) {
+        //         const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+        //         toast.error(message);
+        //     } else {
+        //         try {
+        //             const newDriverData = {
+        //                 name: currentDriver.name,
+        //                 email: currentDriver.email,
+        //                 phone: currentDriver.phone
+        //                 // ,
+        //                 // status: currentDriver.status
+        //             };
+            
+        //             const response = await fetch(`http://localhost:8081/api/driver/${currentDriver.id}`, {
+        //                 method: "PUT",
+        //                 headers: {
+        //                     "Content-Type": "application/json"
+        //                 },
+        //                 body: JSON.stringify(newDriverData)
+        //             });
+            
+        //             if (response.ok) {
+        //                 // Xử lý thành công
+        //                 console.log("Driver đã được cập nhật thành công!");
+        //                 toast.success("Driver đã được cập nhật thành công!");
+        //                 const updatedDriver = await response.json();
+        //                 const updatedDrivers = records.map(driver => {
+        //                     if (driver.id === updatedDriver.id) {
+        //                         return updatedDriver;
+        //                     }
+        //                     return driver;
+        //                 });
+        //                 setRecords(updatedDrivers);
+        //                 // Reset form hoặc làm gì đó khác
+        //                 setName('');
+        //                 setEmail('');
+        //                 setPhone('');
+        //                 setIsEditing(false);
+        //                 // window.location.reload();
+        //             } else {
+        //                 console.error("Có lỗi xảy ra khi cập nhật driver!");
+        //                 toast.error("Có lỗi xảy ra khi cập nhật driver!");
+        //             }
+        //         } catch (error) {
+        //             console.error("Lỗi:", error);
+        //             toast.error("Lỗi:", error);
+        //         }
+        //     }
+        // };
         const handleUpdateDriver = async (e) => {
             e.preventDefault();
             let missingInfo = [];
@@ -184,39 +250,35 @@ const AdminDriver = () =>{
             }
             if (!currentDriver.email) {
                 missingInfo.push("Email");
-            } else if (emailErrorMessage) { // Kiểm tra nếu có errorMessage cho email
-                toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
-                return; // Dừng xử lý tiếp theo nếu có lỗi
+            } else if (emailErrorMessage) {
+                toast.error(emailErrorMessage);
+                return;
             }
             if (!currentDriver.phone) {
                 missingInfo.push("Số điện thoại");
             }
-            // if (currentDriver.status === null || currentDriver.status === undefined) {
-            //     missingInfo.push("Trạng thái");
-            // }
             if (missingInfo.length > 0) {
                 const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token"); // Lấy token từ local storage
                     const newDriverData = {
                         name: currentDriver.name,
                         email: currentDriver.email,
                         phone: currentDriver.phone
-                        // ,
-                        // status: currentDriver.status
                     };
-            
+                
                     const response = await fetch(`http://localhost:8081/api/driver/${currentDriver.id}`, {
                         method: "PUT",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}` // Thêm token vào header
                         },
                         body: JSON.stringify(newDriverData)
                     });
-            
+                
                     if (response.ok) {
-                        // Xử lý thành công
                         console.log("Driver đã được cập nhật thành công!");
                         toast.success("Driver đã được cập nhật thành công!");
                         const updatedDriver = await response.json();
@@ -227,34 +289,36 @@ const AdminDriver = () =>{
                             return driver;
                         });
                         setRecords(updatedDrivers);
-                        // Reset form hoặc làm gì đó khác
                         setName('');
                         setEmail('');
                         setPhone('');
                         setIsEditing(false);
-                        // window.location.reload();
                     } else {
                         console.error("Có lỗi xảy ra khi cập nhật driver!");
                         toast.error("Có lỗi xảy ra khi cập nhật driver!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);
-                    toast.error("Lỗi:", error);
+                    toast.error("Lỗi:", error.message);
                 }
             }
         };
-        const handleRemoveClick = async (driver) => {
-            const driverId = driver.id;
+        const removeDriver = async () => {
+            const driverId = driverToDelete.id;
+
             try {
+                const token = localStorage.getItem("token"); // Lấy token từ local storage
                 const response = await fetch(`http://localhost:8081/api/driver/${driverId}`, {
-                method: "DELETE"
-            });
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}` // Thêm token vào header
+                    }
+                });
                 if (response.ok) {
-                    
-                    // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
                     const updatedDriver = records.filter(record => record.id !== driverId);
                     setRecords(updatedDriver);
                     toast.success("Driver đã được xóa thành công!");
+                    setIsDeleteConfirmVisible(false);
                 } else {
                     console.error("Có lỗi xảy ra khi xóa Driver!");
                     toast.error("Có lỗi xảy ra khi xóa Driver!");
@@ -264,9 +328,15 @@ const AdminDriver = () =>{
                 toast.error("Lỗi:", error.message);
             }
         };
+        
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
+        const handleRemoveClick = (driver) => {
+            setDriverToDelete(driver);
+            setIsDeleteConfirmVisible(true);
+        };
+        const NoDataComponent = () => <div className="emptyData">Không có dữ liệu</div>;
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -297,6 +367,7 @@ const AdminDriver = () =>{
                     columns={columns}
                     data={records}
                     // pagination
+                    noDataComponent={<NoDataComponent />}
                     ></DataTable>
                     <Pagination 
                         count={totalPages}
@@ -313,12 +384,12 @@ const AdminDriver = () =>{
             
             {isEditing && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Sửa thông tin tài xế</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Sửa thông tin tài xế</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
                                         <label className="info">Tên:</label>
@@ -359,12 +430,12 @@ const AdminDriver = () =>{
 
             {isAdd && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Thêm tài xế</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Thêm tài xế</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
                                         <label className="info">Tên:</label>
@@ -398,6 +469,25 @@ const AdminDriver = () =>{
                                         <button type="submit" className="save" onClick={handleCreateDriver}>Tạo</button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isDeleteConfirmVisible && (
+                <div className="modal" id="confirmDeleteModal">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Xác nhận xóa</h2>
+                            </div>
+                            <div className="modal-body">
+                                <p className="textConfirm">Bạn có chắc chắn muốn xóa tài xế này?</p>
+                                <div className="listButton">
+                                    <button type="button"  onClick={() => setIsDeleteConfirmVisible(false)} className="cancel">Hủy</button>
+                                    <button type="button" className="save" onClick={removeDriver}>Xóa</button>
+                                </div>
                             </div>
                         </div>
                     </div>

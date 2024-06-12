@@ -155,7 +155,7 @@
 
     .bookingContent{
         width: 100%;
-        gap: 7rem;
+        gap: 3rem;
         align-items: flex-start;
 
         h3{
@@ -164,31 +164,44 @@
         }
         
         .infoTicket{
-            width: 30rem;
-            height: 38rem;
+            width: 20rem;
+            // height: 38rem;
             background: var(--whiteColor);
             border-radius: 1rem;
             border: 1px solid var(--greyText);
-            padding: 1rem 2rem;
+            padding: 1rem 1rem;
             // display: flex;
-
+            h3{
+                color: var(--blackColor);
+            }
             .lineInfo{
                 display: flex;
                 justify-content: space-between;
                 line-height: 3rem;
+                // span{
+                //     color: var(--blackColor);
+                // }
                 .rightInfo{
-                    width: 18rem;
+                    // width: 18rem;
                     height: 2.5rem;
-                    background: var(--greyText);
-                    border-radius: .5rem;
+                    // background: var(--greyText);
+                    // border-radius: .5rem;
                     span{
                         padding-left: 1rem;
                         padding-bottom: .5rem;
                         color: var(--blackColor);
                     }
                 }
+                .seatInfo{
+                    gap: 1rem;
+                    span{
+                        background: rgb(220, 231, 71);
+                        font-weight: bolder;
+                        padding: .2rem;
+                    }
+                }
                 .Note{
-                    width: 18rem;
+                    // width: 18rem;
                     height: 2.5rem;
                     background: var(--whiteColor);
                     border-radius: .5rem;
@@ -198,7 +211,7 @@
                 }
                 .selectChoose{
                     select{
-                        width: 18rem;
+                        width: 10rem;
                         height: 2.5rem;
                         background: var(--whiteColor);
                         border-radius: .5rem;
@@ -209,6 +222,7 @@
                     }
                 }
             }
+            
             .policyCheckbox{
                 width: 100%;
                 margin-top: 1rem;
@@ -258,6 +272,8 @@
             border-radius: 1rem;
             border: 1px solid var(--greyText);
             padding: 1rem 2rem;
+            margin-top: 1rem;
+            height: auto;
             h3{
                 color: var(--blackColor);
             }
@@ -270,6 +286,7 @@
                 }
                 .infoInput{
                     display: grid;
+                    height: 4rem;
                     .info{
                         width: 18rem;
                         height: 2.5rem;
@@ -283,9 +300,19 @@
                 
             }
         }
+        .discount{
+            margin-top: 1rem;
+            width: 100%;
+            display: flex;
+            margin-inline: auto;
+            .textdiscount{
+                margin-right: 1rem;
+                width: 76%;
+            }
+        }
         .policyInfo{
-            width: 30rem;
-            height: 15rem;
+            width: auto;
+            height: auto;
             background: var(--whiteColor);
             margin-top: 1rem;
             padding: 1rem;
@@ -311,8 +338,9 @@
                     .rightInfo{
                         width: 18rem;
                         height: 2.5rem;
-                        background: var(--greyText);
+                        // background: var(--greyText);
                         border-radius: .5rem;
+                        font-weight: 600;
                         span{
                             padding-left: 1rem;
                             padding-bottom: .5rem;

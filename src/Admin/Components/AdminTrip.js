@@ -44,11 +44,13 @@ const AdminTrip = () =>{
     const [price, setPrice] = useState('');
     const [driver, setDriver] = useState('');
     const [status, setStatus] = useState('');
+    const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
+    const [tripToDelete, setTripToDelete] = useState(null);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
             selector: row => row.id,
-            width: '4rem',
+            width: '3rem',
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.id}</div>
         },
         {
@@ -103,8 +105,8 @@ const AdminTrip = () =>{
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Giá vé</div>,
             selector: row => row.price,
-            width: '5rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.price}</div>
+            width: '7rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.price.toLocaleString('vi-VN')}VND</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tài xế</div>,
@@ -294,14 +296,12 @@ const AdminTrip = () =>{
             if (!driver) {
                 missingInfo.push("Tài xế");
             }
-            if (!status) {
-                missingInfo.push("Trạng thái");
-            }
             if (missingInfo.length > 0) {
                 const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token");
                     const newTripData = {
                         routeId: route,
                         vehicleId: vehicle,
@@ -309,7 +309,7 @@ const AdminTrip = () =>{
                         timeStart: timeStart,
                         price: price,
                         driverId: driver,
-                        status: status,
+                        status: 1,
                     };
                     console.log("newTripData", newTripData);
         
@@ -317,7 +317,8 @@ const AdminTrip = () =>{
                     const response = await fetch("http://localhost:8081/api/trip", {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify(newTripData)
                     });
@@ -379,6 +380,7 @@ const AdminTrip = () =>{
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token");
                     const newTripData = {
                         routeId: currentTrip.route.id,
                         vehicleId: currentTrip.vehicle.id,
@@ -395,7 +397,8 @@ const AdminTrip = () =>{
                     const response = await fetch(`http://localhost:8081/api/trip/${currentTrip.id}`, {
                         method: "PUT",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify(newTripData)
                     });
@@ -436,11 +439,15 @@ const AdminTrip = () =>{
                 }
             }
         };
-        const handleRemoveClick = async (trip) => {
-            const tripId = trip.id;
+        const removeTrip = async () => {
+            const tripId = tripToDelete.id;
             try {
+                const token = localStorage.getItem("token");
                 const response = await fetch(`http://localhost:8081/api/trip/${tripId}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}` // Thêm token vào header
+                }
             });
                 if (response.ok) {
                     
@@ -448,6 +455,7 @@ const AdminTrip = () =>{
                     const updateTrip = records.filter(record => record.id !== tripId);
                     setRecords(updateTrip);
                     toast.success("trip đã được xóa thành công!");
+                    setIsDeleteConfirmVisible(false);
                 } else {
                     console.error("Có lỗi xảy ra khi xóa trip!");
                     toast.error("Có lỗi xảy ra khi xóa trip!");
@@ -460,6 +468,11 @@ const AdminTrip = () =>{
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
+        const handleRemoveClick = (trip) => {
+            setTripToDelete(trip);
+            setIsDeleteConfirmVisible(true);
+        };
+        const NoDataComponent = () => <div className="emptyData">Không có dữ liệu</div>;
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -490,6 +503,7 @@ const AdminTrip = () =>{
                     columns={columns}
                     data={records}
                     // pagination
+                    noDataComponent={<NoDataComponent />}
                     ></DataTable>
                     <Pagination 
                         count={totalPages}
@@ -558,7 +572,7 @@ const AdminTrip = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Giá vé:</label>
-                                        <input type="text" value={currentTrip.price} onChange={(e) => setcurrentTrip({ ...currentTrip, price: e.target.value })} />
+                                        <input type="number" className="inputValue" value={currentTrip.price} onChange={(e) => setcurrentTrip({ ...currentTrip, price: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Tài xế:</label>
@@ -670,7 +684,7 @@ const AdminTrip = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Giá vé:</label>
-                                        <input type="text" value={price} onChange={handlePriceChange} />
+                                        <input type="number" className="inputValue" value={price} onChange={handlePriceChange} />
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Tài xế:</label>
@@ -687,26 +701,29 @@ const AdminTrip = () =>{
                                             ))}
                                         </select>
                                     </div>
-                                    <div className="infoCity">
-                                        <label>Trạng thái:</label>
-                                        {/* <input type="text" value={currentTrip.status} onChange={(e) => setcurrentTrip({ ...currentTrip, status: e.target.value })} /> */}
-                                        <select 
-                                            className="inputValue"
-                                            value={status} onChange={handleStatusChange}
-                                        >
-                                            <option value="">Chọn trạng thái</option>
-                                            {Object.keys(statusMap).map(key => (
-                                                <option key={key} value={key}>
-                                                    {statusMap[key]}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsAdd(false)} className="cancel">Hủy</button>
                                         <button type="submit" className="save" onClick={handleCreateTrip}>Tạo</button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isDeleteConfirmVisible && (
+                <div className="modal" id="confirmDeleteModal">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Xác nhận xóa</h2>
+                            </div>
+                            <div className="modal-body">
+                                <p className="textConfirm">Bạn có chắc chắn muốn xóa chuyến đi này?</p>
+                                <div className="listButton">
+                                    <button type="button"  onClick={() => setIsDeleteConfirmVisible(false)} className="cancel">Hủy</button>
+                                    <button type="button" className="save" onClick={removeTrip}>Xóa</button>
+                                </div>
                             </div>
                         </div>
                     </div>

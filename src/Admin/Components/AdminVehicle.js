@@ -23,6 +23,8 @@ const AdminVehicle = () =>{
     const [status, setStatus] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
+    const [vehicleToDelete, setvehicleToDelete] = useState(null);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -137,26 +139,25 @@ const AdminVehicle = () =>{
             if (!value) {
                 missingInfo.push("Sức chứa");
             }
-            if (!status) {
-                missingInfo.push("Trạng thái");
-            }
             if (missingInfo.length > 0) {
                 const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token");
                     const newVehicleData = {
                         name: name,
                         kindVehicleId: kindVehicle,
                         vehicleNumber: vehicleNumber,
                         value: value,
-                        status: status,
+                        status: 0,
                     };
             
                     const response = await fetch("http://localhost:8081/api/vehicle", {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify(newVehicleData)
                     });
@@ -210,6 +211,7 @@ const AdminVehicle = () =>{
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token");
                     const updateVehicleData = {
                         name: currentVehicle.name,
                         kindVehicleId: currentVehicle.kindVehicle.id,
@@ -221,7 +223,8 @@ const AdminVehicle = () =>{
                     const response = await fetch(`http://localhost:8081/api/vehicle/${currentVehicle.id}`, {
                         method: "PUT",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify(updateVehicleData)
                     });
@@ -256,11 +259,15 @@ const AdminVehicle = () =>{
                 }
             }
         };
-        const handleRemoveClick = async (vehicle) => {
-            const vehicleId = vehicle.id;
+        const removeVehicle = async () => {
+            const vehicleId = vehicleToDelete.id;
             try {
+                const token = localStorage.getItem("token");
                 const response = await fetch(`http://localhost:8081/api/vehicle/${vehicleId}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}` // Thêm token vào header
+                }
             });
                 if (response.ok) {
                     
@@ -268,6 +275,7 @@ const AdminVehicle = () =>{
                     const updateVehicle = records.filter(record => record.id !== vehicleId);
                     setRecords(updateVehicle);
                     toast.success("vehicle đã được xóa thành công!");
+                    setIsDeleteConfirmVisible(false);
                 } else {
                     console.error("Có lỗi xảy ra khi xóa vehicle!");
                     toast.error("Có lỗi xảy ra khi xóa vehicle!");
@@ -280,6 +288,11 @@ const AdminVehicle = () =>{
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
+        const handleRemoveClick = (vehicle) => {
+            setvehicleToDelete(vehicle);
+            setIsDeleteConfirmVisible(true);
+        };
+        const NoDataComponent = () => <div className="emptyData">Không có dữ liệu</div>;
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -310,6 +323,7 @@ const AdminVehicle = () =>{
                     columns={columns}
                     data={records}
                     // pagination
+                    noDataComponent={<NoDataComponent />}
                     ></DataTable>
                     
                     <Pagination 
@@ -361,7 +375,7 @@ const AdminVehicle = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Sức chứa:</label>
-                                        <input type="text" value={currentVehicle.value} onChange={(e) => setcurrentVehicle({ ...currentVehicle, value: e.target.value })} />
+                                        <input type="number" className="inputValue" value={currentVehicle.value} onChange={(e) => setcurrentVehicle({ ...currentVehicle, value: e.target.value })} />
                                     </div>
                                     <div className="infoCity">
                                         <label>Trạng thái:</label>
@@ -421,28 +435,31 @@ const AdminVehicle = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Sức chứa:</label>
-                                        <input type="text" value={value} onChange={handleValueChange} />
-                                    </div>
-                                    <div className="infoCity">
-                                        <label>Trạng thái:</label>
-                                        {/* <input type="text" value={currentVehicle.status} onChange={(e) => setcurrentVehicle({ ...currentVehicle, status: e.target.value })} /> */}
-                                        <select 
-                                            className="inputValue"
-                                            value={status} onChange={handleStatusChange}
-                                        >
-                                            <option value="">Chọn trạng thái</option>
-                                            {Object.keys(statusMap).map(key => (
-                                                <option key={key} value={key}>
-                                                    {statusMap[key]}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        <input type="number" className="inputValue" value={value} onChange={handleValueChange} />
                                     </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsAdd(false)} className="cancel">Hủy</button>
                                         <button type="submit" className="save" onClick={handleCreateVehicle}>Tạo</button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isDeleteConfirmVisible && (
+                <div className="modal" id="confirmDeleteModal">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Xác nhận xóa</h2>
+                            </div>
+                            <div className="modal-body">
+                                <p className="textConfirm">Bạn có chắc chắn muốn xóa phương tiện này?</p>
+                                <div className="listButton">
+                                    <button type="button"  onClick={() => setIsDeleteConfirmVisible(false)} className="cancel">Hủy</button>
+                                    <button type="button" className="save" onClick={removeVehicle}>Xóa</button>
+                                </div>
                             </div>
                         </div>
                     </div>

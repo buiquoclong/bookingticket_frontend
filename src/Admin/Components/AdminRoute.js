@@ -23,6 +23,8 @@ const AdminRoute = () =>{
     const [status, setStatus] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
+    const [routeToDelete, setRouteToDelete] = useState(null);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -50,7 +52,7 @@ const AdminRoute = () =>{
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Khoảng cách</div>,
             selector: row => row.khoangCach,
             width: '10rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.khoangCach}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.khoangCach} km</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Thời gian di chuyển</div>,
@@ -149,29 +151,27 @@ const AdminRoute = () =>{
             if (!timeOfRoute) {
                 missingInfo.push("Thời gian di chuyển");
             }
-            if (!status) {
-                missingInfo.push("Trạng thái");
-            }
             if (missingInfo.length > 0) {
                 const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token");
                     const newRouteData = {
                         name: nameRoute,
                         diemdi: diemDi,
                         diemden: diemDen,
                         khoangCach: khoangCach,
                         timeOfRoute: timeOfRoute,
-                        status: status,
+                        status: 0,
                     };
-                    console.log("newRouteData", newRouteData);
         
             
                     const response = await fetch("http://localhost:8081/api/route", {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify(newRouteData)
                     });
@@ -225,6 +225,7 @@ const AdminRoute = () =>{
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token");
                     const newRouteData = {
                         name: currentRoute.name,
                         diemdi: currentRoute.diemDi.id,
@@ -233,13 +234,13 @@ const AdminRoute = () =>{
                         timeOfRoute: currentRoute.timeOfRoute,
                         status: currentRoute.status,
                     };
-                    console.log("newRouteData", newRouteData);
         
             
                     const response = await fetch(`http://localhost:8081/api/route/${currentRoute.id}`, {
                         method: "PUT",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify(newRouteData)
                     });
@@ -275,11 +276,15 @@ const AdminRoute = () =>{
                 }
             }
         };
-        const handleRemoveClick = async (route) => {
-            const routeId = route.id;
+        const removeRoute = async (route) => {
+            const routeId = routeToDelete.id;
             try {
+                const token = localStorage.getItem("token");
                 const response = await fetch(`http://localhost:8081/api/route/${routeId}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}` // Thêm token vào header
+                }
             });
                 if (response.ok) {
                     
@@ -287,6 +292,7 @@ const AdminRoute = () =>{
                     const updatedRoute = records.filter(record => record.id !== routeId);
                     setRecords(updatedRoute);
                     toast.success("route đã được xóa thành công!");
+                    setIsDeleteConfirmVisible(false);
                 } else {
                     console.error("Có lỗi xảy ra khi xóa route!");
                     toast.error("Có lỗi xảy ra khi xóa route!");
@@ -299,6 +305,12 @@ const AdminRoute = () =>{
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
+        
+        const handleRemoveClick = (route) => {
+            setRouteToDelete(route);
+            setIsDeleteConfirmVisible(true);
+        };
+        const NoDataComponent = () => <div className="emptyData">Không có dữ liệu</div>;
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -329,6 +341,7 @@ const AdminRoute = () =>{
                     columns={columns}
                     data={records}
                     // pagination
+                    noDataComponent={<NoDataComponent />}
                     ></DataTable>
                     <Pagination 
                         count={totalPages}
@@ -395,11 +408,11 @@ const AdminRoute = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Khoảng cách:</label>
-                                        <input type="text" value={currentRoute.khoangCach} onChange={(e) => setcurrentRoute({ ...currentRoute, khoangCach: e.target.value })} />
+                                        <input type="number" className="inputValue" value={currentRoute.khoangCach.toString()} onChange={(e) => setcurrentRoute({ ...currentRoute, khoangCach: parseInt(e.target.value) || '' })} />
                                     </div>
                                     <div className="infoCity">
                                         <label>Thời gian di chuyển:</label>
-                                        <input type="text" value={currentRoute.timeOfRoute} giờ onChange={(e) => setcurrentRoute({ ...currentRoute, timeOfRoute: e.target.value })} />
+                                        <input type="number" className="inputValue" value={currentRoute.timeOfRoute.toString()} onChange={(e) => setcurrentRoute({ ...currentRoute, timeOfRoute: parseInt(e.target.value) || '' })} />
                                     </div>
                                     <div className="infoCity">
                                         <label>Trạng thái:</label>
@@ -437,7 +450,7 @@ const AdminRoute = () =>{
                                 <form>
                                     <div className="infoCity">
                                         <label>Tên tuyến:</label>
-                                        <input type="text" value={nameRoute}/>
+                                        <input type="text" value={nameRoute} readOnly />
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Điểm đi:</label>
@@ -472,32 +485,35 @@ const AdminRoute = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Khoảng cách:</label>
-                                        <input type="text"value={khoangCach} onChange={handleKhoangCachChange} />
+                                        <input type="number" className="inputValue" value={khoangCach} onChange={handleKhoangCachChange} />
                                     </div>
                                     <div className="infoCity">
                                         <label>Thời gian di chuyển:</label>
-                                        <input type="text"value={timeOfRoute} onChange={handleTimeOfRouteChange} />
-                                    </div>
-                                    <div className="infoCity">
-                                        <label>Trạng thái:</label>
-                                        {/* <input type="text" value={currentRoute.status} onChange={(e) => setcurrentRoute({ ...currentRoute, status: e.target.value })} /> */}
-                                        <select 
-                                            className="inputValue"
-                                            value={status} onChange={handleStatusChange}
-                                        >
-                                            <option value="">Chọn trạng thái</option>
-                                            {Object.keys(statusMap).map(key => (
-                                                <option key={key} value={key}>
-                                                    {statusMap[key]}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        <input type="number" className="inputValue" value={timeOfRoute} onChange={handleTimeOfRouteChange} />
                                     </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsAdd(false)} className="cancel">Hủy</button>
                                         <button type="submit" className="save" onClick={handleCreateRoute}>Tạo</button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isDeleteConfirmVisible && (
+                <div className="modal" id="confirmDeleteModal">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Xác nhận xóa</h2>
+                            </div>
+                            <div className="modal-body">
+                                <p className="textConfirm">Bạn có chắc chắn muốn xóa tuyến này?</p>
+                                <div className="listButton">
+                                    <button type="button"  onClick={() => setIsDeleteConfirmVisible(false)} className="cancel">Hủy</button>
+                                    <button type="button" className="save" onClick={removeRoute}>Xóa</button>
+                                </div>
                             </div>
                         </div>
                     </div>

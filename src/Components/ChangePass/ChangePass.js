@@ -105,6 +105,10 @@ const ChangePass  = () => {
                             toast.success("Bạn đã đổi mật khẩu thành công");
                             localStorage.removeItem("userId");
                             setTimeout(() => {
+                                localStorage.removeItem("token");
+                                localStorage.removeItem("userId"); 
+                                localStorage.removeItem("userRole");
+                                localStorage.removeItem("googleLogin");
                                 navigate("/login");
                             }, 2000);
                         } else {

@@ -18,6 +18,8 @@ const AdminPromotion = () =>{
     const [discount, setDiscount] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
+    const [promotionToDelete, setPromotionToDelete] = useState(null);
     const formatDateTime = (dateString) => {
         const date = new Date(dateString);
     
@@ -85,19 +87,6 @@ const AdminPromotion = () =>{
             console.error("Error fetching cities:", error);
         }
     };
-    // const data = [
-    //     { mave: 'ABC123', mahoadon: 121, numTicket: 2, total:'600.000đ' },
-    //     { mave: 'ABC124', mahoadon: 122, numTicket: 2, total:'600.000đ' },
-    //     { mave: 'ABC125', mahoadon: 123, numTicket: 2, total:'600.000đ' },
-    //     { mave: 'ABC126', mahoadon: 124, numTicket: 2, total:'600.000đ' },
-    //     { mave: 'ABC127', mahoadon: 125, numTicket: 2, total:'600.000đ' },
-    //     { mave: 'ABC128', mahoadon: 126, numTicket: 2, total:'600.000đ' },
-    //     { mave: 'ABC129', mahoadon: 127, numTicket: 2, total:'600.000đ' },
-    //     { mave: 'ABC130', mahoadon: 128, numTicket: 2, total:'600.000đ' },
-    //     { mave: 'ABC131', mahoadon: 129, numTicket: 2, total:'600.000đ' },
-    //     { mave: 'ABC132', mahoadon: 130, numTicket: 2, total:'600.000đ' },
-    //     { mave: 'ABC133', mahoadon: 131, numTicket: 2, total:'600.000đ' }
-    // ]
     
     //     const [records, setRecords] = useState(data);
         function handleFilter(event){
@@ -157,19 +146,20 @@ const AdminPromotion = () =>{
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token");
                     const newPromotionData = {
                         description: description,
                         startDay: startDay,
                         endDay: endDay,
                         discount: discount,
                     };
-                    console.log("newPromotionData", newPromotionData);
         
             
                     const response = await fetch("http://localhost:8081/api/promotion", {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify(newPromotionData)
                     });
@@ -222,6 +212,7 @@ const AdminPromotion = () =>{
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token");
                     const newPromotionData = {
                         code: currentPromotion.code,
                         description: currentPromotion.description,
@@ -235,7 +226,8 @@ const AdminPromotion = () =>{
                     const response = await fetch(`http://localhost:8081/api/promotion/${currentPromotion.id}`, {
                         method: "PUT",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify(newPromotionData)
                     });
@@ -269,11 +261,15 @@ const AdminPromotion = () =>{
                 }
             }
         };
-        const handleRemoveClick = async (promotion) => {
-            const promotionId = promotion.id;
+        const removePromotion = async () => {
+            const promotionId = promotionToDelete.id;
             try {
+                const token = localStorage.getItem("token");
                 const response = await fetch(`http://localhost:8081/api/promotion/${promotionId}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}` // Thêm token vào header
+                }
             });
                 if (response.ok) {
                     
@@ -281,6 +277,7 @@ const AdminPromotion = () =>{
                     const updatedPromo = records.filter(record => record.id !== promotionId);
                     setRecords(updatedPromo);
                     toast.success("Promotion đã được xóa thành công!");
+                    setIsDeleteConfirmVisible(false);
                 } else {
                     console.error("Có lỗi xảy ra khi xóa Promotion!");
                     toast.error("Có lỗi xảy ra khi xóa Promotion!");
@@ -293,6 +290,11 @@ const AdminPromotion = () =>{
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
+        const handleRemoveClick = (promotion) => {
+            setPromotionToDelete(promotion);
+            setIsDeleteConfirmVisible(true);
+        };
+        const NoDataComponent = () => <div className="emptyData">Không có dữ liệu</div>;
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -323,6 +325,7 @@ const AdminPromotion = () =>{
                     columns={columns}
                     data={records}
                     // pagination
+                    noDataComponent={<NoDataComponent />}
                     ></DataTable>
                     <Pagination 
                         count={totalPages}
@@ -407,6 +410,24 @@ const AdminPromotion = () =>{
                                         <button type="submit" className="save" onClick={handleCreatePromotion}>Tạo</button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isDeleteConfirmVisible && (
+                <div className="modal" id="confirmDeleteModal">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Xác nhận xóa</h2>
+                            </div>
+                            <div className="modal-body">
+                                <p className="textConfirm">Bạn có chắc chắn muốn xóa mã giảm giá này?</p>
+                                <div className="listButton">
+                                    <button type="button"  onClick={() => setIsDeleteConfirmVisible(false)} className="cancel">Hủy</button>
+                                    <button type="button" className="save" onClick={removePromotion}>Xóa</button>
+                                </div>
                             </div>
                         </div>
                     </div>

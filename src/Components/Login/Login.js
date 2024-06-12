@@ -98,22 +98,32 @@ const Login  = () => {
                             const decodedToken = jwtDecode(token);
                             const userId = decodedToken.userId;
 
+                            
+                            const userRole = decodedToken.role;
+
                             localStorage.setItem('userId', userId);
-                            const userInfoResponse = await fetch(`http://localhost:8081/api/user/${userId}`, {
-                                    method: "GET",
-                                    headers: {'content-type': 'application/json'}
-                                });
-                                const userInfo = await userInfoResponse.json();
-                                const redirectPath = sessionStorage.getItem('redirectPath');
-                                if (redirectPath) {
-                                navigate(redirectPath);
-                                } else {
-                                    if (userInfo.role  === 1) {
-                                        navigate('/');
-                                    } else if (userInfo.role  === 2 || userInfo.role  === 3) {
-                                        navigate('/admin');
-                                    }
-                                }
+                            
+                            localStorage.setItem('userRole', userRole);
+                            if (userRole  === 1) {
+                                navigate('/');
+                            } else if (userRole  === 2 || userRole  === 3) {
+                                navigate('/admin');
+                            }
+                            // const userInfoResponse = await fetch(`http://localhost:8081/api/user/${userId}`, {
+                            //         method: "GET",
+                            //         headers: {'content-type': 'application/json'}
+                            //     });
+                            //     const userInfo = await userInfoResponse.json();
+                            //     const redirectPath = sessionStorage.getItem('redirectPath');
+                            //     if (redirectPath) {
+                            //     navigate(redirectPath);
+                            //     } else {
+                            //         if (userInfo.role  === 1) {
+                            //             navigate('/');
+                            //         } else if (userInfo.role  === 2 || userInfo.role  === 3) {
+                            //             navigate('/admin');
+                            //         }
+                            //     }
                         }
                     } else {
                         toast.error('Failed: ' + response.status);

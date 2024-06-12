@@ -21,6 +21,8 @@ const AdminContact = () =>{
     const [content, setContent] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
+    const [contactToDelete, setContactToDelete] = useState(null);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -193,6 +195,7 @@ const AdminContact = () =>{
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token");
                     const newContactData = {
                         content: currentContact.content,
                         email: currentContact.email,
@@ -203,7 +206,8 @@ const AdminContact = () =>{
                     const response = await fetch(`http://localhost:8081/api/contact/${currentContact.id}`, {
                         method: "PUT",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}` // Thêm token vào header
                         },
                         body: JSON.stringify(newContactData)
                     });
@@ -237,18 +241,23 @@ const AdminContact = () =>{
                 }
             }
         };
-        const handleRemoveClick = async (contact) => {
-            const contactId = contact.id;
+        const removeContact = async () => {
+            const contactId = contactToDelete.id;
             try {
+                const token = localStorage.getItem("token");
                 const response = await fetch(`http://localhost:8081/api/contact/${contactId}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}` // Thêm token vào header
+                }
             });
                 if (response.ok) {
                     
                     // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
                     const updatedContact = records.filter(record => record.id !== contactId);
                     setRecords(updatedContact);
-                    toast.success("contact đã được xóa thành công!");
+                    toast.success("Contact đã được xóa thành công!");
+                    setIsDeleteConfirmVisible(false);
                 } else {
                     console.error("Có lỗi xảy ra khi xóa contact!");
                     toast.error("Có lỗi xảy ra khi xóa contact!");
@@ -261,6 +270,11 @@ const AdminContact = () =>{
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
+        const handleRemoveClick = (contact) => {
+            setContactToDelete(contact);
+            setIsDeleteConfirmVisible(true);
+        };
+        const NoDataComponent = () => <div className="emptyData">Không có dữ liệu</div>;
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -291,6 +305,7 @@ const AdminContact = () =>{
                     columns={columns}
                     data={records}
                     // pagination
+                    noDataComponent={<NoDataComponent />}
                     ></DataTable>
                     <Pagination 
                         count={totalPages}
@@ -366,10 +381,28 @@ const AdminContact = () =>{
                                         <input type="text" value={content} onChange={handleContentChange}/>
                                     </div>
                                     <div className="listButton">
-                                        <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
+                                        <button type="button" onClick={() => setIsAdd(false)} className="cancel">Hủy</button>
                                         <button type="submit" className="save" onClick={handleCreateContact}>Tạo</button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isDeleteConfirmVisible && (
+                <div className="modal" id="confirmDeleteModal">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Xác nhận xóa</h2>
+                            </div>
+                            <div className="modal-body">
+                                <p className="textConfirm">Bạn có chắc chắn muốn xóa liên hệ này?</p>
+                                <div className="listButton">
+                                    <button type="button"  onClick={() => setIsDeleteConfirmVisible(false)} className="cancel">Hủy</button>
+                                    <button type="button" className="save" onClick={removeContact}>Xóa</button>
+                                </div>
                             </div>
                         </div>
                     </div>

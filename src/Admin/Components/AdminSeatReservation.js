@@ -107,6 +107,7 @@ const AdminSeatReservation = () =>{
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
+        const NoDataComponent = () => <div className="emptyData">Không có dữ liệu</div>;
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -136,6 +137,7 @@ const AdminSeatReservation = () =>{
                     columns={columns}
                     data={records}
                     // pagination
+                    noDataComponent={<NoDataComponent />}
                     ></DataTable>
                     <Pagination 
                         count={totalPages}

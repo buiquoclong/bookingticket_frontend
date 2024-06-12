@@ -48,8 +48,8 @@ const Footer = () =>{
 
                         <div className="footerParagraph">
                             <h2>Thông tin liên hệ</h2>
-                            <h4 className="span2">Địa chỉ: Kp.6, Phường LInh Trung, TP Thủ Đức, TP. Hồ Chí Minh</h4>
-                            <h4 className="span3">Email: nlu@hcmuaf.edu.vn</h4>
+                            <h4 className="span2">Địa chỉ: Kp.6, Phường Linh Trung, TP Thủ Đức, TP. Hồ Chí Minh</h4>
+                            <h4 className="span3">Email: roadlinebooking@gmail.com</h4>
                             <h4 className="span4">Điện thoại: 0123456789</h4>
                         </div>
 

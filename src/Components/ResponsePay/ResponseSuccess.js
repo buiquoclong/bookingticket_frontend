@@ -255,7 +255,7 @@ const ResponseSuccess  = () => {
         };
         try {
             // Gửi yêu cầu cập nhật số ghế trống
-            const updateResponse = await fetch(`http://localhost:8081/api/trip/${trip}`, {
+            const updateResponse = await fetch(`http://localhost:8081/api/trip/p1/${trip}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

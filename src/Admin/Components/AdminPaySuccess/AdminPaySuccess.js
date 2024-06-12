@@ -1,18 +1,7 @@
-import React, {useState, useEffect} from 'react'
-import 
-{ BsFillArchiveFill, BsFillGrid3X3GapFill, BsPeopleFill}
-from 'react-icons/bs'
-import 
-{ BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } 
-from 'recharts';
-import { GrLocation } from "react-icons/gr";
-import { RiArrowLeftRightFill } from "react-icons/ri";
-import { HiFilter } from "react-icons/hi";
+import React, {useState, useEffect} from 'react';
 import "../AdminPaySuccess/AdminPaySuccess.scss"
-import success from "../../Assets/img/success.png";
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { toast, ToastContainer, Zoom } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Link, useLocation } from 'react-router-dom';
+import CheckCircleSharpIcon from '@mui/icons-material/CheckCircleSharp';
 
 
 function AdminPaySuccess() {
@@ -50,7 +39,7 @@ function AdminPaySuccess() {
     };
     return (
     <main className='main-container'>
-        {kind === "Một chiều" && (
+        {/* {kind === "Một chiều" && (
             <div>
                 {data &&
                     data.map(detail => (
@@ -235,7 +224,128 @@ function AdminPaySuccess() {
                 ))
             }
             </div>
-        )}
+        )} */}
+        <div className="paySuccess">
+                <div className="imgsucces">
+                    <CheckCircleSharpIcon className="icon"/>              
+                </div>
+                <div className="content">
+                    <div className="titlePay">Mua vé thành công</div>
+                </div>
+                <div className="detailbooking">
+                    <div className="title">THÔNG TIN MUA VÉ</div>
+                    <div className="devide"></div>
+                    <div className="infoTicket">
+                        {kind === "Một chiều" && (
+                            <div className="detailBoooking">
+                                {data &&
+                                    data.map(detail => (
+                                        <div className="infoBookingTicket" key={detail.id}>
+                                            <h3>Mã vé: {detail.id}</h3>
+                                            <div className="lineInfo">
+                                                <span>Tuyến:</span>
+                                                <div className="rightInfo">
+                                                    <span>{detail.trip.route.name}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Loại xe:</span>
+                                                    <div className="rightInfo">
+                                                        <span>{detail.trip.vehicle.kindVehicle.name}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="lineInfo">
+                                                    <span>Ngày:</span>
+                                                    <div className="rightInfo">
+                                                        <span>{formatDate(detail.trip.dayStart)}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="lineInfo">
+                                                    <span>Thời gian:</span>
+                                                    <div className="rightInfo">
+                                                        <span>{detail.trip.timeStart.slice(0, 5)}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="lineInfo">
+                                                    <span>Số ghế:</span>
+                                                    <div className="seatInfo">
+                                                        <span>{detail.seatName}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="lineInfo">
+                                                    <span>Giá:</span>
+                                                    <div className="rightInfo">
+                                                        <span>{detail.price.toLocaleString('vi-VN')}VND</span>
+                                                    </div>
+                                                </div>
+                                    </div>
+                                        
+                                    ))
+                                }
+                            </div>
+                        )}
+                        
+                        {kind === "Khứ hồi" && (
+                            <div className="detailBoooking">
+                                {data &&
+                                    data.map(detail => (
+                                        <div className="infoBookingTicket" key={detail.id}>
+                                            <h3>Mã vé: {detail.id}</h3>
+                                            <div className="lineInfo">
+                                                <span>Tuyến:</span>
+                                                <div className="rightInfo">
+                                                    <span>{detail.trip.route.name}</span>
+                                                </div>
+                                            </div>
+                                            <div className="lineInfo">
+                                                <span>Loại xe:</span>
+                                                    <div className="rightInfo">
+                                                        <span>{detail.trip.vehicle.kindVehicle.name}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="lineInfo">
+                                                    <span>Ngày:</span>
+                                                    <div className="rightInfo">
+                                                        <span>{formatDate(detail.trip.dayStart)}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="lineInfo">
+                                                    <span>Thời gian:</span>
+                                                    <div className="rightInfo">
+                                                        <span>{detail.trip.timeStart.slice(0, 5)}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="lineInfo">
+                                                    <span>Số ghế:</span>
+                                                    <div className="rightInfo">
+                                                        <span>{data.quantity}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="lineInfo">
+                                                    <span>Ghế đã đặt:</span>
+                                                    <div className="seatInfo">
+                                                        <span>{detail.seatName}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="lineInfo">
+                                                    <span>Giá:</span>
+                                                    <div className="rightInfo">
+                                                        <span>{detail.price.toLocaleString('vi-VN')}VND</span>
+                                                    </div>
+                                                </div>
+                                    </div>
+                                        
+                                    ))
+                                }
+                            </div>
+                        )}
+                    </div>
+                    <div className="devide"></div>
+                    <div className="backhome">
+                        <Link to="/admin"><button className="btn backhomebtn">Trở về</button></Link>
+                    </div>
+                </div>
+            </div>
     </main>
     )
 }

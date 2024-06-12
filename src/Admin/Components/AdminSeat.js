@@ -23,6 +23,8 @@ const AdminSeat = () =>{
     
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
+    const [seatToDelete, setSeatToDelete] = useState(null);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -102,9 +104,6 @@ const AdminSeat = () =>{
         const handkindVehicleChange = (event) => {
             setKindVehicle(event.target.value)
         };
-        const handleStatusChange = (event) => {
-            setStatus(event.target.value)
-        }
         const handleCreateSeat = async (e) => {
             e.preventDefault();
             let missingInfo = [];
@@ -114,24 +113,23 @@ const AdminSeat = () =>{
             if (!kindVehicle) {
                 missingInfo.push("Loại xe");
             }
-            if (!status) {
-                missingInfo.push("Trạng thái");
-            }
             if (missingInfo.length > 0) {
                 const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token");
                     const newSeatData = {
                         name: name,
                         kindVehicleId: kindVehicle,
-                        status: status,
+                        status: 0,
                     };
             
                     const response = await fetch("http://localhost:8081/api/seat", {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify(newSeatData)
                     });
@@ -179,6 +177,7 @@ const AdminSeat = () =>{
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token");
                     const updateSeatData = {
                         name: currentSeat.name,
                         kindVehicleId: currentSeat.kindVehicle.id,
@@ -188,7 +187,8 @@ const AdminSeat = () =>{
                     const response = await fetch(`http://localhost:8081/api/seat/${currentSeat.id}`, {
                         method: "PUT",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify(updateSeatData)
                     });
@@ -227,11 +227,15 @@ const AdminSeat = () =>{
             }
         };
         
-        const handleRemoveClick = async (seat) => {
-            const seatId = seat.id;
+        const removeSeat = async () => {
+            const seatId = seatToDelete.id;
             try {
+                const token = localStorage.getItem("token");
                 const response = await fetch(`http://localhost:8081/api/seat/${seatId}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}` // Thêm token vào header
+                }
             });
                 if (response.ok) {
                     
@@ -239,6 +243,7 @@ const AdminSeat = () =>{
                     const updateSeat = records.filter(record => record.id !== seatId);
                     setRecords(updateSeat);
                     toast.success("seat đã được xóa thành công!");
+                    setIsDeleteConfirmVisible(false);
                 } else {
                     console.error("Có lỗi xảy ra khi xóa seat!");
                     toast.error("Có lỗi xảy ra khi xóa seat!");
@@ -251,6 +256,11 @@ const AdminSeat = () =>{
         const handleChangePage = (event, value) => {
             setPage(value);
         };
+        const handleRemoveClick = (seat) => {
+            setSeatToDelete(seat);
+            setIsDeleteConfirmVisible(true);
+        };
+        const NoDataComponent = () => <div className="emptyData">Không có dữ liệu</div>;
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -281,6 +291,7 @@ const AdminSeat = () =>{
                     columns={columns}
                     data={records}
                     // pagination
+                    noDataComponent={<NoDataComponent />}
                     ></DataTable>
                     <Pagination 
                         count={totalPages}
@@ -378,26 +389,29 @@ const AdminSeat = () =>{
                                             ))}
                                         </select>
                                     </div>
-                                    <div className="infoCity">
-                                        <label>Trạn thái:</label>
-                                        {/* <input type="text" value={currentSeat.vehicleNumber} onChange={(e) => setcurrentSeat({ ...currentSeat, vehicleNumber: e.target.value })} /> */}
-                                        <select 
-                                            className="inputValue"
-                                            value={status} onChange={handleStatusChange}
-                                        >
-                                            <option value="">Chọn trạng thái</option>
-                                            {Object.keys(statusMap).map(key => (
-                                                <option key={key} value={key}>
-                                                    {statusMap[key]}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsAdd(false)} className="cancel">Hủy</button>
                                         <button type="submit" className="save" onClick={handleCreateSeat}>Tạo</button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isDeleteConfirmVisible && (
+                <div className="modal" id="confirmDeleteModal">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Xác nhận xóa</h2>
+                            </div>
+                            <div className="modal-body">
+                                <p className="textConfirm">Bạn có chắc chắn muốn xóa ghế này?</p>
+                                <div className="listButton">
+                                    <button type="button"  onClick={() => setIsDeleteConfirmVisible(false)} className="cancel">Hủy</button>
+                                    <button type="button" className="save" onClick={removeSeat}>Xóa</button>
+                                </div>
                             </div>
                         </div>
                     </div>

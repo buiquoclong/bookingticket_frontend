@@ -28,7 +28,6 @@ const AdminUser = () =>{
     const [phone, setPhone] = useState('');
     const [role, setRole] = useState('');
     const [status, setStatus] = useState('');
-    const [type, setType] = useState('');
     const [emailErrorMessage, setEmailErrorMessage] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
@@ -79,16 +78,15 @@ const AdminUser = () =>{
         {
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                    <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
+                    <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button>
                 </div>
             )
         }
     ]
     const roleMap = {
-        1: 'Admin',
+        1: 'User',
         2: 'Employee',
-        3: 'User',
+        3: 'Admin',
     };
     const statusMap = {
         1: 'Chưa kích hoạt',
@@ -151,12 +149,6 @@ const AdminUser = () =>{
         const handleRoleChange = (event) => {
             setRole(event.target.value)
         };
-        const handleStatusChange = (event) => {
-            setStatus(event.target.value)
-        };
-        const handleTypeChange = (event) => {
-            setType(event.target.value)
-        };
         const handleCreateUser = async () => {
             let missingInfo = [];
             if (!userName) {
@@ -174,31 +166,27 @@ const AdminUser = () =>{
             if (!role) {
                 missingInfo.push("Quyền");
             }
-            if (!status) {
-                missingInfo.push("Status");
-            }
-            if (!type) {
-                missingInfo.push("Loại tài khoản");
-            }
             if (missingInfo.length > 0) {
                 const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token");
                     const newUserData = {
                         name: userName,
                         password: "abc12345", 
                         email: email,
                         phone: phone,
                         role: role,
-                        status: status,
-                        type: type,
+                        status: 1,
+                        type: "Đăng ký",
                     };
             
                     const response = await fetch("http://localhost:8081/api/user", {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify(newUserData)
                     });
@@ -215,8 +203,6 @@ const AdminUser = () =>{
                         setEmail('');
                         setPhone('');
                         setRole('');
-                        setStatus('');
-                        setType('');
                         setIsAdd(false);
                         window.location.reload();
                         toast.success("User đã được tạo thành công!");
@@ -233,32 +219,18 @@ const AdminUser = () =>{
         const handleUpdateUser = async (e) => {
             e.preventDefault();
             let missingInfo = [];
-            if (!currentUser.name) {
-                missingInfo.push("Họ và tên");
-            }
-            if (!currentUser.email) {
-                missingInfo.push("Email");
-            } else if (emailErrorMessage) { // Kiểm tra nếu có errorMessage cho email
-                toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
-                return; // Dừng xử lý tiếp theo nếu có lỗi
-            }
-            if (!currentUser.phone) {
-                missingInfo.push("Số điện thoại");
-            }
             if (!currentUser.role) {
                 missingInfo.push("Quyền");
             }
             if (!currentUser.status) {
-                missingInfo.push("Status");
-            }
-            if (!currentUser.type) {
-                missingInfo.push("Loại tài khoản");
+                missingInfo.push("Trạng thái");
             }
             if (missingInfo.length > 0) {
                 const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token");
                     const updateUserData = {
                         name: currentUser.name,
                         password: currentUser.password, 
@@ -268,12 +240,12 @@ const AdminUser = () =>{
                         status: currentUser.status,
                         type: currentUser.type,
                     };
-                    console.log("updateUserData", updateUserData)
             
                     const response = await fetch(`http://localhost:8081/api/user/${currentUser.id}`, {
                         method: "PUT",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify(updateUserData)
                     });
@@ -291,12 +263,8 @@ const AdminUser = () =>{
                         });
                         setRecords(updatedUsers);
                         // Reset form hoặc làm gì đó khác
-                        setuserName('');
-                        setEmail('');
-                        setPhone('');
                         setRole('');
                         setStatus('');
-                        setType('');
                         setIsEditing(false);
                         // window.location.reload();
                     } else {
@@ -309,30 +277,11 @@ const AdminUser = () =>{
                 }
             }
         };
-        const handleRemoveClick = async (user) => {
-            const userId = user.id;
-            try {
-                const response = await fetch(`http://localhost:8081/api/user/${userId}`, {
-                method: "DELETE"
-            });
-                if (response.ok) {
-                    
-                    // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
-                    const updatedUser = records.filter(record => record.id !== userId);
-                    setRecords(updatedUser);
-                    toast.success("User đã được xóa thành công!");
-                } else {
-                    console.error("Có lỗi xảy ra khi xóa User!");
-                    toast.error("Có lỗi xảy ra khi xóa User!");
-                }
-            } catch (error) {
-                console.error("Lỗi:", error);
-                toast.error("Lỗi:", error.message);
-            }
-        };
+        
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
+        const NoDataComponent = () => <div className="emptyData">Không có dữ liệu</div>;
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -363,6 +312,7 @@ const AdminUser = () =>{
                     columns={columns}
                     data={records}
                     // pagination
+                    noDataComponent={<NoDataComponent />}
                     ></DataTable>
                     <Pagination 
                         count={totalPages}
@@ -386,18 +336,6 @@ const AdminUser = () =>{
                             </div>
                             <div className="modal-body">
                                 <form>
-                                    <div className="infoCity">
-                                        <label>Họ tên:</label>
-                                        <input type="text" className="inputValue" value={currentUser.name} onChange={(e) => setcurrentUser({ ...currentUser, name: e.target.value })} />
-                                    </div>
-                                    <div className="infoCity">
-                                        <label>Email:</label>
-                                        <input type="text" className="inputValue" value={currentUser.email} onChange={(e) => setcurrentUser({ ...currentUser, email: e.target.value })} />
-                                    </div>
-                                    <div className="infoCity">
-                                        <label className="info">Điện thoại:</label>
-                                        <input type="text" className="inputValue" value={currentUser.phone} onChange={(e) => setcurrentUser({ ...currentUser, phone: e.target.value })} />
-                                    </div>
                                     <div className="infoCity">
                                         <label>Quyền:</label>
                                         {/* <input type="text" value={roleMap[currentUser.role] || 'Unknown Role'} onChange={(e) => setcurrentUser({ ...currentUser, role: e.target.value })} /> */}
@@ -425,10 +363,6 @@ const AdminUser = () =>{
                                                 </option>
                                             ))}
                                         </select>
-                                    </div>
-                                    <div className="infoCity">
-                                        <label className="info">Phương thức:</label>
-                                        <input type="text" className="inputValue" value={currentUser.type} onChange={(e) => setcurrentUser({ ...currentUser, type: e.target.value })} />
                                     </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
@@ -476,25 +410,6 @@ const AdminUser = () =>{
                                                 </option>
                                             ))}
                                         </select>
-                                    </div>
-                                    <div className="infoCity">
-                                        <label>Tài khoản:</label>
-                                        {/* <input type="text" className="inputValue" value={statusMap[currentUser.status] || 'Unknown Status'} onChange={(e) => setcurrentUser({ ...currentUser, status: e.target.value })} /> */}
-                                        <select 
-                                            className="inputValue"
-                                            value={status} onChange={handleStatusChange} 
-                                        >
-                                            <option value="">Chọn trạng thái</option>
-                                            {Object.keys(statusMap).map(key => (
-                                                <option key={key} value={key}>
-                                                    {statusMap[key]}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div className="infoCity">
-                                        <label className="info">Phương thức:</label>
-                                        <input type="text" className="inputValue" value={type} onChange={handleTypeChange} />
                                     </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsAdd(false)} className="cancel">Hủy</button>

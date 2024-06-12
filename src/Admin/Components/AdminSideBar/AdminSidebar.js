@@ -48,42 +48,55 @@ function AdminSidebar({openSidebarToggle, OpenSidebar}) {
         </div>
 
         <ul className='sidebar-list'>
-            <Link to="/admin" style={{color:"#9e9ea4"}}>
+                <Link to="/admin" style={{color:"#9e9ea4"}}>
                 <li className={`sidebar-list-item ${activeTab === "dashboard" ? "active" : ""}`} onClick={() => handleTabClick("dashboard")}>
-                    <SpaceDashboardIcon  className='icon'/> Dashboard
+                    <SpaceDashboardIcon  className='icon'/> Thống kê
                 </li>
-            </Link>
+                </Link>
+                <Link to="/admin/book-ticket" style={{color:"#9e9ea4"}}>
+                <li className={`sidebar-list-item ${activeTab === "book-ticket" ? "active" : ""}`} onClick={() => handleTabClick("book-ticket")}>
+                    <BookOnlineIcon  className='icon'/> Đặt vé
+                </li>
+                </Link>
             {data && (data.role === 3) && (
+                <>
+                
                 <Link to="/admin/users" style={{color:"#9e9ea4"}}>
                 <li className={`sidebar-list-item ${activeTab === "users" ? "active" : ""}`} onClick={() => handleTabClick("users")}>
                     <ManageAccountsIcon  className='icon'/> Người dùng
                     </li>
                 </Link>
+                <Link to="/admin/cities" style={{color:"#9e9ea4"}}>
+                <li className={`sidebar-list-item ${activeTab === "cities" ? "active" : ""}`} onClick={() => handleTabClick("cities")}>
+                    <LocationCityIcon  className='icon'/> Thành phố
+                    </li>
+                </Link>
+                <Link to="/admin/vehicles" style={{color:"#9e9ea4"}}>
+                <li className={`sidebar-list-item ${activeTab === "vehicles" ? "active" : ""}`} onClick={() => handleTabClick("vehicles")}>
+                        <DirectionsCarIcon className='icon'/> Phương tiện
+                    </li>
+                </Link>
+                <Link to="/admin/seats" style={{color:"#9e9ea4"}}>
+                <li className={`sidebar-list-item ${activeTab === "seats" ? "active" : ""}`} onClick={() => handleTabClick("seats")}>
+                        <EventSeatIcon className='icon'/> Ghế ngồi
+                    </li>
+                </Link>
+                <Link to="/admin/routes" style={{color:"#9e9ea4"}}>
+                <li className={`sidebar-list-item ${activeTab === "routes" ? "active" : ""}`} onClick={() => handleTabClick("routes")}>
+                        <ScheduleIcon className='icon'/> Tuyến đi
+                    </li>
+                </Link>
+                </>
+                
             )}
             
-            <Link to="/admin/cities" style={{color:"#9e9ea4"}}>
-            <li className={`sidebar-list-item ${activeTab === "cities" ? "active" : ""}`} onClick={() => handleTabClick("cities")}>
-                <LocationCityIcon  className='icon'/> Thành phố
-                </li>
-            </Link>
-            <Link to="/admin/vehicles" style={{color:"#9e9ea4"}}>
-            <li className={`sidebar-list-item ${activeTab === "vehicles" ? "active" : ""}`} onClick={() => handleTabClick("vehicles")}>
-                    <DirectionsCarIcon className='icon'/> Phương tiện
-                </li>
-            </Link>
-            <Link to="/admin/seats" style={{color:"#9e9ea4"}}>
-            <li className={`sidebar-list-item ${activeTab === "seats" ? "active" : ""}`} onClick={() => handleTabClick("seats")}>
-                    <EventSeatIcon className='icon'/> Ghế ngồi
-                </li>
-            </Link>
-            <Link to="/admin/routes" style={{color:"#9e9ea4"}}>
-            <li className={`sidebar-list-item ${activeTab === "routes" ? "active" : ""}`} onClick={() => handleTabClick("routes")}>
-                    <ScheduleIcon className='icon'/> Tuyến đi
-                </li>
-            </Link>
+            
+            
+            
+            
             <Link to="/admin/trips" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "trips" ? "active" : ""}`} onClick={() => handleTabClick("trips")}>
-                    <DirectionsCarIcon className='icon'/> Chuyến xe
+                    <DirectionsCarIcon className='icon'/> Chuyến đi
                 </li>
             </Link>
             <Link to="/admin/bookings" style={{color:"#9e9ea4"}}>
@@ -96,11 +109,13 @@ function AdminSidebar({openSidebarToggle, OpenSidebar}) {
                     <EventSeatIcon className='icon'/> Ghế đặt trước
                 </li>
             </Link>
-            <Link to="/admin/drivers" style={{color:"#9e9ea4"}}>
-            <li className={`sidebar-list-item ${activeTab === "drivers" ? "active" : ""}`} onClick={() => handleTabClick("drivers")}>
-                    <ManageAccountsIcon className='icon'/> Tài xế
-                </li>
-            </Link>
+            {data && (data.role === 3) && (
+                <Link to="/admin/drivers" style={{color:"#9e9ea4"}}>
+                <li className={`sidebar-list-item ${activeTab === "drivers" ? "active" : ""}`} onClick={() => handleTabClick("drivers")}>
+                        <ManageAccountsIcon className='icon'/> Tài xế
+                    </li>
+                </Link>
+            )}
             <Link to="/admin/promotions" style={{color:"#9e9ea4"}}>
             <li className={`sidebar-list-item ${activeTab === "promotions" ? "active" : ""}`} onClick={() => handleTabClick("promotions")}>
                     <DiscountIcon className='icon'/> Khuyến mãi
@@ -116,40 +131,13 @@ function AdminSidebar({openSidebarToggle, OpenSidebar}) {
                     <ContactsIcon className='icon'/> Liên hệ
                 </li>
             </Link>
-            <Link to="/admin/logs" style={{color:"#9e9ea4"}}>
-            <li className={`sidebar-list-item ${activeTab === "logs" ? "active" : ""}`} onClick={() => handleTabClick("logs")}>
-                    <WorkHistoryIcon className='icon'/> Log
-                </li>
-            </Link>
-            
-            
-            {/* <li className='sidebar-list-item'>
-                <Link to=""><BsFillGrid3X3GapFill className='icon'/> Thành phố</Link>
-            </li>
-            <li className='sidebar-list-item'>
-                <Link to="/admin/cities"><BsFillArchiveFill className='icon'/> Phương tiện</Link>
-            </li>
-            <li className='sidebar-list-item'>
-                <Link to="/admin/seats"><BsListCheck className='icon'/> Ghế ngồi</Link>
-            </li>
-            <li className='sidebar-list-item'>
-                <Link to="/admin/routes"><BsMenuButtonWideFill className='icon'/> Tuyến đi</Link>
-            </li>
-            <li className='sidebar-list-item'>
-                <Link to="/admin/trips"><BsMenuButtonWideFill className='icon'/> Chuyến xe</Link>
-            </li>
-            <li className='sidebar-list-item'>
-                <Link to="/admin/bookings"><BsMenuButtonWideFill className='icon'/> Hóa đơn</Link>
-            </li>
-            <li className='sidebar-list-item'>
-                <Link to="/admin/booking-details"><BsMenuButtonWideFill className='icon'/> Chi tiết hóa đơn</Link>
-            </li>
-            <li className='sidebar-list-item'>
-                <Link to="/admin/seat-reservation"><BsMenuButtonWideFill className='icon'/> Ghế đặt trước</Link>
-            </li>
-            <li className='sidebar-list-item'>
-                <Link to="/admin"><BsFillGearFill className='icon'/> Setting</Link>
-            </li> */}
+            {data && (data.role === 3) && (
+                <Link to="/admin/logs" style={{color:"#9e9ea4"}}>
+                <li className={`sidebar-list-item ${activeTab === "logs" ? "active" : ""}`} onClick={() => handleTabClick("logs")}>
+                        <WorkHistoryIcon className='icon'/> Log
+                    </li>
+                </Link>
+            )}
         </ul>
     </aside>
     )

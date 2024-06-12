@@ -187,6 +187,7 @@ const TicketHistory = () =>{
             toast.error(message);
         } else {
             try {
+                const token = localStorage.getItem("token");
                 const newRating = {
                     tripId: selectedTrip.id,
                     userId: userId, 
@@ -197,7 +198,8 @@ const TicketHistory = () =>{
                 const response = await fetch("http://localhost:8081/api/review", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                     },
                     body: JSON.stringify(newRating)
                 });
@@ -270,29 +272,29 @@ const TicketHistory = () =>{
                                 <h2 class="modal-title">Đánh giá</h2>
                             </div>
                             <div class="modal-body">
-                                <div className="tripLabel">
-                                    <div className="tripInfo">
-                                        <span>Tuyến đi:</span>
+                                <div className="infoBookingTicket">
+                                    <div className="lineInfo">
+                                        <span>Tuyến:</span>
                                         <div className="rightInfo">
                                             <span>{selectedTrip.route.name}</span>
                                         </div>
                                     </div>
-                                    <div className="tripInfo">
-                                        <span>Ngày đi:</span>
+                                    <div className="lineInfo">
+                                        <span>Loại xe:</span>
+                                        <div className="rightInfo">
+                                            <span>{selectedTrip.vehicle.kindVehicle.name}</span>
+                                        </div>
+                                    </div>
+                                    <div className="lineInfo">
+                                        <span>Ngày:</span>
                                         <div className="rightInfo">
                                             <span>{formatDate(selectedTrip.dayStart)}</span>
                                         </div>
                                     </div>
-                                    <div className="tripInfo">
-                                        <span>Giờ khởi hành:</span>
+                                    <div className="lineInfo">
+                                        <span>Thời gian:</span>
                                         <div className="rightInfo">
                                             <span>{selectedTrip.timeStart.slice(0, 5)}</span>
-                                        </div>
-                                    </div>
-                                    <div className="tripInfo">
-                                        <span>Loại xe/ Biến số:</span>
-                                        <div className="rightInfo">
-                                            <span>{selectedTrip.vehicle.kindVehicle.name}/ {selectedTrip.vehicle.vehicleNumber}</span>
                                         </div>
                                     </div>
                                 </div>

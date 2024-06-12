@@ -7,8 +7,6 @@ import seat_disabled from "../../Assets/img/seat_disabled.svg";
 import seat_selecting from "../../Assets/img/seat_selecting.svg"
 import empty_list from "../../Assets/img/empty_list.svg";
 import { MdArrowDropDown } from "react-icons/md";
-import { FaLongArrowAltRight } from "react-icons/fa";
-import { BiSolidLeftArrow } from "react-icons/bi";
 import { FaAngleLeft } from "react-icons/fa";
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

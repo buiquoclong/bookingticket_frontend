@@ -17,6 +17,8 @@ const AdminCity = () =>{
     const [records, setRecords] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
+    const [cityToDelete, setCityToDelete] = useState(null);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -73,27 +75,6 @@ const AdminCity = () =>{
             setCurrentCity(city);
             setIsEditing(true);
         };
-        const handleRemoveClick = async (city) => {
-            const cityId = city.id;
-            try {
-                const response = await fetch(`http://localhost:8081/api/city/${cityId}`, {
-                method: "DELETE"
-            });
-                if (response.ok) {
-                    
-                    // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
-                    const updatedCities = records.filter(record => record.id !== cityId);
-                    setRecords(updatedCities);
-                    toast.success("Thành phố đã được xóa thành công!");
-                } else {
-                    console.error("Có lỗi xảy ra khi xóa thành phố!");
-                    toast.error("Có lỗi xảy ra khi xóa thành phố!");
-                }
-            } catch (error) {
-                console.error("Lỗi:", error);
-                toast.error("Lỗi:", error.message);
-            }
-        };
 
         const handleCreateClick = () => {
             setIsAdd(true)
@@ -116,9 +97,55 @@ const AdminCity = () =>{
             setIsEditing(false);
             setCityImage(null);
         };
+
+        const handleCreateCity = async (e) => {
+            e.preventDefault();
+            try {
+                const token = localStorage.getItem("token");
+                const formData = new FormData();
+                const newCityData = {
+                    name: cityName
+                };
+                formData.append('city', new Blob([JSON.stringify(newCityData)], { type: 'application/json' }));
+                if (cityImage) {
+                    const fileField = document.querySelector('input[type="file"]');
+                    formData.append('file', fileField.files[0]);
+                }
+        
+                const response = await fetch("http://localhost:8081/api/city", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}` // Thêm token vào header
+                    },
+                    body: formData
+                });
+        
+                if (response.ok) {
+                    // Xử lý thành công
+                    console.log("Thành phố đã được tạo thành công!");
+                    const newCity = await response.json();
+                    newCity.imgUrl = `http://localhost:8081${newCity.imgUrl}`; // Update the URL to be absolute
+                    setData(prevData => [...prevData, newCity]);
+                    setRecords(prevRecords => [...prevRecords, newCity]);
+                    
+                toast.success("Thành phố đã được tạo thành công!");
+                    // Reset form hoặc làm gì đó khác
+                    setCityName('');
+                    setCityImage(null);
+                    setIsAdd(false);
+                } else {
+                    console.error("Có lỗi xảy ra khi tạo thành phố!");
+                    toast.error("Có lỗi xảy ra khi tạo thành phố!");
+                }
+            } catch (error) {
+                console.error("Lỗi:", error);
+                toast.error("Lỗi:", error);
+            }
+        };
         const handleUpdateCity = async (e) => {
             e.preventDefault();
             try {
+                const token = localStorage.getItem("token");
                 const formData = new FormData();
                 formData.append('city', new Blob([JSON.stringify({ name: currentCity.name })], { type: 'application/json' }));
                 if (cityImage) {
@@ -128,6 +155,9 @@ const AdminCity = () =>{
         
                 const response = await fetch(`http://localhost:8081/api/city/${currentCity.id}`, {
                     method: "PUT",
+                    headers: {
+                        "Authorization": `Bearer ${token}` // Thêm token vào header
+                    },
                     body: formData
                 });
         
@@ -156,50 +186,40 @@ const AdminCity = () =>{
                 toast.error("Lỗi:", error);
             }
         };
-
-        const handleCreateCity = async (e) => {
-            e.preventDefault();
+        const removeCity = async () => {
+            const token = localStorage.getItem("token");
+            const cityId = cityToDelete.id;
             try {
-                const formData = new FormData();
-                const newCityData = {
-                    name: cityName
-                };
-                formData.append('city', new Blob([JSON.stringify(newCityData)], { type: 'application/json' }));
-                if (cityImage) {
-                    const fileField = document.querySelector('input[type="file"]');
-                    formData.append('file', fileField.files[0]);
+                const response = await fetch(`http://localhost:8081/api/city/${cityId}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}` // Thêm token vào header
                 }
-        
-                const response = await fetch("http://localhost:8081/api/city", {
-                    method: "POST",
-                    body: formData
-                });
-        
+            });
                 if (response.ok) {
-                    // Xử lý thành công
-                    console.log("Thành phố đã được tạo thành công!");
-                    const newCity = await response.json();
-                    newCity.imgUrl = `http://localhost:8081${newCity.imgUrl}`; // Update the URL to be absolute
-                    setData(prevData => [...prevData, newCity]);
-                    setRecords(prevRecords => [...prevRecords, newCity]);
                     
-                toast.success("Thành phố đã được tạo thành công!");
-                    // Reset form hoặc làm gì đó khác
-                    setCityName('');
-                    setCityImage(null);
-                    setIsAdd(false);
+                    // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
+                    const updatedCities = records.filter(record => record.id !== cityId);
+                    setRecords(updatedCities);
+                    toast.success("Thành phố đã được xóa thành công!");
+                    setIsDeleteConfirmVisible(false);
                 } else {
-                    console.error("Có lỗi xảy ra khi tạo thành phố!");
-                    toast.error("Có lỗi xảy ra khi tạo thành phố!");
+                    console.error("Có lỗi xảy ra khi xóa thành phố!");
+                    toast.error("Có lỗi xảy ra khi xóa thành phố!");
                 }
             } catch (error) {
                 console.error("Lỗi:", error);
-                toast.error("Lỗi:", error);
+                toast.error("Lỗi:", error.message);
             }
         };
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
+        const handleRemoveClick = (city) => {
+            setCityToDelete(city);
+            setIsDeleteConfirmVisible(true);
+        };
+        const NoDataComponent = () => <div className="emptyData">Không có dữ liệu</div>;
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -230,6 +250,7 @@ const AdminCity = () =>{
                     columns={columns}
                     data={records}
                     // pagination
+                    noDataComponent={<NoDataComponent />}
                     ></DataTable>
                     <Pagination 
                         count={totalPages}
@@ -312,7 +333,25 @@ const AdminCity = () =>{
                                     </div>
                                 </div>
                             </div>
-                    )}      
+                    )}  
+                    {isDeleteConfirmVisible && (
+                        <div className="modal" id="confirmDeleteModal">
+                            <div className="modal-dialog">
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h2 className="modal-title">Xác nhận xóa</h2>
+                                    </div>
+                                    <div className="modal-body">
+                                        <p className="textConfirm">Bạn có chắc chắn muốn xóa thành phố này?</p>
+                                        <div className="listButton">
+                                            <button type="button"  onClick={() => setIsDeleteConfirmVisible(false)} className="cancel">Hủy</button>
+                                            <button type="button" className="save" onClick={removeCity}>Xóa</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}    
             {/* </section> */}
             <ToastContainer
                         className="toast-container"

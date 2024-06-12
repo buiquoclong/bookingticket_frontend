@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect  } from "react";
 import "./app.css";
-import { BrowserRouter,Routes, Route} from 'react-router-dom';
+import { BrowserRouter,Routes, Route, Outlet} from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import Homepage from "./page/Homepage";
 
@@ -42,22 +42,28 @@ import ForgetPassPage from "./page/ForgetPassPage";
 import ResponseSuccessPage from "./page/ResponseSuccessPage";
 import ResponseFailedPage from "./page/ResponseFailedPage";
 import NotFoundPage from "./Admin/page/NotFoundPage";
-
+import ContactPage from "./page/ContactPage";
+import AboutUsPage from "./page/AboutUsPage";
+import AdminForBookingPage from "./Admin/page/AdminForBookingPage";
 
 
 
 const App = () => {
     const [userRole, setUserRole] = useState(null);
+
     useEffect(() => {
-        const token = localStorage.getItem("token");
-                if (token) {
-                    const decodedToken = jwtDecode(token);
-                    setUserRole(decodedToken.role);
-                    
-                console.log("Set UserRole:", decodedToken.role);
-                } else {
-                    setUserRole(null);
-                }
+        const userRole1 = localStorage.getItem("userRole");
+        if (userRole1 !== "" && userRole1 !== null) {
+            const userRoleNumber = parseInt(userRole1, 10);
+            if (!isNaN(userRoleNumber)) {
+                setUserRole(userRoleNumber);
+            } else {
+                console.error("userRole is not a valid number");
+                setUserRole(null);
+            }
+        } else {
+            setUserRole(null);
+        }
     }, []);
     const renderRoutes = () => {
         if (userRole === 2 || userRole === 3) {
@@ -105,6 +111,8 @@ const App = () => {
                 <Route path="/info-user" element={<InfoUserPage />} />
                 <Route path="/pay-success" element={<PaysuccessPage />} />
                 <Route path="/news" element={<NewsPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/aboutUs" element={<AboutUsPage />} />
                 <Route path="/my-rating" element={<MyRatingPage />} />
                 <Route path="/my-booking" element={<MyBookingPage />} />
                 <Route path="/change_pass" element={<ChangePassPage />} />
@@ -112,25 +120,29 @@ const App = () => {
                 <Route path="/forget-pass" element={<ForgetPassPage />} />
                 <Route path="/payment-success" element={<ResponseSuccessPage />} />
                 <Route path="/payment-failed" element={<ResponseFailedPage />} />
-                {renderRoutes()}
-                {/* <Route path="/admin" element={<AdminHomePage />} />
-                <Route path="/admin/bookings" element={<AdminBookingPage />} />
-                <Route path="/admin/find-trips" element={<AdminBookTicketPage />} />
-                <Route path="/admin/find-trips-return" element={<AdminBookTicketReturnPage />} />
-                <Route path="/admin/book-cash-payment" element={<AdminPaySuccessPage />} />
-                <Route path="/admin/cities" element={<AdminCityPage />} />
-                <Route path="/admin/booking-trip" element={<AdminPayPage />} />
-                <Route path="/admin/routes" element={<AdminRoutePage />} />
-                <Route path="/admin/vehicles" element={<AdminVehiclePage />} />
-                <Route path="/admin/seats" element={<AdminSeatPage />} />
-                <Route path="/admin/trips" element={<AdminTripPage />} />
-                <Route path="/admin/seat-reservation" element={<AdminSeatReservationPage />} />
-                <Route path="/admin/users" element={userRole === 3 ? <AdminUserPage /> : <NotFoundPage />} />
-                <Route path="/admin/drivers" element={<AdminDriverPage />} />
-                <Route path="/admin/contacts" element={<AdminContactPage />} />
-                <Route path="/admin/logs" element={<AdminLogPage />} />
-                <Route path="/admin/promotions" element={<AdminPromotionPage />} />
-                <Route path="/admin/reviews" element={<AdminReviewPage />} /> */}
+                {/* {userRole !== null && renderRoutes()} */}
+
+                <Route element={(userRole === 2 || userRole === 3) ? <Outlet/> : <LoginPage />}>
+                    <Route path="/admin" element={<AdminHomePage />} />
+                    <Route path="/admin/bookings" element={<AdminBookingPage />} />
+                    <Route path="/admin/book-ticket" element={<AdminForBookingPage />} />
+                    <Route path="/admin/find-trips" element={<AdminBookTicketPage />} />
+                    <Route path="/admin/find-trips-return" element={<AdminBookTicketReturnPage />} />
+                    <Route path="/admin/book-cash-payment" element={<AdminPaySuccessPage />} />
+                    <Route path="/admin/cities" element={<AdminCityPage />} />
+                    <Route path="/admin/booking-trip" element={<AdminPayPage />} />
+                    <Route path="/admin/routes" element={<AdminRoutePage />} />
+                    <Route path="/admin/vehicles" element={<AdminVehiclePage />} />
+                    <Route path="/admin/seats" element={<AdminSeatPage />} />
+                    <Route path="/admin/trips" element={<AdminTripPage />} />
+                    <Route path="/admin/seat-reservation" element={<AdminSeatReservationPage />} />
+                    <Route path="/admin/users" element={userRole === 3 ? <AdminUserPage /> : <NotFoundPage />} />
+                    <Route path="/admin/drivers" element={<AdminDriverPage />} />
+                    <Route path="/admin/contacts" element={<AdminContactPage />} />
+                    <Route path="/admin/logs" element={<AdminLogPage />} />
+                    <Route path="/admin/promotions" element={<AdminPromotionPage />} />
+                    <Route path="/admin/reviews" element={<AdminReviewPage />} />
+                </Route>
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
         </BrowserRouter>

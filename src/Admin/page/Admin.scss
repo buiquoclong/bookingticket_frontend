@@ -83,7 +83,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 15px 30px 0px 30px;
-    margin-bottom: 30px;
+    margin-bottom: 12px;
   }
   
   .sidebar-title > span {
@@ -400,6 +400,15 @@ body {
                           cursor: pointer;
                       }
                   }
+                  .contentTextarea{
+                    font-size: large;
+                  }
+              }
+              .textConfirm{
+                text-align: center;
+                margin: 2rem;
+                font-size: 20px;
+                font-weight: bold;
               }
           }
       }
@@ -470,6 +479,115 @@ body {
     margin-top: 20px;
     text-decoration: none;
     color: #007bff; /* Màu liên kết */
+}
+.infoBookingTicket{
+  width: 20rem;
+  background: var(--whiteColor);
+  border-radius: 1rem;
+  border: 1px solid var(--greyText);
+  padding: 1rem 1rem;
+  margin-inline: auto;
+
+  h3{
+    color: var(--blackColor);
+    text-align: center;
+  }
+  .lineInfo{
+      display: flex;
+      justify-content: space-between;
+      line-height: 3rem;
+      // span{
+      //     color: var(--blackColor);
+      // }
+      .rightInfo{
+          // width: 18rem;
+          height: 2.5rem;
+          // background: var(--greyText);
+          // border-radius: .5rem;
+          span{
+              padding-left: 1rem;
+              padding-bottom: .5rem;
+              color: var(--blackColor);
+          }
+      }
+      .seatInfo{
+          gap: 1rem;
+          span{
+              background: rgb(220, 231, 71);
+              font-weight: bolder;
+              padding: .2rem;
+          }
+      }
+      .Note{
+          // width: 18rem;
+          height: 2.5rem;
+          background: var(--whiteColor);
+          border-radius: .5rem;
+          padding-left: 1rem;
+          border: 1px solid var(--greyText);
+          outline: none;
+      }
+      .selectChoose{
+          select{
+              width: 10rem;
+              height: 2.5rem;
+              background: var(--whiteColor);
+              border-radius: .5rem;
+              padding-left: 1rem;
+              border: 1px solid var(--greyText);
+              outline: none;
+              
+          }
+      }
+  }
+  
+  .policyCheckbox{
+      width: 100%;
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .checkBox{
+          display: flex;
+          align-items: center;
+          .checkbox-input{
+              width: 20px;
+              height: 20px;
+              border: 1px solid var(--greyText);
+          }
+      }
+  }
+  .buttonList{
+      padding-top: 2rem;
+      display: flex;
+      margin-inline: auto;
+      justify-content: center;
+      gap: 2rem;
+      .btn{
+          border-radius: .5rem;
+          font-weight: 600;
+          color: var(--whiteColor);
+      }
+      .cancle{
+          background: #cf1726;
+          &:hover{
+              background: #ea4957;
+          }
+      }
+      .pay{
+          background: var(--PrimaryColor);
+          &:hover{
+              background: var(--SecondaryColor);
+          }
+      }
+  }
+  
+  
+}
+.emptyData{
+  font-size: 20px;
+  margin: 1.5rem;
+  font-style: italic;
 }
   /* Small <= 768px */
     

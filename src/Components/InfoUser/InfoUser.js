@@ -106,7 +106,7 @@ const InfoUser  = () => {
             toast.error(message);
         } else {
             try {
-                // Sau khi cập nhật thành công, cập nhật lại booking
+                const token = localStorage.getItem("token");
                 const updateUser = {
                     name: userName,
                     password: data.password,
@@ -118,9 +118,10 @@ const InfoUser  = () => {
                     confirmToken: data.confirmToken
                 };
                 const updateUserResponse = await fetch(`http://localhost:8081/api/user/${userId}`, {
-                    method: 'PUT', // hoặc 'PATCH' tùy vào API của bạn
+                    method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
                     },
                     body: JSON.stringify(updateUser), // Cập nhật trạng thái của booking thành 'cancelled'
                 });

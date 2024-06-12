@@ -21,6 +21,8 @@ const AdminReview = () =>{
     const [records, setRecords] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
+    const [reviewToDelete, setReviewToDelete] = useState(null);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -151,6 +153,7 @@ const AdminReview = () =>{
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token");
                     const newRating = {
                         rating: currentReview.rating,
                         content: currentReview.content
@@ -159,7 +162,8 @@ const AdminReview = () =>{
                     const response = await fetch(`http://localhost:8081/api/review/${currentReview.id}`, {
                         method: "PUT",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify(newRating)
                     });
@@ -187,11 +191,15 @@ const AdminReview = () =>{
                 }
             }
         };
-        const handleRemoveClick = async (review) => {
-            const reviewId = review.id;
+        const removeReview = async () => {
+            const reviewId = reviewToDelete.id;
             try {
+                const token = localStorage.getItem("token");
                 const response = await fetch(`http://localhost:8081/api/review/${reviewId}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}` // Thêm token vào header
+                }
             });
                 if (response.ok) {
                     
@@ -199,6 +207,7 @@ const AdminReview = () =>{
                     const updatedReview = records.filter(record => record.id !== reviewId);
                     setRecords(updatedReview);
                     toast.success("Review đã được xóa thành công!");
+                    setIsDeleteConfirmVisible(false);
                 } else {
                     console.error("Có lỗi xảy ra khi xóa Review!");
                     toast.error("Có lỗi xảy ra khi xóa Review!");
@@ -209,6 +218,12 @@ const AdminReview = () =>{
             }
         };
         
+        const handleRemoveClick = (review) => {
+            setReviewToDelete(review);
+            setIsDeleteConfirmVisible(true);
+        };
+        
+        const NoDataComponent = () => <div className="emptyData">Không có dữ liệu</div>;
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -239,6 +254,7 @@ const AdminReview = () =>{
                     columns={columns}
                     data={records}
                     // pagination
+                    noDataComponent={<NoDataComponent />}
                     ></DataTable>
                     <Pagination 
                         count={totalPages}
@@ -258,32 +274,32 @@ const AdminReview = () =>{
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h2 className="modal-title">Sửa Chi tiết vé</h2>
+                                <h2 className="modal-title">Sửa Chi tiết Đánh giá</h2>
                             </div>
                             <div className="modal-body">
-                                <div className="tripLabel">
-                                    <div className="tripInfo">
-                                        <span>Tuyến đi:</span>
+                                <div className="infoBookingTicket">
+                                    <div className="lineInfo">
+                                        <span>Tuyến:</span>
                                         <div className="rightInfo">
                                             <span>{currentReview.trip.route.name}</span>
                                         </div>
                                     </div>
-                                    <div className="tripInfo">
-                                        <span>Ngày đi:</span>
+                                    <div className="lineInfo">
+                                        <span>Loại xe:</span>
+                                        <div className="rightInfo">
+                                            <span>{currentReview.trip.vehicle.kindVehicle.name}</span>
+                                        </div>
+                                    </div>
+                                    <div className="lineInfo">
+                                        <span>Ngày:</span>
                                         <div className="rightInfo">
                                             <span>{formatDate(currentReview.trip.dayStart)}</span>
                                         </div>
                                     </div>
-                                    <div className="tripInfo">
-                                        <span>Giờ khởi hành:</span>
+                                    <div className="lineInfo">
+                                        <span>Thời gian:</span>
                                         <div className="rightInfo">
                                             <span>{currentReview.trip.timeStart.slice(0, 5)}</span>
-                                        </div>
-                                    </div>
-                                    <div className="tripInfo">
-                                        <span>Loại xe/ Biến số:</span>
-                                        <div className="rightInfo">
-                                            <span>{currentReview.trip.vehicle.kindVehicle.name}/ {currentReview.trip.vehicle.vehicleNumber}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -322,7 +338,25 @@ const AdminReview = () =>{
                         </div>
                     </div>
                 </div>
-        )}
+            )}
+            {isDeleteConfirmVisible && (
+                <div className="modal" id="confirmDeleteModal">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Xác nhận xóa</h2>
+                            </div>
+                            <div className="modal-body">
+                                <p className="textConfirm">Bạn có chắc chắn muốn xóa đánh giá này?</p>
+                                <div className="listButton">
+                                    <button type="button"  onClick={() => setIsDeleteConfirmVisible(false)} className="cancel">Hủy</button>
+                                    <button type="button" className="save" onClick={removeReview}>Xóa</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* </section> */}
             <ToastContainer
                         className="toast-container"

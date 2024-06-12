@@ -112,47 +112,47 @@ const SearchTicket  = () => {
                                                     <divc lassName="titlePay" style={{fontSize:"2rem"}}>Thông tin chi tiết lượt đi</divc>
                                                 )}
                                             </div>
-                                            <div className="ticketInfo">
-                                                <div className="tripInfo">
-                                                    <span>Mã vé:</span>
+                                            
+                                            <div className="infoBookingTicket">
+                                                <h3>Mã vé: {data.id}</h3>
+                                                <div className="lineInfo">
+                                                    <span>Tuyến:</span>
                                                     <div className="rightInfo">
-                                                        <span>{data.id}</span>
+                                                        <span>{data.trip.route.name}</span>
                                                     </div>
                                                 </div>
-                                                <div className="tripLabel">
-                                                    <div className="tripInfo">
-                                                        <span>Tuyến đi:</span>
-                                                        <div className="rightInfo">
-                                                            <span>{data.trip.route.name}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="tripInfo">
-                                                        <span>Ngày đi:</span>
-                                                        <div className="rightInfo">
-                                                            <span>{formatDate(data.trip.dayStart)}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="tripInfo">
-                                                        <span>Giờ khởi hành:</span>
-                                                        <div className="rightInfo">
-                                                            <span>{data.trip.timeStart.slice(0, 5)}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="tripInfo">
-                                                        <span>Loại xe/ Biến số:</span>
-                                                        <div className="rightInfo">
-                                                            <span>{data.trip.vehicle.kindVehicle.name}/ {data.trip.vehicle.vehicleNumber}</span>
-                                                        </div>
+                                                <div className="lineInfo">
+                                                    <span>Loại xe:</span>
+                                                    <div className="rightInfo">
+                                                        <span>{data.trip.vehicle.kindVehicle.name}</span>
                                                     </div>
                                                 </div>
-                                                <div className="seatInfo">
-                                                    <span>Ghế đã chọn: </span>
+                                                <div className="lineInfo">
+                                                    <span>Ngày:</span>
                                                     <div className="rightInfo">
+                                                        <span>{formatDate(data.trip.dayStart)}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="lineInfo">
+                                                    <span>Thời gian:</span>
+                                                    <div className="rightInfo">
+                                                        <span>{data.trip.timeStart.slice(0, 5)}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="lineInfo">
+                                                    <span>Số ghế:</span>
+                                                    <div className="rightInfo">
+                                                        <span>{data.quantity}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="lineInfo">
+                                                    <span>Ghế đã đặt:</span>
+                                                    <div className="seatInfo">
                                                         <span>{data.seatName}</span>
                                                     </div>
                                                 </div>
-                                                <div className="tripInfo">
-                                                    <span>Tổng tiền:</span>
+                                                <div className="lineInfo">
+                                                    <span>Giá:</span>
                                                     <div className="rightInfo">
                                                         <span>{data.price.toLocaleString('vi-VN')}VND</span>
                                                     </div>

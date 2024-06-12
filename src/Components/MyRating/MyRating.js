@@ -5,6 +5,7 @@ import { useNavigate  } from 'react-router-dom';
 import StarRatings from 'react-star-ratings';
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {Pagination} from '@mui/material';
 
 
 const MyRating = () =>{
@@ -39,6 +40,10 @@ const MyRating = () =>{
     const [rating, setRating] = useState(0);
     const [content, setContent] = useState('');
     const navigate = useNavigate();
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
+    const [reviewToDelete, setReviewToDelete] = useState(null);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -125,7 +130,7 @@ const MyRating = () =>{
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                 <button style={{background:"#3b82f6",paddingInline:".5rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                <button style={{background:"#ef4444",paddingInline:".5rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}> Xóa </button>
+                <button style={{background:"#ef4444",paddingInline:".5rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
                 </div>
             )
         }
@@ -145,15 +150,15 @@ const MyRating = () =>{
             localStorage.setItem('redirectPath', window.location.pathname);
             navigate('/login');
         }
-    }, [userId]);
+    }, [userId, page]);
 
     const fetchReviews = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/api/review/user/${userId}`);
+            const response = await fetch(`http://localhost:8081/api/review/user/${userId}/page?page=${page}&size=10`);
             const data = await response.json();
-            setData(data);
-            setRecords(data);
-            console.log("Review:", data);
+            setData(data.reviews);
+            setRecords(data.reviews);
+            setTotalPages(data.totalPages);
         } catch (error) {
             console.error("Error fetching review:", error);
         }
@@ -182,6 +187,7 @@ const MyRating = () =>{
                 toast.error(message);
             } else {
                 try {
+                    const token = localStorage.getItem("token");
                     const newRating = {
                         rating: rating,
                         content: content
@@ -190,7 +196,8 @@ const MyRating = () =>{
                     const response = await fetch(`http://localhost:8081/api/review/${reviewId}`, {
                         method: "PUT",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify(newRating)
                     });
@@ -221,6 +228,41 @@ const MyRating = () =>{
                 }
             }
         };
+        const removeReview = async () => {
+            const reviewId = reviewToDelete.id;
+            try {
+                const token = localStorage.getItem("token");
+                const response = await fetch(`http://localhost:8081/api/review/${reviewId}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}` // Thêm token vào header
+                }
+            });
+                if (response.ok) {
+                    
+                    // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
+                    const updatedReview = records.filter(record => record.id !== reviewId);
+                    setRecords(updatedReview);
+                    toast.success("Review đã được xóa thành công!");
+                    setIsDeleteConfirmVisible(false);
+                } else {
+                    console.error("Có lỗi xảy ra khi xóa Review!");
+                    toast.error("Có lỗi xảy ra khi xóa Review!");
+                }
+            } catch (error) {
+                console.error("Lỗi:", error);
+                toast.error("Lỗi:", error.message);
+            }
+        };
+        
+        const handleRemoveClick = (review) => {
+            setReviewToDelete(review);
+            setIsDeleteConfirmVisible(true);
+        };
+        const handleChangePage = (event, newPage) => {
+            setPage(newPage);
+        };
+        const NoDataComponent = () => <div className="emptyData">Bạn chưa có đánh giá nào</div>;
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -238,47 +280,23 @@ const MyRating = () =>{
                     <DataTable
                     columns={columns}
                     data={records}
-                    pagination
+                    // pagination
+                    noDataComponent={<NoDataComponent />}
                     ></DataTable>
                 </div>
-            </div>
-            
-            {/* {isEditing && (
-                <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Sửa Chi tiết vé</h2>
-                            </div>
-                            <div class="modal-body">
-                                <form>
-                                    <div className="infoCity">
-                                        <label className="info">Mã vé:</label>
-                                        <input type="text" value={currentCity.mave} onChange={(e) => setCurrentCity({ ...currentCity, mave: e.target.value })} />
-                                    </div>
-                                    <div className="infoCity">
-                                        <label className="info">Mã hóa đơn:</label>
-                                        <input type="text" value={currentCity.mahoadon} onChange={(e) => setCurrentCity({ ...currentCity, mahoadon: e.target.value })} />
-                                    </div>
-                                    <div className="infoCity">
-                                        <label>Số lượng vé:</label>
-                                        <input type="text" value={currentCity.numTicket} onChange={(e) => setCurrentCity({ ...currentCity, numTicket: e.target.value })} />
-                                    </div>
-                                    <div className="infoCity">
-                                        <label>Tổng tiền:</label>
-                                        <input type="text" value={currentCity.total} onChange={(e) => setCurrentCity({ ...currentCity, total: e.target.value })} />
-                                    </div>
-                                    <div className="listButton">
-                                        <button type="button" onClick={() => setIsEditing(false)} className="cancel">Hủy</button>
-                                        <button type="submit" className="save">Lưu</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+                    <div className="center-pagination">
+                        <Pagination 
+                            count={totalPages}
+                            boundaryCount={1}
+                            siblingCount={1} 
+                            color="primary"
+                            showFirstButton 
+                            showLastButton 
+                            page={page}
+                            onChange={handleChangePage}
+                        />
                     </div>
-                </div>
-            )} */}
-
+            </div>
             {isEditing && (
                 <div className="modal" id="deleteModal">
                     <div class="modal-dialog">
@@ -287,29 +305,29 @@ const MyRating = () =>{
                                 <h2 class="modal-title">Đánh giá</h2>
                             </div>
                             <div class="modal-body">
-                                <div className="tripLabel">
-                                    <div className="tripInfo">
-                                        <span>Tuyến đi:</span>
+                                <div className="infoBookingTicket">
+                                    <div className="lineInfo">
+                                        <span>Tuyến:</span>
                                         <div className="rightInfo">
                                             <span>{selectedReview.trip.route.name}</span>
                                         </div>
                                     </div>
-                                    <div className="tripInfo">
-                                        <span>Ngày đi:</span>
+                                    <div className="lineInfo">
+                                        <span>Loại xe:</span>
+                                        <div className="rightInfo">
+                                            <span>{selectedReview.trip.vehicle.kindVehicle.name}</span>
+                                        </div>
+                                    </div>
+                                    <div className="lineInfo">
+                                        <span>Ngày:</span>
                                         <div className="rightInfo">
                                             <span>{formatDate(selectedReview.trip.dayStart)}</span>
                                         </div>
                                     </div>
-                                    <div className="tripInfo">
-                                        <span>Giờ khởi hành:</span>
+                                    <div className="lineInfo">
+                                        <span>Thời gian:</span>
                                         <div className="rightInfo">
                                             <span>{selectedReview.trip.timeStart.slice(0, 5)}</span>
-                                        </div>
-                                    </div>
-                                    <div className="tripInfo">
-                                        <span>Loại xe/ Biến số:</span>
-                                        <div className="rightInfo">
-                                            <span>{selectedReview.trip.vehicle.kindVehicle.name}/ {selectedReview.trip.vehicle.vehicleNumber}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -344,6 +362,24 @@ const MyRating = () =>{
                                         <button type="submit" className="save" onClick={handleUpdateRating}>Sửa đánh giá</button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isDeleteConfirmVisible && (
+                <div className="modal" id="confirmDeleteModal">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Xác nhận xóa</h2>
+                            </div>
+                            <div className="modal-body">
+                                <p className="textConfirm">Bạn có chắc chắn muốn xóa đánh giá này?</p>
+                                <div className="listButton">
+                                    <button type="button"  onClick={() => setIsDeleteConfirmVisible(false)} className="cancel">Hủy</button>
+                                    <button type="button" className="save" onClick={removeReview}>Xóa</button>
+                                </div>
                             </div>
                         </div>
                     </div>

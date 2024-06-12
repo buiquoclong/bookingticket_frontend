@@ -30,6 +30,8 @@ const MyBooking = () =>{
     const navigate = useNavigate();
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [isCancelConfirmVisible, setIsCancelConfirmVisible] = useState(false);
+    const [bookingToCancel, setBookingToCancel] = useState(null);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -130,7 +132,7 @@ const MyBooking = () =>{
             const data = await response.json();
             setData(data.bookings);
             setRecords(data.bookings);
-            setTotalPages(data.totalPages)
+            setTotalPages(data.totalPages);
         } catch (error) {
             console.error("Error fetching detail:", error);
         }
@@ -168,8 +170,8 @@ const MyBooking = () =>{
             }
         }
 
-        const handleCancelBookingClick = async (booking) => {
-            const bookingId = booking.id;
+        const cancelBooking = async () => {
+            const bookingId = bookingToCancel.id;
 
             try {
                 const response = await fetch(`http://localhost:8081/api/seat_reservation/booking/${bookingId}`, {
@@ -194,12 +196,12 @@ const MyBooking = () =>{
                         // Fetch thông tin chi tiết của chuyến đi (trip)
                         const tripResponse = await fetch(`http://localhost:8081/api/trip/${tripId}`);
                         const tripData = await tripResponse.json();
-                        console.log("Trip data before update:", tripData);
             
                         // Cập nhật số ghế trống (emptySeat) của chuyến đi
                         const updatedEmptySeat = tripData.emptySeat + quantity;
             
                         // Cập nhật dữ liệu số ghế trống (emptySeat) trong tripData
+                        const token = localStorage.getItem("token");
                         const tripUpdate = {
                             routeId: tripData.route.id,
                             vehicleId: tripData.vehicle.id,
@@ -216,6 +218,7 @@ const MyBooking = () =>{
                             method: 'PUT', // hoặc 'PATCH' tùy vào API của bạn
                             headers: {
                                 'Content-Type': 'application/json',
+                                "Authorization": `Bearer ${token}`
                             },
                             body: JSON.stringify(tripUpdate),
                         });
@@ -233,20 +236,22 @@ const MyBooking = () =>{
                 // update booking
                 try {
                     // Sau khi cập nhật thành công, cập nhật lại booking
+                    const token = localStorage.getItem("token");
                     const updateBooking = {
-                        userName: booking.userName,
-                        email: booking.email,
-                        phone: booking.phone,
-                        userId: booking.user.id,
-                        total: booking.total,
-                        kindPay: booking.kindPay,
+                        userName: bookingToCancel.userName,
+                        email: bookingToCancel.email,
+                        phone: bookingToCancel.phone,
+                        userId: bookingToCancel.user.id,
+                        total: bookingToCancel.total,
+                        kindPay: bookingToCancel.kindPay,
                         isPaid: 2,
-                        roundTrip: booking.roundTrip,
+                        roundTrip: bookingToCancel.roundTrip,
                     };
                     const updateBookingResponse = await fetch(`http://localhost:8081/api/booking/${bookingId}`, {
                         method: 'PUT', // hoặc 'PATCH' tùy vào API của bạn
                         headers: {
                             'Content-Type': 'application/json',
+                            "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify(updateBooking), // Cập nhật trạng thái của booking thành 'cancelled'
                     });
@@ -255,6 +260,7 @@ const MyBooking = () =>{
                         // Booking được cập nhật thành công
                         console.log(`Booking with ID ${bookingId} is cancelled successfully`);
                         toast.success("Bạn đã hủy hóa đơn thành công");
+                        setIsCancelConfirmVisible(false);
                         const updatedBooking= await updateBookingResponse.json();
                         const updatedReviews = records.map(bookingData => {
                             if (bookingData.id === updatedBooking.id) {
@@ -277,9 +283,15 @@ const MyBooking = () =>{
             
             
         };
+        
+        const handleCancelBookingClick = (booking) => {
+            setBookingToCancel(booking);
+            setIsCancelConfirmVisible(true);
+        };
         const handleChangePage = (event, newPage) => {
             setPage(newPage);
         };
+        const NoDataComponent = () => <div className="emptyData">Bạn chưa có hóa đơn nào</div>;
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -298,6 +310,7 @@ const MyBooking = () =>{
                     columns={columns}
                     data={records}
                     // pagination
+                    noDataComponent={<NoDataComponent />}
                     ></DataTable>
                 </div>
                     <div className="center-pagination">
@@ -313,6 +326,24 @@ const MyBooking = () =>{
                         />
                     </div>
             </div>
+            {isCancelConfirmVisible && (
+                <div className="modal" id="confirmDeleteModal">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Xác nhận xóa</h2>
+                            </div>
+                            <div className="modal-body">
+                                <p className="textConfirm">Bạn có chắc chắn muốn hủy hóa đơn này?</p>
+                                <div className="listButton">
+                                    <button type="button"  onClick={() => setIsCancelConfirmVisible(false)} className="cancel">Hủy</button>
+                                    <button type="button" className="save" onClick={cancelBooking}>Xác nhận hủy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* </section> */}
             <ToastContainer
                         className="toast-container"

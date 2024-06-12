@@ -62,10 +62,19 @@ function AdminHeader({OpenSidebar}) {
             console.error("Error fetching cities:", error);
         }
     };
+    const handleUserInfoClick = () => {
+        navigate('/info-user');
+    }
     const handleLogoutClick = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("userId"); 
-        navigate('/login');
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("googleLogin");
+        if (window.location.pathname === '/') {
+            window.location.reload();
+        } else {
+            navigate('/login');
+        }
     }
 
     return (
@@ -104,7 +113,7 @@ function AdminHeader({OpenSidebar}) {
                 </Link>
                 </StyledItem>
 
-                <StyledItem>
+                <StyledItem   onClick={handleUserInfoClick}>
                 {/* <Link to="/page-layouts/user-profile"> */}
                     <Person />
                     <span>Thông tin</span>

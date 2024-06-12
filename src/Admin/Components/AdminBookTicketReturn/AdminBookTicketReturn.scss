@@ -758,10 +758,13 @@
 
                     .empty_data{
                         height: auto;
-                        padding: 5rem;
+                        padding: 2rem;
                         text-align: center;
+                        display: grid;
+                        justify-content: center;
                         img{
                             margin-bottom: 1rem;
+                            // width: 75%;
                         }
                         span{
                             color: var(--blackColor);
