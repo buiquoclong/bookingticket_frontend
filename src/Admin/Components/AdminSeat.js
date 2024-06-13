@@ -265,13 +265,13 @@ const AdminSeat = () =>{
         <div className="main-container">
             {/* <section className="main section"> */}
             <Breadcrumbs aria-label="breadcrumb">
-                <Link underline="hover" color="inherit" href="/">
+                <Link underline="hover" color="inherit" href="/admin">
                 Admin
                 </Link>
                 <Link
                 underline="hover"
                 color="inherit"
-                href="/admin"
+                href="/admin/seats"
                 >
                 Ghế ngồi
                 </Link>

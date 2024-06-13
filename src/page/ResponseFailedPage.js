@@ -1,22 +1,14 @@
-import React, { useEffect } from "react";
-import Navbar from "../Components/Navbar/Navbar";
-import Footer from "../Components/Footer/Footer";
+import React from "react";
 import ResponseFailed from "../Components/ResponsePay/ResponseFailed";
-
+import Layout from "./Layout";
 
 
 const ResponseFailedPage = () =>{
-    useEffect(() => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-        });
-    });
     return(
         <>
-            <Navbar/>
+            <Layout>
             <ResponseFailed/>
-            <Footer/>
+            </Layout>
         </>
         
     );

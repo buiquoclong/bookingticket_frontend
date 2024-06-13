@@ -93,7 +93,7 @@ function AdminHeader({OpenSidebar}) {
                             {data && (
                                 <strong>
                                     Xin chào {data.name}
-                                    {data.role === 2 && ' (Employee)'}
+                                    {data.role === 2 && ' (Nhân viên)'}
                                     {data.role === 3 && ' (Admin)'}
                                 </strong>
                             )}

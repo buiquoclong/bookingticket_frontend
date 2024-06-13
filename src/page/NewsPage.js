@@ -1,21 +1,13 @@
-import React, { useEffect } from "react";
-import Navbar from "../Components/Navbar/Navbar";
-import Footer from "../Components/Footer/Footer";
+import React from "react";
 import News from "../Components/News/News";
-
+import Layout from "./Layout";
 
 const NewsPage  = () => {
-    useEffect(() => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-        });
-    });
     return (
         <>
-            <Navbar/>
+            <Layout>
             <News/>
-            <Footer/>
+            </Layout>
         </>
     )
 }

@@ -299,13 +299,13 @@ const AdminPromotion = () =>{
         <div className="main-container">
             {/* <section className="main section"> */}
             <Breadcrumbs aria-label="breadcrumb">
-                <Link underline="hover" color="inherit" href="/">
+                <Link underline="hover" color="inherit" href="/admin">
                 Admin
                 </Link>
                 <Link
                 underline="hover"
                 color="inherit"
-                href="/admin"
+                href="/admin/promotions"
                 >
                 Mã giảm giá
                 </Link>
@@ -403,7 +403,7 @@ const AdminPromotion = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label>Mức giảm:</label>
-                                        <input type="text" value={discount} onChange={handleDiscountChange} />
+                                        <input type="number" className="inputValue" value={discount} onChange={handleDiscountChange} />
                                     </div>
                                     <div className="listButton">
                                         <button type="button" onClick={() => setIsAdd(false)} className="cancel">Hủy</button>

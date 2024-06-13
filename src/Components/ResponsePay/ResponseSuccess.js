@@ -14,7 +14,6 @@ const ResponseSuccess  = () => {
     const userId = localStorage.getItem("userId");
     
     const bookingDetails = JSON.parse(localStorage.getItem('bookingDetails'));
-    const totalAmount = bookingDetails.totalPrice + bookingDetails.totalPriceReturn;
 
     useEffect(() => {
         // Call the API to fetch cities
@@ -93,7 +92,7 @@ const ResponseSuccess  = () => {
                     userName: bookingDetails.userName,
                     email: bookingDetails.email,
                     phone: bookingDetails.phone,
-                    total: bookingDetails.totalPrice,
+                    total: bookingDetails.finalPrice,
                     kindPay: "Thanh toán bằng VNPay",
                     isPaid: 1,
                     roundTrip: 0,
@@ -140,7 +139,7 @@ const ResponseSuccess  = () => {
                     userName: bookingDetails.userName,
                     email: bookingDetails.email,
                     phone: bookingDetails.phone,
-                    total: totalAmount,
+                    total: bookingDetails.finalPrice,
                     kindPay:"Thanh toán bằng VNPay",
                     isPaid: 1,
                     roundTrip: 1,

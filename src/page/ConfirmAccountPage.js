@@ -1,21 +1,14 @@
-import React, { useEffect } from "react";
-import Navbar from "../Components/Navbar/Navbar";
-import Footer from "../Components/Footer/Footer";
+import React from "react";
 import ConfirmAccount from "../Components/ConfirmAccount/ConfirmAccount";
+import Layout from "./Layout";
 
 
 const ConfirmAccountPage = () =>{
-    useEffect(() => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-        });
-    });
     return(
         <>
-            <Navbar/>
+            <Layout>
             <ConfirmAccount/>
-            <Footer/>
+            </Layout>
         </>
         
     );

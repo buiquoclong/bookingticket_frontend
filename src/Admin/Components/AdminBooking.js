@@ -7,8 +7,6 @@ import {Pagination, Breadcrumbs, Link} from '@mui/material';
 
 
 const AdminBooking = () =>{
-    const [isEditing, setIsEditing] = useState(false);
-    const [currentBooking, setcurrentBooking] = useState();
     
     const [isDetail, setIsDetail] = useState(false);
     const [bookingDetails, setBookingDetails] = useState(null);
@@ -254,7 +252,6 @@ const AdminBooking = () =>{
                         return booking;
                     });
                     setRecords(updatedBookings);
-                    setIsEditing(false);
                 } else {
                     console.error("Có lỗi xảy ra khi cập nhật user!");
                     toast.error("Có lỗi xảy ra khi cập nhật user!");
@@ -410,13 +407,13 @@ const AdminBooking = () =>{
         <div className="main-container">
             {/* <section className="main section"> */}
             <Breadcrumbs aria-label="breadcrumb">
-                <Link underline="hover" color="inherit" href="/">
+                <Link underline="hover" color="inherit" href="/admin">
                 Admin
                 </Link>
                 <Link
                 underline="hover"
                 color="inherit"
-                href="/admin"
+                href="/admin/bookings"
                 >
                 Hóa đơn
                 </Link>

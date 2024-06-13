@@ -1,26 +1,14 @@
-import React, { useEffect } from "react";
-import Navbar from "../Components/Navbar/Navbar";
+import React from "react";
 import Home from "../Components/Home/Home";
-import Main from "../Components/Main/Main";
-import SliderComponents from "../Components/Slider/SliderComponents";
-import Footer from "../Components/Footer/Footer";
+import Layout from "./Layout";
+
 
 
 const Homepage  = () => {
-    useEffect(() => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-        });
-    });
     return (
-        <>
-            <Navbar/>
+        <Layout>
             <Home/>
-            {/* <Main/> */}
-            <SliderComponents/>
-            <Footer/>
-        </>
+        </Layout>
     )
 }
 export default Homepage;

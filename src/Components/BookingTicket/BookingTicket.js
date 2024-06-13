@@ -30,6 +30,11 @@ const BookingTicket = () =>{
     const [emailErrorMessage, setEmailErrorMessage] = useState('');
     const [phone, setPhone] = useState("");
     const [phoneErrorMessage, setPhoneErrorMessage] = useState('');
+
+    const [discountCode, setDiscountCode] = useState('');
+    const [discountPercent, setDiscountPercent] = useState(null);
+    const [discountAmount, setDiscountAmount] = useState(0);
+    const [isDiscountApplied, setIsDiscountApplied] = useState(false);
     const navigate = useNavigate();
     const userId = localStorage.getItem("userId");
     // Xử lý chọn nhập nơi đón
@@ -254,7 +259,7 @@ const BookingTicket = () =>{
                             insertWaitingSeat(selectedSeatIds, tripId);
                             try {
                                 // Gửi yêu cầu để nhận URL thanh toán từ API
-                                const response = await fetch(`http://localhost:8081/api/payment/pay?total=${totalPrice}`, {
+                                const response = await fetch(`http://localhost:8081/api/payment/pay?total=${finalPrice}`, {
                                     method: 'GET', // hoặc 'PATCH' tùy vào API của bạn
                                     headers: {
                                         'Content-Type': 'application/json',
@@ -282,7 +287,8 @@ const BookingTicket = () =>{
                                     note, 
                                     pickupLocation,
                                     noteReturn,
-                                    pickupLocationReturn
+                                    pickupLocationReturn,
+                                    finalPrice
                                 }));
                                 // Chuyển hướng người dùng đến URL thanh toán
                                 window.location.href = paymentData;
@@ -299,7 +305,7 @@ const BookingTicket = () =>{
                             // Tạo hóa đơn lượt đi
                             try {
                                 // Gửi yêu cầu để nhận URL thanh toán từ API
-                                const response = await fetch(`http://localhost:8081/api/payment/pay?total=${totalAmount}`, {
+                                const response = await fetch(`http://localhost:8081/api/payment/pay?total=${finalPrice}`, {
                                     method: 'GET', // hoặc 'PATCH' tùy vào API của bạn
                                     headers: {
                                         'Content-Type': 'application/json',
@@ -327,7 +333,8 @@ const BookingTicket = () =>{
                                     note, 
                                     pickupLocation,
                                     noteReturn,
-                                    pickupLocationReturn
+                                    pickupLocationReturn,
+                                    finalPrice
                                 }));
                                 // Chuyển hướng người dùng đến URL thanh toán
                                 window.location.href = paymentData;
@@ -439,7 +446,7 @@ const BookingTicket = () =>{
                             userName: userName,
                             email: email,
                             phone: phone,
-                            total: totalPrice,
+                            total: finalPrice,
                             kindPay: "Thanh toán trả sau",
                             isPaid: 0,
                             roundTrip: 0,
@@ -482,7 +489,7 @@ const BookingTicket = () =>{
                             userName: userName,
                             email: email,
                             phone: phone,
-                            total: totalAmount,
+                            total: finalPrice,
                             kindPay:"Thanh toán trả sau",
                             isPaid: 0,
                             roundTrip: 1,
@@ -705,6 +712,35 @@ const BookingTicket = () =>{
             </div>
         );
     }
+    const handleApplyDiscount = async () => {
+        try {
+            const response = await fetch(`http://localhost:8081/api/promotion/check?code=${discountCode}`);
+            const result = await response.text(); // Assuming the API returns text
+
+            if (result === "NULL") {
+                toast.error("Mã giảm giá không hợp lệ hoặc đã hết hạn");
+            } else {
+                const discount = parseInt(result, 10);
+                setDiscountPercent(discount);
+                const discountValue = kind === "Khứ hồi" ? totalAmount * (discount / 100) : totalPrice * (discount / 100);
+                setDiscountAmount(discountValue);
+                setIsDiscountApplied(true);
+                toast.success(`Áp dụng mã giảm giá thành công: ${discount}%`);
+            }
+        } catch (error) {
+            console.error("Error fetching discount code:", error);
+            toast.error("Đã xảy ra lỗi khi kiểm tra mã giảm giá");
+        }
+    };
+    const finalPrice = kind === "Khứ hồi" ? totalAmount - discountAmount : totalPrice - discountAmount;
+
+    const handleCancelDiscount = () => {
+        setDiscountCode('');
+        setDiscountPercent(null);
+        setDiscountAmount(0);
+        setIsDiscountApplied(false);
+        toast.info("Đã hủy áp dụng mã giảm giá");
+    };
 
     return(
         <section className="main container section">
@@ -991,8 +1027,13 @@ const BookingTicket = () =>{
                         </div>
                     </div>
                     <div className="discount" >
-                        <TextField id="" label="Mã giảm giá" size="small" className="textdiscount"/>
-                        <Button variant="contained">Áp dụng</Button>
+                        <TextField id="" label="Mã giảm giá" size="small" className="textdiscount" value={discountCode} onChange={(e) => setDiscountCode(e.target.value)} disabled={isDiscountApplied}/>
+                        {/* <Button variant="contained" onClick={handleApplyDiscount}>Áp dụng</Button> */}
+                        {isDiscountApplied ? (
+                            <Button variant="contained" onClick={handleCancelDiscount}>Hủy</Button>
+                        ) : (
+                            <Button variant="contained" onClick={handleApplyDiscount}>Áp dụng</Button>
+                        )}
                     </div>
                     <div className="policyInfo">
                         <div className="titlePolicy">
@@ -1013,11 +1054,19 @@ const BookingTicket = () =>{
                                         <span>0VND</span>
                                     </div>
                                 </div>
+                                {discountPercent !== null && (
+                                    <div className="lineInfo">
+                                        <span>Giảm giá ({discountPercent}%):</span>
+                                        <div className="rightInfo">
+                                            <span>-{discountAmount.toLocaleString('vi-VN')} VND</span>
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="devide"></div>
                                 <div className="lineInfo" style={{marginTop:".5rem"}}>
                                     <span>Tổng tiền:</span>
                                     <div className="rightInfo">
-                                        <span>{totalPrice.toLocaleString('vi-VN')}VND</span>
+                                        <span>{finalPrice.toLocaleString('vi-VN')}VND</span>
                                     </div>
                                 </div>
                                 <div className="policyCheckbox">
@@ -1048,11 +1097,19 @@ const BookingTicket = () =>{
                                         <span>{totalPriceReturn.toLocaleString('vi-VN')}VND</span>
                                     </div>
                                 </div>
+                                {discountPercent !== null && (
+                                    <div className="lineInfo">
+                                        <span>Giảm giá ({discountPercent}%):</span>
+                                        <div className="rightInfo">
+                                            <span>-{discountAmount.toLocaleString('vi-VN')} VND</span>
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="devide"></div>
                                 <div className="lineInfo" style={{marginTop:".5rem"}}>
                                     <span>Tổng tiền:</span>
                                     <div className="rightInfo">
-                                        <span>{totalAmount.toLocaleString('vi-VN')}VND</span>
+                                        <span>{finalPrice.toLocaleString('vi-VN')}VND</span>
                                     </div>
                                 </div>
                                 <div className="policyCheckbox">

@@ -1,22 +1,14 @@
-import { useState } from 'react'
+import React  from 'react'
 import './Admin.scss'
-import AdminHeader from '../Components/AdminHeader/AdminHeader'
-import AdminSidebar from '../Components/AdminSideBar/AdminSidebar'
 import AdminUser from '../Components/AdminUser'
+import AdminLayout from './AdminLayout'
 
 function AdminUserPage() {
-const [openSidebarToggle, setOpenSidebarToggle] = useState(false)
-
-const OpenSidebar = () => {
-    setOpenSidebarToggle(!openSidebarToggle)
-}
 
 return (
-    <div className='grid-container'>
-    <AdminHeader OpenSidebar={OpenSidebar}/>
-    <AdminSidebar openSidebarToggle={openSidebarToggle} OpenSidebar={OpenSidebar}/>
+    <AdminLayout>
     <AdminUser />
-    </div>
+    </AdminLayout>
 )
 }
 

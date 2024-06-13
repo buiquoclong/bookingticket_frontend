@@ -53,21 +53,39 @@
                 margin: auto;
                 padding: .5rem 0;
 
-                .navItem{
-                    padding: .5rem 0;
+                // .navLink{
+                //     padding: .5rem 0;
 
-                    .navLink{
+                //     .navItem{
+                //         color: var(--textColor);
+                //         font-size: .9rem;
+                //         font-weight: 600;
+                //     }
+                //     .navItem.active{
+                //         color: var(--PrimaryColor);
+                //         font-weight: bold;
+                //     }
+                // }
+                .navItem {
+                    .navLink {
                         color: var(--textColor);
-                        font-size: .9rem;
-                        font-weight: 600;
-
-
-                        &.activeNavbar, &:hover{
+                        padding: 0 0.45rem;
+                        font-size: 0.9rem;
+                        font-weight: 500;
+                    
+                        &.active {
+                            color: var(--PrimaryColor);
+                            font-weight: bold;
+                        }
+                    
+                        &:hover {
                             color: var(--PrimaryColor);
                         }
-
-                        
                     }
+                }
+                .navItem.active .navLink {
+                    color: var(--PrimaryColor) !important;
+                    font-weight: bold;
                 }
 
                 &:hover{

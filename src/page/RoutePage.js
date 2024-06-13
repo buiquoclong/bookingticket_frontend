@@ -1,23 +1,14 @@
-import React, { useEffect } from "react";
-import Navbar from "../Components/Navbar/Navbar";
-import Route from "../Components/SearchRoute/SearchRoute";
-import Footer from "../Components/Footer/Footer";
+import React from "react";
 import SearchRoute from "../Components/SearchRoute/SearchRoute";
-
+import Layout from "./Layout";
 
 
 const Routepage  = () => {
-    useEffect(() => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-        });
-    });
     return (
         <>
-            <Navbar/>
+            <Layout>
             <SearchRoute/>
-            <Footer/>
+            </Layout>
         </>
     )
 }

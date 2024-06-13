@@ -29,8 +29,19 @@ const AdminPay = () =>{
     const [phone, setPhone] = useState("");
     const [phoneErrorMessage, setPhoneErrorMessage] = useState('');
 
+    const [discountCode, setDiscountCode] = useState('');
+    const [discountPercent, setDiscountPercent] = useState(null);
+    const [discountAmount, setDiscountAmount] = useState(0);
+    const [isDiscountApplied, setIsDiscountApplied] = useState(false);
     const navigate = useNavigate();
     const userId = localStorage.getItem("userId");
+
+    const roleMap = {
+        1: 'User',
+        2: 'Employee',
+        3: 'Admin',
+    };
+    
 
     // Xử lý chọn nhập nơi đón
     const handleSelectChange = (event) => {
@@ -141,7 +152,8 @@ const AdminPay = () =>{
             .then((response) => response.json())
             .then((userData) => {
             // Cập nhật thông tin người dùng vào các trường nhập liệu
-            setUserName(userData.name);
+            const roleName = roleMap[userData.role] ? ` (${roleMap[userData.role]})` : '';
+            setUserName(`${userData.name}${roleName}`);
             setPhone(userData.phone);
             setEmail(userData.email);
             })
@@ -173,6 +185,7 @@ const AdminPay = () =>{
         };
 
         const handleChoosePayment = async () => {
+            const token = localStorage.getItem("token");
             try {
                 // Gửi yêu cầu để lấy danh sách các ghế đang chờ cho chuyến đi
                 const responseWaitingTrip = await fetch(`http://localhost:8081/api/waiting_seat/trip/${tripId}`);
@@ -255,9 +268,9 @@ const AdminPay = () =>{
                                 userName: userName,
                                 email: email,
                                 phone: phone,
-                                total: totalPrice,
-                                kindPay: "Thanh toán trả sau",
-                                isPaid: 0,
+                                total: finalPrice,
+                                kindPay: "Thanh toán tiền mặt",
+                                isPaid: 1,
                                 roundTrip: 0,
                             };
                             
@@ -267,10 +280,11 @@ const AdminPay = () =>{
                             }
                 
                             try {
-                                const response = await fetch(`http://localhost:8081/api/booking`, {
+                                const response = await fetch(`http://localhost:8081/api/booking/for-emp`, {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
+                                        "Authorization": `Bearer ${token}`
                                     },
                                     body: JSON.stringify(bookingData)
                                 });
@@ -297,9 +311,9 @@ const AdminPay = () =>{
                                 userName: userName,
                                 email: email,
                                 phone: phone,
-                                total: totalAmount,
-                                kindPay:"Thanh toán trả sau",
-                                isPaid: 0,
+                                total: finalPrice,
+                                kindPay:"Thanh toán tiền mặt",
+                                isPaid: 1,
                                 roundTrip: 1,
                             };
                             // Chỉ thêm userId nếu nó có giá trị
@@ -308,10 +322,11 @@ const AdminPay = () =>{
                             }
                             // Tạo hóa đơn lượt đi
                             try {
-                                const response = await fetch(`http://localhost:8081/api/booking`, {
+                                const response = await fetch(`http://localhost:8081/api/booking/for-emp`, {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
+                                        "Authorization": `Bearer ${token}`
                                     },
                                     body: JSON.stringify(bookingData)
                                 });
@@ -461,14 +476,42 @@ const AdminPay = () =>{
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
-    
+    const handleApplyDiscount = async () => {
+        try {
+            const response = await fetch(`http://localhost:8081/api/promotion/check?code=${discountCode}`);
+            const result = await response.text(); // Assuming the API returns text
+
+            if (result === "NULL") {
+                toast.error("Mã giảm giá không hợp lệ hoặc đã hết hạn");
+            } else {
+                const discount = parseInt(result, 10);
+                setDiscountPercent(discount);
+                const discountValue = kind === "Khứ hồi" ? totalAmount * (discount / 100) : totalPrice * (discount / 100);
+                setDiscountAmount(discountValue);
+                setIsDiscountApplied(true);
+                toast.success(`Áp dụng mã giảm giá thành công: ${discount}%`);
+            }
+        } catch (error) {
+            console.error("Error fetching discount code:", error);
+            toast.error("Đã xảy ra lỗi khi kiểm tra mã giảm giá");
+        }
+    };
+    const finalPrice = kind === "Khứ hồi" ? totalAmount - discountAmount : totalPrice - discountAmount;
+
+    const handleCancelDiscount = () => {
+        setDiscountCode('');
+        setDiscountPercent(null);
+        setDiscountAmount(0);
+        setIsDiscountApplied(false);
+        toast.info("Đã hủy áp dụng mã giảm giá");
+    };
     return(
         <div className="main-container">
             {showPaymentPopup && (
                 <div className="modal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-body">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-body">
                                 <button className="closePopup" onClick={() => setShowPaymentPopup(false)}></button>
                                 <div className="payContent">
                                     <div className="imgsucces">
@@ -724,12 +767,12 @@ const AdminPay = () =>{
                     <div className=" infoUser">
                         <h3>Thông tin người đặt</h3>
                         <div className="lineInfo">
-                            <span>Họ và tên<span style={{color:"red"}}>*</span>:</span>
+                            <span>Nhân viên<span style={{color:"red"}}>*</span>:</span>
                             <div className="infoInput" >
                                 <input type="text" className="info" placeholder="Nhập họ và tên" value={userName} onChange={handleUserNameChange}/>
                             </div>
                         </div>
-                        <div className="lineInfo">
+                        {/* <div className="lineInfo">
                             <span>Số điện thoại<span style={{color:"red"}}>*</span>:</span>
                             <div className="infoInput" >
                                 <input type="text" className="info" placeholder="Nhập số điện thoại" value={phone}  onChange={handlePhoneChange}/>
@@ -742,11 +785,16 @@ const AdminPay = () =>{
                                 <input type="text" className="info" placeholder="Nhập Email" value={email} onChange={handleEmailChange}/>
                                 {emailErrorMessage && <p style={{lineHeight:"1.5", fontSize:"12px", color:"red", paddingLeft:".5rem"  }}>{emailErrorMessage}</p>}
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                     <div className="discount" >
-                        <TextField id="" label="Mã giảm giá" size="small" className="textdiscount"/>
-                        <Button variant="contained">Áp dụng</Button>
+                        <TextField id="" label="Mã giảm giá" size="small" className="textdiscount" value={discountCode} onChange={(e) => setDiscountCode(e.target.value)} disabled={isDiscountApplied}/>
+                        {/* <Button variant="contained" onClick={handleApplyDiscount}>Áp dụng</Button> */}
+                        {isDiscountApplied ? (
+                            <Button variant="contained" onClick={handleCancelDiscount}>Hủy</Button>
+                        ) : (
+                            <Button variant="contained" onClick={handleApplyDiscount}>Áp dụng</Button>
+                        )}
                     </div>
                     <div className="policyInfo">
                         <div className="titlePolicy">
@@ -761,6 +809,14 @@ const AdminPay = () =>{
                                         <span>{totalPrice.toLocaleString('vi-VN')}VND</span>
                                     </div>
                                 </div>
+                                {discountPercent !== null && (
+                                    <div className="lineInfo">
+                                        <span>Giảm giá ({discountPercent}%):</span>
+                                        <div className="rightInfo">
+                                            <span>-{discountAmount.toLocaleString('vi-VN')} VND</span>
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="lineInfo">
                                     <span>Phí thanh toán:</span>
                                     <div className="rightInfo">
@@ -771,7 +827,7 @@ const AdminPay = () =>{
                                 <div className="lineInfo" style={{marginTop:".5rem"}}>
                                     <span>Tổng tiền:</span>
                                     <div className="rightInfo">
-                                        <span>{totalPrice.toLocaleString('vi-VN')}VND</span>
+                                        <span>{finalPrice.toLocaleString('vi-VN')}VND</span>
                                     </div>
                                 </div>
                                 <div className="policyCheckbox">
@@ -802,11 +858,25 @@ const AdminPay = () =>{
                                         <span>{totalPriceReturn.toLocaleString('vi-VN')}VND</span>
                                     </div>
                                 </div>
+                                {discountPercent !== null && (
+                                    <div className="lineInfo">
+                                        <span>Giảm giá ({discountPercent}%):</span>
+                                        <div className="rightInfo">
+                                            <span>-{discountAmount.toLocaleString('vi-VN')} VND</span>
+                                        </div>
+                                    </div>
+                                )}
+                                <div className="lineInfo">
+                                    <span>Phí thanh toán:</span>
+                                    <div className="rightInfo">
+                                        <span>0VND</span>
+                                    </div>
+                                </div>
                                 <div className="devide"></div>
                                 <div className="lineInfo" style={{marginTop:".5rem"}}>
                                     <span>Tổng tiền:</span>
                                     <div className="rightInfo">
-                                        <span>{totalAmount.toLocaleString('vi-VN')}VND</span>
+                                        <span>{finalPrice.toLocaleString('vi-VN')}VND</span>
                                     </div>
                                 </div>
                                 <div className="policyCheckbox">

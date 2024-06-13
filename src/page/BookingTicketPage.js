@@ -1,21 +1,14 @@
-import React, { useEffect } from "react";
-import Navbar from "../Components/Navbar/Navbar";
+import React from "react";
 import BookingTicket from "../Components/BookingTicket/BookingTicket";
-import Footer from "../Components/Footer/Footer";
+import Layout from "./Layout";
 
 
 const BookingTicketlPage = () =>{
-    useEffect(() => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-        });
-    });
     return(
         <>
-            <Navbar/>
+            <Layout>
             <BookingTicket/>
-            <Footer/>
+            </Layout>
         </>
         
     );

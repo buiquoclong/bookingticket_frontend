@@ -84,7 +84,7 @@ const Paysuccess = () =>{
                             <div className="PayInfo">
                                 <div className="payline">
                                     <span className="titlepay">Tổng giá vé:</span>
-                                    <span className="text">{bookingData.total}</span>
+                                    <span className="text">{bookingData.total.toLocaleString('vi-VN')} VND</span>
                                 </div>
                                 <div className="payline">
                                     <span className="titlepay">Phương thức thanh toán:</span>
@@ -135,6 +135,12 @@ const Paysuccess = () =>{
                                                 </div>
                                                 <div className="lineInfo">
                                                     <span>Số ghế:</span>
+                                                    <div className="rightInfo">
+                                                        <span>{detail.quantity}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="lineInfo">
+                                                    <span>Ghế đã đặt:</span>
                                                     <div className="seatInfo">
                                                         <span>{detail.seatName}</span>
                                                     </div>
@@ -142,7 +148,7 @@ const Paysuccess = () =>{
                                                 <div className="lineInfo">
                                                     <span>Giá:</span>
                                                     <div className="rightInfo">
-                                                        <span>{detail.price.toLocaleString('vi-VN')}VND</span>
+                                                        <span>{detail.price.toLocaleString('vi-VN')} VND</span>
                                                     </div>
                                                 </div>
                                     </div>
@@ -185,7 +191,7 @@ const Paysuccess = () =>{
                                                 <div className="lineInfo">
                                                     <span>Số ghế:</span>
                                                     <div className="rightInfo">
-                                                        <span>{data.quantity}</span>
+                                                        <span>{detail.quantity}</span>
                                                     </div>
                                                 </div>
                                                 <div className="lineInfo">

@@ -473,17 +473,24 @@ const AdminTrip = () =>{
             setIsDeleteConfirmVisible(true);
         };
         const NoDataComponent = () => <div className="emptyData">Không có dữ liệu</div>;
+        function getCurrentDateTimeLocal() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0'); // thêm '0' nếu cần
+            const day = now.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
             <Breadcrumbs aria-label="breadcrumb">
-                <Link underline="hover" color="inherit" href="/">
+                <Link underline="hover" color="inherit" href="/admin">
                 Admin
                 </Link>
                 <Link
                 underline="hover"
                 color="inherit"
-                href="/admin"
+                href="/admin/trips"
                 >
                 Chuyến đi
                 </Link>
@@ -568,7 +575,7 @@ const AdminTrip = () =>{
                                     </div>
                                     <div className="infoCity">
                                         <label className="info">Ngày khởi hành:</label>
-                                        <input className="inputValue" type="date" value={currentTrip.dayStart} onChange={(e) => setcurrentTrip({ ...currentTrip, dayStart: e.target.value })} />
+                                        <input className="inputValue" type="date" value={currentTrip.dayStart} onChange={(e) => setcurrentTrip({ ...currentTrip, dayStart: e.target.value })} min={getCurrentDateTimeLocal()}/>
                                     </div>
                                     <div className="infoCity">
                                         <label>Giá vé:</label>
@@ -679,8 +686,8 @@ const AdminTrip = () =>{
                                         
                                     </div>
                                     <div className="infoCity">
-                                        <label className="info">Giờ khởi hành:</label>
-                                        <input className="inputValue" type="date" value={dayStart} onChange={handleDayStartChange}/>
+                                        <label className="info">Ngày khởi hành:</label>
+                                        <input className="inputValue" type="date" value={dayStart} onChange={handleDayStartChange} min={getCurrentDateTimeLocal()}/>
                                     </div>
                                     <div className="infoCity">
                                         <label>Giá vé:</label>

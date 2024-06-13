@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef } from "react";
 import "./navbar.scss";
 import { MdTravelExplore } from "react-icons/md";
 import { AiFillCloseCircle } from "react-icons/ai";
@@ -13,6 +13,8 @@ const Navbar = () =>{
   const [userId, setUserId] = useState(localStorage.getItem("userId"));
 
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
+
     const toggleDropdown = () => {
         setShowDropdown(!showDropdown);}
   // Function to toggle navbar
@@ -62,6 +64,13 @@ const fetchToken = async () => {
       const userId = decodedToken.userId;
       localStorage.setItem("userId", userId);
       setUserId(userId);
+      const userRole = decodedToken.role;
+      localStorage.setItem('userRole', userRole);
+      if (userRole  === 1) {
+        navigate('/');
+    } else if (userRole  === 2 || userRole  === 3) {
+        navigate('/admin');
+    }
     }
   } catch (error) {
     console.error("Error fetching token:", error);
@@ -93,6 +102,20 @@ const handleMyRatingClick = () => {
 const handleMyBookingClick = () => {
   navigate('/my-booking');
 }
+
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setShowDropdown(false);
+    }
+  };
+
+  document.body.addEventListener('click', handleClickOutside);
+
+  return () => {
+    document.body.removeEventListener('click', handleClickOutside);
+  };
+}, []);
     return(
       <section className="navBarSection">
         <header className="header flex">
@@ -125,7 +148,7 @@ const handleMyBookingClick = () => {
                   </li>
                   <div className="infoUser">
                     {userId ? (
-                      <div className="dropdown-container" style={{cursor:"pointer"}}>
+                      <div className="dropdown-container" ref={dropdownRef} style={{cursor:"pointer"}}>
                         <div onClick={toggleDropdown} className="dropdown-toggle">
                             {data && (
                                 <span>{data.name}</span>
