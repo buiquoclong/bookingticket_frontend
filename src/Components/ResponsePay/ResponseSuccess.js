@@ -117,7 +117,7 @@ const ResponseSuccess  = () => {
                         // toast.success("Đơn hàng đã được tạo!");
                         const createdBooking = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
                         await createBookingDetail(createdBooking.id, bookingDetails.tripId, 0, bookingDetails.selectedSeatIds.length, bookingDetails.selectedSeatsNames, bookingDetails.totalPrice, bookingDetails.pickupLocation, bookingDetails.note);
-                        updateTripEmptySeat(bookingDetails.tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, bookingDetails.selectedSeatIds);
+                        updateTripEmptySeat(bookingDetails.tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, bookingDetails.selectedSeatIds, data.status);
                         insertSeatReservation(bookingDetails.selectedSeatIds, bookingDetails.tripId, createdBooking.id);
                         await sendMail(createdBooking.id);
                         deleteWaitingSeat(bookingDetails.selectedSeatIds, bookingDetails.tripId);
@@ -163,12 +163,12 @@ const ResponseSuccess  = () => {
                         const createdBooking = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
                         // tạo chi tiết và upadte lượt đi
                         await createBookingDetail(createdBooking.id, bookingDetails.tripId, 0, bookingDetails.selectedSeatIds.length, bookingDetails.selectedSeatsNames, bookingDetails.totalPrice, bookingDetails.pickupLocation, bookingDetails.note);
-                        updateTripEmptySeat(bookingDetails.tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, bookingDetails.selectedSeatIds);
+                        updateTripEmptySeat(bookingDetails.tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, bookingDetails.selectedSeatIds, data.status);
                         insertSeatReservation(bookingDetails.selectedSeatIds, bookingDetails.tripId, createdBooking.id);
                         deleteWaitingSeat(bookingDetails.selectedSeatIds, bookingDetails.tripId);
                         // tạo chi tiết và update lượt về
                         await createBookingDetail(createdBooking.id, bookingDetails.tripIdReturn, 1, bookingDetails.selectedSeatIdsReturn.length, bookingDetails.selectedSeatsNamesReturn, bookingDetails.totalPriceReturn, bookingDetails.pickupLocationReturn, bookingDetails.noteReturn);
-                        updateTripEmptySeat(bookingDetails.tripIdReturn, dataReturn.route.id, dataReturn.vehicle.id, dataReturn.dayStart, dataReturn.timeStart, dataReturn.price, dataReturn.driver.id, dataReturn.emptySeat, bookingDetails.selectedSeatIdsReturn);
+                        updateTripEmptySeat(bookingDetails.tripIdReturn, dataReturn.route.id, dataReturn.vehicle.id, dataReturn.dayStart, dataReturn.timeStart, dataReturn.price, dataReturn.driver.id, dataReturn.emptySeat, bookingDetails.selectedSeatIdsReturn, dataReturn.status);
                         insertSeatReservation(bookingDetails.selectedSeatIdsReturn, bookingDetails.tripIdReturn, createdBooking.id);
                         deleteWaitingSeat(bookingDetails.selectedSeatIdsReturn, bookingDetails.tripIdReturn);
                         await sendMail(createdBooking.id);
@@ -241,7 +241,7 @@ const ResponseSuccess  = () => {
     
 
     // Update lại số ghế trống
-    const updateTripEmptySeat = async (trip, route, vehicleId, daystart, timestart, price, driver, emptyseat, selectedSeatIds) => {
+    const updateTripEmptySeat = async (trip, route, vehicleId, daystart, timestart, price, driver, emptyseat, selectedSeatIds, status) => {
         const newEmptySeat = emptyseat - selectedSeatIds.length;
         const tripUpdate = {
             routeId: route ,
@@ -250,7 +250,8 @@ const ResponseSuccess  = () => {
             timeStart: timestart,
             price: price,
             driverId: driver,
-            emptySeat: newEmptySeat
+            emptySeat: newEmptySeat,
+            status: status
         };
         try {
             // Gửi yêu cầu cập nhật số ghế trống

@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import "./Footer.scss";
 import background from "../../Assets/img/background.jpg";
 import { FiSend } from "react-icons/fi";
@@ -9,6 +9,8 @@ import { AiFillInstagram } from "react-icons/ai";
 import { FaTripadvisor } from "react-icons/fa";
 import { FiChevronRight } from "react-icons/fi";
 import { Link } from 'react-router-dom';
+import { toast, ToastContainer, Zoom } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import Aos from "aos";
 import "aos/dist/aos.css";
@@ -18,6 +20,67 @@ const Footer = () =>{
     useEffect(()=>{
         Aos.init({duration: 2000});
     },[]);
+    
+    const [email, setEmail] = useState('');
+    const [emailErrorMessage, setEmailErrorMessage] = useState('');
+    const handleEmailChange = (event) => {
+        // setEmail(event.target.value);
+        const emailAddress = event.target.value;
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Biểu thức chính quy kiểm tra email
+        
+        // Kiểm tra xem email nhập vào có khớp với biểu thức chính quy không
+        if (!emailPattern.test(emailAddress)) {
+            setEmailErrorMessage("Email không hợp lệ.");
+        } else {
+            setEmailErrorMessage(""); // Nếu hợp lệ, xóa thông báo lỗi
+        }
+        setEmail(emailAddress);
+    };
+    const handleCreateContact = async (e) => {
+        e.preventDefault();
+        let missingInfo = [];
+        if (!email) {
+            missingInfo.push("Email");
+        } else if (emailErrorMessage) { // Kiểm tra nếu có errorMessage cho email
+            toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
+            return; // Dừng xử lý tiếp theo nếu có lỗi
+        }
+        if (missingInfo.length > 0) {
+            const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
+            toast.error(message);
+        } else {
+            try {
+                const newContactData = {
+                    content: "Cần liên hệ",
+                    email: email,
+                    name: "Cần liên hệ",
+                    title: "Cần liên hệ"
+                };
+        
+                const response = await fetch("http://localhost:8081/api/contact", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(newContactData)
+                });
+        
+                if (response.ok) {
+                    // Xử lý thành công
+                    toast.success("Chúng tôi đã nhận được email cần liên hệ của bạn!");
+                    
+                    // Reset form hoặc làm gì đó khác
+                    setEmail('');
+                } else {
+                    console.error("Có lỗi xảy ra khi tạo contact!");
+                    toast.error("Có lỗi xảy ra khi tạo liên hệ!");
+                }
+            } catch (error) {
+                console.error("Lỗi:", error);
+                toast.error("Lỗi:", error);
+            }
+        }
+    };
 
     return(
         <section className="footer">
@@ -33,8 +96,8 @@ const Footer = () =>{
                     </div>
 
                     <div className="inputDiv flex">
-                        <input type="text" placeholder="Enter Email Address"/>
-                        <button className="btn flex" type="submit">
+                        <input type="email" placeholder="Enter Email Address" value={email} onChange={handleEmailChange} required/>
+                        <button className="btn flex" type="submit"  onClick={handleCreateContact}>
                             SEND <FiSend className="icon"/>
                         </button>
                     </div>
@@ -67,24 +130,19 @@ const Footer = () =>{
                             <span className="groupTitile">Thông tin</span>
 
                             <li className="footerList flex">
-                                <Link to="/" className="foot_text"><FiChevronRight className="icon"/>
+                                <Link to="/aboutUs" className="foot_text"><FiChevronRight className="icon"/>
                                 Về chúng tôi</Link>
                                 
                             </li>
 
                             <li className="footerList flex">
-                                <Link to="/" className="foot_text"><FiChevronRight className="icon"/>
+                                <Link to="/contact" className="foot_text"><FiChevronRight className="icon"/>
                                 Liên hệ</Link>
                             </li>
 
                             <li className="footerList flex">
                             <Link to="/route" className="foot_text"><FiChevronRight className="icon"/>
                                 Lịch trình</Link>
-                            </li>
-
-                            <li className="footerList flex">
-                                <Link to="/news" className="foot_text"><FiChevronRight className="icon"/>
-                                Tin tức</Link>
                             </li>
 
                             <li className="footerList flex">
@@ -103,18 +161,13 @@ const Footer = () =>{
                             </li>
 
                             <li className="footerList flex">
-                                <Link to="/" className="foot_text"><FiChevronRight className="icon"/>
+                                <Link to="/contact" className="foot_text"><FiChevronRight className="icon"/>
                                 Liên hệ</Link>
                             </li>
 
                             <li className="footerList flex">
                             <Link to="/route" className="foot_text"><FiChevronRight className="icon"/>
                                 Lịch trình</Link>
-                            </li>
-
-                            <li className="footerList flex">
-                                <Link to="/news" className="foot_text"><FiChevronRight className="icon"/>
-                                Tin tức</Link>
                             </li>
 
                             <li className="footerList flex">
@@ -129,7 +182,7 @@ const Footer = () =>{
                             <span className="groupTitile">Hỗ trợ</span>
 
                             <li className="footerList flex">
-                                <Link to="/" className="foot_text"><FiChevronRight className="icon"/>
+                                <Link to="/contact" className="foot_text"><FiChevronRight className="icon"/>
                                 Liên hệ</Link>
                             </li>
 
@@ -141,11 +194,6 @@ const Footer = () =>{
                             <li className="footerList flex">
                             <Link to="/" className="foot_text"><FiChevronRight className="icon"/>
                                 Điều khoản</Link>
-                            </li>
-
-                            <li className="footerList flex">
-                                <Link to="/news" className="foot_text"><FiChevronRight className="icon"/>
-                                Tin tức</Link>
                             </li>
 
                             <li className="footerList flex">
@@ -161,6 +209,17 @@ const Footer = () =>{
                     </div>
                 </div>
             </div>
+            <ToastContainer
+                        className="toast-container"
+                        toastClassName="toast"
+                        bodyClassName="toast-body"
+                        progressClassName="toast-progress"
+                        theme='colored'
+                        transition={Zoom}
+                        autoClose={500}
+                        hideProgressBar={true}
+                        pauseOnHover
+                    ></ToastContainer>
         </section>
 
     )

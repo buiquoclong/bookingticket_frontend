@@ -210,16 +210,18 @@
                 }
                 .selectChoose{
                     select{
-                        width: 10rem;
+                        width: 13rem;
                         height: 2.5rem;
                         background: var(--whiteColor);
                         border-radius: .5rem;
                         padding-left: 1rem;
                         border: 1px solid var(--greyText);
                         outline: none;
-                        
                     }
                 }
+            }
+            .lineInfoCheck{
+                justify-content: center;
             }
             
             .policyCheckbox{

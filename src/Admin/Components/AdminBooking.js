@@ -218,7 +218,7 @@ const AdminBooking = () =>{
     };
         function handleFilter(event){
             const newData = data.filter(row => {
-                return row.kindPay.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
+                return row.email.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
             })
             setRecords(newData)
         }
@@ -462,6 +462,7 @@ const AdminBooking = () =>{
                                             <DataTable
                                         columns={columnDetails}
                                         data={bookingDetails}
+                                        noDataComponent={<NoDataComponent />}
                                     />
                                 </div>
                             )}

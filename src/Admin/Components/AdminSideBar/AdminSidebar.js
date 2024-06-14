@@ -105,11 +105,23 @@ function AdminSidebar({ openSidebarToggle, OpenSidebar }) {
                     </li>
                 </Link>
                 {data && data.role === 3 && (
+                    <>
                     <Link to="/admin/drivers" style={{ color: "#9e9ea4" }}>
                         <li className={`sidebar-list-item ${activeTab === "drivers" ? "active" : ""}`} onClick={() => setActiveTab("drivers")}>
                             <ManageAccountsIcon className='icon' /> Tài xế
                         </li>
                     </Link>
+                    <Link to="/admin/catch-point" style={{ color: "#9e9ea4" }}>
+                        <li className={`sidebar-list-item ${activeTab === "catch-point" ? "active" : ""}`} onClick={() => setActiveTab("catch-point")}>
+                            <ManageAccountsIcon className='icon' /> Điểm đón tuyến
+                        </li>
+                    </Link>
+                    <Link to="/admin/kind-vehicle" style={{ color: "#9e9ea4" }}>
+                        <li className={`sidebar-list-item ${activeTab === "kind-vehicle" ? "active" : ""}`} onClick={() => setActiveTab("kind-vehicle")}>
+                            <ManageAccountsIcon className='icon' /> Loại xe
+                        </li>
+                    </Link>
+                    </>
                 )}
                 <Link to="/admin/promotions" style={{ color: "#9e9ea4" }}>
                     <li className={`sidebar-list-item ${activeTab === "promotions" ? "active" : ""}`} onClick={() => setActiveTab("promotions")}>

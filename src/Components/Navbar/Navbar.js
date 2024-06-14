@@ -170,9 +170,11 @@ useEffect(() => {
                       </div>
                       
                     ) : (
+                        <Link to="/login">
                         <button className="btn">
-                            <Link to="/login">ĐĂNG NHẬP/ ĐĂNG KÝ</Link>
+                            ĐĂNG NHẬP/ ĐĂNG KÝ
                         </button>
+                      </Link>
                     )}
                   </div>
                   

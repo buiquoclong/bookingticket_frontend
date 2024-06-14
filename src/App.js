@@ -45,6 +45,8 @@ import NotFoundPage from "./Admin/page/NotFoundPage";
 import ContactPage from "./page/ContactPage";
 import AboutUsPage from "./page/AboutUsPage";
 import AdminForBookingPage from "./Admin/page/AdminForBookingPage";
+import AdminCatchPointPage from "./Admin/page/AdminCatchPointPage";
+import AdminKindvehiclePage from "./Admin/page/AdminKindvehiclePage";
 
 
 
@@ -142,6 +144,8 @@ const App = () => {
                     <Route path="/admin/logs" element={<AdminLogPage />} />
                     <Route path="/admin/promotions" element={<AdminPromotionPage />} />
                     <Route path="/admin/reviews" element={<AdminReviewPage />} />
+                    <Route path="/admin/catch-point" element={<AdminCatchPointPage />} />
+                    <Route path="/admin/kind-vehicle" element={<AdminKindvehiclePage />} />
                 </Route>
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>

@@ -69,8 +69,8 @@ const AdminVehicle = () =>{
         }
     ]
     const statusMap = {
-        0: 'Đang hoạt động',
-        1: 'Tạm dừng hoạt động'
+        1: 'Đang hoạt động',
+        2: 'Tạm dừng hoạt động'
     };
     const kindVehicleMap = {
         1: 'Giường nằm',

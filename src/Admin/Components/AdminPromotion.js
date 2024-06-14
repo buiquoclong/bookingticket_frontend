@@ -345,7 +345,7 @@ const AdminPromotion = () =>{
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h2 className="modal-title">Sửa Chi mã giảm giá</h2>
+                                <h2 className="modal-title">Sửa Chi tiết mã giảm giá</h2>
                             </div>
                             <div className="modal-body">
                                 <form>

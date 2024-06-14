@@ -62,7 +62,7 @@ const AdminRoute = () =>{
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Trạng thái</div>,
             selector: row => row.status,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{statusMap[row.status] || 'Unknown Status'}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{statusMap[row.status] || 'Unknown Status'}</div>
         },
         {
             cell: (row) => (
@@ -74,8 +74,8 @@ const AdminRoute = () =>{
         }
     ]
     const statusMap = {
-        0: 'Đang hoạt động',
-        1: 'Tạm dừng hoạt động'
+        1: 'Đang hoạt động', 
+        2: 'Tạm dừng hoạt động'
     };
     useEffect(() => {
         // Call the API to fetch cities
@@ -444,7 +444,7 @@ const AdminRoute = () =>{
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h2 className="modal-title">Sửa tuyến xe</h2>
+                                <h2 className="modal-title">Thêm tuyến xe</h2>
                             </div>
                             <div className="modal-body">
                                 <form>

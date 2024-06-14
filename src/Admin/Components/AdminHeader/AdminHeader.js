@@ -8,7 +8,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
     Home,
     Person,
-    Settings,
     PowerSettingsNew
 } from "@mui/icons-material";
 // import "./Header.scss"
@@ -114,16 +113,9 @@ function AdminHeader({OpenSidebar}) {
                 </StyledItem>
 
                 <StyledItem   onClick={handleUserInfoClick}>
-                {/* <Link to="/page-layouts/user-profile"> */}
                     <Person />
                     <span>Thông tin</span>
-                {/* </Link> */}
                 </StyledItem>
-
-                <MenuItem>
-                    <Settings />
-                    <span>Cài đặt</span>
-                </MenuItem>
 
                 <StyledItem  onClick={handleLogoutClick}>
                     <PowerSettingsNew />

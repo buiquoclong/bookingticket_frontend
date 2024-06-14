@@ -91,14 +91,25 @@
                 &:hover{
                     background: var(--whiteColor);
                 }
-
-                .btn{
+                a{
                     margin-top: 1rem;
 
-                    a{
+                    .btn{
+                        margin-top: 1rem;
                         font-weight: 600;
                         color: var(--whiteColor);
                     }
+                }
+
+                .btn{
+                    margin-top: 1rem;
+                    font-weight: 600;
+                    color: var(--whiteColor);
+
+                    // a{
+                    //     font-weight: 600;
+                    //     color: var(--whiteColor);
+                    // }
                 }
             }
 
@@ -147,6 +158,7 @@
                 flex-direction: row;
 
                 .navItem{
+                    text-align: center;
                     .navLink{
                         color: var(--textColor);
                         padding: 0 0.45rem;
@@ -159,12 +171,21 @@
                     }
                 }
 
-                .btn{
-                    margin-left: 1rem;
-                    a{
+                a{
+                    // margin-left: 1rem;
+                    // text-align: center;
+                    .btn{
                         color: var(--whiteColor);
                         font-weight: 500;
                     }
+                }
+                .btn{
+                    color: var(--whiteColor);
+                    font-weight: 500;
+                    // a{
+                    //     color: var(--whiteColor);
+                    //     font-weight: 500;
+                    // }
                 }
             }
         }

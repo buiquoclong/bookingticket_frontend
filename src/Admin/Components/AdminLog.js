@@ -61,7 +61,7 @@ const AdminLog = () =>{
         };
         function handleFilter(event){
             const newData = data.filter(row => {
-                return row.name.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
+                return row.user.name.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
             })
             setRecords(newData)
         }
@@ -96,7 +96,6 @@ const AdminLog = () =>{
                 <div className="HistoryTick">
                     <div className="contentTikcet">
                         <div className="title">Quản lý Logs</div>
-                        <button className="btn back">Tạo Log</button>
                     </div>
                     <div className="devide"></div>
                     <DataTable

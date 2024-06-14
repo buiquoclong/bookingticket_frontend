@@ -18,7 +18,7 @@ const SearchRoute  = () => {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Quãng đường</div>,
             selector: row => row.khoangCach,
             width: '20rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.khoangCach}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.khoangCach} km</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Thời gian đi</div>,
@@ -45,7 +45,7 @@ const SearchRoute  = () => {
 
     const fetchRoutes = async () => {
         try {
-            const response = await fetch("http://localhost:8081/api/route");
+            const response = await fetch("http://localhost:8081/api/route/active");
             const data = await response.json();
             setData(data);
             setRecords(data);

@@ -45,6 +45,12 @@
                 &:nth-child(4) {
                     background-color: #d50000;
                 }
+                &:nth-child(5) {
+                    background-color: #2e7d32;
+                }
+                &:nth-child(6) {
+                    background-color: #d50000;
+                }
                 .card-inner {
                     display: flex;
                     align-items: center;
@@ -64,139 +70,6 @@
             box-shadow: 0 6px 7px -3px rgba(0, 0, 0, 0.35);
         }
     }
-    // .sachRouteContent{
-    //     .homeContent{
-    //         height: max-content;
-    //         padding: 8rem 1.5rem 3rem;
-    //         display: flex;
-    //         row-gap: 3rem;
-    //         flex-direction: column;
-    //         align-items: stretch;
-    //         justify-content: center;
-    //         margin: auto;
-    //         color: var(--whiteColor);
-    //         z-index: 100;
-    //         width: 87% !important;
-            
-    
-    //         .cardDiv{
-    //             position: relative;
-    //             padding: 2rem 1rem;
-    //             background: var(--whiteColor);
-    //             border-radius: 10px;
-    //             gap: 1rem;
-    //             line-height: 30px;
-    //             border: 1px solid var(--blackColor);
-    
-                
-    
-    //             .radioButtons {
-    //                 display: flex;
-    //                 justify-content: baseline;
-    //                 margin-bottom: 1rem;
-            
-    //                 label {
-    //                     margin-right: 1rem;
-    //                     cursor: pointer;
-    //                     font-size: 17px;
-            
-    //                     input[type="radio"] {
-    //                         margin-right: 0.5rem;
-    //                     }
-    //                 }
-    //             }
-    
-    //             .destinationIn{
-                    
-    //                 display: flex;
-    //                 flex-wrap: wrap;
-    //                 justify-content: space-between; // Đảm bảo các phần tử đều nằm cách đều nhau theo chiều ngang
-    
-    //                 .destinationInput, .dateInput {
-    //                     margin-bottom: 10px; // Khoảng cách giữa các hàng
-    //                 }
-    //             }
-    
-    //             .sizeOne{
-    //                 width: 80%;
-    //                 margin-inline: auto;
-    //             }
-    
-    //             .sizeTwo{
-    //                 width: 97%;
-    //                 margin-inline: auto;
-    //             }
-    
-    //             label{
-    //                 display: block;
-    //                 color: var(--textColor);
-    //                 color: #1b2d36;
-    //                 padding-bottom: 10px;
-    //                 font-size: 15px;
-    //                 font-weight: 500;
-    //             }
-                
-    //             .input{
-    //                 height: 3rem;
-    //                 padding: 0 1rem;
-    //                 background: var(--inputColor);
-    //                 border-radius: .5rem;
-    //                 font-size: 18px;
-    //                 outline: none;
-    
-    //                 input{
-    //                     background: none;
-    //                     border: none;
-    //                     outline: none;
-    //                     width: 100%;
-    //                     font-size: 18px;
-    //                     font-weight: 500;
-    //                     &::placeholder{
-    //                         font-size: 13px;
-    //                     }
-    //                     cursor: pointer;
-    //                 }
-    
-    //                 .icon{
-    //                     font-size: 18px;
-    //                     color: var(--PrimaryColor)
-    //                     !important;
-    //                     margin-left: 10px;
-    //                 }
-    //             }
-    
-    //             .searchOption{
-    //                 position: absolute;
-    //                 background-color: var(--PrimaryColor);
-    //                 width: max-content;
-    //                 bottom: -0.7rem;
-    //                 column-gap: .8rem;
-    //                 padding: 5px 1rem;
-    //                 border-radius: 3rem;
-    //                 left: 50%;
-    //                 transform: translate(-50%);
-    //                 justify-content: center;
-    //                 cursor: pointer;
-    //                 color: var(--whiteColor);
-    
-    //                 &:hover{
-    //                     background: var(--SecondaryColor);
-    //                 }
-    
-    //                 .icon{
-    //                     font-size: 18px;
-    //                 }
-    
-    //                 span{
-    //                     font-size: 13px;
-    //                 }
-    //             }
-    
-                
-    //         }
-            
-    //     }
-    // }
     .toast-container {
         position: fixed;
         top: 50%; 

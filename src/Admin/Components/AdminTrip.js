@@ -46,6 +46,7 @@ const AdminTrip = () =>{
     const [status, setStatus] = useState('');
     const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
     const [tripToDelete, setTripToDelete] = useState(null);
+    const [filterDate, setFilterDate] = useState('');
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -78,23 +79,9 @@ const AdminTrip = () =>{
             width: '5rem',
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.vehicle.vehicleNumber}</div>
         },
-        // {
-        //     name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Giờ khởi hành </div>,
-        //     selector: row => row.timeStart,
-        //     sortable: true,
-        //     width: '5rem',
-        //     cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.timeStart.slice(0, 5)}</div>
-        // },
-        // {
-        //     name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Ngày khởi hành </div>,
-        //     selector: row => row.dayStart,
-        //     sortable: true,
-        //     width: '8rem',
-        //     cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{formatDate(row.dayStart)}</div>
-        // }
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Thời gian khởi hành </div>,
-            width: '10rem',
+            width: '9rem',
             cell: row => (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
                     {row.timeStart.slice(0, 5)} - {formatDate(row.dayStart)}
@@ -111,7 +98,7 @@ const AdminTrip = () =>{
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tài xế</div>,
             selector: row => row.driver.name,
-            width: '10rem',
+            width: '8rem',
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.driver.name}</div>
         },
         {
@@ -180,12 +167,14 @@ const AdminTrip = () =>{
             console.error("Error fetching trips:", error);
         }
     };
-        function handleFilter(event){
-            const newData = data.filter(row => {
-                return row.routeName.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
-            })
-            setRecords(newData)
-        }
+    const handleFilter = (event) => {
+        const value = event.target.value;
+        setFilterDate(value); // Cập nhật giá trị tìm kiếm cho ngày khởi hành
+        const newData = data.filter(row => {
+            return row.dayStart.includes(value); // Lọc theo ngày khởi hành
+        });
+        setRecords(newData);
+    };
         const handleEditClick = (row) => {
             if (row && row.route && row.vehicle && row.driver) {
                 setcurrentTrip({
@@ -498,7 +487,7 @@ const AdminTrip = () =>{
 
             <div className="HisContent">
                 <div className="searchIn">
-                    <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/>
+                    <input type="text" onChange={handleFilter} placeholder="Tìm kiếm theo ngày khởi hành" className="findTuyen"/>
                 </div>
                 <div className="HistoryTick">
                     <div className="contentTikcet">
@@ -631,7 +620,7 @@ const AdminTrip = () =>{
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h2 class="modal-title">Sửa chuyến đi</h2>
+                                <h2 class="modal-title">Thêm chuyến đi</h2>
                             </div>
                             <div class="modal-body">
                                 <form>

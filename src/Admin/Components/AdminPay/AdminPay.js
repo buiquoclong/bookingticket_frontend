@@ -293,7 +293,7 @@ const AdminPay = () =>{
                                     toast.success("Đơn hàng đã được tạo!");
                                     const createdBooking = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
                                     await createBookingDetail(createdBooking.id, tripId, 0, selectedSeatIds.length, selectedSeatsNames, totalPrice, pickupLocation, note);
-                                    updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds);
+                                    updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds, data.status);
                                     insertSeatReservation(selectedSeatIds, tripId, createdBooking.id);
                                     setTimeout(() => {
                                         navigate("/admin/book-cash-payment", { state: { bookingId: createdBooking.id, kind: kind } });
@@ -336,11 +336,11 @@ const AdminPay = () =>{
                                     const createdBooking = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
                                     // tạo chi tiết và upadte lượt đi
                                     await createBookingDetail(createdBooking.id, tripId, 0, selectedSeatIds.length, selectedSeatsNames, totalPrice, pickupLocation, note);
-                                    updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds);
+                                    updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds, data.status);
                                     insertSeatReservation(selectedSeatIds, tripId, createdBooking.id);
                                     // tạo chi tiết và update lượt về
                                     await createBookingDetail(createdBooking.id, tripIdReturn, 1, selectedSeatIdsReturn.length, selectedSeatsNamesReturn, totalPriceReturn, pickupLocationReturn, noteReturn);
-                                    updateTripEmptySeat(tripIdReturn, dataReturn.route.id, dataReturn.vehicle.id, dataReturn.dayStart, dataReturn.timeStart, dataReturn.price, dataReturn.driver.id, dataReturn.emptySeat, selectedSeatIdsReturn);
+                                    updateTripEmptySeat(tripIdReturn, dataReturn.route.id, dataReturn.vehicle.id, dataReturn.dayStart, dataReturn.timeStart, dataReturn.price, dataReturn.driver.id, dataReturn.emptySeat, selectedSeatIdsReturn, dataReturn.status);
                                     insertSeatReservation(selectedSeatIdsReturn, tripIdReturn, createdBooking.id);
                                     setTimeout(() => {
                                         navigate("/admin/book-cash-payment", { state: { bookingId: createdBooking.id, kind: kind } });
@@ -403,7 +403,7 @@ const AdminPay = () =>{
     
 
     // Update lại số ghế trống
-    const updateTripEmptySeat = async (trip, route, vehicleId, daystart, timestart, price, driver, emptyseat, selectedSeatIds) => {
+    const updateTripEmptySeat = async (trip, route, vehicleId, daystart, timestart, price, driver, emptyseat, selectedSeatIds, status) => {
         const newEmptySeat = emptyseat - selectedSeatIds.length;
         const tripUpdate = {
             routeId: route ,
@@ -412,7 +412,8 @@ const AdminPay = () =>{
             timeStart: timestart,
             price: price,
             driverId: driver,
-            emptySeat: newEmptySeat
+            emptySeat: newEmptySeat,
+            status: status
         };
         try {
             // Gửi yêu cầu cập nhật số ghế trống

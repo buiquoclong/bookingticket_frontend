@@ -8,6 +8,7 @@ import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { FormGroup, FormControlLabel, Switch } from '@mui/material';
 
 
 const BookingTicket = () =>{
@@ -37,14 +38,11 @@ const BookingTicket = () =>{
     const [isDiscountApplied, setIsDiscountApplied] = useState(false);
     const navigate = useNavigate();
     const userId = localStorage.getItem("userId");
-    // Xử lý chọn nhập nơi đón
-    const handleSelectChange = (event) => {
-        setShowLocationInput(event.target.value === 'Yes');
-    };
-    // Xử lý chọn nhập nơi đón cho chuyến về
-    const handleSelectRetrunChange = (event) => {
-        setShowLocationRetrunInput(event.target.value === 'Yes');
-    };
+
+    const [catchPoints, setCatchPoints] = useState([]);
+    const [catchPointsReturn, setCatchPointsReturn] = useState([]);
+    const [routeId, setRouteId] = useState('');
+    const [routeReturnId, setRouteReturnId] = useState('');
 
     // Xử lý input ghi chú
     const handleNoteChange = (event) => {
@@ -153,28 +151,66 @@ const BookingTicket = () =>{
             .catch((error) => console.error("Error fetching user data:", error));
         }
     },[kind, tripId, tripIdReturn]);
+    useEffect(() => {
+        if (showLocationInput) {
+            const fetchCatchPoints = async () => {
+                try {
+                    const response = await fetch(`http://localhost:8081/api/catch-point/route/${routeId}`);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const data = await response.json();
+                    setCatchPoints(data);
+                } catch (error) {
+                    console.error('Error fetching catch points:', error);
+                }
+            };
+            fetchCatchPoints();
+        }
+        if (showLocationRetrunInput) {
+            const fetchCatchPointsReturn = async () => {
+                try {
+                    const response = await fetch(`http://localhost:8081/api/catch-point/route/${routeReturnId}`);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const dataReturn = await response.json();
+                    setCatchPointsReturn(dataReturn);
+                } catch (error) {
+                    console.error('Error fetching catch points:', error);
+                }
+            };
+            fetchCatchPointsReturn();
+        }
+    }, [showLocationRetrunInput, routeReturnId]);
 
     const fetchTripInfo = async () => {
         try {
             const response = await fetch(`http://localhost:8081/api/trip/${tripId}`);
             const data = await response.json();
             setData(data);
-            console.log(data)
+            setRouteId(data.route.id);
         } catch (error) {
             console.error("Error fetching:", error);
         }
     };
     const fetchTripReturnInfo = async () => {
-        
-        console.log("Selected Seat IDs:", selectedSeatIds);
             try {
                 const response = await fetch(`http://localhost:8081/api/trip/${tripIdReturn}`);
                 const dataReturn = await response.json();
                 setDataReturn(dataReturn);
-                console.log(dataReturn)
+                setRouteReturnId(dataReturn.route.id);
             } catch (error) {
                 console.error("Error fetching:", error);
             }
+    };
+         // Xử lý chọn nhập nơi đón
+        const handleSwitchChange = (event) => {
+            setShowLocationInput(event.target.checked);
+        };
+        // Xử lý chọn nhập nơi đón cho chuyến về
+        const handleSwitchReturnChange = (event) => {
+            setShowLocationRetrunInput(event.target.checked);
         };
 
         const handleChooseVNPAYPayment = async () => {
@@ -470,7 +506,7 @@ const BookingTicket = () =>{
                                 toast.success("Đơn hàng đã được tạo!");
                                 const createdBooking = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
                                 await createBookingDetail(createdBooking.id, tripId, 0, selectedSeatIds.length, selectedSeatsNames, totalPrice, pickupLocation, note);
-                                updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds);
+                                updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds, data.status);
                                 insertSeatReservation(selectedSeatIds, tripId, createdBooking.id);
                                 await sendMail(createdBooking.id);
                                 setTimeout(() => {
@@ -513,11 +549,11 @@ const BookingTicket = () =>{
                                 const createdBooking = await response.json(); // Lấy thông tin của hóa đơn vừa tạo
                                 // tạo chi tiết và upadte lượt đi
                                 await createBookingDetail(createdBooking.id, tripId, 0, selectedSeatIds.length, selectedSeatsNames, totalPrice, pickupLocation, note);
-                                updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds);
+                                updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds, data.status);
                                 insertSeatReservation(selectedSeatIds, tripId, createdBooking.id);
                                 // tạo chi tiết và update lượt về
                                 await createBookingDetail(createdBooking.id, tripIdReturn, 1, selectedSeatIdsReturn.length, selectedSeatsNamesReturn, totalPriceReturn, pickupLocationReturn, noteReturn);
-                                updateTripEmptySeat(tripIdReturn, dataReturn.route.id, dataReturn.vehicle.id, dataReturn.dayStart, dataReturn.timeStart, dataReturn.price, dataReturn.driver.id, dataReturn.emptySeat, selectedSeatIdsReturn);
+                                updateTripEmptySeat(tripIdReturn, dataReturn.route.id, dataReturn.vehicle.id, dataReturn.dayStart, dataReturn.timeStart, dataReturn.price, dataReturn.driver.id, dataReturn.emptySeat, selectedSeatIdsReturn, dataReturn.status);
                                 insertSeatReservation(selectedSeatIdsReturn, tripIdReturn, createdBooking.id);
                                 await sendMail(createdBooking.id);
                                 setTimeout(() => {
@@ -598,7 +634,7 @@ const BookingTicket = () =>{
     
 
     // Update lại số ghế trống
-    const updateTripEmptySeat = async (trip, route, vehicleId, daystart, timestart, price, driver, emptyseat, selectedSeatIds) => {
+    const updateTripEmptySeat = async (trip, route, vehicleId, daystart, timestart, price, driver, emptyseat, selectedSeatIds, status) => {
         const newEmptySeat = emptyseat - selectedSeatIds.length;
         const tripUpdate = {
             routeId: route ,
@@ -607,7 +643,9 @@ const BookingTicket = () =>{
             timeStart: timestart,
             price: price,
             driverId: driver,
-            emptySeat: newEmptySeat
+            emptySeat: newEmptySeat,
+            status: status
+
         };
         try {
             // Gửi yêu cầu cập nhật số ghế trống
@@ -818,20 +856,35 @@ const BookingTicket = () =>{
                                                     <input type="text" className="Note" placeholder="Thêm ghi chú ở đây" onChange={handleNoteChange}/>
                                                 </div>
                                             </div>
-                                            <div className="lineInfo">
-                                                <span>Chọn điểm đón:</span>
+                                            <div className="lineInfo lineInfoCheck">
+                                                {/* <span>Chọn điểm đón:</span>
                                                 <div className="selectChoose">
                                                     <select onChange={handleSelectChange}>
                                                         <option value="No">Không</option>
                                                         <option value="Yes">Có</option>
                                                     </select>
-                                                </div>
+                                                </div> */}
+                                                <FormGroup>
+                                                    <FormControlLabel 
+                                                        control={<Switch checked={showLocationInput} onChange={handleSwitchChange} />} 
+                                                        label="Chọn điểm đón" 
+                                                        labelPlacement="start"
+                                                    />
+                                                </FormGroup>
                                             </div>
                                             {showLocationInput && (
                                                 <div className="lineInfo">
                                                     <span>Nơi đón:</span>
-                                                    <div>
+                                                    {/* <div>
                                                         <input type="text" className="Note" placeholder="Nhập nơi đón ở đây" onChange={handlePickupLocationChange}/>
+                                                    </div> */}
+                                                    <div className="selectChoose">
+                                                        <select className="Note" value={pickupLocation} onChange={handlePickupLocationChange}>
+                                                            <option value="">Chọn nơi đón</option>
+                                                            {catchPoints.map((point) => (
+                                                                <option key={point.id} value={point.address}>{point.name} - {point.address}</option>
+                                                            ))}
+                                                        </select>
                                                     </div>
                                                 </div>
                                             )}
@@ -901,20 +954,35 @@ const BookingTicket = () =>{
                                                     <input type="text" className="Note" placeholder="Thêm ghi chú ở đây" onChange={handleNoteChange}/>
                                                 </div>
                                             </div>
-                                            <div className="lineInfo">
-                                                <span>Chọn điểm đón:</span>
+                                            <div className="lineInfo lineInfoCheck">
+                                                {/* <span>Chọn điểm đón:</span>
                                                 <div className="selectChoose">
                                                     <select onChange={handleSelectChange}>
                                                         <option value="No">Không</option>
                                                         <option value="Yes">Có</option>
                                                     </select>
-                                                </div>
+                                                </div> */}
+                                                <FormGroup>
+                                                    <FormControlLabel 
+                                                        control={<Switch checked={showLocationInput} onChange={handleSwitchChange} />} 
+                                                        label="Chọn điểm đón" 
+                                                        labelPlacement="start"
+                                                    />
+                                                </FormGroup>
                                             </div>
                                             {showLocationInput && (
                                                 <div className="lineInfo">
                                                     <span>Nơi đón:</span>
-                                                    <div>
+                                                    {/* <div>
                                                         <input type="text" className="Note" placeholder="Nhập nơi đón ở đây" onChange={handlePickupLocationChange}/>
+                                                    </div> */}
+                                                    <div className="selectChoose">
+                                                        <select className="Note" value={pickupLocation} onChange={handlePickupLocationChange}>
+                                                            <option value="">Chọn nơi đón</option>
+                                                            {catchPoints.map((point) => (
+                                                                <option key={point.id} value={point.address}>{point.name} - {point.address}</option>
+                                                            ))}
+                                                        </select>
                                                     </div>
                                                 </div>
                                             )}
@@ -967,20 +1035,36 @@ const BookingTicket = () =>{
                                                     <input type="text" className="Note" placeholder="Thêm ghi chú ở đây" onChange={handleNoteReturnChange}/>
                                                 </div>
                                             </div>
-                                            <div className="lineInfo">
-                                                <span>Chọn điểm đón:</span>
+                                            <div className="lineInfo lineInfoCheck">
+                                                {/* <span>Chọn điểm đón:</span>
                                                 <div className="selectChoose">
                                                     <select onChange={handleSelectRetrunChange}>
                                                         <option value="No">Không</option>
                                                         <option value="Yes">Có</option>
                                                     </select>
-                                                </div>
+                                                </div> */}
+                                                
+                                                <FormGroup>
+                                                    <FormControlLabel 
+                                                        control={<Switch checked={showLocationRetrunInput} onChange={handleSwitchReturnChange} />} 
+                                                        label="Chọn điểm đón" 
+                                                        labelPlacement="start"
+                                                    />
+                                                </FormGroup>
                                             </div>
                                             {showLocationRetrunInput && (
                                                 <div className="lineInfo">
                                                     <span>Nơi đón:</span>
-                                                    <div>
+                                                    {/* <div>
                                                         <input type="text" className="Note" placeholder="Nhập nơi đón ở đây" onChange={handlePickupLocationReturnChange}/>
+                                                    </div> */}
+                                                    <div className="selectChoose">
+                                                        <select className="Note" value={pickupLocationReturn} onChange={handlePickupLocationReturnChange}>
+                                                            <option value="">Chọn nơi đón</option>
+                                                            {catchPointsReturn.map((point) => (
+                                                                <option key={point.id} value={point.address}>{point.name} - {point.address}</option>
+                                                            ))}
+                                                        </select>
                                                     </div>
                                                 </div>
                                             )}

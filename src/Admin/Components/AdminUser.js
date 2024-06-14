@@ -41,7 +41,7 @@ const AdminUser = () =>{
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Họ tên</div>,
             selector: row => row.name,
-            width: '14rem',
+            width: '12rem',
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.name}</div>
         },
         {
@@ -116,7 +116,7 @@ const AdminUser = () =>{
     };
         function handleFilter(event){
             const newData = data.filter(row => {
-                return row.name.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
+                return row.email.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
             })
             setRecords(newData)
         }
@@ -300,7 +300,7 @@ const AdminUser = () =>{
 
             <div className="HisContent">
                 <div className="searchIn">
-                    <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/>
+                    <input type="text" onChange={handleFilter} placeholder="Tìm kiếm bằng email" className="findTuyen"/>
                 </div>
                 <div className="HistoryTick">
                     <div className="contentTikcet">
@@ -332,7 +332,7 @@ const AdminUser = () =>{
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h2 className="modal-title">Sửa Người dùng</h2>
+                                <h2 className="modal-title">Chỉnh sửa thông tin tài khoản</h2>
                             </div>
                             <div className="modal-body">
                                 <form>
@@ -380,7 +380,7 @@ const AdminUser = () =>{
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h2 className="modal-title">Thêm Người dùng</h2>
+                                <h2 className="modal-title">Thêm tài khoản</h2>
                             </div>
                             <div className="modal-body">
                                 <form>

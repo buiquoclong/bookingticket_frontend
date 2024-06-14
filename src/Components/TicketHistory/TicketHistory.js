@@ -233,6 +233,7 @@ const TicketHistory = () =>{
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
+    const NoDataComponent = () => <div className="emptyData">Bạn chưa có vé nào đã đặt</div>;
     return(
         <div className="hisInfoTicket">
             <div className="HisContent">
@@ -249,6 +250,7 @@ const TicketHistory = () =>{
                     columns={columns}
                     data={records}
                     // pagination
+                    noDataComponent={<NoDataComponent />}
                     ></DataTable>
                 </div>
                     <div className="center-pagination">

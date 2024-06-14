@@ -35,7 +35,7 @@ const AdminSeatReservation = () =>{
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Email</div>,
             selector: row => row.booking.email,
             width: '10rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.booking.email}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.booking.email}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên xe</div>,
@@ -69,13 +69,6 @@ const AdminSeatReservation = () =>{
                     {row.trip.timeStart.slice(0, 5)} - {formatDate(row.trip.dayStart)}
                 </div>
             )
-        },
-        {
-            cell: (row) => (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                    <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button>
-                </div>
-            )
         }
     ]
     useEffect(() => {
@@ -96,7 +89,7 @@ const AdminSeatReservation = () =>{
     };
         function handleFilter(event){
             const newData = data.filter(row => {
-                return row.email.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
+                return row.booking.email.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
             })
             setRecords(newData)
         }

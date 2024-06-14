@@ -66,7 +66,7 @@ const Home = () =>{
     };
     const fetchRoutes = async () => {
         try {
-            const response = await fetch("http://localhost:8081/api/route");
+            const response = await fetch("http://localhost:8081/api/route/active");
             const data = await response.json();
             setData(data);
             console.log("Routes:", data);
@@ -406,7 +406,7 @@ const Home = () =>{
 
                                             <div className="fees flex">
                                                 <div className="grade">
-                                                    <span>Quãng đường: {route.khoangCach}<small> +</small></span>
+                                                    <span>Quãng đường: {route.khoangCach} km <small> +</small></span>
                                                 </div>
                                                 <div className="price">
                                                     <h5>{route.timeOfRoute} giờ</h5>
