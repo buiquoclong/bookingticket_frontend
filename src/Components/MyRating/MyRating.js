@@ -6,6 +6,7 @@ import StarRatings from 'react-star-ratings';
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Pagination} from '@mui/material';
+import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 
 
 const MyRating = () =>{
@@ -44,6 +45,9 @@ const MyRating = () =>{
     const [totalPages, setTotalPages] = useState(0);
     const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
     const [reviewToDelete, setReviewToDelete] = useState(null);
+    
+
+    const [searchValue, setSearchValue] = useState('');
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -150,11 +154,12 @@ const MyRating = () =>{
             localStorage.setItem('redirectPath', window.location.pathname);
             navigate('/login');
         }
-    }, [userId, page]);
+    }, [userId, page, searchValue]);
 
     const fetchReviews = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/api/review/user/${userId}/page?page=${page}&size=10`);
+            // const response = await fetch(`http://localhost:8081/api/review/user/${userId}/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/review/page?page=${page}&size=10&userId=${userId}&rating=${searchValue}`);
             const data = await response.json();
             setData(data.reviews);
             setRecords(data.reviews);
@@ -269,7 +274,23 @@ const MyRating = () =>{
 
             <div className="HisContent">
                 <div className="searchIn">
-                    <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/>
+                    {/* <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/> */}
+                    <FormControl sx={{ minWidth: 150 }} variant="outlined" className="searchCriteria" size="small">
+                    <InputLabel id="search-criteria-label">Đánh giá</InputLabel>
+                    <Select
+                        labelId="search-criteria-label"
+                        id="search-criteria"
+                        value={searchValue}
+                        onChange={(e) =>  setSearchValue(e.target.value)}
+                        label="Đánh giá"
+                    >
+                        <MenuItem value="1" style={{justifyContent:"center"}}><span style={{ color:  'gold', fontSize:"20px" }}>★</span><span style={{ color:  'grey', fontSize:"20px" }}>★★★★</span></MenuItem>
+                        <MenuItem value="2" style={{justifyContent:"center"}}><span style={{ color:  'gold', fontSize:"20px" }}>★★</span><span style={{ color:  'grey', fontSize:"20px" }}>★★★</span></MenuItem>
+                        <MenuItem value="3" style={{justifyContent:"center"}}><span style={{ color:  'gold', fontSize:"20px" }}>★★★</span><span style={{ color:  'grey', fontSize:"20px" }}>★★</span></MenuItem>
+                        <MenuItem value="4" style={{justifyContent:"center"}}><span style={{ color:  'gold', fontSize:"20px" }}>★★★★</span><span style={{ color:  'grey', fontSize:"20px" }}>★</span></MenuItem>
+                        <MenuItem value="5" style={{justifyContent:"center"}}><span style={{ color:  'gold', fontSize:"20px" }}>★★★★★</span></MenuItem>
+                    </Select>
+                </FormControl>
                 </div>
                 <div className="HistoryTick">
                     <div className="contentTikcet">
@@ -387,6 +408,7 @@ const MyRating = () =>{
             )}
             {/* </section> */}
             <ToastContainer
+                        containerId="main-container"
                         className="toast-container"
                         toastClassName="toast"
                         bodyClassName="toast-body"

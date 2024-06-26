@@ -35,7 +35,14 @@ const Login  = () => {
         setEmail(emailAddress);
     };
     const handlePassChange = (event) => {
-        setPassword(event.target.value);
+        const password = event.target.value;
+
+        if (!validatePassword(password)) {
+            setPassErrorMessage('Mật khẩu không đúng định dạng');
+        } else {
+            setPassErrorMessage('');
+        }
+        setPassword(password);
     };
     const validatePassword = (password) => {
         return password.length >= 8 && password.length <= 32 && /[a-zA-Z]/.test(password) && /[0-9]/.test(password);
@@ -167,7 +174,7 @@ const Login  = () => {
                             </div>
                     </form>
 
-                    <button className="btn"onClick={googleLogin} >Tiếp tục với Google</button>
+                    <button className="btn" onClick={googleLogin} >Tiếp tục với Google</button>
                                     
                     <div className="register-link">
                         <p>Bạn chưa có tài khoản

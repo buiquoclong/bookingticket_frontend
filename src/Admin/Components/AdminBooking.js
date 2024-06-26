@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component'
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
+import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 
 
 const AdminBooking = () =>{
@@ -40,6 +41,9 @@ const AdminBooking = () =>{
     
         return `${formattedHours}:${formattedMinutes} ${formattedDay}/${formattedMonth}/${year}`;
     }
+    
+    const [searchCriteria, setSearchCriteria] = useState('email');
+    const [searchValue, setSearchValue] = useState('');
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -177,14 +181,14 @@ const AdminBooking = () =>{
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Nơi đón</div>,
             selector: row => row.pointCatch,
-            width: '7rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.pointCatch}</div>
+            width: '20rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.pointCatch}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Ghi chú</div>,
             selector: row => row.note,
             width: '7rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.note}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.note}</div>
         }
     ]
     const roundTrip = {
@@ -203,11 +207,12 @@ const AdminBooking = () =>{
     useEffect(() => {
         // Call the API to fetch cities
         fetchBookings();
-    }, [page]);
+    }, [page, searchCriteria, searchValue]);
 
     const fetchBookings = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/api/booking/page?page=${page}&size=10`);
+            // const response = await fetch(`http://localhost:8081/api/booking/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/booking/page?page=${page}&size=5&${searchCriteria}=${searchValue}`);
             const data = await response.json();
             setData(data.bookings);
             setRecords(data.bookings);
@@ -403,6 +408,9 @@ const AdminBooking = () =>{
         };
         
         const NoDataComponent = () => <div className="emptyData">Không có dữ liệu</div>;
+        const handleCriteriaChange = (event) => {
+            setSearchCriteria(event.target.value);
+        };
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -421,7 +429,29 @@ const AdminBooking = () =>{
 
             <div className="HisContent">
                 <div className="searchIn">
-                    <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/>
+                    {/* <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/> */}
+                    <input
+                    type="text"
+                    onChange={(e) =>  setSearchValue(e.target.value)}
+                    placeholder={`Tìm kiếm `}
+                    value={searchValue}
+                    className="findTuyen" style={{marginRight:"1rem"}}
+                />
+                <FormControl sx={{ minWidth: 150 }} variant="outlined" className="searchCriteria" size="small">
+                    <InputLabel id="search-criteria-label">Tìm kiếm bằng</InputLabel>
+                    <Select
+                        labelId="search-criteria-label"
+                        id="search-criteria"
+                        value={searchCriteria}
+                        onChange={handleCriteriaChange}
+                        label="Tiềm kiếm bằng"
+                    >
+                        <MenuItem value="userName">Tên</MenuItem>
+                        <MenuItem value="email">Email</MenuItem>
+                        <MenuItem value="phone">Số điện thoại</MenuItem>
+                        <MenuItem value="kindPay">Hình thức thanh toán</MenuItem>
+                    </Select>
+                </FormControl>
                 </div>
                 <div className="HistoryTick">
                     <div className="contentTikcet">
@@ -476,7 +506,7 @@ const AdminBooking = () =>{
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h2 className="modal-title">Xác nhận xóa</h2>
+                                <h2 className="modal-title">Xác nhận hủy</h2>
                             </div>
                             <div className="modal-body">
                                 <p className="textConfirm">Bạn có chắc chắn muốn hủy hóa đơn này?</p>

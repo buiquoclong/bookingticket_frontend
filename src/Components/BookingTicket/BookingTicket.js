@@ -9,6 +9,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { FormGroup, FormControlLabel, Switch } from '@mui/material';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 
 const BookingTicket = () =>{
@@ -160,6 +162,7 @@ const BookingTicket = () =>{
                         throw new Error('Network response was not ok');
                     }
                     const data = await response.json();
+                    console.log(data);
                     setCatchPoints(data);
                 } catch (error) {
                     console.error('Error fetching catch points:', error);
@@ -182,7 +185,7 @@ const BookingTicket = () =>{
             };
             fetchCatchPointsReturn();
         }
-    }, [showLocationRetrunInput, routeReturnId]);
+    }, [showLocationRetrunInput, showLocationInput]);
 
     const fetchTripInfo = async () => {
         try {
@@ -483,7 +486,7 @@ const BookingTicket = () =>{
                             email: email,
                             phone: phone,
                             total: finalPrice,
-                            kindPay: "Thanh toán trả sau",
+                            kindPay: "Thanh toán khi lên xe",
                             isPaid: 0,
                             roundTrip: 0,
                         };
@@ -743,13 +746,6 @@ const BookingTicket = () =>{
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
-    function LoadingOverlay() {
-        return (
-            <div className="loading-overlay">
-                <div className="loader"></div>
-            </div>
-        );
-    }
     const handleApplyDiscount = async () => {
         try {
             const response = await fetch(`http://localhost:8081/api/promotion/check?code=${discountCode}`);
@@ -779,10 +775,16 @@ const BookingTicket = () =>{
         setIsDiscountApplied(false);
         toast.info("Đã hủy áp dụng mã giảm giá");
     };
-
     return(
         <section className="main container section">
-            {isLoading && <LoadingOverlay />}
+            {isLoading && 
+            <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={isLoading}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
+            }
             {showPaymentPopup && (
                 <div className="modal">
                     <div className="modal-dialog">
@@ -799,7 +801,9 @@ const BookingTicket = () =>{
                                     </div>
                                     <div className="payMent" style={{marginBottom:"1rem"}}>
                                         <button className="vnpay btn" onClick={handleChooseVNPAYPayment}><span style={{ color: "#ed3237" }}>VN</span><span style={{ color: "#0f62ac " }}>PAY</span></button>
-                                        <button className="btn trasau " onClick={handleChoosePayment}>Trả sau</button>
+                                        {userId && (
+                                            <button className="btn trasau" onClick={handleChoosePayment}>Thanh toán khi lên xe</button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -857,13 +861,6 @@ const BookingTicket = () =>{
                                                 </div>
                                             </div>
                                             <div className="lineInfo lineInfoCheck">
-                                                {/* <span>Chọn điểm đón:</span>
-                                                <div className="selectChoose">
-                                                    <select onChange={handleSelectChange}>
-                                                        <option value="No">Không</option>
-                                                        <option value="Yes">Có</option>
-                                                    </select>
-                                                </div> */}
                                                 <FormGroup>
                                                     <FormControlLabel 
                                                         control={<Switch checked={showLocationInput} onChange={handleSwitchChange} />} 
@@ -1214,10 +1211,8 @@ const BookingTicket = () =>{
                 </div>
                                             
             </div>
-
-
-            
             <ToastContainer
+                        containerId="main"
                         className="toast-container"
                         toastClassName="toast"
                         bodyClassName="toast-body"

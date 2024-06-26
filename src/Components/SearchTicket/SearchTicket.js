@@ -40,11 +40,12 @@ const SearchTicket  = () => {
                     }
                 });
                 if (response.status === 404) {
-                    toast.error("Không tìm thấy dữ liệu");
+                    toast.error("Không tìm thấy vé xe có mã tương ứng");
                     return;
                 }
                     const data = await response.json();
                     setData(data);
+                     console.log(data);
                     setIsSearch(true);
                 
             } catch (error) {
@@ -99,10 +100,10 @@ const SearchTicket  = () => {
                     </form>
                 </div>
                 {isSearch && (
-                    <div class="modal1" id="deleteModal">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-body">
+                    <div className="modal1" id="deleteModal">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-body">
                                     {data &&
                                         <div className="infoTicket" key={data.id}>
                                             <div className="content">
@@ -113,7 +114,7 @@ const SearchTicket  = () => {
                                                 )}
                                             </div>
                                             
-                                            <div className="infoBookingTicket">
+                                            <div className="infoBookingTicket detailTicket" style={{width:"25rem"}}>
                                                 <h3>Mã vé: {data.id}</h3>
                                                 <div className="lineInfo">
                                                     <span>Tuyến:</span>
@@ -155,6 +156,18 @@ const SearchTicket  = () => {
                                                     <span>Giá:</span>
                                                     <div className="rightInfo">
                                                         <span>{data.price.toLocaleString('vi-VN')}VND</span>
+                                                    </div>
+                                                </div>
+                                                <div className="lineInfo">
+                                                    <span>Ghi chú:</span>
+                                                    <div className="rightInfo">
+                                                        <span>{data.note}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="lineInfo pointCatch" style={{lineHeight:"1.5rem"}}>
+                                                    <span>Điểm đón:</span>
+                                                    <div className="rightInfo" style={{marginLeft:"3rem"}}>
+                                                        <span>{data.pointCatch}</span>
                                                     </div>
                                                 </div>
                                             </div>

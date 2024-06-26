@@ -123,7 +123,7 @@ const handleEmailChange = (event) => {
                         <h3 data-aos="fade-right" className="title">
                             QUÊN MẬT KHẨU
                         </h3>
-                        {/* <p>Vui lòng nhập địa chỉ email của bạn để </p> */}
+                        <p>Vui lòng nhập địa chỉ email của bạn để có thể tiếp tục đăng nhập vào hệ thống</p>
                     </div>
 
                     <form className="infoTicket">

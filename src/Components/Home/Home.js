@@ -281,7 +281,7 @@ const Home = () =>{
                         {kind === "Một chiều" && (
                         <div className="destinationIn sizeOne">
                             <div className="destinationInput">
-                                <label htmlFor="city">Chọnđiểm xuất phát: </label>
+                                <label htmlFor="city">Chọn điểm xuất phát: </label>
                                 <select className="input" value={origin} onChange={handleOriginChange}>
                                     <option value="">Chọn địa điểm xuất phát...</option>
                                         {cities.map(city => (

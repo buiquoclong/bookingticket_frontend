@@ -31,10 +31,10 @@ const Navbar = () =>{
   useEffect(() => {
     // Chỉ thực hiện fetchToken nếu googleLogin là true
     const googleLogin = localStorage.getItem("googleLogin") === "true";
-    if (googleLogin && !userId) {
+    if (googleLogin) {
       fetchToken();
     }
-  }, [userId, navigate]);
+  }, [userId]);
   useEffect(() => {
     // Call the API to fetch cities
     if (userId) {

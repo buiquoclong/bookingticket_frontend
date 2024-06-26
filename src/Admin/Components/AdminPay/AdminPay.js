@@ -36,11 +36,6 @@ const AdminPay = () =>{
     const navigate = useNavigate();
     const userId = localStorage.getItem("userId");
 
-    const roleMap = {
-        1: 'User',
-        2: 'Employee',
-        3: 'Admin',
-    };
     
 
     // Xử lý chọn nhập nơi đón
@@ -118,12 +113,12 @@ const AdminPay = () =>{
             toast.error(phoneErrorMessage); // Hiển thị errorMessage nếu có
             return; // Dừng xử lý tiếp theo nếu có lỗi
         }
-        if (!email) {
-            missingInfo.push("Email");
-        } else if (emailErrorMessage) { // Kiểm tra nếu có errorMessage cho email
-            toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
-            return; // Dừng xử lý tiếp theo nếu có lỗi
-        }
+        // if (!email) {
+        //     missingInfo.push("Email");
+        // } else if (emailErrorMessage) { // Kiểm tra nếu có errorMessage cho email
+        //     toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
+        //     return; // Dừng xử lý tiếp theo nếu có lỗi
+        // }
         if (missingInfo.length > 0) {
             const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`;
             toast.error(message);
@@ -146,19 +141,6 @@ const AdminPay = () =>{
             fetchTripReturnInfo();
         }
         // const userId = localStorage.getItem("userId");
-        if (userId) {
-        // Nếu có userId, thực hiện gọi API để lấy thông tin người dùng
-        fetch(`http://localhost:8081/api/user/${userId}`)
-            .then((response) => response.json())
-            .then((userData) => {
-            // Cập nhật thông tin người dùng vào các trường nhập liệu
-            const roleName = roleMap[userData.role] ? ` (${roleMap[userData.role]})` : '';
-            setUserName(`${userData.name}${roleName}`);
-            setPhone(userData.phone);
-            setEmail(userData.email);
-            })
-            .catch((error) => console.error("Error fetching user data:", error));
-        }
     },[kind, tripId, tripIdReturn]);
 
     const fetchTripInfo = async () => {
@@ -768,12 +750,12 @@ const AdminPay = () =>{
                     <div className=" infoUser">
                         <h3>Thông tin người đặt</h3>
                         <div className="lineInfo">
-                            <span>Nhân viên<span style={{color:"red"}}>*</span>:</span>
+                            <span>Họ và tên<span style={{color:"red"}}>*</span>:</span>
                             <div className="infoInput" >
                                 <input type="text" className="info" placeholder="Nhập họ và tên" value={userName} onChange={handleUserNameChange}/>
                             </div>
                         </div>
-                        {/* <div className="lineInfo">
+                        <div className="lineInfo">
                             <span>Số điện thoại<span style={{color:"red"}}>*</span>:</span>
                             <div className="infoInput" >
                                 <input type="text" className="info" placeholder="Nhập số điện thoại" value={phone}  onChange={handlePhoneChange}/>
@@ -786,7 +768,7 @@ const AdminPay = () =>{
                                 <input type="text" className="info" placeholder="Nhập Email" value={email} onChange={handleEmailChange}/>
                                 {emailErrorMessage && <p style={{lineHeight:"1.5", fontSize:"12px", color:"red", paddingLeft:".5rem"  }}>{emailErrorMessage}</p>}
                             </div>
-                        </div> */}
+                        </div>
                     </div>
                     <div className="discount" >
                         <TextField id="" label="Mã giảm giá" size="small" className="textdiscount" value={discountCode} onChange={(e) => setDiscountCode(e.target.value)} disabled={isDiscountApplied}/>

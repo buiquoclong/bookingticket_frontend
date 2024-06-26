@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component'
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
+import { FiEdit, FiTrash, FiList } from 'react-icons/fi';
 
 
 const AdminTrip = () =>{
@@ -36,6 +37,8 @@ const AdminTrip = () =>{
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
+    
+    const [daySearch, setDaySearch] = useState("");
 
     const [route, setRoute] = useState('');
     const [vehicle, setVehicle] = useState('');
@@ -108,10 +111,52 @@ const AdminTrip = () =>{
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{statusMap[row.status] || 'Unknown Status'}</div>
         },
         {
+            // cell: (row) => (
+            //     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+            //         <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}  onClick={() => handleDetailClick(row)}> Danh sách ghế đặt </button> | 
+            //         <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
+            //         <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
+            //     </div>
+            // )
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Hành động</div>,
             cell: (row) => (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                    <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', width: '100%' }}>
+                    <FiList 
+                        size={24} 
+                        style={{ 
+                            color: "#3b82f6", 
+                            cursor: "pointer",
+                            transition: "color 0.3s ease"
+                        }} 
+                        onClick={() => handleDetailClick(row)}
+                        onMouseEnter={(e) => e.currentTarget.style.color = "#2563eb"}
+                        onMouseLeave={(e) => e.currentTarget.style.color = "#3b82f6"}
+                        title="Xem danh sách ghế đã đặt"
+                    />
+                    <FiEdit 
+                        size={24} 
+                        style={{ 
+                            color: "#3b82f6", 
+                            cursor: "pointer",
+                            transition: "color 0.3s ease"
+                        }} 
+                        onClick={() => handleEditClick(row)}
+                        onMouseEnter={(e) => e.currentTarget.style.color = "#2563eb"}
+                        onMouseLeave={(e) => e.currentTarget.style.color = "#3b82f6"}
+                        title="Chỉnh sửa"
+                    />
+                    <FiTrash 
+                        size={24} 
+                        style={{ 
+                            color: "#ef4444", 
+                            cursor: "pointer",
+                            transition: "color 0.3s ease"
+                        }} 
+                        onClick={() => handleRemoveClick(row)}
+                        onMouseEnter={(e) => e.currentTarget.style.color = "#dc2626"}
+                        onMouseLeave={(e) => e.currentTarget.style.color = "#ef4444"}
+                        title="Xóa"
+                    />
                 </div>
             )
         }
@@ -121,17 +166,66 @@ const AdminTrip = () =>{
         2: 'Đã hoàn thành',
         3: 'Đã bị hủy',
     };
+
+    const columnDetails = [
+        // {
+        //     name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
+        //     selector: row => row.id,
+        //     width: '3rem',
+        //     cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.id}</div>
+        // },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Ghế đặt</div>,
+            selector: row => row.seat.name,
+            width: '10rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.seat.name}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên</div>,
+            selector: row => row.booking.userName,
+            width: '10rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.booking.userName}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Email</div>,
+            selector: row => row.booking.email,
+            width: '15rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.booking.email}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Số điện thoại</div>,
+            selector: row => row.booking.phone,
+            width: '10rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.booking.phone}</div>
+        },
+    ]
+    const [seatData, setSeatData] = useState([])
+    
+    const [isDetail, setIsDetail] = useState(false);
+    const handleDetailClick = (trip) => {
+        const tripId = trip.id;
+        fetch(`http://localhost:8081/api/seat_reservation/trip/${tripId}`)
+        .then(response => response.json())
+        .then(data => {
+            setSeatData(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+        setIsDetail(true);
+    };
     useEffect(() => {
         // Call the API to fetch cities
         fetchTrips();
         fetchKindVehicles();
         fetchDrivers();
         fetchRoutes();
-    }, [page]);
+    }, [page, daySearch]);
 
     const fetchTrips = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/api/trip/page?page=${page}&size=10`);
+            // const response = await fetch(`http://localhost:8081/api/trip/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/trip/page?page=${page}&size=10&routeId=&dayStart=${daySearch}`);
             const data = await response.json();
             setData(data.trips);
             setRecords(data.trips);
@@ -469,6 +563,12 @@ const AdminTrip = () =>{
             const day = now.getDate().toString().padStart(2, '0');
             return `${year}-${month}-${day}`;
         }
+        const handleOutsideClick = (e) => {
+            // Đóng modal khi click vào phần tử có class 'modal'
+            if (e.target.classList.contains('modal')) {
+                setIsDetail(false);
+            }
+        }
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -487,7 +587,7 @@ const AdminTrip = () =>{
 
             <div className="HisContent">
                 <div className="searchIn">
-                    <input type="text" onChange={handleFilter} placeholder="Tìm kiếm theo ngày khởi hành" className="findTuyen"/>
+                    <input type="date" onChange={(e) =>  setDaySearch(e.target.value)} placeholder="Tìm kiếm theo ngày khởi hành" className="findTuyen"/>
                 </div>
                 <div className="HistoryTick">
                     <div className="contentTikcet">
@@ -513,6 +613,30 @@ const AdminTrip = () =>{
                         /> 
                 </div>
             </div>
+            {isDetail && (
+                <div className="modal" id="deleteModal" onClick={handleOutsideClick}>
+                    <div className="modal-dialog" style={{width:"50%"}}>
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Danh sách ghế đã đặt</h2>
+                                {/* <button type="button" className="close" onClick={() => setIsDetail(false)}>
+                                    &times;
+                                </button> */}
+                            </div>
+                            {seatData && (
+                                <div className="modal-body" style={{overflowY:"auto"}}>
+                                            <DataTable
+                                        columns={columnDetails}
+                                        data={seatData}
+                                        noDataComponent={<NoDataComponent />}
+                                    />
+                                </div>
+                            )}
+                            
+                        </div>
+                    </div>
+                </div>
+            )}
             
             {isEditing && (
                 <div className="modal" id="deleteModal">
@@ -617,12 +741,12 @@ const AdminTrip = () =>{
 
             {isAdd && (
                 <div className="modal" id="deleteModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 class="modal-title">Thêm chuyến đi</h2>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Thêm chuyến đi</h2>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
                                     <div className="infoCity">
                                         <label>Tên chuyến:</label>
@@ -631,7 +755,7 @@ const AdminTrip = () =>{
                                             className="inputValue"
                                             value={route} onChange={handleRouteChange} 
                                         >
-                                            <option value="">Chọn điểm đến</option>
+                                            <option value="">Chọn tuyến</option>
                                             {routes.map(route => (
                                                 <option key={route.id} value={route.id}>
                                                     {route.name}

@@ -18,6 +18,7 @@ const AdminSeatReservation = () =>{
     const [records, setRecords] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [searchValue, setSearchValue] = useState('');
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -28,13 +29,19 @@ const AdminSeatReservation = () =>{
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Chuyến</div>,
             selector: row => row.trip.route.name,
-            width: '10rem',
+            width: '15rem',
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.trip.route.name}</div>
+        },
+        {
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên người đặt</div>,
+            selector: row => row.booking.userName,
+            width: '10rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.booking.userName}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Email</div>,
             selector: row => row.booking.email,
-            width: '10rem',
+            width: '15rem',
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.booking.email}</div>
         },
         {
@@ -74,11 +81,12 @@ const AdminSeatReservation = () =>{
     useEffect(() => {
         // Call the API to fetch cities
         fetchSeatReservations();
-    }, [page]);
+    }, [page, searchValue]);
 
     const fetchSeatReservations = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/api/seat_reservation/page?page=${page}&size=10`);
+            // const response = await fetch(`http://localhost:8081/api/seat_reservation/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/seat_reservation/page?page=${page}&size=10&name=${searchValue}`);
             const data = await response.json();
             setData(data.seatReservations);
             setRecords(data.seatReservations);
@@ -119,7 +127,7 @@ const AdminSeatReservation = () =>{
 
             <div className="HisContent">
                 <div className="searchIn">
-                    <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/>
+                    <input type="text" onChange={(e) =>  setSearchValue(e.target.value)} placeholder="Tìm kiếm" className="findTuyen"/>
                 </div>
                 <div className="HistoryTick">
                     <div className="contentTikcet">

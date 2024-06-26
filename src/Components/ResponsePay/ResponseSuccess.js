@@ -1,8 +1,11 @@
 import React, {useState, useEffect} from "react";
 import "./ResponsePay.scss";
-import {  useNavigate } from 'react-router-dom';
+import {  useNavigate, useLocation  } from 'react-router-dom';
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+import CheckCircleSharpIcon from '@mui/icons-material/CheckCircleSharp';
 
 
 const ResponseSuccess  = () => {
@@ -12,19 +15,41 @@ const ResponseSuccess  = () => {
     const [dataReturn, setDataReturn] = useState(null);
     const navigate = useNavigate();
     const userId = localStorage.getItem("userId");
+    const location = useLocation();
+
+    const [isDataFetched, setIsDataFetched] = useState(false);
+
+    const [hasPaymentHandled, setHasPaymentHandled] = useState(false);
+    
+    const [bookingID, setBookingId] = useState('');
+    
+    const [kind, setKind] = useState('');
     
     const bookingDetails = JSON.parse(localStorage.getItem('bookingDetails'));
 
     useEffect(() => {
-        // Call the API to fetch cities
-        if (bookingDetails.kind === "Một chiều") {
-            fetchTripInfo();
-        } else if (bookingDetails.kind === "Khứ hồi") {
-            fetchTripInfo();
-            fetchTripReturnInfo();
+        const fetchData = async () => {
+          setIsDataFetched(false); // Reset fetch state
+
+          // Kiểm tra bookingDetails có tồn tại và có thuộc tính kind không
+            if (bookingDetails && bookingDetails.kind) {
+                if (bookingDetails.kind === "Một chiều") {
+                await fetchTripInfo();
+                } else if (bookingDetails.kind === "Khứ hồi") {
+                await fetchTripInfo();
+                await fetchTripReturnInfo();
+                }
+            }
+        
+          setIsDataFetched(true); // Set fetch state to true after fetching data
+        };
+
+        if (bookingDetails) {
+            fetchData();
         }
-    },[bookingDetails.kind, bookingDetails.tripId, bookingDetails.tripIdReturn]);
-    const fetchTripInfo = async () => {
+    }, [bookingDetails]);
+    
+        const fetchTripInfo = async () => {
             try {
                 const response = await fetch(`http://localhost:8081/api/trip/${bookingDetails.tripId}`);
                 const data = await response.json();
@@ -45,9 +70,19 @@ const ResponseSuccess  = () => {
                 }
             };
 
+    const handleContinue= () => {
+        if (bookingID && kind) {
+            navigate("/pay-success", { state: { bookingId: bookingID, kind: kind } });
+            localStorage.removeItem('bookingDetails');
+        } else {
+            // Xử lý khi kind không tồn tại hoặc là null
+            console.error('Kind is null or undefined');
+            // Thực hiện các hành động phù hợp như báo lỗi hoặc xử lý thay thế
+        }
+    }
 
-    const handleChoosePayment = async (event) => {
-        event.preventDefault();
+    const handleChoosePayment = async () => {
+        // event.preventDefault();
         setIsLoading(true);
         try {
             // Gửi yêu cầu để lấy danh sách các ghế đã đặt cho chuyến đi
@@ -119,13 +154,17 @@ const ResponseSuccess  = () => {
                         await createBookingDetail(createdBooking.id, bookingDetails.tripId, 0, bookingDetails.selectedSeatIds.length, bookingDetails.selectedSeatsNames, bookingDetails.totalPrice, bookingDetails.pickupLocation, bookingDetails.note);
                         updateTripEmptySeat(bookingDetails.tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, bookingDetails.selectedSeatIds, data.status);
                         insertSeatReservation(bookingDetails.selectedSeatIds, bookingDetails.tripId, createdBooking.id);
-                        await sendMail(createdBooking.id);
                         deleteWaitingSeat(bookingDetails.selectedSeatIds, bookingDetails.tripId);
-                        setTimeout(() => {
-                            navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: bookingDetails.kind } });
-                        }, 1500);
+                        await sendMail(createdBooking.id);
+                        setBookingId(createdBooking.id);
+                        setKind(bookingDetails.kind);
+                        // setTimeout(() => {
+                        //     navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: bookingDetails.kind } });
+                        // }, 1500);
                         
-                        localStorage.removeItem('bookingDetails');
+                        // localStorage.removeItem('bookingDetails');
+                        
+                        setIsLoading(false);
                         
                     } else {
                         throw new Error('Something went wrong with the order creation.');
@@ -172,10 +211,12 @@ const ResponseSuccess  = () => {
                         insertSeatReservation(bookingDetails.selectedSeatIdsReturn, bookingDetails.tripIdReturn, createdBooking.id);
                         deleteWaitingSeat(bookingDetails.selectedSeatIdsReturn, bookingDetails.tripIdReturn);
                         await sendMail(createdBooking.id);
-                        setTimeout(() => {
-                            navigate("/pay-success", { state: { bookingId: createdBooking.id, kind: bookingDetails.kind } });
-                        }, 1500);
-                        localStorage.removeItem('bookingDetails');
+                        
+                        setBookingId(createdBooking.id);
+                        setKind(bookingDetails.kind);
+                        
+                        setIsLoading(false);
+                        
                     } else {
                         throw new Error('Something went wrong with the order creation.');
                     }
@@ -192,6 +233,16 @@ const ResponseSuccess  = () => {
             toast.error('Lỗi kiểm tra trạng thái ghế.');
         }
     };
+    useEffect(() => {
+        if (location.pathname === "/payment-success") {
+            if (!bookingDetails) {
+                navigate("/");
+            }else if(isDataFetched && !hasPaymentHandled){
+                handleChoosePayment();
+            setHasPaymentHandled(true);
+            }
+        }
+    }, [location.pathname, bookingDetails, isDataFetched, hasPaymentHandled]);
     // send mail
     const sendMail = async (bookingId) => {
         try {
@@ -350,15 +401,25 @@ const ResponseSuccess  = () => {
 
     return (
             <section className="main container section">
-            {isLoading && <LoadingOverlay />}
+            {isLoading && 
+            <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={isLoading}
+          >
+            <CircularProgress color="inherit" />
+          </Backdrop>
+            }
                 <div className="reponseInfo ">
+                    <div className="imgsucces">
+                        <CheckCircleSharpIcon className="icon"/>              
+                    </div>
                     <div className="secTitle">
                         <p>Thanh toán thành công</p>
                         <p>Giao dịch của bạn đã được ghi nhận</p>
                     </div>
 
                     <form className="infoTicket">
-                        <button className="btn search" onClick={handleChoosePayment}>Tiếp tục</button>
+                        <button className="btn search" onClick={handleContinue}>Tiếp tục</button>
                     </form>
                 </div>
                 <ToastContainer

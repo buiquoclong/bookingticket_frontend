@@ -30,9 +30,24 @@ body {
         border: 1px solid var(--greyText);
         padding: 1rem;
         border-radius: .5rem;
+        .imgsucces{
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            .icon{
+                color: #04aa6d;
+                font-size: 8rem;
+                display: flex;
+                justify-content: center;
+            }
+            
+        }
         .secTitle{
             text-align: center;
             line-height: 2rem;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 3rem;
             .title{
                 position: relative;
                 width: max-content;
@@ -42,7 +57,7 @@ body {
                 margin-inline: auto;
             }
             p{
-                width: 54%;
+                width: 60%;
                 margin-inline: auto;
                 color: var(--blackColor);
             }

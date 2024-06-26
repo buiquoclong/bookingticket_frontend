@@ -4,6 +4,8 @@ import DataTable from 'react-data-table-component'
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
+import { FiEdit, FiTrash } from 'react-icons/fi';
+
 
 
 const AdminRoute = () =>{
@@ -25,6 +27,7 @@ const AdminRoute = () =>{
     const [totalPages, setTotalPages] = useState(0);
     const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
     const [routeToDelete, setRouteToDelete] = useState(null);
+    const [searchValue, setSearchValue] = useState('');
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -65,10 +68,39 @@ const AdminRoute = () =>{
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{statusMap[row.status] || 'Unknown Status'}</div>
         },
         {
+            // cell: (row) => (
+            //     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+            //         <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
+            //         <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
+            //     </div>
+            // )
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Hành động</div>,
             cell: (row) => (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                    <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', width: '100%' }}>
+                    <FiEdit 
+                        size={24} 
+                        style={{ 
+                            color: "#3b82f6", 
+                            cursor: "pointer",
+                            transition: "color 0.3s ease"
+                        }} 
+                        onClick={() => handleEditClick(row)}
+                        onMouseEnter={(e) => e.currentTarget.style.color = "#2563eb"}
+                        onMouseLeave={(e) => e.currentTarget.style.color = "#3b82f6"}
+                        title="Chỉnh sửa"
+                    />
+                    <FiTrash 
+                        size={24} 
+                        style={{ 
+                            color: "#ef4444", 
+                            cursor: "pointer",
+                            transition: "color 0.3s ease"
+                        }} 
+                        onClick={() => handleRemoveClick(row)}
+                        onMouseEnter={(e) => e.currentTarget.style.color = "#dc2626"}
+                        onMouseLeave={(e) => e.currentTarget.style.color = "#ef4444"}
+                        title="Xóa"
+                    />
                 </div>
             )
         }
@@ -81,11 +113,12 @@ const AdminRoute = () =>{
         // Call the API to fetch cities
         fetchRoutes();
         fetchCities();
-    }, [page]);
+    }, [page, searchValue]);
 
     const fetchRoutes = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/api/route/page?page=${page}&size=10`);
+            // const response = await fetch(`http://localhost:8081/api/route/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/route/page?page=${page}&size=10&name=${searchValue}`);
             const data = await response.json();
             setData(data.routes);
             setRecords(data.routes);
@@ -163,7 +196,7 @@ const AdminRoute = () =>{
                         diemden: diemDen,
                         khoangCach: khoangCach,
                         timeOfRoute: timeOfRoute,
-                        status: 0,
+                        status: 1,
                     };
         
             
@@ -329,7 +362,7 @@ const AdminRoute = () =>{
 
             <div className="HisContent">
                 <div className="searchIn">
-                    <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/>
+                    <input type="text" onChange={(e) =>  setSearchValue(e.target.value)} placeholder="Tìm kiếm" className="findTuyen"/>
                 </div>
                 <div className="HistoryTick">
                     <div className="contentTikcet">

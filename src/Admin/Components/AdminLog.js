@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import DataTable from 'react-data-table-component'
 // import "../AdminLog/AdminLog.scss"
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
+import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 
 
 const AdminLog = () =>{
@@ -11,6 +12,8 @@ const AdminLog = () =>{
     const [records, setRecords] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [searchCriteria, setSearchCriteria] = useState('userName');
+    const [searchValue, setSearchValue] = useState('');
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -46,11 +49,12 @@ const AdminLog = () =>{
         useEffect(() => {
             // Call the API to fetch cities
             fetchLogs();
-        }, [page]);
+        }, [page, searchCriteria, searchValue]);
     
         const fetchLogs = async () => {
             try {
-                const response = await fetch(`http://localhost:8081/api/log/page?page=${page}&size=10`);
+                // const response = await fetch(`http://localhost:8081/api/log/page?page=${page}&size=10`);
+                const response = await fetch(`http://localhost:8081/api/log/page?page=${page}&${searchCriteria}=${searchValue}`);
                 const data = await response.json();
                 setData(data.logs);
                 setRecords(data.logs);
@@ -73,6 +77,9 @@ const AdminLog = () =>{
             setPage(newPage);
         };
         const NoDataComponent = () => <div className="emptyData">Không có dữ liệu</div>;
+        const handleCriteriaChange = (event) => {
+            setSearchCriteria(event.target.value);
+        };
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -91,11 +98,31 @@ const AdminLog = () =>{
 
             <div className="HisContent">
                 <div className="searchIn">
-                    <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/>
+                    {/* <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/> */}
+                    <input
+                    type="text"
+                    onChange={(e) =>  setSearchValue(e.target.value)}
+                    placeholder={`Tìm kiếm `}
+                    value={searchValue}
+                    className="findTuyen" style={{marginRight:"1rem"}}
+                />
+                <FormControl sx={{ minWidth: 150 }} variant="outlined" className="searchCriteria" size="small">
+                    <InputLabel id="search-criteria-label">Tìm kiếm bằng</InputLabel>
+                    <Select
+                        labelId="search-criteria-label"
+                        id="search-criteria"
+                        value={searchCriteria}
+                        onChange={handleCriteriaChange}
+                        label="Tiềm kiếm bằng"
+                    >
+                        <MenuItem value="userName">Tên</MenuItem>
+                        <MenuItem value="level">Level</MenuItem>
+                    </Select>
+                </FormControl>
                 </div>
                 <div className="HistoryTick">
                     <div className="contentTikcet">
-                        <div className="title">Quản lý Logs</div>
+                        <div className="title">Quản lý Nhật ký</div>
                     </div>
                     <div className="devide"></div>
                     <DataTable

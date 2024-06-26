@@ -5,6 +5,7 @@ import { useNavigate  } from 'react-router-dom';
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Pagination} from '@mui/material';
+import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 
 
 const MyBooking = () =>{
@@ -32,6 +33,8 @@ const MyBooking = () =>{
     const [totalPages, setTotalPages] = useState(0);
     const [isCancelConfirmVisible, setIsCancelConfirmVisible] = useState(false);
     const [bookingToCancel, setBookingToCancel] = useState(null);
+    
+    const [searchValue, setSearchValue] = useState('');
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -92,7 +95,7 @@ const MyBooking = () =>{
                     {row.isPaid === 0 && (
                         <>
                             <button style={{ background: "white", color: "red", border: "none", cursor: "pointer" }} onClick={() => handleCancelBookingClick(row)}>Hủy</button> |
-                            <button style={{ background: "#3b82f6", paddingInline: ".5rem", paddingTop: ".5rem", paddingBottom: ".5rem", borderRadius: ".5rem", color: "white", border: "none", cursor: "pointer" }} onClick={() => handlePayBookingClick(row)}>Thanh toán</button>
+                            <button style={{ background: "#3b82f6", paddingInline: ".5rem", paddingTop: ".5rem", paddingBottom: ".5rem", borderRadius: ".5rem", color: "white", border: "none", cursor: "pointer" }} onClick={() => handlePayBookingClick(row)}>Thanh toán bằng VNPay</button>
                         </>
                     )}
                     {row.isPaid === 1 && (
@@ -124,11 +127,12 @@ const MyBooking = () =>{
             sessionStorage.setItem('redirectPath', window.location.pathname);
             navigate('/login');
         }
-    }, [userId, page]);
+    }, [userId, page, searchValue]);
 
     const fetchReviews = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/api/booking/user/${userId}/page?page=${page}&size=10`);
+            // const response = await fetch(`http://localhost:8081/api/booking/user/${userId}/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/booking/page?page=${page}&size=5&userId=${userId}&isPaid=${searchValue}`);
             const data = await response.json();
             setData(data.bookings);
             setRecords(data.bookings);
@@ -298,7 +302,20 @@ const MyBooking = () =>{
 
             <div className="HisContent">
                 <div className="searchIn">
-                    <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/>
+                    {/* <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/> */}
+                    <FormControl sx={{ minWidth: 200 }} variant="outlined" className="searchCriteria" size="small">
+                    <InputLabel id="search-criteria-label">trạng thái thanh toán</InputLabel>
+                    <Select
+                        labelId="search-criteria-label"
+                        id="search-criteria"
+                        value={searchValue}
+                        onChange={(e) =>  setSearchValue(e.target.value)}
+                        label="trạng thái thanh toán"
+                    >
+                        <MenuItem value="0">Chưa thanh toán</MenuItem>
+                        <MenuItem value="1">Đã thanh toán</MenuItem>
+                    </Select>
+                </FormControl>
                 </div>
                 <div className="HistoryTick">
                     <div className="contentTikcet">
@@ -331,7 +348,7 @@ const MyBooking = () =>{
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h2 className="modal-title">Xác nhận xóa</h2>
+                                <h2 className="modal-title">Xác nhận hủy</h2>
                             </div>
                             <div className="modal-body">
                                 <p className="textConfirm">Bạn có chắc chắn muốn hủy hóa đơn này?</p>

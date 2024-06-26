@@ -14,6 +14,8 @@ const TicketHistory = () =>{
     const [selectedTrip, setSelectedTrip] = useState(null);
     const [rating, setRating] = useState(0);
     const [content, setContent] = useState('');
+    
+    const [ticketId, setTicketId] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const formatDate = (dateString) => {
@@ -144,11 +146,12 @@ const TicketHistory = () =>{
             sessionStorage.setItem('redirectPath', window.location.pathname);
             navigate('/login');
         }
-    },[userId, page]);
+    },[userId, page, ticketId]);
 
     const fetchBookingDetails = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/api/booking_detail/user/${userId}/booking_details/page?page=${page}&size=10`);
+            // const response = await fetch(`http://localhost:8081/api/booking_detail/user/${userId}/booking_details/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/booking_detail/user/${userId}/booking_details/page?page=${page}&size=10&id=${ticketId}`);
             const data = await response.json();
             setData(data.bookingDetails);
             setRecords(data.bookingDetails);
@@ -238,7 +241,7 @@ const TicketHistory = () =>{
         <div className="hisInfoTicket">
             <div className="HisContent">
                 <div className="searchIn">
-                    <input type="text" onChange={handleFilter} placeholder="Tìm kiếm chuyến" className="findTuyen"/>
+                    <input type="text" onChange={(e) =>  setTicketId(e.target.value)} placeholder="Tìm kiếm mã vé" className="findTuyen"/>
                 </div>
                 <div className="HistoryTick">
                     <div className="contentTikcet">

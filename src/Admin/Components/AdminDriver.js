@@ -4,6 +4,9 @@ import DataTable from 'react-data-table-component'
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
+import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import { FiEdit, FiTrash } from 'react-icons/fi';
+
 
 
 const AdminDriver = () =>{
@@ -21,6 +24,8 @@ const AdminDriver = () =>{
     const [totalPages, setTotalPages] = useState(0);
     const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
     const [driverToDelete, setDriverToDelete] = useState(null);
+    const [searchCriteria, setSearchCriteria] = useState('name');
+    const [searchValue, setSearchValue] = useState('');
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -50,10 +55,39 @@ const AdminDriver = () =>{
         //     cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%',backgroundColor: statusColorMap[row.status] || 'transparent', padding:".3rem 0rem", borderRadius:"5px", fontWeight:"600", color:"" }}>{statusMap[row.status] || 'Unknown Status'}</div>
         // },
         {
+            // cell: (row) => (
+            //     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+            //         <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
+            //         <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
+            //     </div>
+            // )
+            name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Hành động</div>,
             cell: (row) => (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                    <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-                    <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', width: '100%' }}>
+                    <FiEdit 
+                        size={24} 
+                        style={{ 
+                            color: "#3b82f6", 
+                            cursor: "pointer",
+                            transition: "color 0.3s ease"
+                        }} 
+                        onClick={() => handleEditClick(row)}
+                        onMouseEnter={(e) => e.currentTarget.style.color = "#2563eb"}
+                        onMouseLeave={(e) => e.currentTarget.style.color = "#3b82f6"}
+                        title="Chỉnh sửa"
+                    />
+                    <FiTrash 
+                        size={24} 
+                        style={{ 
+                            color: "#ef4444", 
+                            cursor: "pointer",
+                            transition: "color 0.3s ease"
+                        }} 
+                        onClick={() => handleRemoveClick(row)}
+                        onMouseEnter={(e) => e.currentTarget.style.color = "#dc2626"}
+                        onMouseLeave={(e) => e.currentTarget.style.color = "#ef4444"}
+                        title="Xóa"
+                    />
                 </div>
             )
         }
@@ -72,11 +106,12 @@ const AdminDriver = () =>{
     useEffect(() => {
         // Call the API to fetch cities
         fetchDrivers();
-    }, [page]);
+    }, [page, searchCriteria, searchValue]);
 
     const fetchDrivers = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/api/driver/page?page=${page}&size=10`);
+            // const response = await fetch(`http://localhost:8081/api/driver/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/driver/page?page=1&size=10&${searchCriteria}=${searchValue}`);
             const data = await response.json();
             setData(data.drivers);
             setRecords(data.drivers);
@@ -337,6 +372,9 @@ const AdminDriver = () =>{
             setIsDeleteConfirmVisible(true);
         };
         const NoDataComponent = () => <div className="emptyData">Không có dữ liệu</div>;
+        const handleCriteriaChange = (event) => {
+            setSearchCriteria(event.target.value);
+        };
     return(
         <div className="main-container">
             {/* <section className="main section"> */}
@@ -355,7 +393,28 @@ const AdminDriver = () =>{
 
             <div className="HisContent">
                 <div className="searchIn">
-                    <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/>
+                    {/* <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/> */}
+                    <input
+                    type="text"
+                    onChange={(e) =>  setSearchValue(e.target.value)}
+                    placeholder={`Tìm kiếm `}
+                    value={searchValue}
+                    className="findTuyen" style={{marginRight:"1rem"}}
+                />
+                <FormControl sx={{ minWidth: 150 }} variant="outlined" className="searchCriteria" size="small">
+                    <InputLabel id="search-criteria-label">Tìm kiếm bằng</InputLabel>
+                    <Select
+                        labelId="search-criteria-label"
+                        id="search-criteria"
+                        value={searchCriteria}
+                        onChange={handleCriteriaChange}
+                        label="Tiềm kiếm bằng"
+                    >
+                        <MenuItem value="name">Tên</MenuItem>
+                        <MenuItem value="email">Email</MenuItem>
+                        <MenuItem value="phone">Số điện thoại</MenuItem>
+                    </Select>
+                </FormControl>
                 </div>
                 <div className="HistoryTick">
                     <div className="contentTikcet">

@@ -68,7 +68,7 @@ const fetchUserInfo = async () => {
                         type: data.type, 
                         confirmToken: data.confirmToken
                     };
-                    const confirmUserResponse = await fetch(`http://localhost:8081/api/user/${userId}`, {
+                    const confirmUserResponse = await fetch(`http://localhost:8081/api/user/update/${userId}`, {
                         method: 'PUT', // hoặc 'PATCH' tùy vào API của bạn
                         headers: {
                             'Content-Type': 'application/json',

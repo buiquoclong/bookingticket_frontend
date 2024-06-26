@@ -44,13 +44,35 @@ const Register  = () => {
         setEmail(emailAddress);
     };
     const handleUserNameChange = (event) => {
-        setUserName(event.target.value);
+        const newUserName = event.target.value;
+
+        if (newUserName.trim() === '') {
+            setUserNameErrorMessage('Tên người dùng không được để trống');
+        } else {
+            setUserNameErrorMessage('');
+        }
+        setUserName(newUserName);
     };
     const handleNewPassChange = (event) => {
-        setNewPass(event.target.value);
+        const newPassword = event.target.value;
+
+        if (!validatePassword(newPassword)) {
+            setNewPassErrorMessage('Mật khẩu phải dài từ 8 đến 32 ký tự, bao gồm chữ và số');
+        } else {
+            setNewPassErrorMessage('');
+        }
+        setNewPass(newPassword);
     };
+
     const handleReNewPassChange = (event) => {
-        setReNewPass(event.target.value);
+        const reNewPassword = event.target.value;
+
+        if (!validatePassword(reNewPassword)) {
+            setReNewPassErrorMessage('Mật khẩu không đúng định dạng');
+        } else {
+            setReNewPassErrorMessage('');
+        }
+        setReNewPass(reNewPassword);
     };
     const validatePassword = (password) => {
         return password.length >= 8 && password.length <= 32 && /[a-zA-Z]/.test(password) && /[0-9]/.test(password);
@@ -78,7 +100,7 @@ const Register  = () => {
                         type: "Đăng ký"
                     };
                     try {
-                        const regiterUserResponse = await fetch(`http://localhost:8081/api/user`, {
+                        const regiterUserResponse = await fetch(`http://localhost:8081/api/user/register`, {
                             method: 'POST', // hoặc 'PATCH' tùy vào API của bạn
                             headers: {
                                 'Content-Type': 'application/json',
@@ -110,6 +132,11 @@ const Register  = () => {
             }
         }
     };
+    
+    const googleLogin = () => {
+        localStorage.setItem("googleLogin", "true"); 
+        window.location.href = 'http://localhost:8081/oauth2/authorization/google';
+    };
 
     return(
         <section className="main container section">
@@ -124,6 +151,7 @@ const Register  = () => {
                             </div>
                             <div className="form-feild">
                                 <input type="email" className="input" placeholder="Tên người dùng" required value={userName} onChange={handleUserNameChange}/>
+                                {userNameErrorMessage && <p style={{lineHeight:"1.5", fontSize:"12px", color:"red", paddingLeft:".5rem"  }}>{userNameErrorMessage}</p>}
                                         
                             </div>
                             <div className="form-feild">
@@ -153,7 +181,7 @@ const Register  = () => {
                             </div>
                     </form>
 
-                    <button className="btn" >Tiếp tục với Google</button>
+                    <button className="btn" onClick={googleLogin}>Tiếp tục với Google</button>
                                     
                     <div className="register-link">
                         <p>Bạn đã có tài khoản
