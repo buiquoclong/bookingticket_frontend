@@ -61,32 +61,32 @@ const AdminTrip = () =>{
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên chuyến</div>,
             selector: row => row.route.name,
             sortable: true,
-            width: '10rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.route.name}</div>
+            // width: '10rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.route.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}> Loại xe</div>,
             selector: row => row.vehicle.kindVehicle.name,
-            width: '7rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.vehicle.kindVehicle.name}</div>
+            // width: '7rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.vehicle.kindVehicle.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}> Tên xe</div>,
             selector: row => row.vehicle.name,
-            width: '7rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.vehicle.name}</div>
+            // width: '7rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.vehicle.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Biển số</div>,
             selector: row => row.vehicle.vehicleNumber,
-            width: '5rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.vehicle.vehicleNumber}</div>
+            // width: '5rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.vehicle.vehicleNumber}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Thời gian khởi hành </div>,
-            width: '9rem',
+            // width: '9rem',
             cell: row => (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', textAlign:"center" }}>
                     {row.timeStart.slice(0, 5)} - {formatDate(row.dayStart)}
                 </div>
             )
@@ -95,29 +95,22 @@ const AdminTrip = () =>{
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Giá vé</div>,
             selector: row => row.price,
-            width: '7rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.price.toLocaleString('vi-VN')}VND</div>
+            // width: '7rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.price.toLocaleString('vi-VN')}VND</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tài xế</div>,
             selector: row => row.driver.name,
-            width: '8rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.driver.name}</div>
+            // width: '8rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.driver.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Trạng thái</div>,
             selector: row => row.status,
-            width: '8rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{statusMap[row.status] || 'Unknown Status'}</div>
+            // width: '8rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{statusMap[row.status] || 'Unknown Status'}</div>
         },
         {
-            // cell: (row) => (
-            //     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-            //         <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}}  onClick={() => handleDetailClick(row)}> Danh sách ghế đặt </button> | 
-            //         <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-            //         <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
-            //     </div>
-            // )
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Hành động</div>,
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', width: '100%' }}>
@@ -168,34 +161,24 @@ const AdminTrip = () =>{
     };
 
     const columnDetails = [
-        // {
-        //     name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
-        //     selector: row => row.id,
-        //     width: '3rem',
-        //     cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.id}</div>
-        // },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Ghế đặt</div>,
             selector: row => row.seat.name,
-            width: '10rem',
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.seat.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên</div>,
             selector: row => row.booking.userName,
-            width: '10rem',
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.booking.userName}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Email</div>,
             selector: row => row.booking.email,
-            width: '15rem',
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.booking.email}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Số điện thoại</div>,
             selector: row => row.booking.phone,
-            width: '10rem',
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.booking.phone}</div>
         },
     ]
@@ -218,7 +201,6 @@ const AdminTrip = () =>{
         // Call the API to fetch cities
         fetchTrips();
         fetchKindVehicles();
-        fetchDrivers();
         fetchRoutes();
     }, [page, daySearch]);
 
@@ -252,9 +234,9 @@ const AdminTrip = () =>{
             console.error("Error fetching trips:", error);
         }
     };
-    const fetchDrivers = async () => {
+    const fetchDrivers = async (dayStart) => {
         try {
-            const response = await fetch("http://localhost:8081/api/driver");
+            const response = await fetch(`http://localhost:8081/api/driver/available?dayStart=${dayStart}`);
             const data = await response.json();
             setDrivers(data);
         } catch (error) {
@@ -298,6 +280,7 @@ const AdminTrip = () =>{
                 setIsEditing(true);
 
                 fetchVehiclesByKind(row.vehicle.kindVehicle.id);
+                fetchDrivers(row.dayStart);
             }
         };
         
@@ -314,7 +297,7 @@ const AdminTrip = () =>{
         };
         const fetchVehiclesByKind = async (kindVehicleId) => {
             try {
-                const response = await fetch(`http://localhost:8081/api/vehicle/kind/${kindVehicleId}`);
+                const response = await fetch(`http://localhost:8081/api/vehicle/available/${kindVehicleId}?dayStart=${dayStart}`);
                 const data = await response.json();
                 setVehicleOfKind(data);
             } catch (error) {
@@ -344,7 +327,15 @@ const AdminTrip = () =>{
             setVehicle(event.target.value)
         };
         const handleDayStartChange = (event) => {
-            setDayStart(event.target.value)
+            const newDayStart = event.target.value;
+            setDayStart(newDayStart);
+            setcurrentTrip({ ...currentTrip, kindVehicle: null });
+            setcurrentTrip(prevTrip => ({
+                ...prevTrip,
+                dayStart: newDayStart
+            }));
+            setVehicleOfKind([]);
+            fetchDrivers(newDayStart);
         };
         const handleTimeStartChange = (event) => {
             setTimeStart(event.target.value)
@@ -408,8 +399,7 @@ const AdminTrip = () =>{
             
                     if (response.ok) {
                         // Xử lý thành công
-                        console.log("User đã được tạo thành công!");
-                        toast.success("User đã được tạo thành công!");
+                        toast.success("Chuyến đi đã được tạo thành công!");
                         const newTrip = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
                         // Thêm người dùng mới vào danh sách
                         setData(prevData => [...prevData, newTrip]);
@@ -426,7 +416,7 @@ const AdminTrip = () =>{
                         // window.location.reload();
                     } else {
                         console.error("Có lỗi xảy ra khi tạo trip!");
-                        toast.error("Có lỗi xảy ra khi tạo trip!");
+                        toast.error("Có lỗi xảy ra khi tạo chuyến đi!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);
@@ -488,8 +478,8 @@ const AdminTrip = () =>{
             
                     if (response.ok) {
                         // Xử lý thành công
-                        console.log("trip đã được cập nhật thành công!");
-                        toast.success("trip đã được cập nhật thành công!");
+                        console.log("Chuyến đi đã được cập nhật thành công!");
+                        toast.success("Chuyến đi đã được cập nhật thành công!");
                         const updatedTrip = await response.json();
                         const updatedTrips = records.map(trip => {
                             if (trip.id === updatedTrip.id) {
@@ -513,8 +503,8 @@ const AdminTrip = () =>{
                         setIsEditing(false);
                         // window.location.reload();
                     } else {
-                        console.error("Có lỗi xảy ra khi cập nhật trip!");
-                        toast.error("Có lỗi xảy ra khi cập nhật trip!");
+                        console.error("Có lỗi xảy ra khi cập nhật chuyến đi!");
+                        toast.error("Có lỗi xảy ra khi cập nhật chuyến đi!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);
@@ -540,8 +530,8 @@ const AdminTrip = () =>{
                     toast.success("trip đã được xóa thành công!");
                     setIsDeleteConfirmVisible(false);
                 } else {
-                    console.error("Có lỗi xảy ra khi xóa trip!");
-                    toast.error("Có lỗi xảy ra khi xóa trip!");
+                    console.error("Có lỗi xảy ra khi xóa chuyến đi!");
+                    toast.error("Có lỗi xảy ra khi xóa chuyến đi!");
                 }
             } catch (error) {
                 console.error("Lỗi:", error);
@@ -652,6 +642,15 @@ const AdminTrip = () =>{
                                         <input type="text" value={currentTrip.route.name} onChange={(e) => setcurrentTrip({ ...currentTrip, route: {...currentTrip.route, name: e.target.value }})} />
                                     </div>
                                     <div className="infoCity">
+                                        <label className="info">Giờ khởi hành:</label>
+                                        <input className="inputValue" type="time" value={currentTrip.timeStart && currentTrip.timeStart.slice(0, 5)} onChange={(e) => setcurrentTrip({ ...currentTrip, timeStart: e.target.value })}/>
+                                        
+                                    </div>
+                                    <div className="infoCity">
+                                        <label className="info">Ngày khởi hành:</label>
+                                        <input className="inputValue" type="date" value={currentTrip.dayStart} onChange={handleDayStartChange} min={getCurrentDateTimeLocal()}/>
+                                    </div>
+                                    <div className="infoCity">
                                         <label className="info">Loại xe:</label>
                                         <select
                                             className="inputValue"
@@ -682,15 +681,6 @@ const AdminTrip = () =>{
                                         </select>
                                     </div>
                                     <div className="infoCity">
-                                        <label className="info">Giờ khởi hành:</label>
-                                        <input className="inputValue" type="time" value={currentTrip.timeStart && currentTrip.timeStart.slice(0, 5)} onChange={(e) => setcurrentTrip({ ...currentTrip, timeStart: e.target.value })}/>
-                                        
-                                    </div>
-                                    <div className="infoCity">
-                                        <label className="info">Ngày khởi hành:</label>
-                                        <input className="inputValue" type="date" value={currentTrip.dayStart} onChange={(e) => setcurrentTrip({ ...currentTrip, dayStart: e.target.value })} min={getCurrentDateTimeLocal()}/>
-                                    </div>
-                                    <div className="infoCity">
                                         <label>Giá vé:</label>
                                         <input type="number" className="inputValue" value={currentTrip.price} onChange={(e) => setcurrentTrip({ ...currentTrip, price: e.target.value })} />
                                     </div>
@@ -707,7 +697,7 @@ const AdminTrip = () =>{
                                                 }
                                             }))}
                                         >
-                                            {drivers.map(driver => (
+                                            {drivers && drivers.map(driver => (
                                                 <option key={driver.id} value={driver.id}>
                                                     {driver.name}
                                                 </option>
@@ -764,12 +754,22 @@ const AdminTrip = () =>{
                                         </select>
                                     </div>
                                     <div className="infoCity">
+                                        <label className="info">Giờ khởi hành:</label>
+                                        <input className="inputValue" type="time" value={timeStart} onChange={handleTimeStartChange}/>
+                                        
+                                    </div>
+                                    <div className="infoCity">
+                                        <label className="info">Ngày khởi hành:</label>
+                                        <input className="inputValue" type="date" value={dayStart} onChange={handleDayStartChange} min={getCurrentDateTimeLocal()}/>
+                                    </div>
+                                    <div className="infoCity">
                                         <label className="info">Loại xe:</label>
                                         <select
                                             className="inputValue"
                                             value={currentTrip.kindVehicle ? currentTrip.kindVehicle.id : ''}
                                             onChange={handleKindVehicleChange}
                                         >
+                                            <option value="">Chọn loại xe</option>
                                             {kindVehicledata.map(kind => (
                                                 <option key={kind.id} value={kind.id}>
                                                     {kind.name}
@@ -794,15 +794,6 @@ const AdminTrip = () =>{
                                         </select>
                                     </div>
                                     <div className="infoCity">
-                                        <label className="info">Giờ khởi hành:</label>
-                                        <input className="inputValue" type="time" value={timeStart} onChange={handleTimeStartChange}/>
-                                        
-                                    </div>
-                                    <div className="infoCity">
-                                        <label className="info">Ngày khởi hành:</label>
-                                        <input className="inputValue" type="date" value={dayStart} onChange={handleDayStartChange} min={getCurrentDateTimeLocal()}/>
-                                    </div>
-                                    <div className="infoCity">
                                         <label>Giá vé:</label>
                                         <input type="number" className="inputValue" value={price} onChange={handlePriceChange} />
                                     </div>
@@ -814,7 +805,7 @@ const AdminTrip = () =>{
                                             onChange={handleDriverChange}
                                         >
                                             <option value="">Chọn tài xế</option>
-                                            {drivers.map(driver => (
+                                            {drivers && drivers.map(driver => (
                                                 <option key={driver.id} value={driver.id}>
                                                     {driver.name}
                                                 </option>

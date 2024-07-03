@@ -6,7 +6,7 @@ import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Pagination} from '@mui/material';
 import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
-
+import { FaCreditCard } from 'react-icons/fa';
 
 const MyBooking = () =>{
     function formatDate1(dateString) {
@@ -46,43 +46,43 @@ const MyBooking = () =>{
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Người đặt</div>,
             selector: row => row.userName,
             width: '14rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.userName}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.userName}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Email</div>,
             selector: row => row.email,
             width: '9rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.email}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.email}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Số điện thoại</div>,
             selector: row => row.phone,
             width: '8rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.phone}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.phone}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Ngày đặt</div>,
             selector: row => row.dayBook,
             width: '9rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{formatDate1(row.dayBook)}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{formatDate1(row.dayBook)}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tổng tiền</div>,
             selector: row => row.total,
             width: '8rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.total.toLocaleString('vi-VN')}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.total.toLocaleString('vi-VN')}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Hình thức thanh toán</div>,
             selector: row => row.kindPay,
             width: '14rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.kindPay}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.kindPay}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Đặt vé</div>,
             selector: row => row.roundTrip,
             width: '6rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{roundTrip[row.roundTrip] || 'Unknown roundTrip'}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{roundTrip[row.roundTrip] || 'Unknown roundTrip'}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Trạng thái</div>,
@@ -95,7 +95,8 @@ const MyBooking = () =>{
                     {row.isPaid === 0 && (
                         <>
                             <button style={{ background: "white", color: "red", border: "none", cursor: "pointer" }} onClick={() => handleCancelBookingClick(row)}>Hủy</button> |
-                            <button style={{ background: "#3b82f6", paddingInline: ".5rem", paddingTop: ".5rem", paddingBottom: ".5rem", borderRadius: ".5rem", color: "white", border: "none", cursor: "pointer" }} onClick={() => handlePayBookingClick(row)}>Thanh toán bằng VNPay</button>
+                            {/* <button style={{ background: "#3b82f6", paddingInline: ".5rem", paddingTop: ".5rem", paddingBottom: ".5rem", borderRadius: ".5rem", color: "white", border: "none", cursor: "pointer" }} onClick={() => handlePayBookingClick(row)}>Thanh toán bằng VNPay</button> */}
+                            <button style={{ background: "#3b82f6", paddingInline: ".3rem", paddingTop: ".3rem", paddingBottom: ".3rem", borderRadius: ".5rem", color: "white", border: "none", cursor: "pointer" }} onClick={() => handlePayBookingClick(row)}>Thanh toán</button>
                         </>
                     )}
                     {row.isPaid === 1 && (
@@ -363,6 +364,7 @@ const MyBooking = () =>{
             )}
             {/* </section> */}
             <ToastContainer
+                        containerId="main-container"
                         className="toast-container"
                         toastClassName="toast"
                         bodyClassName="toast-body"

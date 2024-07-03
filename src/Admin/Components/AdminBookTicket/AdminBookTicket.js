@@ -20,7 +20,7 @@ const AdminBookTicket = () =>{
     console.log(kind);
     const [tabValues, setTabValues] = useState({});
     const [selectedSeatsById, setSelectedSeatsById] = useState({});
-    
+    const [kindVehicledata, setKindVehicledata] = useState([]);
     const [data, setData] = useState(null);
     const [seats, setSeats] = useState([]);
     const [timeStartFrom, setTimeStartFrom] = useState('');
@@ -64,6 +64,7 @@ const AdminBookTicket = () =>{
 
         useEffect(() => {
             fetchTrip();
+            fetchKindVehicles();
         }, [timeStartFrom, timeStartTo, sort, kindVehicleId]);
 
         const fetchTrip = async () => {
@@ -92,6 +93,15 @@ const AdminBookTicket = () =>{
             .catch(error => {
                 console.error('Error:', error);
             });
+        };
+        const fetchKindVehicles = async () => {
+            try {
+                const response = await fetch("http://localhost:8081/api/kindVehicle");
+                const data = await response.json();
+                setKindVehicledata(data);
+            } catch (error) {
+                console.error("Error fetching trips:", error);
+            }
         };
 
 
@@ -123,11 +133,38 @@ const AdminBookTicket = () =>{
                         })
                         .then(reservedSeats => {
                             console.log('Reserved Seats:', reservedSeats);
-                            const updatedSeats = data.map(seat => ({
-                                ...seat,
-                                status: reservedSeats.some(reservedSeat => reservedSeat.seat.id === seat.id) ? 1 : 0
-                            }));
-                            setSeats(updatedSeats);
+                            // Lấy danh sách các ghế chờ cho chuyến đi
+                            fetch(`http://localhost:8081/api/waiting_seat/trip/${tripId}`)
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Failed to fetch waiting seats');
+                                    }
+                                    return response.json();
+                                })
+                                .then(waitingSeats => {
+                                    console.log('Waiting Seats:', waitingSeats);
+                                    const updatedSeats = data.map(seat => {
+                                        const isReserved = reservedSeats.some(reservedSeat => reservedSeat.seat.id === seat.id);
+                                        const isWaiting = waitingSeats.some(waitingSeat => waitingSeat.seat.id === seat.id);
+                                        let status = 0;
+
+                                        if (isReserved) {
+                                            status = 1;
+                                        }
+                                        if (isWaiting) {
+                                            status = 1;
+                                        }
+
+                                        return {
+                                            ...seat,
+                                            status
+                                        };
+                                    });
+                                    setSeats(updatedSeats);
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching waiting seats:', error);
+                                });
                         })
                         .catch(error => {
                             console.error('Error fetching reserved seats:', error);
@@ -340,9 +377,14 @@ const AdminBookTicket = () =>{
                                     <div className="selectChoose">
                                         <select onChange={handleKindChange}>
                                             <option value="">Loại xe</option>
-                                            <option value="1">Gường nằm</option>
+                                            {/* <option value="1">Gường nằm</option>
                                             <option value="2">Limousine</option>
-                                            <option value="3">Ghế ngồi</option>
+                                            <option value="3">Ghế ngồi</option> */}
+                                            {kindVehicledata.map(kind => (
+                                                <option key={kind.id} value={kind.id}>
+                                                    {kind.name}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                 </div>

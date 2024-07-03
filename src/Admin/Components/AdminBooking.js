@@ -248,7 +248,7 @@ const AdminBooking = () =>{
         
                 if (response.ok) {
                     // Xử lý thành công
-                    toast.success("Booking đã được cập nhật thành công!");
+                    toast.success("Hóa đơn đã được cập nhật thành công!");
                     const updatedBooking = await response.json();
                     const updatedBookings = records.map(booking => {
                         if (booking.id === updatedBooking.id) {
@@ -258,8 +258,8 @@ const AdminBooking = () =>{
                     });
                     setRecords(updatedBookings);
                 } else {
-                    console.error("Có lỗi xảy ra khi cập nhật user!");
-                    toast.error("Có lỗi xảy ra khi cập nhật user!");
+                    console.error("Có lỗi xảy ra khi cập nhật Hóa đơn!");
+                    toast.error("Có lỗi xảy ra khi cập nhật hóa đơn!");
                 }
             } catch (error) {
                 console.error("Lỗi:", error);

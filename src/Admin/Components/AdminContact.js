@@ -5,6 +5,7 @@ import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
 import { FiEdit, FiTrash } from 'react-icons/fi';
+import useDebounce from './useDebounce';
 
 
 
@@ -26,6 +27,7 @@ const AdminContact = () =>{
     const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
     const [contactToDelete, setContactToDelete] = useState(null);
     const [searchValue, setSearchValue] = useState('');
+    const searchDebounce = useDebounce(searchValue.trim(), 500);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -53,12 +55,6 @@ const AdminContact = () =>{
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.content}</div>
         },
         {
-            // cell: (row) => (
-            //     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-            //         <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-            //         <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
-            //     </div>
-            // )
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Hành động</div>,
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', width: '100%' }}>
@@ -92,17 +88,27 @@ const AdminContact = () =>{
     ]
     useEffect(() => {
         // Call the API to fetch cities
-        fetchContacts();
-    }, [page, searchValue]);
-
-    const fetchContacts = async () => {
-        try {
-            // const response = await fetch(`http://localhost:8081/api/contact/page?page=${page}&size=10`);
-            const response = await fetch(`http://localhost:8081/api/contact/page?page=${page}&size=10&email=${searchValue}`);
-            const data = await response.json();
+        let mounted = true;
+    
+        fetchContacts(searchDebounce).then((data) => {
+          if (mounted && data) {
             setData(data.contacts);
             setRecords(data.contacts);
-            setTotalPages(data.totalPages)
+            setTotalPages(data.totalPages);
+          }
+        });
+    
+        return () => {
+          mounted = false;
+        };
+    }, [page, searchDebounce]);
+
+    const fetchContacts = async (searchDebounce) => {
+        try {
+            // const response = await fetch(`http://localhost:8081/api/contact/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/contact/page?page=${page}&size=10&email=${searchDebounce}`);
+            const data = await response.json();
+            return data;
         } catch (error) {
             console.error("Error fetching cities:", error);
         }
@@ -146,7 +152,7 @@ const AdminContact = () =>{
             e.preventDefault();
             let missingInfo = [];
             if (!name) {
-                missingInfo.push("Tên tài xế");
+                missingInfo.push("Họ và tên");
             }
             if (!email) {
                 missingInfo.push("Email");
@@ -184,8 +190,8 @@ const AdminContact = () =>{
             
                     if (response.ok) {
                         // Xử lý thành công
-                        console.log("Contact đã được tạo thành công!");
-                        toast.success("Contact đã được tạo thành công!");
+                        console.log("Liên hệ đã được tạo thành công!");
+                        toast.success("Liên hệ đã được tạo thành công!");
                         const newContact = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
                         // Thêm người dùng mới vào danh sách
                         setData(prevData => [...prevData, newContact]);
@@ -199,7 +205,7 @@ const AdminContact = () =>{
                         // window.location.reload();
                     } else {
                         console.error("Có lỗi xảy ra khi tạo contact!");
-                        toast.error("Có lỗi xảy ra khi tạo contact!");
+                        toast.error("Có lỗi xảy ra khi tạo Liên hệ!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);
@@ -211,7 +217,7 @@ const AdminContact = () =>{
             e.preventDefault();
             let missingInfo = [];
             if (!currentContact.name) {
-                missingInfo.push("Tên tài xế");
+                missingInfo.push("Họ tên");
             }
             if (!currentContact.email) {
                 missingInfo.push("Email");
@@ -249,8 +255,8 @@ const AdminContact = () =>{
             
                     if (response.ok) {
                         // Xử lý thành công
-                        console.log("Contact đã được cập nhật thành công!");
-                        toast.success("Contact đã được cập nhật thành công!");
+                        console.log("Liên hệ đã được cập nhật thành công!");
+                        toast.success("Liên hệ đã được cập nhật thành công!");
                         const updatedContact = await response.json();
                         const updatedContacts = records.map(contact => {
                             if (contact.id === updatedContact.id) {
@@ -267,8 +273,8 @@ const AdminContact = () =>{
                         setIsEditing(false);
                         // window.location.reload();
                     } else {
-                        console.error("Có lỗi xảy ra khi cập nhật contact!");
-                        toast.error("Có lỗi xảy ra khi cập nhật contact!");
+                        console.error("Có lỗi xảy ra khi cập nhật liên hệ!");
+                        toast.error("Có lỗi xảy ra khi cập nhật liên hệ!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);
@@ -291,11 +297,11 @@ const AdminContact = () =>{
                     // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
                     const updatedContact = records.filter(record => record.id !== contactId);
                     setRecords(updatedContact);
-                    toast.success("Contact đã được xóa thành công!");
+                    toast.success("Liên hệ đã được xóa thành công!");
                     setIsDeleteConfirmVisible(false);
                 } else {
-                    console.error("Có lỗi xảy ra khi xóa contact!");
-                    toast.error("Có lỗi xảy ra khi xóa contact!");
+                    console.error("Có lỗi xảy ra khi xóa liên hệ!");
+                    toast.error("Có lỗi xảy ra khi xóa liên hệ!");
                 }
             } catch (error) {
                 console.error("Lỗi:", error);

@@ -5,7 +5,7 @@ import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
 import { FiEdit, FiTrash, FiList } from 'react-icons/fi';
-
+import useDebounce from './useDebounce';
 
 const AdminCity = () =>{
     const [isEditing, setIsEditing] = useState(false);
@@ -21,6 +21,7 @@ const AdminCity = () =>{
     const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
     const [cityToDelete, setCityToDelete] = useState(null);
     const [searchValue, setSearchValue] = useState('');
+    const searchDebounce = useDebounce(searchValue.trim(), 500);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -38,15 +39,9 @@ const AdminCity = () =>{
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Ảnh</div>,
             // selector: row => row.image
-            cell: row => <img height="50" alt={row.name} src={"http://localhost:8081/" + row.imgUrl} style={{paddingBottom:"1rem", paddingTop:"1rem"}} />
+            cell: row => <img height="50" alt={row.name} src={row.imgUrl} style={{paddingBottom:"1rem", paddingTop:"1rem"}} />
         },
         {
-            // cell: (row) => (
-            //     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-            //         <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-            //         <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
-            //     </div>
-            // )
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Hành động</div>,
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', width: '100%' }}>
@@ -80,30 +75,34 @@ const AdminCity = () =>{
     ]
     useEffect(() => {
         // Call the API to fetch cities
-        fetchCities();
-    }, [page, searchValue]);
-
-    const fetchCities = async () => {
-        try {
-            // const response = await fetch(`http://localhost:8081/api/city/page?page=${page}&size=10`);
-            const response = await fetch(`http://localhost:8081/api/city/page?page=${page}&size=10&name=${searchValue}`);
-            const data = await response.json();
+        let mounted = true;
+    
+        fetchCities(searchDebounce).then((data) => {
+          if (mounted && data) {
             setData(data.cities);
-            console.log("data",data.cities )
             setRecords(data.cities);
             setTotalPages(data.totalPages)
+          }
+        });
+    
+        return () => {
+          mounted = false;
+        };
+    }, [page, searchDebounce]);
+
+    const fetchCities = async (searchDebounce) => {
+        try {
+            // const response = await fetch(`http://localhost:8081/api/city/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/city/page?page=${page}&size=10&name=${searchDebounce}`);
+            const data = await response.json();
+            return data;
+
         } catch (error) {
             console.error("Error fetching cities:", error);
         }
     };
     
         
-        function handleFilter(event){
-            const newData = data.filter(row => {
-                return row.name.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
-            })
-            setRecords(newData)
-        }
         const handleEditClick = (city) => {
             setCurrentCity(city);
             setIsEditing(true);
@@ -157,7 +156,7 @@ const AdminCity = () =>{
                     // Xử lý thành công
                     console.log("Thành phố đã được tạo thành công!");
                     const newCity = await response.json();
-                    newCity.imgUrl = `http://localhost:8081${newCity.imgUrl}`; // Update the URL to be absolute
+                    // newCity.imgUrl = `http://localhost:8081${newCity.imgUrl}`; // Update the URL to be absolute
                     setData(prevData => [...prevData, newCity]);
                     setRecords(prevRecords => [...prevRecords, newCity]);
                     
@@ -318,7 +317,7 @@ const AdminCity = () =>{
                                                 <img className="inputValue" src={cityImage} alt="City" style={{ width: "18rem", height: "140px" }} />
                                             )}
                                             {!cityImage && currentCity.imgUrl && (
-                                                <img className="inputValue" src={"http://localhost:8081/" + currentCity.imgUrl} alt="City" style={{ width: "18rem", height: "140px" }} />
+                                                <img className="inputValue" src={currentCity.imgUrl} alt="City" style={{ width: "18rem", height: "140px" }} />
                                             )}
                                             <input className="inputValue" type="file" accept="image/*" onChange={handleImageChange} />
                                         </div>

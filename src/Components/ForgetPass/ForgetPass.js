@@ -139,6 +139,7 @@ const handleEmailChange = (event) => {
                     </form>
                 </div>
                 <ToastContainer
+                        containerId="main"
                         className="toast-container"
                         toastClassName="toast"
                         bodyClassName="toast-body"

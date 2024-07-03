@@ -5,6 +5,7 @@ import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
 import { FiEdit, FiTrash } from 'react-icons/fi';
+import useDebounce from './useDebounce';
 
 
 
@@ -28,6 +29,7 @@ const AdminRoute = () =>{
     const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
     const [routeToDelete, setRouteToDelete] = useState(null);
     const [searchValue, setSearchValue] = useState('');
+    const searchDebounce = useDebounce(searchValue.trim(), 500);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -38,29 +40,29 @@ const AdminRoute = () =>{
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên tuyến</div>,
             selector: row => row.name,
-            width: '12rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.name}</div>
+            // width: '12rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Điểm đi</div>,
             selector: row => row.diemDi.name,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.diemDi.name}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.diemDi.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Điểm đến</div>,
             selector: row => row.diemDen.name,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.diemDen.name}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.diemDen.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Khoảng cách</div>,
             selector: row => row.khoangCach,
-            width: '10rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.khoangCach} km</div>
+            // width: '10rem',
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.khoangCach} km</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Thời gian di chuyển</div>,
             selector: row => row.timeOfRoute,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.timeOfRoute} giờ</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.timeOfRoute} giờ</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Trạng thái</div>,
@@ -68,12 +70,6 @@ const AdminRoute = () =>{
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{statusMap[row.status] || 'Unknown Status'}</div>
         },
         {
-            // cell: (row) => (
-            //     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-            //         <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-            //         <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
-            //     </div>
-            // )
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Hành động</div>,
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', width: '100%' }}>
@@ -111,18 +107,41 @@ const AdminRoute = () =>{
     };
     useEffect(() => {
         // Call the API to fetch cities
-        fetchRoutes();
-        fetchCities();
-    }, [page, searchValue]);
+        let mounted = true;
+    
+        const fetchData = async () => {
+            const [routesData, citiesData] = await Promise.all([
+                fetchRoutes(searchDebounce),
+                fetchCities(),
+            ]);
+    
+            if (mounted) {
+                if (routesData) {
+                    setRecords(routesData.routes);
+                    setTotalPages(routesData.totalPages);
+                }
+                if (citiesData) {
+                    setCities(citiesData);
+                }
+            }
+        };
 
-    const fetchRoutes = async () => {
+        fetchData();
+    
+        return () => {
+            mounted = false;
+        };
+    }, [page, searchDebounce]);
+
+    const fetchRoutes = async (searchDebounce) => {
         try {
             // const response = await fetch(`http://localhost:8081/api/route/page?page=${page}&size=10`);
-            const response = await fetch(`http://localhost:8081/api/route/page?page=${page}&size=10&name=${searchValue}`);
+            const response = await fetch(`http://localhost:8081/api/route/page?page=${page}&size=10&name=${searchDebounce}`);
             const data = await response.json();
-            setData(data.routes);
-            setRecords(data.routes);
-            setTotalPages(data.totalPages)
+            return data;
+            // setData(data.routes);
+            // setRecords(data.routes);
+            // setTotalPages(data.totalPages)
         } catch (error) {
             console.error("Error fetching cities:", error);
         }
@@ -131,7 +150,8 @@ const AdminRoute = () =>{
         try {
             const response = await fetch("http://localhost:8081/api/city");
             const data = await response.json();
-            setCities(data);
+            return data;
+            // setCities(data);
         } catch (error) {
             console.error("Error fetching cities:", error);
         }
@@ -211,8 +231,8 @@ const AdminRoute = () =>{
             
                     if (response.ok) {
                         // Xử lý thành công
-                        console.log("User đã được tạo thành công!");
-                        toast.success("User đã được tạo thành công!");
+                        console.log("Tuyến đã được tạo thành công!");
+                        toast.success("Tuyến đã được tạo thành công!");
                         const newRoute = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
                         // Thêm người dùng mới vào danh sách
                         setData(prevData => [...prevData, newRoute]);
@@ -226,8 +246,8 @@ const AdminRoute = () =>{
                         setIsAdd(false);
                         // window.location.reload();
                     } else {
-                        console.error("Có lỗi xảy ra khi tạo route!");
-                        toast.error("Có lỗi xảy ra khi tạo route!");
+                        console.error("Có lỗi xảy ra khi tạo tuyến!");
+                        toast.error("Có lỗi xảy ra khi tạo tuyến!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);
@@ -280,8 +300,8 @@ const AdminRoute = () =>{
             
                     if (response.ok) {
                         // Xử lý thành công
-                        console.log("route đã được tạo thành công!");
-                        toast.success("route đã được tạo thành công!");
+                        console.log("Tuyến đã được cập nhật thành công!");
+                        toast.success("Tuyến đã được cập nhật thành công!");
                         const updatedRoute = await response.json();
                         const updatedRoutes = records.map(route => {
                             if (route.id === updatedRoute.id) {
@@ -300,8 +320,8 @@ const AdminRoute = () =>{
                         setIsEditing(false);
                         // window.location.reload();
                     } else {
-                        console.error("Có lỗi xảy ra khi tạo route!");
-                        toast.error("Có lỗi xảy ra khi tạo route!");
+                        console.error("Có lỗi xảy ra khi cập nhật tuyến!");
+                        toast.error("Có lỗi xảy ra khi cập nhật tuyến!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);
@@ -324,11 +344,11 @@ const AdminRoute = () =>{
                     // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
                     const updatedRoute = records.filter(record => record.id !== routeId);
                     setRecords(updatedRoute);
-                    toast.success("route đã được xóa thành công!");
+                    toast.success("Tuyến đã được xóa thành công!");
                     setIsDeleteConfirmVisible(false);
                 } else {
-                    console.error("Có lỗi xảy ra khi xóa route!");
-                    toast.error("Có lỗi xảy ra khi xóa route!");
+                    console.error("Có lỗi xảy ra khi xóa tuyến!");
+                    toast.error("Có lỗi xảy ra khi xóa tuyến!");
                 }
             } catch (error) {
                 console.error("Lỗi:", error);

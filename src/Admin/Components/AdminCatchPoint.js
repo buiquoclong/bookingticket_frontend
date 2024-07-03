@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
 import { FiEdit, FiTrash } from 'react-icons/fi';
 
+import useDebounce from './useDebounce';
 
 
 const AdminCatchPoint = () =>{
@@ -29,19 +30,20 @@ const AdminCatchPoint = () =>{
     const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
     const [pointToDelete, setPointToDelete] = useState(null);
     const [searchValue, setSearchValue] = useState('');
+    const searchDebounce = useDebounce(searchValue.trim(), 500);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
             selector: row => row.id,
             width: '3rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.id}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.id}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên chuyến</div>,
             selector: row => row.route.name,
             sortable: true,
             // width: '10rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.route.name}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.route.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên điểm đón</div>,
@@ -56,12 +58,6 @@ const AdminCatchPoint = () =>{
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.address}</div>
         },
         {
-            // cell: (row) => (
-            //     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-            //         <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-            //         <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
-            //     </div>
-            // )
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Hành động</div>,
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', width: '100%' }}>
@@ -94,33 +90,54 @@ const AdminCatchPoint = () =>{
         }
     ]
     
-    useEffect(() => {
-        // Call the API to fetch cities
-        fetchCatchPoint();
-        fetchRoutes();
-    }, [page, searchValue]);
-
-    const fetchCatchPoint = async () => {
+    const fetchCatchPoint = async (searchDebounce) => {
         try {
-            // const response = await fetch(`http://localhost:8081/api/catch-point/page?page=${page}&size=10`);
-            const response = await fetch(`http://localhost:8081/api/catch-point/page?page=${page}&size=10&address=${searchValue}`);
+            const response = await fetch(`http://localhost:8081/api/catch-point/page?page=${page}&size=10&address=${searchDebounce}`);
             const data = await response.json();
-            setData(data.catchPoints);
-            setRecords(data.catchPoints);
-            setTotalPages(data.totalPages)
+            return data;
         } catch (error) {
-            console.error("Error fetching cities:", error);
+            console.error("Error fetching catch points:", error);
+            return null;
         }
     };
+    
     const fetchRoutes = async () => {
         try {
             const response = await fetch("http://localhost:8081/api/route");
             const data = await response.json();
-            setRoutes(data);
+            return data;
         } catch (error) {
-            console.error("Error fetching route:", error);
+            console.error("Error fetching routes:", error);
+            return null;
         }
     };
+    
+    useEffect(() => {
+        let mounted = true;
+    
+        const fetchData = async () => {
+            const [catchPointsData, routesData] = await Promise.all([
+                fetchCatchPoint(searchDebounce),
+                fetchRoutes(),
+            ]);
+        
+            if (mounted) {
+                if (catchPointsData) {
+                setRecords(catchPointsData.catchPoints);
+                setTotalPages(catchPointsData.totalPages);
+                }
+                if (routesData) {
+                setRoutes(routesData);
+                }
+            }
+        };
+    
+        fetchData();
+    
+        return () => {
+            mounted = false;
+        };
+    }, [page, searchDebounce]);
         function handleFilter(event){
             const newData = data.filter(row => {
                 return row.name.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())

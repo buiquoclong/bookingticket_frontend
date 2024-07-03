@@ -76,17 +76,17 @@ const App = () => {
                     <Route path="/admin/find-trips" element={<AdminBookTicketPage />} />
                     <Route path="/admin/find-trips-return" element={<AdminBookTicketReturnPage />} />
                     <Route path="/admin/book-cash-payment" element={<AdminPaySuccessPage />} />
-                    <Route path="/admin/cities" element={<AdminCityPage />} />
+                    <Route path="/admin/cities" element={userRole === 3 ? <AdminCityPage /> : <NotFoundPage />} />
                     <Route path="/admin/booking-trip" element={<AdminPayPage />} />
-                    <Route path="/admin/routes" element={<AdminRoutePage />} />
-                    <Route path="/admin/vehicles" element={<AdminVehiclePage />} />
-                    <Route path="/admin/seats" element={<AdminSeatPage />} />
+                    <Route path="/admin/routes" element={userRole === 3 ? <AdminRoutePage /> : <NotFoundPage />} />
+                    <Route path="/admin/vehicles" element={userRole === 3 ? <AdminVehiclePage /> : <NotFoundPage />} />
+                    <Route path="/admin/seats" element={userRole === 3 ? <AdminSeatPage /> : <NotFoundPage />} />
                     <Route path="/admin/trips" element={<AdminTripPage />} />
                     <Route path="/admin/seat-reservation" element={<AdminSeatReservationPage />} />
                     <Route path="/admin/users" element={userRole === 3 ? <AdminUserPage /> : <NotFoundPage />} />
-                    <Route path="/admin/drivers" element={<AdminDriverPage />} />
+                    <Route path="/admin/drivers" element={userRole === 3 ? <AdminDriverPage /> : <NotFoundPage />} />
                     <Route path="/admin/contacts" element={<AdminContactPage />} />
-                    <Route path="/admin/logs" element={<AdminLogPage />} />
+                    <Route path="/admin/logs" element={userRole === 3 ? <AdminLogPage /> : <NotFoundPage />} />
                     <Route path="/admin/promotions" element={<AdminPromotionPage />} />
                     <Route path="/admin/reviews" element={<AdminReviewPage />} />
                 </>
@@ -131,21 +131,21 @@ const App = () => {
                     <Route path="/admin/find-trips" element={<AdminBookTicketPage />} />
                     <Route path="/admin/find-trips-return" element={<AdminBookTicketReturnPage />} />
                     <Route path="/admin/book-cash-payment" element={<AdminPaySuccessPage />} />
-                    <Route path="/admin/cities" element={<AdminCityPage />} />
+                    <Route path="/admin/cities" element={userRole === 3 ? <AdminCityPage /> : <NotFoundPage />} />
                     <Route path="/admin/booking-trip" element={<AdminPayPage />} />
-                    <Route path="/admin/routes" element={<AdminRoutePage />} />
-                    <Route path="/admin/vehicles" element={<AdminVehiclePage />} />
-                    <Route path="/admin/seats" element={<AdminSeatPage />} />
+                    <Route path="/admin/routes" element={userRole === 3 ? <AdminRoutePage /> : <NotFoundPage />} />
+                    <Route path="/admin/vehicles" element={userRole === 3 ? <AdminVehiclePage /> : <NotFoundPage />} />
+                    <Route path="/admin/seats" element={userRole === 3 ? <AdminSeatPage /> : <NotFoundPage />} />
                     <Route path="/admin/trips" element={<AdminTripPage />} />
                     <Route path="/admin/seat-reservation" element={<AdminSeatReservationPage />} />
                     <Route path="/admin/users" element={userRole === 3 ? <AdminUserPage /> : <NotFoundPage />} />
-                    <Route path="/admin/drivers" element={<AdminDriverPage />} />
+                    <Route path="/admin/drivers" element={userRole === 3 ? <AdminDriverPage /> : <NotFoundPage />} />
                     <Route path="/admin/contacts" element={<AdminContactPage />} />
-                    <Route path="/admin/logs" element={<AdminLogPage />} />
+                    <Route path="/admin/logs" element={userRole === 3 ? <AdminLogPage /> : <NotFoundPage />} />
                     <Route path="/admin/promotions" element={<AdminPromotionPage />} />
                     <Route path="/admin/reviews" element={<AdminReviewPage />} />
-                    <Route path="/admin/catch-point" element={<AdminCatchPointPage />} />
-                    <Route path="/admin/kind-vehicle" element={<AdminKindvehiclePage />} />
+                    <Route path="/admin/catch-point" element={userRole === 3 ? <AdminCatchPointPage /> : <NotFoundPage />} />
+                    <Route path="/admin/kind-vehicle" element={userRole === 3 ? <AdminKindvehiclePage /> : <NotFoundPage />} />
                 </Route>
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>

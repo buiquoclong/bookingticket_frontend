@@ -369,6 +369,7 @@ const Home = () =>{
                     </div>
                 </div>
                 <ToastContainer
+                        containerId="home"
                             className="toast-container"
                             toastClassName="toast"
                             bodyClassName="toast-body"
@@ -392,7 +393,7 @@ const Home = () =>{
                     data.map(route => (
                         <div key={route.id}className="singleDestination">
                                     <div className="imageDiv">
-                                        <img src={"http://localhost:8081/" + route.diemDi.imgUrl} alt={route.name}/>
+                                        <img src={route.diemDi.imgUrl} alt={route.name}/>
                                     </div>
 
                                         <div className="cardInfo">

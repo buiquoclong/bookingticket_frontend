@@ -5,6 +5,7 @@ import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
 import { FiEdit, FiTrash } from 'react-icons/fi';
+import useDebounce from './useDebounce';
 
 
 
@@ -22,6 +23,7 @@ const AdminKindVehicle = () =>{
     const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
     const [kindVehicleToDelete, setKindVehicleToDelete] = useState(null);
     const [searchValue, setSearchValue] = useState('');
+    const searchDebounce = useDebounce(searchValue.trim(), 500);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -34,12 +36,6 @@ const AdminKindVehicle = () =>{
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.name}</div>
         },
         {
-            // cell: (row) => (
-            //     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-            //         <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-            //         <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
-            //     </div>
-            // )
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Hành động</div>,
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', width: '100%' }}>
@@ -72,18 +68,30 @@ const AdminKindVehicle = () =>{
         }
     ]
     useEffect(() => {
-        // Call the API to fetch cities
-        fetchKindVehicle();
-    }, [page, searchValue]);
-
-    const fetchKindVehicle = async () => {
-        try {
-            // const response = await fetch(`http://localhost:8081/api/kindVehicle/page?page=${page}&size=10`);
-            const response = await fetch(`http://localhost:8081/api/kindVehicle/page?page=${page}&size=10&name=${searchValue}`);
-            const data = await response.json();
+        let mounted = true;
+    
+        fetchKindVehicle(searchDebounce).then((data) => {
+          if (mounted && data) {
             setData(data.kindVehicles);
             setRecords(data.kindVehicles);
-            setTotalPages(data.totalPages)
+            setTotalPages(data.totalPages);
+          }
+        });
+    
+        return () => {
+          mounted = false;
+        };
+    }, [page, searchDebounce]);
+
+    const fetchKindVehicle = async (searchDebounce) => {
+        try {
+            // const response = await fetch(`http://localhost:8081/api/kindVehicle/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/kindVehicle/page?page=${page}&size=10&name=${searchDebounce}`);
+            const data = await response.json();
+            return data;
+            // setData(data.kindVehicles);
+            // setRecords(data.kindVehicles);
+            // setTotalPages(data.totalPages)
         } catch (error) {
             console.error("Error fetching cities:", error);
         }

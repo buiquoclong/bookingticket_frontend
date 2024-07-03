@@ -2,6 +2,8 @@ import React, {useState, useEffect} from "react";
 import DataTable from 'react-data-table-component'
 // import "../AdminSeatReservation/AdminSeatReservation.scss"
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
+import useDebounce from './useDebounce';
+
 
 
 const AdminSeatReservation = () =>{
@@ -19,6 +21,7 @@ const AdminSeatReservation = () =>{
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const [searchValue, setSearchValue] = useState('');
+    const searchDebounce = useDebounce(searchValue.trim(), 500);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -79,18 +82,30 @@ const AdminSeatReservation = () =>{
         }
     ]
     useEffect(() => {
-        // Call the API to fetch cities
-        fetchSeatReservations();
-    }, [page, searchValue]);
-
-    const fetchSeatReservations = async () => {
-        try {
-            // const response = await fetch(`http://localhost:8081/api/seat_reservation/page?page=${page}&size=10`);
-            const response = await fetch(`http://localhost:8081/api/seat_reservation/page?page=${page}&size=10&name=${searchValue}`);
-            const data = await response.json();
+        let mounted = true;
+    
+        fetchSeatReservations(searchDebounce).then((data) => {
+          if (mounted && data) {
             setData(data.seatReservations);
             setRecords(data.seatReservations);
-            setTotalPages(data.totalPages)
+            setTotalPages(data.totalPages);
+          }
+        });
+    
+        return () => {
+          mounted = false;
+        };
+    }, [page, searchDebounce]);
+
+    const fetchSeatReservations = async (searchDebounce) => {
+        try {
+            // const response = await fetch(`http://localhost:8081/api/seat_reservation/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/seat_reservation/page?page=${page}&size=10&name=${searchDebounce}`);
+            const data = await response.json();
+            return data;
+            // setData(data.seatReservations);
+            // setRecords(data.seatReservations);
+            // setTotalPages(data.totalPages)
         } catch (error) {
             console.error("Error fetching cities:", error);
         }

@@ -3,6 +3,7 @@ import DataTable from 'react-data-table-component'
 // import "../AdminLog/AdminLog.scss"
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
 import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import useDebounce from './useDebounce';
 
 
 const AdminLog = () =>{
@@ -14,10 +15,12 @@ const AdminLog = () =>{
     const [totalPages, setTotalPages] = useState(0);
     const [searchCriteria, setSearchCriteria] = useState('userName');
     const [searchValue, setSearchValue] = useState('');
+    const searchDebounce = useDebounce(searchValue.trim(), 500);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
             selector: row => row.id,
+            width: '5rem',
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.id}</div>
         },
         {
@@ -47,18 +50,30 @@ const AdminLog = () =>{
         3: '#ff0000c2'     // Tạm khóa
         };
         useEffect(() => {
-            // Call the API to fetch cities
-            fetchLogs();
-        }, [page, searchCriteria, searchValue]);
+            let mounted = true;
     
-        const fetchLogs = async () => {
+            fetchLogs(searchDebounce).then((data) => {
+          if (mounted && data) {
+            setData(data.logs);
+            setRecords(data.logs);
+            setTotalPages(data.totalPages);
+          }
+        });
+    
+        return () => {
+          mounted = false;
+        };
+        }, [page, searchCriteria, searchDebounce]);
+    
+        const fetchLogs = async (searchDebounce) => {
             try {
                 // const response = await fetch(`http://localhost:8081/api/log/page?page=${page}&size=10`);
-                const response = await fetch(`http://localhost:8081/api/log/page?page=${page}&${searchCriteria}=${searchValue}`);
+                const response = await fetch(`http://localhost:8081/api/log/page?page=${page}&${searchCriteria}=${searchDebounce}`);
                 const data = await response.json();
-                setData(data.logs);
-                setRecords(data.logs);
-                setTotalPages(data.totalPages)
+                return data;
+                // setData(data.logs);
+                // setRecords(data.logs);
+                // setTotalPages(data.totalPages)
             } catch (error) {
                 console.error("Error fetching cities:", error);
             }

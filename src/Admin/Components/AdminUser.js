@@ -7,6 +7,7 @@ import {Pagination, Breadcrumbs, Link} from '@mui/material';
 import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 
 import { FiEdit} from 'react-icons/fi';
+import useDebounce from './useDebounce';
 
 
 const AdminUser = () =>{
@@ -36,6 +37,7 @@ const AdminUser = () =>{
     const [totalPages, setTotalPages] = useState(0);
     const [searchCriteria, setSearchCriteria] = useState('email');
     const [searchValue, setSearchValue] = useState('');
+    const searchDebounce = useDebounce(searchValue.trim(), 500);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -80,11 +82,6 @@ const AdminUser = () =>{
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.type}</div>
         },
         {
-            // cell: (row) => (
-            //     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-            //         <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button>
-            //     </div>
-            // )
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Hành động</div>,
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', width: '100%' }}>
@@ -119,22 +116,32 @@ const AdminUser = () =>{
         2: '#008000b3',  // Đã kích hoạt
         3: '#ff0000c2'     // Tạm khóa
     };
-    useEffect(() => {
-        // Call the API to fetch cities
-        fetchUsers();
-    }, [page, searchCriteria, searchValue]);
-
-    const fetchUsers = async () => {
+    const fetchUsers = async (searchDebounce) => {
         try {
-            const response = await fetch(`http://localhost:8081/api/user/page?page=${page}&size=10&${searchCriteria}=${searchValue}`);
-            const data = await response.json();
+          const response = await fetch(`http://localhost:8081/api/user/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`);
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error("Error fetching users:", error);
+          return null;
+        }
+      };
+    
+      useEffect(() => {
+        let mounted = true;
+    
+        fetchUsers(searchDebounce).then((data) => {
+          if (mounted && data) {
             setData(data.users);
             setRecords(data.users);
             setTotalPages(data.totalPages);
-        } catch (error) {
-            console.error("Error fetching cities:", error);
-        }
-    };
+          }
+        });
+    
+        return () => {
+          mounted = false;
+        };
+      }, [searchDebounce, page, searchCriteria]);
         function handleFilter(event){
             // const newData = data.filter(row => {
             //     return row.email.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase())
@@ -215,7 +222,7 @@ const AdminUser = () =>{
             
                     if (response.ok) {
                         // Xử lý thành công
-                        console.log("User đã được tạo thành công!");
+                        console.log("Người dùng đã được tạo thành công!");
                         // const newUser = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
                         // Thêm người dùng mới vào danh sách
                         // setData(prevData => [...prevData, newUser]);
@@ -227,10 +234,10 @@ const AdminUser = () =>{
                         setRole('');
                         setIsAdd(false);
                         window.location.reload();
-                        toast.success("User đã được tạo thành công!");
+                        toast.success("Người dùng đã được tạo thành công!");
                     } else {
-                        console.error("Có lỗi xảy ra khi tạo user!");
-                        toast.error("Có lỗi xảy ra khi tạo user!");
+                        console.error("Có lỗi xảy ra khi tạo người dùng!");
+                        toast.error("Có lỗi xảy ra khi tạo người dùng!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);
@@ -274,8 +281,8 @@ const AdminUser = () =>{
             
                     if (response.ok) {
                         // Xử lý thành công
-                        console.log("User đã được cập nhật thành công!");
-                        toast.success("User đã được cập nhật thành công!");
+                        console.log("Người dùng đã được cập nhật thành công!");
+                        toast.success("Người dùng đã được cập nhật thành công!");
                         const updatedUser = await response.json();
                         const updatedUsers = records.map(user => {
                             if (user.id === updatedUser.id) {
@@ -290,8 +297,8 @@ const AdminUser = () =>{
                         setIsEditing(false);
                         // window.location.reload();
                     } else {
-                        console.error("Có lỗi xảy ra khi cập nhật user!");
-                        toast.error("Có lỗi xảy ra khi cập nhật user!");
+                        console.error("Có lỗi xảy ra khi cập nhật người dùng!");
+                        toast.error("Có lỗi xảy ra khi cập nhật người dùng!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);

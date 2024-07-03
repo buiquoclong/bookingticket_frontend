@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import {Pagination, Breadcrumbs, Link} from '@mui/material';
 import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import { FiEdit, FiTrash } from 'react-icons/fi';
+import useDebounce from './useDebounce';
 
 
 
@@ -26,6 +27,7 @@ const AdminDriver = () =>{
     const [driverToDelete, setDriverToDelete] = useState(null);
     const [searchCriteria, setSearchCriteria] = useState('name');
     const [searchValue, setSearchValue] = useState('');
+    const searchDebounce = useDebounce(searchValue.trim(), 500);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -55,12 +57,6 @@ const AdminDriver = () =>{
         //     cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%',backgroundColor: statusColorMap[row.status] || 'transparent', padding:".3rem 0rem", borderRadius:"5px", fontWeight:"600", color:"" }}>{statusMap[row.status] || 'Unknown Status'}</div>
         // },
         {
-            // cell: (row) => (
-            //     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-            //         <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-            //         <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
-            //     </div>
-            // )
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Hành động</div>,
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', width: '100%' }}>
@@ -104,18 +100,30 @@ const AdminDriver = () =>{
     //     3: '#ff0000c2'     // Tạm khóa
     // };
     useEffect(() => {
-        // Call the API to fetch cities
-        fetchDrivers();
-    }, [page, searchCriteria, searchValue]);
-
-    const fetchDrivers = async () => {
-        try {
-            // const response = await fetch(`http://localhost:8081/api/driver/page?page=${page}&size=10`);
-            const response = await fetch(`http://localhost:8081/api/driver/page?page=1&size=10&${searchCriteria}=${searchValue}`);
-            const data = await response.json();
+        let mounted = true;
+    
+        fetchDrivers(searchDebounce).then((data) => {
+          if (mounted && data) {
             setData(data.drivers);
             setRecords(data.drivers);
-            setTotalPages(data.totalPages)
+            setTotalPages(data.totalPages);
+          }
+        });
+    
+        return () => {
+          mounted = false;
+        };
+    }, [page, searchCriteria, searchDebounce]);
+
+    const fetchDrivers = async (searchDebounce) => {
+        try {
+            // const response = await fetch(`http://localhost:8081/api/driver/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/driver/page?page=1&size=10&${searchCriteria}=${searchDebounce}`);
+            const data = await response.json();
+            return data;
+            // setData(data.drivers);
+            // setRecords(data.drivers);
+            // setTotalPages(data.totalPages)
         } catch (error) {
             console.error("Error fetching cities:", error);
         }
@@ -192,8 +200,8 @@ const AdminDriver = () =>{
                     });
                 
                     if (response.ok) {
-                        console.log("Driver đã được tạo thành công!");
-                        toast.success("Driver đã được tạo thành công!");
+                        console.log("Tài xế đã được tạo thành công!");
+                        toast.success("Tài xế đã được tạo thành công!");
                         const newDriver = await response.json();
                         setData(prevData => [...prevData, newDriver]);
                         setRecords(prevRecords => [...prevRecords, newDriver]);
@@ -202,8 +210,8 @@ const AdminDriver = () =>{
                         setPhone('');
                         setIsAdd(false);
                     } else {
-                        console.error("Có lỗi xảy ra khi tạo driver!");
-                        toast.error("Có lỗi xảy ra khi tạo driver!");
+                        console.error("Có lỗi xảy ra khi tạo tài xế!");
+                        toast.error("Có lỗi xảy ra khi tạo tài xế!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);
@@ -314,8 +322,8 @@ const AdminDriver = () =>{
                     });
                 
                     if (response.ok) {
-                        console.log("Driver đã được cập nhật thành công!");
-                        toast.success("Driver đã được cập nhật thành công!");
+                        console.log("Tài xế đã được cập nhật thành công!");
+                        toast.success("Tài xế đã được cập nhật thành công!");
                         const updatedDriver = await response.json();
                         const updatedDrivers = records.map(driver => {
                             if (driver.id === updatedDriver.id) {
@@ -329,8 +337,8 @@ const AdminDriver = () =>{
                         setPhone('');
                         setIsEditing(false);
                     } else {
-                        console.error("Có lỗi xảy ra khi cập nhật driver!");
-                        toast.error("Có lỗi xảy ra khi cập nhật driver!");
+                        console.error("Có lỗi xảy ra khi cập nhật tài xế!");
+                        toast.error("Có lỗi xảy ra khi cập nhật tài xế!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);

@@ -64,12 +64,6 @@ const AdminVehicle = () =>{
             cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{statusMap[row.status] || 'Unknown Status'}</div>
         },
         {
-            // cell: (row) => (
-            //     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-            //         <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-            //         <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
-            //     </div>
-            // )
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Hành động</div>,
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', width: '100%' }}>
@@ -198,8 +192,8 @@ const AdminVehicle = () =>{
             
                     if (response.ok) {
                         // Xử lý thành công
-                        console.log("User đã được tạo thành công!");
-                        toast.success("User đã được tạo thành công!");
+                        console.log("Phương tiện đã được tạo thành công!");
+                        toast.success("Phương tiện đã được tạo thành công!");
                         const newVehicle = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
                         // Thêm người dùng mới vào danh sách
                         setData(prevData => [...prevData, newVehicle]);
@@ -213,8 +207,8 @@ const AdminVehicle = () =>{
                         setIsAdd(false);
                         // window.location.reload();
                     } else {
-                        console.error("Có lỗi xảy ra khi tạo vehicle!");
-                        toast.error("Có lỗi xảy ra khi tạo vehicle!");
+                        console.error("Có lỗi xảy ra khi tạo phương tiện!");
+                        toast.error("Có lỗi xảy ra khi tạo phương tiện!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);
@@ -265,8 +259,8 @@ const AdminVehicle = () =>{
             
                     if (response.ok) {
                         // Xử lý thành công
-                        console.log("Vehicle đã được cập nhật thành công!");
-                        toast.success("Vehicle đã được cập nhật thành công!");
+                        console.log("Phương tiện đã được cập nhật thành công!");
+                        toast.success("Phương tiện đã được cập nhật thành công!");
                         const updatedVehicle = await response.json();
                         const updatedVehicles = records.map(vehicle => {
                             if (vehicle.id === updatedVehicle.id) {
@@ -284,8 +278,8 @@ const AdminVehicle = () =>{
                         setIsEditing(false);
                         // window.location.reload();
                     } else {
-                        console.error("Có lỗi xảy ra khi cập nhật vehicle!");
-                        toast.error("Có lỗi xảy ra khi cập nhật vehicle!");
+                        console.error("Có lỗi xảy ra khi cập nhật phương tiện!");
+                        toast.error("Có lỗi xảy ra khi cập nhật phương tiện!");
                     }
                 } catch (error) {
                     console.error("Lỗi:", error);
@@ -308,11 +302,11 @@ const AdminVehicle = () =>{
                     // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
                     const updateVehicle = records.filter(record => record.id !== vehicleId);
                     setRecords(updateVehicle);
-                    toast.success("vehicle đã được xóa thành công!");
+                    toast.success("Phương tiện đã được xóa thành công!");
                     setIsDeleteConfirmVisible(false);
                 } else {
-                    console.error("Có lỗi xảy ra khi xóa vehicle!");
-                    toast.error("Có lỗi xảy ra khi xóa vehicle!");
+                    console.error("Có lỗi xảy ra khi xóa phương tiện!");
+                    toast.error("Có lỗi xảy ra khi xóa phương tiện!");
                 }
             } catch (error) {
                 console.error("Lỗi:", error);

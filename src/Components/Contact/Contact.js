@@ -41,7 +41,7 @@ const Contact = () =>{
         e.preventDefault();
         let missingInfo = [];
         if (!name) {
-            missingInfo.push("Tên tài xế");
+            missingInfo.push("Họ tên");
         }
         if (!email) {
             missingInfo.push("Email");
@@ -130,6 +130,7 @@ const Contact = () =>{
             </form>
             </div>
             <ToastContainer
+                        containerId="contact-form"
                         className="toast-container"
                         toastClassName="toast"
                         bodyClassName="toast-body"

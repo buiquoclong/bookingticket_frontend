@@ -7,6 +7,7 @@ import { toast, ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import { FiEdit, FiTrash } from 'react-icons/fi';
+import useDebounce from './useDebounce';
 
 
 
@@ -29,6 +30,7 @@ const AdminReview = () =>{
     const [reviewToDelete, setReviewToDelete] = useState(null);
     const [searchCriteria, setSearchCriteria] = useState('userName');
     const [searchValue, setSearchValue] = useState('');
+    const searchDebounce = useDebounce(searchValue.trim(), 500);
     const columns = [
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>ID</div>,
@@ -39,37 +41,37 @@ const AdminReview = () =>{
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên</div>,
             selector: row => row.user.name,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.user.name}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.user.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Chuyến</div>,
             selector: row => row.trip.route.name,
             width: '10rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.trip.route.name}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.trip.route.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Tên xe</div>,
             selector: row => row.trip.vehicle.name,
             width: '7rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.trip.vehicle.name}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.trip.vehicle.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Loại xe</div>,
             selector: row => row.trip.vehicle.kindVehicle.name,
             width: '7rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.trip.vehicle.kindVehicle.name}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.trip.vehicle.kindVehicle.name}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Biển số</div>,
             selector: row => row.trip.vehicle.vehicleNumber,
             width: '6rem',
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.trip.vehicle.vehicleNumber}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.trip.vehicle.vehicleNumber}</div>
         },
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Thời gian khởi hành </div>,
             width: '10rem',
             cell: row => (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', textAlign:"center" }}>
                     {row.trip.timeStart.slice(0, 5)} - {formatDate(row.trip.dayStart)}
                 </div>
             )
@@ -94,7 +96,7 @@ const AdminReview = () =>{
         {
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Nội dung</div>,
             selector: row => row.content,
-            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>{row.content}</div>
+            cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', textAlign:"center" }}>{row.content}</div>
         },
         // ,
         // {
@@ -104,12 +106,6 @@ const AdminReview = () =>{
         //     cell: row => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%',backgroundColor: statusColorMap[row.status] || 'transparent', padding:".3rem 0rem", borderRadius:"5px", fontWeight:"600", color:"" }}>{statusMap[row.status] || 'Unknown Status'}</div>
         // },
         {
-            // cell: (row) => (
-            //     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-            //         <button style={{background:"#3b82f6",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleEditClick(row)}> Sửa </button> | 
-            //         <button style={{background:"#ef4444",paddingInline:"1rem",paddingTop:".5rem",paddingBottom:".5rem", borderRadius:".5rem", color:"white", border:"none", cursor:"pointer"}} onClick={() => handleRemoveClick(row)}> Xóa </button>
-            //     </div>
-            // )
             name: <div style={{ color: 'blue', fontWeight: 'bold', fontSize:"16px", textAlign:"center", width: '100%' }}>Hành động</div>,
             cell: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', width: '100%' }}>
@@ -149,18 +145,30 @@ const AdminReview = () =>{
         'Xuất sắc'
     ];
     useEffect(() => {
-        // Call the API to fetch cities
-        fetchReviews();
-    }, [page, searchCriteria, searchValue]);
-
-    const fetchReviews = async () => {
-        try {
-            // const response = await fetch(`http://localhost:8081/api/review/page?page=${page}&size=10`);
-            const response = await fetch(`http://localhost:8081/api/review/page?page=${page}&size=10&${searchCriteria}=${searchValue}`);
-            const data = await response.json();
+        let mounted = true;
+    
+        fetchReviews(searchDebounce).then((data) => {
+          if (mounted && data) {
             setData(data.reviews);
             setRecords(data.reviews);
-            setTotalPages(data.totalPages)
+            setTotalPages(data.totalPages);
+          }
+        });
+    
+        return () => {
+          mounted = false;
+        };
+    }, [page, searchCriteria, searchDebounce]);
+
+    const fetchReviews = async (searchDebounce) => {
+        try {
+            // const response = await fetch(`http://localhost:8081/api/review/page?page=${page}&size=10`);
+            const response = await fetch(`http://localhost:8081/api/review/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`);
+            const data = await response.json();
+            return data;
+            // setData(data.reviews);
+            // setRecords(data.reviews);
+            // setTotalPages(data.totalPages)
         } catch (error) {
             console.error("Error fetching cities:", error);
         }
@@ -242,11 +250,11 @@ const AdminReview = () =>{
                     // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
                     const updatedReview = records.filter(record => record.id !== reviewId);
                     setRecords(updatedReview);
-                    toast.success("Review đã được xóa thành công!");
+                    toast.success("Đánh giá đã được xóa thành công!");
                     setIsDeleteConfirmVisible(false);
                 } else {
                     console.error("Có lỗi xảy ra khi xóa Review!");
-                    toast.error("Có lỗi xảy ra khi xóa Review!");
+                    toast.error("Có lỗi xảy ra khi xóa Đánh giá!");
                 }
             } catch (error) {
                 console.error("Lỗi:", error);

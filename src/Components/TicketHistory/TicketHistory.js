@@ -341,6 +341,7 @@ const TicketHistory = () =>{
             )}
             
             <ToastContainer
+                        containerId="hisInfoTicket"
                         className="toast-container"
                         toastClassName="toast"
                         bodyClassName="toast-body"

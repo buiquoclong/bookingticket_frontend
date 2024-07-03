@@ -296,6 +296,7 @@ const BookingTicket = () =>{
                         if (kind === "Một chiều") {
                             // Gửi yêu cầu để thêm ghế đang chờ cho chuyến đi
                             insertWaitingSeat(selectedSeatIds, tripId);
+                            updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds, data.status);
                             try {
                                 // Gửi yêu cầu để nhận URL thanh toán từ API
                                 const response = await fetch(`http://localhost:8081/api/payment/pay?total=${finalPrice}`, {
@@ -340,7 +341,9 @@ const BookingTicket = () =>{
                             
                             // Gửi yêu cầu để thêm ghế đang chờ cho chuyến đi
                             insertWaitingSeat(selectedSeatIds, tripId);
-                            insertWaitingSeat(selectedSeatIds, tripIdReturn);
+                            insertWaitingSeat(selectedSeatIdsReturn, tripIdReturn);
+                            updateTripEmptySeat(tripId, data.route.id, data.vehicle.id, data.dayStart, data.timeStart, data.price, data.driver.id, data.emptySeat, selectedSeatIds, data.status);
+                            updateTripEmptySeat(tripIdReturn, dataReturn.route.id, dataReturn.vehicle.id, dataReturn.dayStart, dataReturn.timeStart, dataReturn.price, dataReturn.driver.id, dataReturn.emptySeat, selectedSeatIdsReturn, dataReturn.status);
                             // Tạo hóa đơn lượt đi
                             try {
                                 // Gửi yêu cầu để nhận URL thanh toán từ API
