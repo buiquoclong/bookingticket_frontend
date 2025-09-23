@@ -1,514 +1,502 @@
-:root{
-    --PrimaryColor: hsl(199, 100%, 33%);
-    --SecondaryColor: hsl(187, 85%, 43%);
-    --gradientColor: linear-gradient(to right, hsl(187, 85%, 43%), hsl(199, 100%, 33%));
-    --whiteColor: hsl(0, 0%, 100%);
-    --blackColor: hsl(201, 33%, 16%);
-    --textColor: hsl(240, 4%, 36%);
-    --whiteColorDeam: hsl(0, 0%, 93%);
-    --greyText: rgb(190, 190, 190);
-    --inputColor: rgb(239, 239, 239);
-    --bodyColor: rgb(240, 240, 246);
-    --cardBG: rgb(225, 225, 235);
+:root {
+  --PrimaryColor: hsl(199, 100%, 33%);
+  --SecondaryColor: hsl(187, 85%, 43%);
+  --gradientColor: linear-gradient(
+    to right,
+    hsl(187, 85%, 43%),
+    hsl(199, 100%, 33%)
+  );
+  --whiteColor: hsl(0, 0%, 100%);
+  --blackColor: hsl(201, 33%, 16%);
+  --textColor: hsl(240, 4%, 36%);
+  --whiteColorDeam: hsl(0, 0%, 93%);
+  --greyText: rgb(190, 190, 190);
+  --inputColor: rgb(239, 239, 239);
+  --bodyColor: rgb(240, 240, 246);
+  --cardBG: rgb(225, 225, 235);
 }
 
-body{
-    background-color: var(--whiteColor);
+body {
+  background-color: var(--whiteColor);
 }
 
-.home{
+.home {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  height: auto;
+
+  .overlay {
+    position: absolute;
+    height: 100%;
     width: 100%;
-    position: relative;
+    background: rgb(47, 106, 127);
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+    mix-blend-mode: hard-light;
+  }
+
+  img {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    object-fit: cover;
+  }
+
+  .homeContent {
+    width: 100%;
+    height: auto;
+    padding: 4rem 1.5rem 3rem;
     display: flex;
-    align-items: center;
+    row-gap: 3rem;
+    flex-direction: column;
+    align-items: stretch;
     justify-content: center;
     margin: auto;
-    height: auto;
+    color: var(--whiteColor);
+    z-index: 100;
+    width: 66% !important;
 
-    .overlay{
-        position: absolute;
-        height: 100%;
-        width: 100%;
-        background: rgb(47, 106, 127);
-        top: 0;
-        bottom: 0;
-        z-index: 1;
-        mix-blend-mode: hard-light;
+    .textDiv {
+      padding: 2rem 0;
+
+      .smallText {
+        font-size: 13px;
+        text-transform: uppercase;
+      }
+
+      .homeTitle {
+        position: relative;
+        font-size: 3rem;
+      }
     }
 
-    img{
-        position: absolute;
-        height: 100%;
-        width: 100%;
-        top: 0;
-        bottom: 0;
-        object-fit: cover;
-        
-    }
+    .cardDiv {
+      position: relative;
+      padding: 2rem 1rem;
+      background: var(--whiteColor);
+      border-radius: 10px;
+      gap: 1rem;
+      line-height: 30px;
 
-    .homeContent{
-        width: 100%;
-        height: auto;
-        padding: 4rem 1.5rem 3rem;
+      .radioButtons {
         display: flex;
-        row-gap: 3rem;
-        flex-direction: column;
-        align-items: stretch;
-        justify-content: center;
-        margin: auto;
-        color: var(--whiteColor);
-        z-index: 100;
-        width: 66% !important;
+        justify-content: baseline;
+        margin-bottom: 1rem;
 
-        .textDiv{
-            padding: 2rem 0;
+        label {
+          margin-right: 1rem;
+          cursor: pointer;
+          font-size: 17px;
 
-            .smallText{
-                font-size: 13px;
-                text-transform: uppercase;
-            }
-
-            .homeTitle{
-                position: relative;
-                font-size: 3rem;
-            }
+          input[type="radio"] {
+            margin-right: 0.5rem;
+          }
         }
+      }
 
-        .cardDiv{
-            position: relative;
-            padding: 2rem 1rem;
-            background: var(--whiteColor);
-            border-radius: 10px;
-            gap: 1rem;
-            line-height: 30px;
+      .destinationIn {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between; // Đảm bảo các phần tử đều nằm cách đều nhau theo chiều ngang
 
-            
-
-            .radioButtons {
-                display: flex;
-                justify-content: baseline;
-                margin-bottom: 1rem;
-        
-                label {
-                    margin-right: 1rem;
-                    cursor: pointer;
-                    font-size: 17px;
-        
-                    input[type="radio"] {
-                        margin-right: 0.5rem;
-                    }
-                }
-            }
-
-            .destinationIn{
-                
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: space-between; // Đảm bảo các phần tử đều nằm cách đều nhau theo chiều ngang
-
-                .destinationInput, .dateInput {
-                    margin-bottom: 10px; // Khoảng cách giữa các hàng
-                }
-                .destinationInput, .dateInput{
-                    width: 100%;
-                    .input{
-                        height: 3rem;
-                        padding: 0 1rem;
-                        background: var(--inputColor);
-                        border-radius: .5rem;
-                        font-size: 18px;
-                        outline: none;
-                        width: 100%;
-
-                        input{
-                            background: none;
-                            border: none;
-                            outline: none;
-                            width: 100%;
-                            font-size: 18px;
-                            font-weight: 500;
-                            &::placeholder{
-                                font-size: 13px;
-                            }
-                            cursor: pointer;
-                        }
-
-                        .icon{
-                            font-size: 18px;
-                            color: var(--PrimaryColor)
-                            !important;
-                            margin-left: 10px;
-                        }
-                    }
-                }
-            }
-
-            .sizeOne{
-                width: 80%;
-                margin-inline: auto;
-            }
-
-            .sizeTwo{
-                width: 97%;
-                margin-inline: auto;
-            }
-
-            label{
-                display: block;
-                color: var(--textColor);
-                color: #1b2d36;
-                padding-bottom: 10px;
-                font-size: 15px;
-                font-weight: 500;
-            }
-            
-
-            .searchOption{
-                position: absolute;
-                background-color: var(--PrimaryColor);
-                width: max-content;
-                bottom: -0.7rem;
-                column-gap: .8rem;
-                padding: 5px 1rem;
-                border-radius: 3rem;
-                left: 50%;
-                transform: translate(-50%);
-                justify-content: center;
-                cursor: pointer;
-                color: var(--whiteColor);
-
-                &:hover{
-                    background: var(--SecondaryColor);
-                }
-
-                .icon{
-                    font-size: 18px;
-                }
-
-                span{
-                    font-size: 13px;
-                }
-            }
-
-            
+        .destinationInput,
+        .dateInput {
+          margin-bottom: 10px; // Khoảng cách giữa các hàng
         }
-
-        .homeFooterIcons{
+        .destinationInput,
+        .dateInput {
+          width: 100%;
+          .input {
+            height: 3rem;
+            padding: 0 1rem;
+            background: var(--inputColor);
+            border-radius: 0.5rem;
+            font-size: 15px;
+            outline: none;
             width: 100%;
-            justify-content: space-between;
 
-            .icon{
-                font-size: 20px;
-                margin: 0 5px;
-                color: var(--whiteColor);
-                font-weight: 600;
-                &:hover{
-                    color: var(--PrimaryColor);
-                }
+            input {
+              background: none;
+              border: none;
+              outline: none;
+              width: 100%;
+              font-size: 15px;
+              font-weight: 500;
+              &::placeholder {
+                font-size: 13px;
+              }
+              cursor: pointer;
             }
-        }
-    }
-    .toast-container {
-        position: fixed;
-        top: 50%; 
-        right: 0; 
-        transform: translateY(-50%); 
-        z-index: 9999; 
-    }
 
-}
-.main{
-    width: 100%;
-
-    .secTitle{
-        .title{
-            position: relative;
-            width: max-content;
-            color: var(--textColor);
-            margin: 1rem 0;
-            z-index: 2;
-            margin-inline: auto;
-
-            &::after{
-                position: absolute;
-                content: '';
-                // background: var(--SecondaryColor);
-                height: 5px;
-                width: 120px;
-                right: 0;
-                bottom: 5px;
-                z-index: -1;
+            .icon {
+              font-size: 18px;
+              color: var(--PrimaryColor) !important;
+              margin-left: 10px;
             }
+          }
         }
-    }
-    
-    .secContent{
+      }
+
+      .sizeOne {
+        width: 80%;
+        margin-inline: auto;
+      }
+
+      .sizeTwo {
+        width: 97%;
+        margin-inline: auto;
+      }
+
+      label {
+        display: block;
+        color: var(--textColor);
+        color: #1b2d36;
+        padding-bottom: 10px;
+        font-size: 15px;
+        font-weight: 500;
+      }
+
+      .searchOption {
+        position: absolute;
+        background-color: var(--PrimaryColor);
+        width: max-content;
+        bottom: -0.7rem;
+        column-gap: 0.8rem;
+        padding: 5px 1rem;
+        border-radius: 3rem;
+        left: 50%;
+        transform: translate(-50%);
         justify-content: center;
-        gap: 1.5rem;
+        cursor: pointer;
+        color: var(--whiteColor);
 
-        .singleDestination{
-            height: 100%;
-            display: grid;
-            row-gap: 10px;
-            border-radius: 10px;
-            align-items: center;
-            background: var(--cardBG);
-            box-shadow: 0 2px 4px rgba(140,140, 141, 0.549);
-            overflow: hidden;
-            &:hover{
-                background: var(--cardHover);
-                box-shadow: 1 4px 4px rgba(85, 85, 114, 0.549);
-                transition: .3s ease;
-            }
-
-            .imageDiv{
-                height: 180px;
-                width: 100%;
-                overflow: hidden;
-
-                img{
-                    height: 100%;
-                    width: 100%;
-                    object-fit: cover;
-                    transition: 2s ease;
-                }
-
-                &:hover{
-                    img{
-                        transform: scale(1.1);
-                    }
-                }
-            }
-
-            .cardInfo{
-                padding: 1rem;
-
-                .desTitle{
-                    color: var(--blackColor);
-                    font-size: 1.25rem;
-                }
-
-                .continent{
-                    gap: .5rem;
-                    
-                    .icon{
-                        color: var(--textColor);
-                        font-size: 18px;
-                    }
-
-                    .name{
-                        color: var(--textColor);
-                        font-weight: 400;
-                        font-size: 14px;
-                    }
-                }
-
-                .fees{
-                    width: 100%;
-                    justify-content: space-between;
-                    padding: 1rem;
-                    margin: 1rem 0;
-                    border-top: 1.5px solid var(--greyText);
-                    border-bottom: 1.5px solid var(--greyText);
-
-                    .grade{
-                        color: var(--textColor);
-                        max-width: 120px;
-                        line-height: 20px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-
-                        small{
-                            text-align: center;
-                            background: var(--gradientColor);
-                            border-radius: 1rem;
-                            color: var(--whiteColor);
-                            padding: 1px 10px;
-                            font-size: 10px;
-                        }
-                    }
-
-                    .price{
-                        font-size: 2rem;
-                        color: var(--blackColor);
-                    }
-                }
-
-                .desc{
-                    font-size: 13.5px;
-                    color: var(--textColor);
-                    font-weight: 500;
-                }
-
-                .btn{
-                    margin-top: 1rem;
-                    color: var(--whiteColor);
-                    font-weight: 600;
-                    justify-content: space-between;
-                    gap: .5rem;
-                    transition: .3s ease-in-out;
-
-                    .icon{
-                        align-self: center;
-                        font-size: 18px;
-                    }
-                    &:hover{
-                        transform: translateX(7px);
-                    }
-                    
-                }
-            }
+        &:hover {
+          background: var(--SecondaryColor);
         }
+
+        .icon {
+          font-size: 18px;
+        }
+
+        span {
+          font-size: 13px;
+        }
+      }
     }
 
+    .homeFooterIcons {
+      width: 100%;
+      justify-content: space-between;
+
+      .icon {
+        font-size: 20px;
+        margin: 0 5px;
+        color: var(--whiteColor);
+        font-weight: 600;
+        &:hover {
+          color: var(--PrimaryColor);
+        }
+      }
+    }
+  }
+  .toast-container {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: 9999;
+  }
+}
+.main {
+  width: 100%;
+
+  .secTitle {
+    .title {
+      position: relative;
+      width: max-content;
+      color: var(--textColor);
+      margin: 1rem 0;
+      z-index: 2;
+      margin-inline: auto;
+
+      &::after {
+        position: absolute;
+        content: "";
+        // background: var(--SecondaryColor);
+        height: 5px;
+        width: 120px;
+        right: 0;
+        bottom: 5px;
+        z-index: -1;
+      }
+    }
+  }
+
+  .secContent {
+    justify-content: center;
+    gap: 1.5rem;
+
+    .singleDestination {
+      height: 100%;
+      display: grid;
+      row-gap: 10px;
+      border-radius: 10px;
+      align-items: center;
+      background: var(--cardBG);
+      box-shadow: 0 2px 4px rgba(140, 140, 141, 0.549);
+      overflow: hidden;
+      &:hover {
+        background: var(--cardHover);
+        box-shadow: 1 4px 4px rgba(85, 85, 114, 0.549);
+        transition: 0.3s ease;
+      }
+
+      .imageDiv {
+        height: 180px;
+        width: 100%;
+        overflow: hidden;
+
+        img {
+          height: 100%;
+          width: 100%;
+          object-fit: cover;
+          transition: 2s ease;
+        }
+
+        &:hover {
+          img {
+            transform: scale(1.1);
+          }
+        }
+      }
+
+      .cardInfo {
+        padding: 1rem;
+
+        .desTitle {
+          color: var(--blackColor);
+          font-size: 1.25rem;
+        }
+
+        .continent {
+          gap: 0.5rem;
+
+          .icon {
+            color: var(--textColor);
+            font-size: 18px;
+          }
+
+          .name {
+            color: var(--textColor);
+            font-weight: 400;
+            font-size: 14px;
+          }
+        }
+
+        .fees {
+          width: 100%;
+          justify-content: space-between;
+          padding: 1rem;
+          margin: 1rem 0;
+          border-top: 1.5px solid var(--greyText);
+          border-bottom: 1.5px solid var(--greyText);
+
+          .grade {
+            color: var(--textColor);
+            max-width: 120px;
+            line-height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            small {
+              text-align: center;
+              background: var(--gradientColor);
+              border-radius: 1rem;
+              color: var(--whiteColor);
+              padding: 1px 10px;
+              font-size: 10px;
+            }
+          }
+
+          .price {
+            font-size: 2rem;
+            color: var(--blackColor);
+          }
+        }
+
+        .desc {
+          font-size: 13.5px;
+          color: var(--textColor);
+          font-weight: 500;
+        }
+
+        .btn {
+          margin-top: 1rem;
+          color: var(--whiteColor);
+          font-weight: 600;
+          justify-content: space-between;
+          gap: 0.5rem;
+          transition: 0.3s ease-in-out;
+
+          .icon {
+            align-self: center;
+            font-size: 18px;
+          }
+          &:hover {
+            transform: translateX(7px);
+          }
+        }
+      }
+    }
+  }
 }
 
 // MEDIA QUERIES ============================
 @media screen and (min-width: 500px) {
-    .title{
-        font-size: 1.5rem;
-        &::after{
-            width: 155px !important;
-        }
+  .title {
+    font-size: 1.5rem;
+    &::after {
+      width: 155px !important;
     }
+  }
 
-    .secContent{
-        grid-template-columns: repeat(2,1fr);
+  .secContent {
+    grid-template-columns: repeat(2, 1fr);
 
-        .singleDestination{
-            height: auto;
-        }
+    .singleDestination {
+      height: auto;
     }
+  }
 }
 
 @media screen and (min-width: 840px) {
-    .secContent{
-        grid-template-columns: repeat(3,1fr);
+  .secContent {
+    grid-template-columns: repeat(3, 1fr);
 
-        .singleDestination{
-            height: auto;
-        }
+    .singleDestination {
+      height: auto;
     }
+  }
 }
 
-@media screen and (max-width: 500px){
-    .home{
-        .homeContent{
-
-                .cardDiv{
-                    // grid-template-columns: repeat(2,1fr);
-                    .changedes{
-                        margin-top: 0;
-                        rotate:  90deg;
-                    }
-                }
+@media screen and (max-width: 500px) {
+  .home {
+    .homeContent {
+      .cardDiv {
+        // grid-template-columns: repeat(2,1fr);
+        .changedes {
+          margin-top: 0;
+          rotate: 90deg;
         }
+      }
     }
-
+  }
 }
 
 @media screen and (max-width: 767px) {
-    .home{
-        .homeContent{
-            .cardDiv{
-                .searchOption{
-                    bottom: -1.35rem;
-                    padding: 6px 1rem;
-    
-                    span{
-                        font-size: 14px;
-                    }
-                }
+  .home {
+    .homeContent {
+      .cardDiv {
+        .searchOption {
+          bottom: -1.35rem;
+          padding: 6px 1rem;
 
-            }
+          span {
+            font-size: 14px;
+          }
         }
+      }
     }
+  }
 }
 
 @media screen and (min-width: 768px) {
-    .home{
-        .homeContent{
-            .cardDiv{
-                .searchOption{
-                    bottom: -1.35rem;
-                    padding: 6px 1rem;
-    
-                    span{
-                        font-size: 15px;
-                    }
-                }
+  .home {
+    .homeContent {
+      .cardDiv {
+        .searchOption {
+          bottom: -1.35rem;
+          padding: 6px 1rem;
 
-            }
+          span {
+            font-size: 15px;
+          }
         }
+      }
     }
-    
+  }
 }
 
 @media screen and (min-width: 992px) {
-    .home{
-        .homeContent{
-            .cardDiv{
-                .sizeOne{
-                    display: grid;
-                    grid-gap: 1rem;
-                    grid-template-columns: repeat(3,1fr);
-                }
-                .sizeTwo{
-                    display: grid;
-                    grid-gap: 1rem;
-                    grid-template-columns: repeat(4,1fr);
-                }
-                .searchOption{
-                    bottom: -1.35rem;
-                    padding: 6px 1rem;
-    
-                    span{
-                        font-size: 16px;
-                    }
-                }
-
-            }
+  .home {
+    .homeContent {
+      .cardDiv {
+        .sizeOne {
+          display: grid;
+          grid-gap: 1rem;
+          grid-template-columns: repeat(3, 1fr);
         }
+        .sizeTwo {
+          display: grid;
+          grid-gap: 1rem;
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .searchOption {
+          bottom: -1.35rem;
+          padding: 6px 1rem;
+
+          span {
+            font-size: 16px;
+          }
+        }
+      }
     }
-    
+  }
 }
 
 @media screen and (min-width: 1240px) {
-    .home{
-        height: auto;
+  .home {
+    height: auto;
 
-        .homeContent{
-            padding-left: 0;
-            padding-right: 0;
+    .homeContent {
+      padding-left: 0;
+      padding-right: 0;
 
-            .cardDiv{
-                padding: 2rem 1rem;
-                // grid-template-columns: repeat(3,1fr);
-                justify-content: center;
-                .input{
-                    margin-bottom: 1rem;
-                }
-                .sizeOne{
-                    display: grid;
-                    grid-gap: 1rem;
-                    grid-template-columns: repeat(3,1fr);
-                }
-                .sizeTwo{
-                    display: grid;
-                    grid-gap: 1rem;
-                    grid-template-columns: repeat(4,1fr);
-                }
-
-                .searchOption{
-                    bottom: -1.35rem;
-                    padding: 8px 1rem;
-
-                    span{
-                        font-size: 17px;
-                    }
-                }
-            }
+      .cardDiv {
+        padding: 2rem 1rem;
+        // grid-template-columns: repeat(3,1fr);
+        justify-content: center;
+        .input {
+          margin-bottom: 1rem;
         }
+        .sizeOne {
+          display: grid;
+          grid-gap: 1rem;
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .sizeTwo {
+          display: grid;
+          grid-gap: 1rem;
+          grid-template-columns: repeat(4, 1fr);
+        }
+
+        .searchOption {
+          bottom: -1.35rem;
+          padding: 8px 1rem;
+
+          span {
+            font-size: 17px;
+          }
+        }
+      }
     }
+  }
 }

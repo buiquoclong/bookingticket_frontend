@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import "./BookTicket.scss";
 import pickup from "../../Assets/img/pickup.svg";
 import station from "../../Assets/img/station.svg";
@@ -70,12 +70,7 @@ const BookTicket = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchTrip();
-    fetchKindVehicles();
-  }, [timeStartFrom, timeStartTo, sort, kindVehicleId]);
-
-  const fetchTrip = async () => {
+  const fetchTrip = useCallback(async () => {
     const postData = {
       diemDiId: diemDiId,
       diemDenId: diemDenId,
@@ -101,8 +96,17 @@ const BookTicket = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
-  };
-  const fetchKindVehicles = async () => {
+  }, [
+    diemDiId,
+    diemDenId,
+    dayStart,
+    timeStartFrom,
+    timeStartTo,
+    sort,
+    kindVehicleId,
+  ]);
+
+  const fetchKindVehicles = useCallback(async () => {
     try {
       const response = await fetch("http://localhost:8081/api/kindVehicle");
       const data = await response.json();
@@ -110,7 +114,12 @@ const BookTicket = () => {
     } catch (error) {
       console.error("Error fetching trips:", error);
     }
-  };
+  }, []);
+  useEffect(() => {
+    fetchTrip();
+    fetchKindVehicles();
+  }, [fetchTrip, fetchKindVehicles]);
+
   const handleTabClick = (tab, tripId, kindVehicleId) => {
     // setTabValues((prevState) => ({
     //   ...prevState,
