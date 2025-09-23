@@ -26,7 +26,6 @@ const BookTicket = () => {
   } = location.state || {};
 
   console.log(kind);
-  const [tabValues, setTabValues] = useState({});
   const [selectedSeatsById, setSelectedSeatsById] = useState({});
   const [kindVehicledata, setKindVehicledata] = useState([]);
   const [data, setData] = useState(null);
@@ -35,6 +34,7 @@ const BookTicket = () => {
   const [timeStartTo, setTimeStartTo] = useState("");
   const [kindVehicleId, setKindVehicleId] = useState("");
   const [sort, setSort] = useState("");
+  const [activeTab, setActiveTab] = useState(null);
   const handleTimeChange = (event) => {
     const selectedValue = event.target.value;
     switch (selectedValue) {
@@ -112,10 +112,17 @@ const BookTicket = () => {
     }
   };
   const handleTabClick = (tab, tripId, kindVehicleId) => {
-    setTabValues((prevState) => ({
-      ...prevState,
-      [tripId]: prevState[tripId] === tab ? null : tab,
-    }));
+    // setTabValues((prevState) => ({
+    //   ...prevState,
+    //   [tripId]: prevState[tripId] === tab ? null : tab,
+    // }));
+    // Nếu click lại tab đang mở → đóng
+    if (activeTab && activeTab.tripId === tripId && activeTab.tab === tab) {
+      setActiveTab(null);
+      return;
+    }
+    // Mở tab mới
+    setActiveTab({ tripId, tab });
 
     if (tab === 1) {
       console.log("tab1");
@@ -445,9 +452,18 @@ const BookTicket = () => {
                             <div className="tabChoose_list">
                               <div
                                 className={`tabChoose_tab ${
-                                  tabValues[trip.id] === 1 ? "active" : ""
+                                  activeTab?.tripId === trip.id &&
+                                  activeTab.tab === 1
+                                    ? "active"
+                                    : ""
                                 }`}
-                                onClick={() => handleTabClick(1, trip.id)}
+                                onClick={() =>
+                                  handleTabClick(
+                                    1,
+                                    trip.id,
+                                    trip.vehicle.kindVehicle.id
+                                  )
+                                }
                               >
                                 <div role="tab" className="tabChoose_tab_btn">
                                   <div className="btn_tabName">
@@ -457,7 +473,10 @@ const BookTicket = () => {
                               </div>
                               <div
                                 className={`tabChoose_tab tab1 ${
-                                  tabValues[trip.id] === 3 ? "active" : ""
+                                  activeTab?.tripId === trip.id &&
+                                  activeTab.tab === 3
+                                    ? "active"
+                                    : ""
                                 }`}
                                 onClick={() => handleTabClick(3, trip.id)}
                               >
@@ -470,371 +489,380 @@ const BookTicket = () => {
                             </div>
                           </div>
                         </div>
-                        {tabValues[trip.id] === 1 && (
-                          <div className="chooseTab">
-                            <div className="chooseListTab">
-                              <div className="chooseSeatTab">
-                                <div className="chooseSeatContent">
-                                  <div className="seatCenter">
-                                    <div className="seatLoca">
-                                      <div className="seatLocaInfo">
-                                        <div className="seatNote">
-                                          <span className="seatNote1">
-                                            <div className="seatSaled"></div>Đã
-                                            bán
-                                          </span>
-                                          <span className="seatNote1">
-                                            <div className="seatNonChose"></div>
-                                            Còn trống
-                                          </span>
-                                          <span className="seatNote1 seatNote2">
-                                            <div className="seatChosing"></div>
-                                            Đang chọn
-                                          </span>
-                                        </div>
-                                        <div className="numSeat">
-                                          <div className="bottomSeat">
-                                            <div className="nameBottomSeat">
-                                              <span>Danh sách ghế</span>
-                                              <MdArrowDropDown className="icon" />
-                                            </div>
-                                            <div className="devide"></div>
-                                            <table className="seatBottomnum">
-                                              <tbody>
-                                                {seats &&
-                                                  seats.length > 0 &&
-                                                  chunkArray(seats, 3).map(
-                                                    (seatRow, rowIndex) => (
-                                                      <tr
-                                                        className="seatNum"
-                                                        key={rowIndex}
-                                                      >
-                                                        {seatRow.map(
-                                                          (seat, seatIndex) => {
-                                                            const {
-                                                              src,
-                                                              spanStyle,
-                                                            } =
-                                                              getSeatImageAndStyle(
-                                                                seat.status
-                                                              );
-                                                            const isSelected =
-                                                              selectedSeatsById[
-                                                                trip.id
-                                                              ]?.some(
-                                                                (
-                                                                  selectedSeat
-                                                                ) =>
-                                                                  selectedSeat.id ===
-                                                                  seat.id
-                                                              );
-                                                            return (
-                                                              <React.Fragment
-                                                                key={seat.id}
-                                                              >
-                                                                <td
-                                                                  className="singleSeat"
-                                                                  style={
-                                                                    getSeatImageAndStyle(
-                                                                      seat.status
-                                                                    ).tdStyle
-                                                                  }
-                                                                  onClick={() =>
-                                                                    handleClick(
-                                                                      seat.id,
-                                                                      trip.id
-                                                                    )
-                                                                  }
+                        {activeTab?.tripId === trip.id &&
+                          activeTab.tab === 1 && (
+                            <div className="chooseTab">
+                              <div className="chooseListTab">
+                                <div className="chooseSeatTab">
+                                  <div className="chooseSeatContent">
+                                    <div className="seatCenter">
+                                      <div className="seatLoca">
+                                        <div className="seatLocaInfo">
+                                          <div className="seatNote">
+                                            <span className="seatNote1">
+                                              <div className="seatSaled"></div>
+                                              Đã bán
+                                            </span>
+                                            <span className="seatNote1">
+                                              <div className="seatNonChose"></div>
+                                              Còn trống
+                                            </span>
+                                            <span className="seatNote1 seatNote2">
+                                              <div className="seatChosing"></div>
+                                              Đang chọn
+                                            </span>
+                                          </div>
+                                          <div className="numSeat">
+                                            <div className="bottomSeat">
+                                              <div className="nameBottomSeat">
+                                                <span>Danh sách ghế</span>
+                                                <MdArrowDropDown className="icon" />
+                                              </div>
+                                              <div className="devide"></div>
+                                              <table className="seatBottomnum">
+                                                <tbody>
+                                                  {seats &&
+                                                    seats.length > 0 &&
+                                                    chunkArray(seats, 3).map(
+                                                      (seatRow, rowIndex) => (
+                                                        <tr
+                                                          className="seatNum"
+                                                          key={rowIndex}
+                                                        >
+                                                          {seatRow.map(
+                                                            (
+                                                              seat,
+                                                              seatIndex
+                                                            ) => {
+                                                              const {
+                                                                src,
+                                                                spanStyle,
+                                                              } =
+                                                                getSeatImageAndStyle(
+                                                                  seat.status
+                                                                );
+                                                              const isSelected =
+                                                                selectedSeatsById[
+                                                                  trip.id
+                                                                ]?.some(
+                                                                  (
+                                                                    selectedSeat
+                                                                  ) =>
+                                                                    selectedSeat.id ===
+                                                                    seat.id
+                                                                );
+                                                              return (
+                                                                <React.Fragment
+                                                                  key={seat.id}
                                                                 >
-                                                                  {isSelected ? (
-                                                                    <>
-                                                                      <img
-                                                                        style={{
-                                                                          width:
-                                                                            "32px",
-                                                                        }}
-                                                                        src={
-                                                                          seat_selecting
-                                                                        }
-                                                                        alt="selected seat icon"
-                                                                      />
-                                                                      <span
-                                                                        className="numSeatA"
-                                                                        style={{
-                                                                          color:
-                                                                            "#EF5222",
-                                                                        }}
-                                                                      >
-                                                                        {
-                                                                          seat.name
-                                                                        }
-                                                                      </span>
-                                                                    </>
-                                                                  ) : (
-                                                                    <>
-                                                                      <img
-                                                                        style={{
-                                                                          width:
-                                                                            "32px",
-                                                                        }}
-                                                                        src={
-                                                                          src
-                                                                        }
-                                                                        alt="seat icon"
-                                                                      />
-                                                                      <span
-                                                                        className="numSeatA"
-                                                                        style={
-                                                                          spanStyle
-                                                                        }
-                                                                      >
-                                                                        {
-                                                                          seat.name
-                                                                        }
-                                                                      </span>
-                                                                    </>
-                                                                  )}
-                                                                </td>
-                                                                {seatIndex <
-                                                                  2 && (
                                                                   <td
-                                                                    style={{
-                                                                      position:
-                                                                        "relative",
-                                                                      width:
-                                                                        "1.5rem",
-                                                                    }}
-                                                                  ></td>
-                                                                )}
-                                                              </React.Fragment>
-                                                            );
-                                                          }
-                                                        )}
-                                                      </tr>
-                                                    )
-                                                  )}
-                                              </tbody>
-                                            </table>
+                                                                    className="singleSeat"
+                                                                    style={
+                                                                      getSeatImageAndStyle(
+                                                                        seat.status
+                                                                      ).tdStyle
+                                                                    }
+                                                                    onClick={() =>
+                                                                      handleClick(
+                                                                        seat.id,
+                                                                        trip.id
+                                                                      )
+                                                                    }
+                                                                  >
+                                                                    {isSelected ? (
+                                                                      <>
+                                                                        <img
+                                                                          style={{
+                                                                            width:
+                                                                              "32px",
+                                                                          }}
+                                                                          src={
+                                                                            seat_selecting
+                                                                          }
+                                                                          alt="selected seat icon"
+                                                                        />
+                                                                        <span
+                                                                          className="numSeatA"
+                                                                          style={{
+                                                                            color:
+                                                                              "#EF5222",
+                                                                          }}
+                                                                        >
+                                                                          {
+                                                                            seat.name
+                                                                          }
+                                                                        </span>
+                                                                      </>
+                                                                    ) : (
+                                                                      <>
+                                                                        <img
+                                                                          style={{
+                                                                            width:
+                                                                              "32px",
+                                                                          }}
+                                                                          src={
+                                                                            src
+                                                                          }
+                                                                          alt="seat icon"
+                                                                        />
+                                                                        <span
+                                                                          className="numSeatA"
+                                                                          style={
+                                                                            spanStyle
+                                                                          }
+                                                                        >
+                                                                          {
+                                                                            seat.name
+                                                                          }
+                                                                        </span>
+                                                                      </>
+                                                                    )}
+                                                                  </td>
+                                                                  {seatIndex <
+                                                                    2 && (
+                                                                    <td
+                                                                      style={{
+                                                                        position:
+                                                                          "relative",
+                                                                        width:
+                                                                          "1.5rem",
+                                                                      }}
+                                                                    ></td>
+                                                                  )}
+                                                                </React.Fragment>
+                                                              );
+                                                            }
+                                                          )}
+                                                        </tr>
+                                                      )
+                                                    )}
+                                                </tbody>
+                                              </table>
+                                            </div>
                                           </div>
                                         </div>
                                       </div>
-                                    </div>
-                                    <div className="devide"></div>
-                                    {selectedSeatsById[trip.id] &&
-                                      selectedSeatsById[trip.id].length > 0 &&
-                                      renderTicketInfo(trip.id)}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                        {tabValues[trip.id] === 3 && (
-                          <div className="chooseTab">
-                            <div className="chooseListTab">
-                              <div className="chooseSeatTab">
-                                <div className="chooseSeatContent">
-                                  <div className="policyCenter">
-                                    <div className="policyItem">
-                                      <div className="content">
-                                        <div className="itemContent">
-                                          Chính sách hủy vé
-                                        </div>
-                                        <div className="listpolicy">
-                                          <div className="listpolicyItem">
-                                            <ul>
-                                              <li>
-                                                <p>
-                                                  Chỉ được chuyển đổi vé 1 lần
-                                                  duy nhất
-                                                </p>
-                                              </li>
-                                              <li>
-                                                <p>
-                                                  Chi phí hủy vé từ 10% – 30%
-                                                  giá vé tùy thuộc thời gian hủy
-                                                  vé so với giờ khởi hành ghi
-                                                  trên vé và số lượng vé cá
-                                                  nhân/tập thể áp dụng theo các
-                                                  quy định hiện hành.
-                                                </p>
-                                              </li>
-                                              <li>
-                                                <p>
-                                                  Quý khách khi có nhu cầu muốn
-                                                  thay đổi hoặc hủy vé đã thanh
-                                                  toán, cần liên hệ với Trung
-                                                  tâm tổng đài 1900 6067 hoặc
-                                                  quầy vé chậm nhất trước 24h so
-                                                  với giờ xe khởi hành được ghi
-                                                  trên vé, trên email hoặc tin
-                                                  nhắn để được hướng dẫn thêm.
-                                                </p>
-                                              </li>
-                                            </ul>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div className="policyItem">
-                                      <div className="content">
-                                        <div className="itemContent">
-                                          Yêu cầu khi lên xe
-                                        </div>
-                                        <div className="listpolicy">
-                                          <div className="listpolicyItem">
-                                            <ul>
-                                              <li>
-                                                <p>
-                                                  Có mặt tại Văn phòng/Bến xe
-                                                  (Địa điểm xe đón trực tiếp)
-                                                  trước 30 phút để làm thủ tục
-                                                  lên xe (đối với ngày lễ tết
-                                                  cần ra trước 60 phút).
-                                                </p>
-                                              </li>
-                                              <li>
-                                                <p>
-                                                  Xuất trình thông tin vé được
-                                                  gửi qua SMS/Email hoặc liên hệ
-                                                  quầy vé để nhận thông tin vé
-                                                  trước khi lên xe
-                                                </p>
-                                              </li>
-                                              <li>
-                                                <p>
-                                                  Không mang thức ăn/đồ uống có
-                                                  mùi lên xe.
-                                                </p>
-                                              </li>
-                                              <li>
-                                                <p>
-                                                  Không hút thuốc, không sử dụng
-                                                  đồ uống có cồn hoặc sử dụng
-                                                  chất kích thích trên xe.
-                                                </p>
-                                              </li>
-                                              <li>
-                                                <p>
-                                                  Không mang các vật dễ cháy nổ
-                                                  lên xe.
-                                                </p>
-                                              </li>
-                                              <li>
-                                                <p>Không vứt rác trên xe.</p>
-                                              </li>
-                                              <li>
-                                                <p>
-                                                  Không mang động vật lên xe.
-                                                </p>
-                                              </li>
-                                            </ul>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div className="policyItem">
-                                      <div className="content">
-                                        <div className="itemContent">
-                                          hành lý xách tay
-                                        </div>
-                                        <div className="listpolicy">
-                                          <div className="listpolicyItem">
-                                            <ul>
-                                              <li>
-                                                <p>
-                                                  Tổng trọng lượng hành lý không
-                                                  vượt quá 20kg
-                                                </p>
-                                              </li>
-                                              <li>
-                                                <p>
-                                                  Không vận chuyển hàng hoá cồng
-                                                  kềnh
-                                                </p>
-                                              </li>
-                                            </ul>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div className="policyItem">
-                                      <div className="content">
-                                        <div className="itemContent">
-                                          Trẻ em dưới 6 tuổi và phụ nữ có thai
-                                        </div>
-                                        <div className="listpolicy">
-                                          <div className="listpolicyItem">
-                                            <ul>
-                                              <li>
-                                                <p>
-                                                  Trẻ em dưới 6 tuổi, cao từ
-                                                  1.3m trở xuống, cân nặng dưới
-                                                  30kg thì không phải mua vé.
-                                                </p>
-                                              </li>
-                                              <li>
-                                                <p>
-                                                  Trong trường hợp trẻ em không
-                                                  thoả 1 trong 3 tiêu chí trên
-                                                  sẽ mua 01 vé tương đương với
-                                                  người lớn.
-                                                </p>
-                                              </li>
-                                              <li>
-                                                <p>
-                                                  Mỗi người lớn sẽ đi kèm tối đa
-                                                  một trẻ em.
-                                                </p>
-                                              </li>
-                                              <li>
-                                                <p>
-                                                  Phụ nữ có thai cần đảm bảo sức
-                                                  khoẻ trong suốt quá trình di
-                                                  chuyển.
-                                                </p>
-                                              </li>
-                                            </ul>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div className="policyItem">
-                                      <div className="content">
-                                        <div className="itemContent">
-                                          Vé đón đường
-                                        </div>
-                                        <div className="listpolicy">
-                                          <div className="listpolicyItem">
-                                            <ul>
-                                              <li>
-                                                <p>
-                                                  Trường hợp có nhu cầu lên xe
-                                                  dọc đường, Quý khách vui lòng
-                                                  đăng kí trước ít nhất 2 tiếng
-                                                  so với giờ xe khởi hành và vui
-                                                  lòng chuẩn bị hành lý nhỏ gọn
-                                                  (tối đa 20kg).
-                                                </p>
-                                              </li>
-                                              <li>
-                                                <p>
-                                                  Lưu ý, chúng tôi chỉ hỗ trợ
-                                                  đón ở một số địa điểm thuận
-                                                  tiện nằm trên lộ trình
-                                                </p>
-                                              </li>
-                                            </ul>
-                                          </div>
-                                        </div>
-                                      </div>
+                                      <div className="devide"></div>
+                                      {selectedSeatsById[trip.id] &&
+                                        selectedSeatsById[trip.id].length > 0 &&
+                                        renderTicketInfo(trip.id)}
                                     </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          )}
+                        {activeTab?.tripId === trip.id &&
+                          activeTab.tab === 3 && (
+                            <div className="chooseTab">
+                              <div className="chooseListTab">
+                                <div className="chooseSeatTab">
+                                  <div className="chooseSeatContent">
+                                    <div className="policyCenter">
+                                      <div className="policyItem">
+                                        <div className="content">
+                                          <div className="itemContent">
+                                            Chính sách hủy vé
+                                          </div>
+                                          <div className="listpolicy">
+                                            <div className="listpolicyItem">
+                                              <ul>
+                                                <li>
+                                                  <p>
+                                                    Chỉ được chuyển đổi vé 1 lần
+                                                    duy nhất
+                                                  </p>
+                                                </li>
+                                                <li>
+                                                  <p>
+                                                    Chi phí hủy vé từ 10% – 30%
+                                                    giá vé tùy thuộc thời gian
+                                                    hủy vé so với giờ khởi hành
+                                                    ghi trên vé và số lượng vé
+                                                    cá nhân/tập thể áp dụng theo
+                                                    các quy định hiện hành.
+                                                  </p>
+                                                </li>
+                                                <li>
+                                                  <p>
+                                                    Quý khách khi có nhu cầu
+                                                    muốn thay đổi hoặc hủy vé đã
+                                                    thanh toán, cần liên hệ với
+                                                    Trung tâm tổng đài 1900 6067
+                                                    hoặc quầy vé chậm nhất trước
+                                                    24h so với giờ xe khởi hành
+                                                    được ghi trên vé, trên email
+                                                    hoặc tin nhắn để được hướng
+                                                    dẫn thêm.
+                                                  </p>
+                                                </li>
+                                              </ul>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="policyItem">
+                                        <div className="content">
+                                          <div className="itemContent">
+                                            Yêu cầu khi lên xe
+                                          </div>
+                                          <div className="listpolicy">
+                                            <div className="listpolicyItem">
+                                              <ul>
+                                                <li>
+                                                  <p>
+                                                    Có mặt tại Văn phòng/Bến xe
+                                                    (Địa điểm xe đón trực tiếp)
+                                                    trước 30 phút để làm thủ tục
+                                                    lên xe (đối với ngày lễ tết
+                                                    cần ra trước 60 phút).
+                                                  </p>
+                                                </li>
+                                                <li>
+                                                  <p>
+                                                    Xuất trình thông tin vé được
+                                                    gửi qua SMS/Email hoặc liên
+                                                    hệ quầy vé để nhận thông tin
+                                                    vé trước khi lên xe
+                                                  </p>
+                                                </li>
+                                                <li>
+                                                  <p>
+                                                    Không mang thức ăn/đồ uống
+                                                    có mùi lên xe.
+                                                  </p>
+                                                </li>
+                                                <li>
+                                                  <p>
+                                                    Không hút thuốc, không sử
+                                                    dụng đồ uống có cồn hoặc sử
+                                                    dụng chất kích thích trên
+                                                    xe.
+                                                  </p>
+                                                </li>
+                                                <li>
+                                                  <p>
+                                                    Không mang các vật dễ cháy
+                                                    nổ lên xe.
+                                                  </p>
+                                                </li>
+                                                <li>
+                                                  <p>Không vứt rác trên xe.</p>
+                                                </li>
+                                                <li>
+                                                  <p>
+                                                    Không mang động vật lên xe.
+                                                  </p>
+                                                </li>
+                                              </ul>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="policyItem">
+                                        <div className="content">
+                                          <div className="itemContent">
+                                            hành lý xách tay
+                                          </div>
+                                          <div className="listpolicy">
+                                            <div className="listpolicyItem">
+                                              <ul>
+                                                <li>
+                                                  <p>
+                                                    Tổng trọng lượng hành lý
+                                                    không vượt quá 20kg
+                                                  </p>
+                                                </li>
+                                                <li>
+                                                  <p>
+                                                    Không vận chuyển hàng hoá
+                                                    cồng kềnh
+                                                  </p>
+                                                </li>
+                                              </ul>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="policyItem">
+                                        <div className="content">
+                                          <div className="itemContent">
+                                            Trẻ em dưới 6 tuổi và phụ nữ có thai
+                                          </div>
+                                          <div className="listpolicy">
+                                            <div className="listpolicyItem">
+                                              <ul>
+                                                <li>
+                                                  <p>
+                                                    Trẻ em dưới 6 tuổi, cao từ
+                                                    1.3m trở xuống, cân nặng
+                                                    dưới 30kg thì không phải mua
+                                                    vé.
+                                                  </p>
+                                                </li>
+                                                <li>
+                                                  <p>
+                                                    Trong trường hợp trẻ em
+                                                    không thoả 1 trong 3 tiêu
+                                                    chí trên sẽ mua 01 vé tương
+                                                    đương với người lớn.
+                                                  </p>
+                                                </li>
+                                                <li>
+                                                  <p>
+                                                    Mỗi người lớn sẽ đi kèm tối
+                                                    đa một trẻ em.
+                                                  </p>
+                                                </li>
+                                                <li>
+                                                  <p>
+                                                    Phụ nữ có thai cần đảm bảo
+                                                    sức khoẻ trong suốt quá
+                                                    trình di chuyển.
+                                                  </p>
+                                                </li>
+                                              </ul>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="policyItem">
+                                        <div className="content">
+                                          <div className="itemContent">
+                                            Vé đón đường
+                                          </div>
+                                          <div className="listpolicy">
+                                            <div className="listpolicyItem">
+                                              <ul>
+                                                <li>
+                                                  <p>
+                                                    Trường hợp có nhu cầu lên xe
+                                                    dọc đường, Quý khách vui
+                                                    lòng đăng kí trước ít nhất 2
+                                                    tiếng so với giờ xe khởi
+                                                    hành và vui lòng chuẩn bị
+                                                    hành lý nhỏ gọn (tối đa
+                                                    20kg).
+                                                  </p>
+                                                </li>
+                                                <li>
+                                                  <p>
+                                                    Lưu ý, chúng tôi chỉ hỗ trợ
+                                                    đón ở một số địa điểm thuận
+                                                    tiện nằm trên lộ trình
+                                                  </p>
+                                                </li>
+                                              </ul>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                       </div>
                       <button
                         className="btn buttonChooseRoute"
