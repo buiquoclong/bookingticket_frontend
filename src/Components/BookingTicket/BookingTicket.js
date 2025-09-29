@@ -518,9 +518,6 @@ const BookingTicket = () => {
                   {showLocationInput && (
                     <div className="lineInfo">
                       <span>Nơi đón:</span>
-                      {/* <div>
-                                                        <input type="text" className="Note" placeholder="Nhập nơi đón ở đây" onChange={handlePickupLocationChange}/>
-                                                    </div> */}
                       <div className="selectChoose">
                         <select
                           className="Note"
@@ -622,13 +619,6 @@ const BookingTicket = () => {
                       </div>
                     </div>
                     <div className="lineInfo lineInfoCheck">
-                      {/* <span>Chọn điểm đón:</span>
-                                                <div className="selectChoose">
-                                                    <select onChange={handleSelectChange}>
-                                                        <option value="No">Không</option>
-                                                        <option value="Yes">Có</option>
-                                                    </select>
-                                                </div> */}
                       <FormGroup>
                         <FormControlLabel
                           control={
@@ -645,9 +635,6 @@ const BookingTicket = () => {
                     {showLocationInput && (
                       <div className="lineInfo">
                         <span>Nơi đón:</span>
-                        {/* <div>
-                                                        <input type="text" className="Note" placeholder="Nhập nơi đón ở đây" onChange={handlePickupLocationChange}/>
-                                                    </div> */}
                         <div className="selectChoose">
                           <select
                             className="Note"
@@ -721,14 +708,6 @@ const BookingTicket = () => {
                       </div>
                     </div>
                     <div className="lineInfo lineInfoCheck">
-                      {/* <span>Chọn điểm đón:</span>
-                                                <div className="selectChoose">
-                                                    <select onChange={handleSelectRetrunChange}>
-                                                        <option value="No">Không</option>
-                                                        <option value="Yes">Có</option>
-                                                    </select>
-                                                </div> */}
-
                       <FormGroup>
                         <FormControlLabel
                           control={
@@ -745,9 +724,6 @@ const BookingTicket = () => {
                     {showLocationRetrunInput && (
                       <div className="lineInfo">
                         <span>Nơi đón:</span>
-                        {/* <div>
-                                                        <input type="text" className="Note" placeholder="Nhập nơi đón ở đây" onChange={handlePickupLocationReturnChange}/>
-                                                    </div> */}
                         <div className="selectChoose">
                           <select
                             className="Note"
@@ -874,7 +850,6 @@ const BookingTicket = () => {
               onChange={(e) => setDiscountCode(e.target.value)}
               disabled={isDiscountApplied}
             />
-            {/* <Button variant="contained" onClick={handleApplyDiscount}>Áp dụng</Button> */}
             {isDiscountApplied ? (
               <Button variant="contained" onClick={handleCancelDiscount}>
                 Hủy
