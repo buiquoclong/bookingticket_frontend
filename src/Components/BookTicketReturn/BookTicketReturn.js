@@ -123,42 +123,6 @@ const BookTicketReturn = () => {
     fetchTrip();
     fetchKindVehicles();
   }, [fetchTrip, fetchKindVehicles]);
-  //   const fetchTrip = async () => {
-  //     const postData = {
-  //       diemDiId: diemDenId,
-  //       diemDenId: diemDiId,
-  //       dayStart: dayReturn,
-  //       timeStartFrom: timeStartFrom,
-  //       timeStartTo: timeStartTo,
-  //       kindVehicleId: kindVehicleId,
-  //       sort: sort,
-  //     };
-
-  //     fetch("http://localhost:8081/api/trip/search", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(postData),
-  //     })
-  //       .then((response) => response.json())
-  //       .then((data) => {
-  //         console.log(data);
-  //         setData(data);
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error:", error);
-  //       });
-  //   };
-  //   const fetchKindVehicles = async () => {
-  //     try {
-  //       const response = await fetch("http://localhost:8081/api/kindVehicle");
-  //       const data = await response.json();
-  //       setKindVehicledata(data);
-  //     } catch (error) {
-  //       console.error("Error fetching trips:", error);
-  //     }
-  //   };
 
   const handleTabClick = (tab, tripId, kindVehicleId) => {
     // Nếu click lại tab đang mở → đóng
