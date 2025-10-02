@@ -268,6 +268,7 @@ const BookingTicket = () => {
       total: finalPrice,
       roundTrip: kind === "Khứ hồi" ? 1 : 0,
       userId: userId || null,
+      sendMail: true,
 
       // Lượt đi
       tripId: tripId,
