@@ -3,8 +3,7 @@ import DataTable from "react-data-table-component";
 // import "../AdminReview/AdminReview.scss"
 import { Pagination, Breadcrumbs, Link } from "@mui/material";
 import StarRatings from "react-star-ratings";
-import { toast, ToastContainer, Zoom } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import { FiEdit, FiTrash } from "react-icons/fi";
 import useDebounce from "./useDebounce";
@@ -692,18 +691,6 @@ const AdminReview = () => {
           </div>
         </div>
       )}
-      {/* </section> */}
-      <ToastContainer
-        className="toast-container"
-        toastClassName="toast"
-        bodyClassName="toast-body"
-        progressClassName="toast-progress"
-        theme="colored"
-        transition={Zoom}
-        autoClose={500}
-        hideProgressBar={true}
-        pauseOnHover
-      ></ToastContainer>
     </div>
   );
 };

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import DataTable from "react-data-table-component";
 import "./MyRating.scss";
 import { useNavigate } from "react-router-dom";
 import StarRatings from "react-star-ratings";
-import { toast, ToastContainer, Zoom } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import { Pagination } from "@mui/material";
 import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 
@@ -33,7 +32,6 @@ const MyRating = () => {
 
     return `${formattedHours}:${formattedMinutes} ${formattedDay}/${formattedMonth}/${year}`;
   }
-  const [data, setData] = useState([]);
   const [records, setRecords] = useState([]);
   const userId = localStorage.getItem("userId");
   const [selectedReview, setSelectedReview] = useState(null);
@@ -411,38 +409,30 @@ const MyRating = () => {
     },
   ];
   const ratingsDescription = ["Tệ", "Trung bình", "Tốt", "Rất tốt", "Xuất sắc"];
+
+  const fetchReviews = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8081/api/review/page?page=${page}&size=10&userId=${userId}&rating=${searchValue}`
+      );
+      const data = await response.json();
+      setRecords(data.reviews);
+      setTotalPages(data.totalPages);
+    } catch (error) {
+      console.error("Error fetching review:", error);
+    }
+  }, [userId, page, searchValue]);
+
+  // useEffect xử lý điều hướng và gọi API
   useEffect(() => {
-    // Call the API to fetch cities
     if (userId) {
       fetchReviews();
     } else {
       localStorage.setItem("redirectPath", window.location.pathname);
       navigate("/login");
     }
-  }, [userId, page, searchValue]);
+  }, [userId, fetchReviews, navigate]);
 
-  const fetchReviews = async () => {
-    try {
-      // const response = await fetch(`http://localhost:8081/api/review/user/${userId}/page?page=${page}&size=10`);
-      const response = await fetch(
-        `http://localhost:8081/api/review/page?page=${page}&size=10&userId=${userId}&rating=${searchValue}`
-      );
-      const data = await response.json();
-      setData(data.reviews);
-      setRecords(data.reviews);
-      setTotalPages(data.totalPages);
-    } catch (error) {
-      console.error("Error fetching review:", error);
-    }
-  };
-  function handleFilter(event) {
-    const newData = data.filter((row) => {
-      return row.user.name
-        .toLocaleLowerCase()
-        .includes(event.target.value.toLocaleLowerCase());
-    });
-    setRecords(newData);
-  }
   const handleEditClick = (review) => {
     setSelectedReview(review);
     setRating(review.rating);
@@ -729,19 +719,6 @@ const MyRating = () => {
           </div>
         </div>
       )}
-      {/* </section> */}
-      <ToastContainer
-        containerId="main-container"
-        className="toast-container"
-        toastClassName="toast"
-        bodyClassName="toast-body"
-        progressClassName="toast-progress"
-        theme="colored"
-        transition={Zoom}
-        autoClose={500}
-        hideProgressBar={true}
-        pauseOnHover
-      ></ToastContainer>
     </div>
   );
 };

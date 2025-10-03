@@ -9,8 +9,7 @@ import seat_selecting from "../../../../Assets/img/seat_selecting.svg";
 import empty_list from "../../../../Assets/img/empty_list.svg";
 import { MdArrowDropDown } from "react-icons/md";
 import { FaAngleLeft } from "react-icons/fa";
-import { toast, ToastContainer, Zoom } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
@@ -905,17 +904,6 @@ const AdminBookTicketReturn = () => {
             </div>
           </div>
         </div>
-        <ToastContainer
-          className="toast-container"
-          toastClassName="toast"
-          bodyClassName="toast-body"
-          progressClassName="toast-progress"
-          theme="colored"
-          transition={Zoom}
-          autoClose={500}
-          hideProgressBar={true}
-          pauseOnHover
-        ></ToastContainer>
       </div>
     </main>
   );

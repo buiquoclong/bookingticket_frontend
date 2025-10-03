@@ -266,6 +266,7 @@ const BookingTicket = () => {
       email,
       phone,
       total: finalPrice,
+      kind: kind,
       roundTrip: kind === "Khứ hồi" ? 1 : 0,
       userId: userId || null,
       sendMail: true,
@@ -329,12 +330,27 @@ const BookingTicket = () => {
         // Thanh toán online VNPAY
         const bookingRequest = buildBookingRequest("VNPAY");
 
+        // Lưu booking tạm vào backend trước khi redirect VNPay
+        const responseBooking = await fetch(
+          "http://localhost:8081/api/booking/create",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(bookingRequest),
+          }
+        );
+
+        if (!responseBooking.ok) throw new Error("Lỗi khi tạo booking!");
+        const createdBooking = await responseBooking.json();
+
+        // Lưu booking ID để callback
+        localStorage.setItem("bookingId", createdBooking.id);
         // Lưu booking tạm để xử lý khi callback
         localStorage.setItem("bookingDetails", JSON.stringify(bookingRequest));
 
         // Gọi backend lấy URL thanh toán
         const response = await fetch(
-          `http://localhost:8081/api/payment/pay?total=${finalPrice}`
+          `http://localhost:8081/api/payment/pay?total=${finalPrice}&bookingId=${createdBooking.id}`
         );
         if (!response.ok) throw new Error("Lỗi khi gọi API thanh toán!");
 

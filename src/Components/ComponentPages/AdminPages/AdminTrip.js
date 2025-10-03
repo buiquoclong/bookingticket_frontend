@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import DataTable from "react-data-table-component";
 // import "../AdminTrip/AdminTrip.scss"
-import { toast, ToastContainer, Zoom } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import { Pagination, Breadcrumbs, Link } from "@mui/material";
 import { FiEdit, FiTrash, FiList } from "react-icons/fi";
 
@@ -1287,18 +1286,6 @@ const AdminTrip = () => {
           </div>
         </div>
       )}
-      {/* </section> */}
-      <ToastContainer
-        className="toast-container"
-        toastClassName="toast"
-        bodyClassName="toast-body"
-        progressClassName="toast-progress"
-        theme="colored"
-        transition={Zoom}
-        autoClose={500}
-        hideProgressBar={true}
-        pauseOnHover
-      ></ToastContainer>
     </div>
   );
 };

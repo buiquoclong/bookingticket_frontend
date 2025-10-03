@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { HiFilter } from "react-icons/hi";
 import "./AdminForBookTicket.scss";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer, Zoom } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import { Breadcrumbs, Link } from "@mui/material";
 
 function AdminForBookTicket() {
@@ -322,17 +321,6 @@ function AdminForBookTicket() {
           </div>
         </div>
       </div>
-      <ToastContainer
-        className="toast-container"
-        toastClassName="toast"
-        bodyClassName="toast-body"
-        progressClassName="toast-progress"
-        theme="colored"
-        transition={Zoom}
-        autoClose={2000}
-        hideProgressBar={true}
-        pauseOnHover
-      ></ToastContainer>
     </main>
   );
 }

@@ -2,8 +2,7 @@ import React, { useCallback, useState, useEffect } from "react";
 import "./AdminPay.scss";
 import success from "../../../../Assets/img/success.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { toast, ToastContainer, Zoom } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Backdrop from "@mui/material/Backdrop";
@@ -895,17 +894,6 @@ const AdminPay = () => {
           </div>
         </div>
       </div>
-      <ToastContainer
-        className="toast-container"
-        toastClassName="toast"
-        bodyClassName="toast-body"
-        progressClassName="toast-progress"
-        theme="colored"
-        transition={Zoom}
-        autoClose={500}
-        hideProgressBar={true}
-        pauseOnHover
-      ></ToastContainer>
     </div>
   );
 };

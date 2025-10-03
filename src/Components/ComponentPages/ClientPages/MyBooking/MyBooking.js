@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import DataTable from "react-data-table-component";
 import "./MyBooking.scss";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer, Zoom } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import { Pagination } from "@mui/material";
 import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
-import { FaCreditCard } from "react-icons/fa";
 
 const MyBooking = () => {
   function formatDate1(dateString) {
@@ -25,7 +23,6 @@ const MyBooking = () => {
 
     return `${formattedHours}:${formattedMinutes} ${formattedDay}/${formattedMonth}/${year}`;
   }
-  const [data, setData] = useState([]);
   const [records, setRecords] = useState([]);
   const userId = localStorage.getItem("userId");
   const navigate = useNavigate();
@@ -371,43 +368,35 @@ const MyBooking = () => {
     1: "Đã thanh toán",
     2: "Đã hủy",
   };
-  useEffect(() => {
-    // Call the API to fetch cities
-    const redirectPath = sessionStorage.getItem("redirectPath");
-    const currentPath = window.location.pathname;
-    if (redirectPath === currentPath) {
-      sessionStorage.removeItem("redirectPath");
-    }
-    if (userId) {
-      fetchReviews();
-    } else {
-      sessionStorage.setItem("redirectPath", window.location.pathname);
-      navigate("/login");
-    }
-  }, [userId, page, searchValue]);
-
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     try {
-      // const response = await fetch(`http://localhost:8081/api/booking/user/${userId}/page?page=${page}&size=10`);
       const response = await fetch(
         `http://localhost:8081/api/booking/page?page=${page}&size=5&userId=${userId}&isPaid=${searchValue}`
       );
       const data = await response.json();
-      setData(data.bookings);
       setRecords(data.bookings);
       setTotalPages(data.totalPages);
     } catch (error) {
       console.error("Error fetching detail:", error);
     }
-  };
-  function handleFilter(event) {
-    const newData = data.filter((row) => {
-      return row.user.name
-        .toLocaleLowerCase()
-        .includes(event.target.value.toLocaleLowerCase());
-    });
-    setRecords(newData);
-  }
+  }, [userId, page, searchValue]); // Dependencies
+
+  useEffect(() => {
+    const redirectPath = sessionStorage.getItem("redirectPath");
+    const currentPath = window.location.pathname;
+
+    if (redirectPath === currentPath) {
+      sessionStorage.removeItem("redirectPath");
+    }
+
+    if (userId) {
+      fetchReviews();
+    } else {
+      sessionStorage.setItem("redirectPath", currentPath);
+      navigate("/login");
+    }
+  }, [userId, fetchReviews, navigate]);
+
   const handlePayBookingClick = async (booking) => {
     const total = booking.total;
     const bookingId = booking.id;
@@ -576,7 +565,6 @@ const MyBooking = () => {
 
       <div className="HisContent">
         <div className="searchIn">
-          {/* <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/> */}
           <FormControl
             sx={{ minWidth: 200 }}
             variant="outlined"
@@ -656,19 +644,6 @@ const MyBooking = () => {
           </div>
         </div>
       )}
-      {/* </section> */}
-      <ToastContainer
-        containerId="main-container"
-        className="toast-container"
-        toastClassName="toast"
-        bodyClassName="toast-body"
-        progressClassName="toast-progress"
-        theme="colored"
-        transition={Zoom}
-        autoClose={500}
-        hideProgressBar={true}
-        pauseOnHover
-      ></ToastContainer>
     </div>
   );
 };

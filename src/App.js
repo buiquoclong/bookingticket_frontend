@@ -47,6 +47,7 @@ import AboutUsPage from "./page/Client/AboutUsPage";
 import AdminForBookingPage from "./page/Admin/AdminForBookingPage";
 import AdminCatchPointPage from "./page/Admin/AdminCatchPointPage";
 import AdminKindvehiclePage from "./page/Admin/AdminKindvehiclePage";
+import CustomToastContainer from "./Components/ComponentParts/CustomToastContainer";
 
 const App = () => {
   const [userRole, setUserRole] = useState(null);
@@ -219,6 +220,7 @@ const App = () => {
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      <CustomToastContainer />
     </BrowserRouter>
   );
 };
