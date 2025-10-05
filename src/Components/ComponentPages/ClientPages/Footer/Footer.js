@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./Footer.scss";
+import "../../../../Assets/scss/Clients/Footer.scss";
 import background from "../../../../Assets/img/background.jpg";
 import { FiSend } from "react-icons/fi";
 import { MdTravelExplore } from "react-icons/md";
@@ -9,8 +9,7 @@ import { AiFillInstagram } from "react-icons/ai";
 import { FaTripadvisor } from "react-icons/fa";
 import { FiChevronRight } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import { toast, ToastContainer, Zoom } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 
 import Aos from "aos";
 import "aos/dist/aos.css";
@@ -87,18 +86,19 @@ const Footer = () => {
 
   return (
     <section className="footer">
-      <div className="imgDiv">
-        <img src={background} alt="card" />
+      <div className="footerBackground">
+        <img src={background} alt="footer background" />
+        <div className="overlay"></div>
       </div>
 
       <div className="secContent container">
-        <div className="contactDiv flex">
-          <div className="text">
+        <div className="contactDiv">
+          <div className="contactText">
             <small>KEEP IN TOUCH</small>
-            <h2> Booking with us</h2>
+            <h2>Booking with us</h2>
           </div>
 
-          <div className="inputDiv flex">
+          <div className="contactForm">
             <input
               type="email"
               placeholder="Enter Email Address"
@@ -106,11 +106,7 @@ const Footer = () => {
               onChange={handleEmailChange}
               required
             />
-            <button
-              className="btn flex"
-              type="submit"
-              onClick={handleCreateContact}
-            >
+            <button className="btn" type="submit" onClick={handleCreateContact}>
               SEND <FiSend className="icon" />
             </button>
           </div>
@@ -248,17 +244,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <ToastContainer
-        className="toast-container"
-        toastClassName="toast"
-        bodyClassName="toast-body"
-        progressClassName="toast-progress"
-        theme="colored"
-        transition={Zoom}
-        autoClose={500}
-        hideProgressBar={true}
-        pauseOnHover
-      ></ToastContainer>
     </section>
   );
 };

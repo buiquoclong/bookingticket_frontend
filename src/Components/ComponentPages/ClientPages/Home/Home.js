@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState, useRef } from "react";
-// import "./Home.scss";
-import "../../../../Assets/scss/Home.scss";
+import "../../../../Assets/scss/Clients/Home.scss";
 import background from "../../../../Assets/img/background.jpg";
 import { FiFacebook } from "react-icons/fi";
 import { AiOutlineInstagram } from "react-icons/ai";
