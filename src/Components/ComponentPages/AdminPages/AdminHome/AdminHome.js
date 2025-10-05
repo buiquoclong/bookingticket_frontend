@@ -20,7 +20,6 @@ import {
   //   Pie,
 } from "recharts";
 import "./AdminHome.scss";
-import "react-toastify/dist/ReactToastify.css";
 
 function AdminHome() {
   const [totalAll, setTotalAll] = useState(null);

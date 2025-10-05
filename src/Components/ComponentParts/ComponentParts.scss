@@ -1,0 +1,506 @@
+@import "../../Assets/scss/variables.scss";
+
+/* ============ ROUTE CARD ============ */
+.routeCard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 10px;
+  background: var(--cardBG);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .imageContainer {
+    width: 100%;
+    height: 180px; // chiều cao cố định card
+    border-radius: 10px 10px 0 0; // bo góc đẹp
+    overflow: hidden;
+    position: relative;
+
+    .routeImage {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease; // hover mượt
+      display: block;
+
+      &:hover {
+        transform: scale(1.1); // zoom nhẹ khi hover
+      }
+    }
+  }
+
+  .cardInfo {
+    flex: 1; // chiếm toàn bộ không gian còn lại
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem;
+
+    .routeHeader {
+      margin-bottom: 1rem;
+      .desTitle {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.6rem;
+        color: var(--blackColor);
+      }
+
+      .routeLocations {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--textColor);
+
+        .locationItem {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          max-width: 120px; // giới hạn chỉ cho text, không ảnh hưởng icon
+          overflow: hidden;
+
+          .icon {
+            flex-shrink: 0; // icon không bị co khi text dài
+            color: var(--PrimaryColor);
+            font-size: 1rem;
+          }
+
+          .locationName {
+            font-weight: 500;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+          }
+        }
+
+        .separator {
+          flex-shrink: 0; // separator luôn hiện
+          margin: 0 0.5rem;
+          color: var(--greyText);
+          font-weight: 700;
+          white-space: nowrap;
+        }
+      }
+    }
+
+    .routeStats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      background: var(--gradientColor);
+      color: var(--whiteColor);
+      font-weight: 600;
+      margin-bottom: 1rem;
+
+      min-height: 60px; // cố định chiều cao tối thiểu, đồng bộ
+      box-sizing: border-box;
+
+      .statItem {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        .label {
+          font-size: 0.85rem;
+          font-weight: 500;
+          opacity: 0.85;
+        }
+
+        .value {
+          font-size: 1.1rem;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 0.2rem;
+
+          small {
+            font-size: 0.8rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            padding: 0 0.3rem;
+          }
+        }
+      }
+    }
+
+    .desc {
+      flex-grow: 1; // để chiếm chỗ còn lại nếu nội dung ít
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 0.5rem; // khoảng cách giữa các dòng
+      font-size: 0.95rem;
+      color: var(--textColor);
+      margin-bottom: 1rem;
+
+      .descItem {
+        display: flex;
+        justify-content: space-between; // label bên trái, value bên phải
+        align-items: center;
+        padding: 0.3rem 0;
+        border-bottom: 1px solid var(--greyText); // dòng phân cách nhẹ
+
+        &:last-child {
+          border-bottom: none; // bỏ border cho dòng cuối
+        }
+
+        .label {
+          font-weight: 600;
+          color: var(--blackColor);
+        }
+
+        .value {
+          font-weight: 500;
+          color: var(--PrimaryColor); // hoặc một màu nổi bật hơn
+        }
+      }
+    }
+
+    .btn {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--whiteColor);
+      cursor: pointer;
+      overflow: hidden;
+      background: none;
+
+      /* Gradient mặc định */
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          hsl(187, 85%, 43%),
+          hsl(199, 100%, 33%)
+        );
+        z-index: 0;
+        transition: opacity 0.5s ease;
+      }
+
+      /* Gradient hover */
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          hsl(199, 100%, 33%),
+          hsl(187, 85%, 43%)
+        );
+        z-index: 0;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+
+      /* Nội dung luôn trên gradient */
+      > .btnText,
+      > .icon {
+        position: relative;
+        z-index: 1;
+      }
+
+      &:hover::after {
+        opacity: 1; /* Gradually show hover gradient */
+      }
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 150, 136, 0.6);
+      }
+
+      .icon {
+        font-size: 1.1rem;
+        transition: transform 1s ease; // Di chuyển mượt
+      }
+
+      &:hover .icon {
+        transform: translateX(150px); // dịch icon sang phải khi hover
+      }
+    }
+  }
+}
+
+/* ============ SEARCH TRIP FORM ============ */
+
+.cardDiv {
+  position: relative;
+  width: 100%;
+  max-width: 650px; // chiều rộng tối đa của card
+  margin: 0 auto;
+  background: var(--whiteColor);
+  border-radius: 16px;
+  padding: 2rem 2rem 3rem; // tăng padding dưới để chứa nút tìm chuyến
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  }
+
+  /* ---- Loại chuyến đi ---- */
+  .trip-type-card {
+    width: 100%;
+    max-width: 600px;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    .trip-type-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1e293b;
+      letter-spacing: 0.2px;
+    }
+
+    .trip-type-toggle {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 240px;
+      background: #f9fafb;
+      border-radius: 50px;
+      border: 1px solid #e2e8f0;
+      padding: 4px;
+      overflow: hidden;
+      transition: all 0.35s ease;
+
+      .trip-option {
+        position: relative;
+        z-index: 2;
+        flex: 1;
+        text-align: center;
+        padding: 0.5rem 0.8rem;
+        border-radius: 50px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #4b5563;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.3s ease;
+
+        input {
+          display: none;
+        }
+
+        &:hover {
+          color: #2563eb;
+        }
+
+        &.active {
+          color: #ffffff;
+        }
+      }
+
+      .active-bg {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 48%;
+        height: calc(100% - 6px);
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        border-radius: 50px;
+        box-shadow: 0 0 8px rgba(37, 99, 235, 0.3);
+        transition: all 0.35s ease-in-out;
+        z-index: 1;
+
+        &.right {
+          left: 49%;
+        }
+      }
+    }
+  }
+
+  /* ---- Form chọn chuyến đi ---- */
+  .trip-form {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    background: #ffffff;
+    padding: 2rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    position: relative;
+
+    .trip-field {
+      flex: 1 1 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.35s ease;
+
+      &.return-field {
+        width: 0; // ban đầu ẩn
+        opacity: 0;
+        overflow: hidden;
+        transform: scaleX(0.3) translateX(-20%);
+        transition: all 2s ease;
+      }
+
+      &.return-field.active {
+        width: 220px; // hiện ra
+        opacity: 1;
+        transform: scaleX(1) translateX(0);
+      }
+
+      label {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #1e293b;
+      }
+
+      .trip-input {
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        padding: 0.65rem 0.9rem;
+        font-size: 0.95rem;
+        background: #f9fafb;
+        color: #374151;
+        transition: all 0.35s ease;
+
+        &:hover {
+          background: #f3f4f6;
+          border-color: #93c5fd;
+        }
+
+        &:focus {
+          outline: none;
+          border-color: #3b82f6;
+          background: #fff;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        &[type="date"] {
+          &::-webkit-calendar-picker-indicator {
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
+
+  /* ---- Nút tìm chuyến ---- */
+  .searchOption {
+    position: absolute;
+    bottom: -1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(
+      135deg,
+      var(--PrimaryColor),
+      var(--SecondaryColor)
+    );
+    color: var(--whiteColor);
+    padding: 0.8rem 2rem;
+    border-radius: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border: 2px solid transparent;
+    transition: all 0.35s ease-in-out;
+    letter-spacing: 0.5px;
+
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        var(--SecondaryColor),
+        var(--PrimaryColor)
+      );
+      transform: translateX(-50%) scale(1.08);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    &:active {
+      transform: translateX(-50%) scale(0.96);
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .icon {
+      font-size: 18px;
+      transition: transform 0.35s ease;
+    }
+
+    &:hover .icon {
+      transform: rotate(360deg);
+      transition: transform 1.5s ease;
+    }
+
+    span {
+      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 768px) {
+    padding: 1.5rem 1.2rem 4rem;
+    gap: 1.5rem;
+
+    .trip-type-card,
+    .trip-form {
+      max-width: 100%;
+      width: 100%;
+    }
+
+    .trip-form {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      padding: 1.5rem;
+    }
+
+    .searchOption {
+      padding: 0.8rem 1.5rem;
+      font-size: 13px;
+    }
+  }
+}
