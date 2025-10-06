@@ -1,188 +1,167 @@
-import React, {useState, useEffect} from "react";
-import "./ChangePass.scss";
-import {useNavigate } from 'react-router-dom';
-import { FaEye, FaEyeSlash  } from "react-icons/fa";
-import { toast, ToastContainer, Zoom } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState } from "react";
+import "../../../../Assets/scss/Clients/ChangePass.scss";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import PasswordInput from "../../../ComponentParts/PasswordInput";
 
+const ChangePass = () => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("userId");
 
-const ChangePass  = () => {
-    
-    const [data, setData] = useState(null);
-    
-    const [showNowPassword, setShowNowPassword] = useState(false);
-    const [showNewPassword, setShowNewPassword] = useState(false);
-    const [showReNewPassword, setShowReNewPassword] = useState(false);
-    
-    const [nowPassErrorMessage, setNowPassErrorMessage] = useState('');
-    const [newPassErrorMessage, setNewPassErrorMessage] = useState('');
-    const [renewPassErrorMessage, setReNewPassErrorMessage] = useState('');
+  const [form, setForm] = useState({
+    nowPass: "",
+    newPass: "",
+    reNewPass: "",
+  });
 
-    const [nowPass, setNowPass] = useState("");
-    const [newPass, setNewPass] = useState("");
-    const [reNewPass, setReNewPass] = useState("");
+  const [errors, setErrors] = useState({
+    nowPass: "",
+    newPass: "",
+    reNewPass: "",
+  });
 
-    const navigate = useNavigate();
-    const toggleNowPasswordVisibility = () => {
-        setShowNowPassword(!showNowPassword);
-    };
+  const [show, setShow] = useState({
+    nowPass: false,
+    newPass: false,
+    reNewPass: false,
+  });
 
-    const toggleNewPasswordVisibility = () => {
-        setShowNewPassword(!showNewPassword);
-    };
+  const toggleShowPassword = (key) => {
+    setShow((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
-    const toggleReNewPasswordVisibility = () => {
-        setShowReNewPassword(!showReNewPassword);
-    };
-    const userId = localStorage.getItem("userId");
-        useEffect(() => {
-            if (userId) {
-            fetchUserInfo();
+  const handleChange = (key, value) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const canUpdatePassword = form.nowPass && form.newPass && form.reNewPass;
+
+  const validatePassword = (password) =>
+    password.length >= 8 &&
+    password.length <= 32 &&
+    /[a-zA-Z]/.test(password) &&
+    /[0-9]/.test(password);
+
+  const handleUpdatePass = async () => {
+    // Reset errors
+    setErrors({ nowPass: "", newPass: "", reNewPass: "" });
+
+    if (form.newPass !== form.reNewPass) {
+      setErrors((prev) => ({
+        ...prev,
+        reNewPass: "Mật khẩu nhập lại không khớp.",
+      }));
+      return;
+    }
+
+    if (!validatePassword(form.newPass)) {
+      setErrors((prev) => ({
+        ...prev,
+        newPass: "Mật khẩu không đúng định dạng",
+      }));
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:8081/api/user/${userId}/change-password`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            oldPassword: form.nowPass,
+            newPassword: form.newPass,
+          }),
         }
-    }, [userId]);
-    
-    const fetchUserInfo = async () => {
-        try {
-            const response = await fetch(`http://localhost:8081/api/user/${userId}`);
-            const data = await response.json();
-            if (response.ok) {
-                setData(data);
-            } else {
-                console.error("Error fetching user data:", data.message);
-            }
-        } catch (error) {
-            console.error("Error fetching cities:", error);
-        }
-    };
-    const handleNowPassChange = (event) => {
-        setNowPass(event.target.value);
-    };
-    const handleNewPassChange = (event) => {
-        setNewPass(event.target.value);
-    };
-    const handleReNewPassChange = (event) => {
-        setReNewPass(event.target.value);
-    };
-    const canUpdatePassword = nowPass && newPass && reNewPass;
-    
-    const validatePassword = (password) => {
-        return password.length >= 8 && password.length <= 32 && /[a-zA-Z]/.test(password) && /[0-9]/.test(password);
-    };
+      );
 
-    const handleupdatePass = async () => {
+      const data = await response.text();
 
-        if (newPass !== reNewPass) {
-            setReNewPassErrorMessage('Mật khẩu nhập lại không khớp.');
-            return;
-        } else {
-            setReNewPassErrorMessage('');
-            if (!validatePassword(newPass)) {
-            setNewPassErrorMessage('Mật khẩu không đúng định dạng');
-            return;
-            } else {
-                setNewPassErrorMessage('');
-                    setNowPassErrorMessage("");
-                    try {
-                        // Sau khi cập nhật thành công, cập nhật lại booking
-                        const updatePass = {
-                                oldPassword: nowPass,
-                                newPassword: newPass
-                        };
-                        const updatePassResponse = await fetch(`http://localhost:8081/api/user/${userId}/change-password`, {
-                            method: 'PUT', // hoặc 'PATCH' tùy vào API của bạn
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(updatePass), // Cập nhật trạng thái của booking thành 'cancelled'
-                        });
-        
-                        if (updatePassResponse.ok) {
-                            const data = await updatePassResponse.text();
-                            if(data === "Mật khẩu cũ không đúng"){
-                                toast.error("Mật khẩu cũ không đúng");
-                                return;
-                            }
-                            toast.success("Bạn đã đổi mật khẩu thành công");
-                            localStorage.removeItem("userId");
-                            setTimeout(() => {
-                                localStorage.removeItem("token");
-                                localStorage.removeItem("userId"); 
-                                localStorage.removeItem("userRole");
-                                localStorage.removeItem("googleLogin");
-                                navigate("/login");
-                            }, 2000);
-                        } else {
-                            // Xử lý lỗi nếu có
-                            console.error('Failed to update pass:', updatePassResponse.statusText);
-                        }
-                    } catch (error) {
-                        console.error("Error update:", error);
-                    }
-            }
-        }
-    };
-    
+      if (!response.ok) {
+        toast.error("Có lỗi xảy ra. Vui lòng thử lại!");
+        console.error("Failed to update password:", data);
+        return;
+      }
 
-    
-    return (
-            <section className="main container section">
-                <div className="infoContent ">
-                    <div className="secTitle">
-                        <h3 data-aos="fade-right" className="title">
-                            Đổi mật khẩu
-                        </h3>
-                    </div>
-                    <div className="infoPassUser">
-                        <div className="passInfo">
-                            <span>Mật khẩu hiện tại:</span>
-                            <div className="form-feild">
-                                <input type={showNowPassword ? 'text' : 'password'} className="input" placeholder="Nhập lại mật khẩu" required  value={nowPass} onChange={handleNowPassChange}/>      
-                                {showNowPassword ? <FaEyeSlash onClick={toggleNowPasswordVisibility} className="icon"/> : <FaEye onClick={toggleNowPasswordVisibility} className="icon"/>}
-                                {nowPassErrorMessage && <p style={{lineHeight:"1.5", fontSize:"12px", color:"red", paddingLeft:".3rem"  }}>{nowPassErrorMessage}</p>}
-                            </div>
-                        </div>
-                        <div className="passInfo">
-                            <span>Mật khẩu mới:</span>
-                            <div className="form-feild">
-                                <input type={showNewPassword ? 'text' : 'password'} className="input" placeholder="Nhập lại mật khẩu" required  value={newPass} onChange={handleNewPassChange}/>
-                                {newPassErrorMessage ?<p style={{lineHeight:"1.5", fontSize:"12px", color:"red", paddingLeft:".3rem"  }}>{newPassErrorMessage}</p> : <p style={{lineHeight:"1.5", fontSize:"12px", color:"black", paddingLeft:".3rem" }}>Mật khẩu phải dài từ 8 đến 32 ký tự, bao gồm chữ và số</p> }
-                                {showNewPassword ? <FaEyeSlash onClick={toggleNewPasswordVisibility} className="icon"/> : <FaEye onClick={toggleNewPasswordVisibility} className="icon"/>}
-                            </div>
-                        </div>
-                        <div className="passInfo">
-                            <span>Nhập lại mật khẩu mới:</span>
-                            <div className="form-feild">
-                                <input type={showReNewPassword ? 'text' : 'password'} className="input" placeholder="Nhập lại mật khẩu" required  value={reNewPass} onChange={handleReNewPassChange}/>
-                                {renewPassErrorMessage && <p style={{lineHeight:"1.5", fontSize:"12px", color:"red", paddingLeft:".3rem"  }}>{renewPassErrorMessage}</p>}
-                                {showReNewPassword ? <FaEyeSlash onClick={toggleReNewPasswordVisibility} className="icon"/> : <FaEye onClick={toggleReNewPasswordVisibility} className="icon"/>}
-                            </div>
-                        </div>
-                        
-                        <div className="buttonSave">
-                            <button
-                                className={canUpdatePassword ? 'btn save' : ' disabled'}
-                                disabled={!canUpdatePassword}
-                                onClick={handleupdatePass}
-                                >
-                                Đổi mật khẩu
-                            </button>
-                        </div>
-                        
-                    </div>
-                </div>
-                <ToastContainer
-                        containerId="main"
-                        className="toast-container"
-                        toastClassName="toast"
-                        bodyClassName="toast-body"
-                        progressClassName="toast-progress"
-                        theme='colored'
-                        transition={Zoom}
-                        autoClose={500}
-                        hideProgressBar={true}
-                        pauseOnHover
-                    ></ToastContainer>
-            </section>
-    )
-}
+      if (data === "Mật khẩu cũ không đúng") {
+        toast.error("Mật khẩu cũ không đúng");
+        return;
+      }
+
+      toast.success("Bạn đã đổi mật khẩu thành công");
+      setTimeout(() => {
+        ["token", "userId", "userRole", "googleLogin"].forEach((item) =>
+          localStorage.removeItem(item)
+        );
+        navigate("/login");
+      }, 2000);
+    } catch (error) {
+      console.error("Error updating password:", error);
+      toast.error("Có lỗi xảy ra. Vui lòng thử lại!");
+    }
+  };
+
+  return (
+    <section className="change-password container section">
+      <div className="change-password__content">
+        <div className="change-password__header">
+          <h3 data-aos="fade-right" className="change-password__title">
+            Đổi mật khẩu
+          </h3>
+          <p className="change-password__subtitle">
+            Cập nhật mật khẩu mới để bảo vệ tài khoản của bạn an toàn hơn.
+          </p>
+        </div>
+
+        <div
+          className="change-password__form"
+          data-aos="fade-up"
+          data-aos-duration="1000"
+        >
+          <PasswordInput
+            label="Mật khẩu hiện tại:"
+            placeholder="Nhập mật khẩu hiện tại"
+            value={form.nowPass}
+            onChange={(e) => handleChange("nowPass", e.target.value)}
+            showPassword={show.nowPass}
+            toggleShow={() => toggleShowPassword("nowPass")}
+            errorMessage={errors.nowPass}
+          />
+
+          <PasswordInput
+            label="Mật khẩu mới:"
+            placeholder="Nhập mật khẩu mới"
+            value={form.newPass}
+            onChange={(e) => handleChange("newPass", e.target.value)}
+            showPassword={show.newPass}
+            toggleShow={() => toggleShowPassword("newPass")}
+            errorMessage={errors.newPass}
+            hintText="Mật khẩu phải dài từ 8 đến 32 ký tự, bao gồm chữ và số"
+          />
+
+          <PasswordInput
+            label="Nhập lại mật khẩu mới:"
+            placeholder="Nhập lại mật khẩu mới"
+            value={form.reNewPass}
+            onChange={(e) => handleChange("reNewPass", e.target.value)}
+            showPassword={show.reNewPass}
+            toggleShow={() => toggleShowPassword("reNewPass")}
+            errorMessage={errors.reNewPass}
+          />
+
+          <div className="buttonSave">
+            <button
+              className={`btn-save ${canUpdatePassword ? "" : "disabled"}`}
+              disabled={!canUpdatePassword}
+              onClick={handleUpdatePass}
+            >
+              Đổi mật khẩu
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 export default ChangePass;

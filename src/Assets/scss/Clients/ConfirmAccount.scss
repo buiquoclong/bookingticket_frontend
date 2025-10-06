@@ -1,0 +1,167 @@
+@import "../variables.scss";
+
+body {
+  background: var(--whiteColor);
+}
+
+.verify-section {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 1rem;
+
+  .verify-wrapper {
+    width: 100%;
+    max-width: 500px;
+    background: var(--whiteColor);
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    padding: 2.5rem 2rem;
+    animation: fadeUp 0.8s ease-out;
+
+    .verify-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+
+      .verify-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--PrimaryColor);
+        margin-bottom: 1rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+
+      .verify-description {
+        font-size: 0.95rem;
+        color: var(--greyText);
+        line-height: 1.7;
+        width: 90%;
+        margin: 0 auto;
+      }
+    }
+
+    .verify-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .form-group {
+        width: 100%;
+        margin-bottom: 1.5rem;
+
+        .input-field {
+          position: relative;
+          width: 100%;
+
+          .form-input {
+            width: 100%;
+            height: 3.3rem;
+            border: 1.5px solid #d0d0d0;
+            border-radius: 0.8rem;
+            padding: 0 1.2rem;
+            font-size: 1rem;
+            background-color: #fafafa;
+            transition: all 0.3s ease;
+            outline: none;
+
+            &:focus {
+              border-color: var(--PrimaryColor);
+              background-color: #fff;
+              box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+            }
+
+            // label nằm trên border khi focus hoặc có text
+            &:focus + .form-label,
+            &:not(:placeholder-shown) + .form-label {
+              top: 0;
+              left: 1.2rem;
+              transform: translateY(-50%);
+              padding: 0 0.4rem;
+              background-color: #fff;
+              font-size: 0.8rem;
+              color: var(--PrimaryColor);
+              font-weight: 500;
+            }
+          }
+
+          .form-label {
+            position: absolute;
+            top: 50%;
+            left: 1.2rem;
+            transform: translateY(-50%);
+            color: #888;
+            pointer-events: none;
+            transition: all 0.25s ease;
+            background-color: transparent;
+          }
+        }
+
+        .error-message {
+          color: #e63946;
+          font-size: 0.8rem;
+          margin-top: 0.4rem;
+          padding-left: 0.5rem;
+          font-weight: 500;
+        }
+      }
+
+      .button-group {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+
+        .btn {
+          border: none;
+          cursor: pointer;
+          padding: 0.9rem 2.5rem;
+          border-radius: 0.8rem;
+          font-weight: 600;
+          font-size: 1rem;
+          transition: all 0.3s ease;
+          letter-spacing: 0.5px;
+
+          &.btn-primary {
+            background: var(--PrimaryColor);
+            color: var(--whiteColor);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+
+            &:hover {
+              background: var(--SecondaryColor);
+              transform: translateY(-2px);
+              box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+            }
+          }
+
+          &.btn-outline {
+            background: transparent;
+            color: var(--PrimaryColor);
+            border: 2px solid var(--PrimaryColor);
+
+            &:hover {
+              background: var(--PrimaryColor);
+              color: var(--whiteColor);
+              transform: translateY(-2px);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Hiệu ứng xuất hiện nhẹ nhàng */
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
