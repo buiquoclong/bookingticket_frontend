@@ -1,18 +1,19 @@
-import { ToastContainer, Zoom } from "react-toastify";
+import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./ComponentParts.scss";
 
 const CustomToastContainer = () => {
   return (
     <ToastContainer
-      containerId="main"
+      position="top-center"
       className="toast-container"
       toastClassName="toast"
       bodyClassName="toast-body"
       progressClassName="toast-progress"
       theme="colored"
-      transition={Zoom}
-      autoClose={5000} // chỉnh lại thời gian nếu muốn
-      hideProgressBar={true}
+      transition={Slide}
+      autoClose={2000} // chỉnh lại thời gian nếu muốn
+      hideProgressBar={false}
       pauseOnHover
     />
   );

@@ -1,0 +1,105 @@
+@import "../variables.scss";
+
+body {
+  background: var(--whiteColor);
+}
+
+.profile-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 3rem 1rem;
+  background: var(--whiteColor);
+
+  .profile-container {
+    width: 100%;
+    max-width: 500px;
+
+    .profile-title {
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--textColor);
+      margin-bottom: 2rem;
+    }
+
+    .profile-card {
+      background: var(--whiteColor);
+      border: 1px solid #1b2d363d;
+      border-radius: 0.8rem;
+      padding: 2rem 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1.5rem;
+
+        label {
+          font-weight: 500;
+          margin-bottom: 0.5rem;
+          color: var(--blackColor);
+        }
+
+        input {
+          height: 2.8rem;
+          padding: 0 1rem;
+          border-radius: 0.5rem;
+          border: 1px solid var(--greyText);
+          outline: none;
+          font-size: 1rem;
+          transition: all 0.2s;
+
+          &:focus {
+            border-color: var(--PrimaryColor);
+            box-shadow: 0 0 0 2px rgba(0, 128, 255, 0.1);
+          }
+        }
+
+        .error {
+          margin-top: 0.3rem;
+          color: #ff4d4f;
+          font-size: 0.85rem;
+        }
+      }
+
+      .button-group {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+
+        .btn {
+          flex: 1;
+          padding: 0.6rem 1.2rem;
+          font-weight: 600;
+          border-radius: 0.5rem;
+          border: none;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &.change-pass {
+            background-color: var(--SecondaryColor);
+            color: var(--whiteColor);
+            margin-right: 0.5rem;
+
+            &:hover {
+              background-color: var(--SecondaryColor);
+              filter: brightness(0.9);
+            }
+          }
+
+          &.save {
+            background-color: var(--PrimaryColor);
+            color: var(--whiteColor);
+            margin-left: 0.5rem;
+
+            &:hover {
+              background-color: var(--PrimaryColor);
+              filter: brightness(0.9);
+            }
+          }
+        }
+      }
+    }
+  }
+}

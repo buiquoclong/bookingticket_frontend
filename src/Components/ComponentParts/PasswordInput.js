@@ -18,6 +18,7 @@ const PasswordInput = ({
       <div className="inputWrapper">
         <input
           type={showPassword ? "text" : "password"}
+          name="password"
           className="inputField"
           placeholder={placeholder}
           required

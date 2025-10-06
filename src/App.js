@@ -127,6 +127,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
+      <CustomToastContainer />
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/route" element={<RoutePage />} />
@@ -220,7 +221,6 @@ const App = () => {
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      <CustomToastContainer />
     </BrowserRouter>
   );
 };
