@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./app.css";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
-import Homepage from "./page/Client/Homepage";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import AdminHomePage from "./page/Admin/AdminHomePage";
 // import AdminBookingDetailPage from "./Admin/page/AdminBookingDetailPage";
@@ -22,32 +20,34 @@ import AdminContactPage from "./page/Admin/AdminContactPage";
 import AdminLogPage from "./page/Admin/AdminLogPage";
 import AdminPromotionPage from "./page/Admin/AdminPromotionPage";
 import AdminReviewPage from "./page/Admin/AdminReviewPage";
-import TicketHistoryPage from "./page/Client/TicketHistoryPage";
-import SearchTicketPage from "./page/Client/SearchTicketPage";
-import RegisterPage from "./page/Client/RegisterPage";
-import InfoUserPage from "./page/Client/InfoUserPage";
-import PaysuccessPage from "./page/Client/PaysuccessPage";
-import NewsPage from "./page/Client/NewsPage";
-import RoutePage from "./page/Client/RoutePage";
-import LoginPage from "./page/Client/LoginPage";
-import BookingTicketPage from "./page/Client/BookingTicketPage";
-import BookTicketPage from "./page/Client/BookTicketPage";
-import BookTicketReturnPage from "./page/Client/BookTicketReturnPage";
 import AdminPaySuccessPage from "./page/Admin/AdminPaySuccessPage";
-import MyRatingPage from "./page/Client/MyRatingPage";
-import MyBookingPage from "./page/Client/MyBookingPage";
-import ChangePassPage from "./page/Client/ChangePassPage";
-import ConfirmAccountPage from "./page/Client/ConfirmAccountPage";
-import ForgetPassPage from "./page/Client/ForgetPassPage";
-import ResponseSuccessPage from "./page/Client/ResponseSuccessPage";
-import ResponseFailedPage from "./page/Client/ResponseFailedPage";
 import NotFoundPage from "./page/Admin/NotFoundPage";
-import ContactPage from "./page/Client/ContactPage";
-import AboutUsPage from "./page/Client/AboutUsPage";
 import AdminForBookingPage from "./page/Admin/AdminForBookingPage";
 import AdminCatchPointPage from "./page/Admin/AdminCatchPointPage";
 import AdminKindvehiclePage from "./page/Admin/AdminKindvehiclePage";
 import CustomToastContainer from "./Components/ComponentParts/CustomToastContainer";
+import Layout from "./page/Client/Layout";
+import Home from "./Components/ComponentPages/ClientPages/Home/Home";
+import SearchRoute from "./Components/ComponentPages/ClientPages/SearchRoute/SearchRoute";
+import SearchTicket from "./Components/ComponentPages/ClientPages/SearchTicket/SearchTicket";
+import Login from "./Components/ComponentPages/ClientPages/Login/Login";
+import Register from "./Components/ComponentPages/ClientPages/Register/Register";
+import BookingTicket from "./Components/ComponentPages/ClientPages/BookingTicket/BookingTicket";
+import BookTicket from "./Components/ComponentPages/ClientPages/BookTicket/BookTicket";
+import BookTicketReturn from "./Components/ComponentPages/ClientPages/BookTicketReturn/BookTicketReturn";
+import InfoUser from "./Components/ComponentPages/ClientPages/InfoUser/InfoUser";
+import Paysuccess from "./Components/ComponentPages/ClientPages/Paysuccess/Paysuccess";
+import Contact from "./Components/ComponentPages/ClientPages/Contact/Contact";
+import AboutUs from "./Components/ComponentPages/ClientPages/AboutUs/AboutUs";
+import MyRating from "./Components/ComponentPages/ClientPages/MyRating/MyRating";
+import MyBooking from "./Components/ComponentPages/ClientPages/MyBooking/MyBooking";
+import ChangePass from "./Components/ComponentPages/ClientPages/ChangePass/ChangePass";
+import ConfirmAccount from "./Components/ComponentPages/ClientPages/ConfirmAccount/ConfirmAccount";
+import ForgetPass from "./Components/ComponentPages/ClientPages/ForgetPass/ForgetPass";
+import ResponseSuccess from "./Components/ComponentPages/ClientPages/ResponsePay/ResponseSuccess";
+import ResponseFailed from "./Components/ComponentPages/ClientPages/ResponsePay/ResponseFailed";
+import TicketHistory from "./Components/ComponentPages/ClientPages/TicketHistory/TicketHistory";
+import ProtectedRoute from "./Components/ComponentParts/ProtectedRoute";
 
 const App = () => {
   const [userRole, setUserRole] = useState(null);
@@ -66,97 +66,35 @@ const App = () => {
       setUserRole(null);
     }
   }, []);
-  const renderRoutes = () => {
-    if (userRole === 2 || userRole === 3) {
-      return (
-        <>
-          <Route path="/admin" element={<AdminHomePage />} />
-          <Route path="/admin/bookings" element={<AdminBookingPage />} />
-          <Route path="/admin/find-trips" element={<AdminBookTicketPage />} />
-          <Route
-            path="/admin/find-trips-return"
-            element={<AdminBookTicketReturnPage />}
-          />
-          <Route
-            path="/admin/book-cash-payment"
-            element={<AdminPaySuccessPage />}
-          />
-          <Route
-            path="/admin/cities"
-            element={userRole === 3 ? <AdminCityPage /> : <NotFoundPage />}
-          />
-          <Route path="/admin/booking-trip" element={<AdminPayPage />} />
-          <Route
-            path="/admin/routes"
-            element={userRole === 3 ? <AdminRoutePage /> : <NotFoundPage />}
-          />
-          <Route
-            path="/admin/vehicles"
-            element={userRole === 3 ? <AdminVehiclePage /> : <NotFoundPage />}
-          />
-          <Route
-            path="/admin/seats"
-            element={userRole === 3 ? <AdminSeatPage /> : <NotFoundPage />}
-          />
-          <Route path="/admin/trips" element={<AdminTripPage />} />
-          <Route
-            path="/admin/seat-reservation"
-            element={<AdminSeatReservationPage />}
-          />
-          <Route
-            path="/admin/users"
-            element={userRole === 3 ? <AdminUserPage /> : <NotFoundPage />}
-          />
-          <Route
-            path="/admin/drivers"
-            element={userRole === 3 ? <AdminDriverPage /> : <NotFoundPage />}
-          />
-          <Route path="/admin/contacts" element={<AdminContactPage />} />
-          <Route
-            path="/admin/logs"
-            element={userRole === 3 ? <AdminLogPage /> : <NotFoundPage />}
-          />
-          <Route path="/admin/promotions" element={<AdminPromotionPage />} />
-          <Route path="/admin/reviews" element={<AdminReviewPage />} />
-        </>
-      );
-    } else {
-      return <Route path="*" element={<NotFoundPage />} />;
-    }
-  };
 
   return (
     <BrowserRouter>
       <CustomToastContainer />
       <Routes>
-        <Route path="/" element={<Homepage />} />
-        <Route path="/route" element={<RoutePage />} />
-        <Route path="/search_ticket" element={<SearchTicketPage />} />
-        <Route path="/my_ticket" element={<TicketHistoryPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/booking-ticket" element={<BookingTicketPage />} />
-        <Route path="/book-ticket" element={<BookTicketPage />} />
-        <Route path="/book-ticketreturn" element={<BookTicketReturnPage />} />
-        <Route path="/info-user" element={<InfoUserPage />} />
-        <Route path="/pay-success" element={<PaysuccessPage />} />
-        <Route path="/news" element={<NewsPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/aboutUs" element={<AboutUsPage />} />
-        <Route path="/my-rating" element={<MyRatingPage />} />
-        <Route path="/my-booking" element={<MyBookingPage />} />
-        <Route path="/change_pass" element={<ChangePassPage />} />
-        <Route path="/confirm-account" element={<ConfirmAccountPage />} />
-        <Route path="/forget-pass" element={<ForgetPassPage />} />
-        <Route path="/payment-success" element={<ResponseSuccessPage />} />
-        <Route path="/payment-failed" element={<ResponseFailedPage />} />
-        {/* {userRole !== null && renderRoutes()} */}
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/route" element={<SearchRoute />} />
+          <Route path="/search_ticket" element={<SearchTicket />} />
+          <Route path="/my_ticket" element={<TicketHistory />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/booking-ticket" element={<BookingTicket />} />
+          <Route path="/book-ticket" element={<BookTicket />} />
+          <Route path="/book-ticketreturn" element={<BookTicketReturn />} />
+          <Route path="/info-user" element={<InfoUser />} />
+          <Route path="/pay-success" element={<Paysuccess />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/aboutUs" element={<AboutUs />} />
+          <Route path="/my-rating" element={<MyRating />} />
+          <Route path="/my-booking" element={<MyBooking />} />
+          <Route path="/change_pass" element={<ChangePass />} />
+          <Route path="/confirm-account" element={<ConfirmAccount />} />
+          <Route path="/forget-pass" element={<ForgetPass />} />
+          <Route path="/payment-success" element={<ResponseSuccess />} />
+          <Route path="/payment-failed" element={<ResponseFailed />} />
+        </Route>
 
-        <Route
-          element={
-            userRole === 2 || userRole === 3 ? <Outlet /> : <LoginPage />
-          }
-        >
+        <Route element={<ProtectedRoute allowedRoles={[2, 3]} />}>
           <Route path="/admin" element={<AdminHomePage />} />
           <Route path="/admin/bookings" element={<AdminBookingPage />} />
           <Route path="/admin/book-ticket" element={<AdminForBookingPage />} />

@@ -1,47 +1,48 @@
+// Paysuccess.jsx
 import React, { useCallback, useState, useEffect } from "react";
-
-import "./Paysuccess.scss";
 import { Link, useLocation } from "react-router-dom";
-import CheckCircleSharpIcon from "@mui/icons-material/CheckCircleSharp";
+
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import BookingTicketInfo from "../../../ComponentParts/BookingTicketInfo";
+import "../../../../Assets/scss/Clients/Paysuccess.scss";
 
 const Paysuccess = () => {
   const location = useLocation();
   const { bookingId, kind } = location.state || {};
-  console.log(kind);
   const [data, setData] = useState(null);
   const [bookingData, setBookingData] = useState(null);
-  // const orderId = 1;
-  console.log("bookingId", bookingId);
-
-  // const [orders, setsetOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchBookingDetail = useCallback(async () => {
-    fetch(`http://localhost:8081/api/booking_detail/booking/${bookingId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setData(data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    try {
+      const response = await fetch(
+        `http://localhost:8081/api/booking_detail/booking/${bookingId}`
+      );
+      const result = await response.json();
+      setData(result);
+    } catch (error) {
+      console.error("Error fetching booking details:", error);
+    }
   }, [bookingId]);
+
   const fetchBooking = useCallback(async () => {
-    fetch(`http://localhost:8081/api/booking/${bookingId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setBookingData(data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    try {
+      const response = await fetch(
+        `http://localhost:8081/api/booking/${bookingId}`
+      );
+      const result = await response.json();
+      setBookingData(result);
+    } catch (error) {
+      console.error("Error fetching booking data:", error);
+    }
   }, [bookingId]);
+
   useEffect(() => {
-    // Call the API to fetch cities
-    fetchBookingDetail();
-    fetchBooking();
-  }, [fetchBookingDetail, fetchBooking]);
+    setLoading(true);
+    Promise.all([fetchBooking(), fetchBookingDetail()]).finally(() =>
+      setLoading(false)
+    );
+  }, [fetchBooking, fetchBookingDetail]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -50,182 +51,119 @@ const Paysuccess = () => {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
-  return (
-    <section className="main container section">
-      {bookingData && (
-        <div className="paySuccess">
-          <div className="imgsucces">
-            <CheckCircleSharpIcon className="icon" />
-          </div>
-          <div className="content">
-            <div className="titlePay">Mua vé thành công</div>
-            <div className="text">
-              Chúng tôi đã gửi thông tin vé về địa chỉ email {bookingData.email}
-              . Vui lòng kiểm tra lại
-            </div>
-          </div>
-          <div className="detailbooking">
-            <div className="title">THÔNG TIN MUA VÉ</div>
-            <div className="info">
-              <div className="infoBooking">
-                <div className="userInfo">
-                  <div className="userline">
-                    <span className="titleuser">Họ và tên:</span>
-                    <span className="text">{bookingData.userName}</span>
-                  </div>
-                  <div className="userline">
-                    <span className="titleuser">Số điện thoại:</span>
-                    <span className="text">{bookingData.phone}</span>
-                  </div>
-                  <div className="userline">
-                    <span className="titleuser">Email:</span>
-                    <span className="text">{bookingData.email}</span>
-                  </div>
-                </div>
-                <div className="PayInfo">
-                  <div className="payline">
-                    <span className="titlepay">Tổng giá vé:</span>
-                    <span className="text">
-                      {bookingData.total.toLocaleString("vi-VN")} VND
-                    </span>
-                  </div>
-                  <div className="payline">
-                    <span className="titlepay">Phương thức thanh toán:</span>
-                    <span className="text">{bookingData.kindPay}</span>
-                  </div>
-                  <div className="payline">
-                    <span className="titlepay">Trang thái:</span>
-                    {bookingData.isPaid === 1 ? (
-                      <span className="text">Thanh toán thành công</span>
-                    ) : (
-                      <span className="text">Chưa thanh toán</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="devide"></div>
-            <div className="infoTicket">
-              {kind === "Một chiều" && (
-                <div className="detailBoooking">
-                  {data &&
-                    data.map((detail) => (
-                      <div className="infoBookingTicket" key={detail.id}>
-                        <h3>Mã vé: {detail.id}</h3>
-                        <div className="lineInfo">
-                          <span>Tuyến:</span>
-                          <div className="rightInfo">
-                            <span>{detail.trip.route.name}</span>
-                          </div>
-                        </div>
-                        <div className="lineInfo">
-                          <span>Loại xe:</span>
-                          <div className="rightInfo">
-                            <span>{detail.trip.vehicle.kindVehicle.name}</span>
-                          </div>
-                        </div>
-                        <div className="lineInfo">
-                          <span>Ngày:</span>
-                          <div className="rightInfo">
-                            <span>{formatDate(detail.trip.dayStart)}</span>
-                          </div>
-                        </div>
-                        <div className="lineInfo">
-                          <span>Thời gian:</span>
-                          <div className="rightInfo">
-                            <span>{detail.trip.timeStart.slice(0, 5)}</span>
-                          </div>
-                        </div>
-                        <div className="lineInfo">
-                          <span>Số ghế:</span>
-                          <div className="rightInfo">
-                            <span>{detail.quantity}</span>
-                          </div>
-                        </div>
-                        <div className="lineInfo">
-                          <span>Ghế đã đặt:</span>
-                          <div className="seatInfo">
-                            <span>{detail.seatName}</span>
-                          </div>
-                        </div>
-                        <div className="lineInfo">
-                          <span>Giá:</span>
-                          <div className="rightInfo">
-                            <span>
-                              {detail.price.toLocaleString("vi-VN")} VND
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              )}
 
-              {kind === "Khứ hồi" && (
-                <div className="detailBoooking">
-                  {data &&
-                    data.map((detail) => (
-                      <div className="infoBookingTicket" key={detail.id}>
-                        <h3>Mã vé: {detail.id}</h3>
-                        <div className="lineInfo">
-                          <span>Tuyến:</span>
-                          <div className="rightInfo">
-                            <span>{detail.trip.route.name}</span>
-                          </div>
-                        </div>
-                        <div className="lineInfo">
-                          <span>Loại xe:</span>
-                          <div className="rightInfo">
-                            <span>{detail.trip.vehicle.kindVehicle.name}</span>
-                          </div>
-                        </div>
-                        <div className="lineInfo">
-                          <span>Ngày:</span>
-                          <div className="rightInfo">
-                            <span>{formatDate(detail.trip.dayStart)}</span>
-                          </div>
-                        </div>
-                        <div className="lineInfo">
-                          <span>Thời gian:</span>
-                          <div className="rightInfo">
-                            <span>{detail.trip.timeStart.slice(0, 5)}</span>
-                          </div>
-                        </div>
-                        <div className="lineInfo">
-                          <span>Số ghế:</span>
-                          <div className="rightInfo">
-                            <span>{detail.quantity}</span>
-                          </div>
-                        </div>
-                        <div className="lineInfo">
-                          <span>Ghế đã đặt:</span>
-                          <div className="seatInfo">
-                            <span>{detail.seatName}</span>
-                          </div>
-                        </div>
-                        <div className="lineInfo">
-                          <span>Giá:</span>
-                          <div className="rightInfo">
-                            <span>
-                              {detail.price.toLocaleString("vi-VN")}VND
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              )}
-            </div>
-            <div className="devide"></div>
-            <div className="backhome">
-              <Link to="/">
-                <button className="btn backhomebtn">Trở về</button>
-              </Link>
-            </div>
+  if (loading) {
+    return (
+      <section className="pay-success container section">
+        <div className="loading">
+          <div className="spinner"></div>
+          <p>Đang tải thông tin vé...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (!bookingData) {
+    return (
+      <section className="pay-success container section">
+        <p>Không tìm thấy thông tin vé. Vui lòng thử lại.</p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="pay-success container section">
+      <div className="success-card">
+        <div className="success-content">
+          <div className="icon-wrapper">
+            <CheckCircleOutlineIcon className="success-icon" />
+            {/* 🔹 Vòng tròn phát sáng */}
+            <span className="icon-glow"></span>
+            <span className="icon-glow"></span>
+            <span className="icon-glow"></span>
+          </div>
+
+          <div className="text-center">
+            <h2 className="success-title">Mua vé thành công</h2>
+            <p className="success-message">
+              Chúng tôi đã gửi thông tin vé về địa chỉ email{" "}
+              <strong>{bookingData?.email}</strong>. Vui lòng kiểm tra lại.
+            </p>
           </div>
         </div>
-      )}
+
+        <div className="booking-info-card">
+          <h3 className="section-title">THÔNG TIN MUA VÉ</h3>
+
+          <div className="info-grid">
+            <div className="info-block">
+              <h4>Thông tin người mua</h4>
+              <ul>
+                <li>
+                  <span>Họ và tên:</span>
+                  <span>{bookingData.userName}</span>
+                </li>
+                <li>
+                  <span>Số điện thoại:</span>
+                  <span>{bookingData.phone}</span>
+                </li>
+                <li>
+                  <span>Email:</span>
+                  <span>{bookingData.email}</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="info-block">
+              <h4>Thông tin thanh toán</h4>
+              <ul>
+                <li>
+                  <span>Tổng giá vé:</span>
+                  <span>{bookingData.total.toLocaleString("vi-VN")} VND</span>
+                </li>
+                <li>
+                  <span>Phương thức:</span>
+                  <span>{bookingData.kindPay}</span>
+                </li>
+                <li>
+                  <span>Trạng thái:</span>
+                  <span
+                    className={
+                      bookingData.isPaid === 1
+                        ? "status success"
+                        : "status pending"
+                    }
+                  >
+                    {bookingData.isPaid === 1
+                      ? "Thanh toán thành công"
+                      : "Chưa thanh toán"}
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="divider" />
+
+          <div className="ticket-section">
+            <BookingTicketInfo
+              kind={kind}
+              data={data}
+              formatDate={formatDate}
+            />
+          </div>
+
+          <div className="divider" />
+
+          <div className="backhome">
+            <Link to="/">
+              <button className="btn backhome-btn">Trở về trang chủ</button>
+            </Link>
+          </div>
+        </div>
+      </div>
     </section>
   );
 };
+
 export default Paysuccess;

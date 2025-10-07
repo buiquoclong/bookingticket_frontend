@@ -1,20 +1,39 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "../../Components/ComponentPages/ClientPages/Navbar/Navbar";
 import Footer from "../../Components/ComponentPages/ClientPages/Footer/Footer";
 
-const Layout = ({ children }) => {
+const Layout = () => {
+  const navbarRef = useRef(null);
+  const [navbarHeight, setNavbarHeight] = useState(0);
+  const location = useLocation();
+
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  });
+    const updateNavbarHeight = () => {
+      if (navbarRef.current) {
+        setNavbarHeight(navbarRef.current.offsetHeight);
+      }
+    };
+
+    updateNavbarHeight();
+    window.addEventListener("resize", updateNavbarHeight);
+
+    return () => window.removeEventListener("resize", updateNavbarHeight);
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [location.pathname]);
+
   return (
     <>
-      <Navbar />
-      {children}
+      <Navbar ref={navbarRef} />
+      <main style={{ paddingTop: `${navbarHeight}px` }}>
+        <Outlet />
+      </main>
       <Footer />
     </>
   );
 };
+
 export default Layout;

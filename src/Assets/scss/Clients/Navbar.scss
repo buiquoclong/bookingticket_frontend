@@ -1,0 +1,467 @@
+@import "../variables.scss";
+
+.navbar-section {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: var(--whiteColor);
+
+  .navbar-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    background: var(--whiteColorDeam);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(2, 15, 29, 0.1);
+
+    &.shadow {
+      box-shadow: 0 3px 6px rgba(2, 15, 29, 0.2);
+    }
+
+    /* LOGO */
+    .logo-div {
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.2rem; // khoảng cách hợp lý giữa icon và chữ
+        color: var(--blackColor);
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: transform 0.2s ease, color 0.2s ease;
+        font-size: 2rem;
+        color: var(--PrimaryColor);
+        transition: transform 0.3s ease;
+      }
+
+      .logo-text {
+        font-family: "Great Vibes", cursive;
+        font-size: 2rem;
+        color: var(--PrimaryColor);
+        letter-spacing: 1px;
+        transition: color 0.3s ease, transform 0.3s ease;
+      }
+
+      &:hover {
+        .icon {
+          transform: rotate(-10deg) scale(1.1);
+        }
+        .logo-text {
+          color: var(--SecondaryColor);
+          transform: scale(1.05);
+        }
+      }
+    }
+
+    /* MENU CHÍNH */
+    .navbar-menu {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .nav-list {
+        display: flex;
+        justify-content: center; // căn giữa toàn bộ menu
+        align-items: center;
+        gap: 1.5rem;
+
+        .nav-item {
+          flex: 1 1 auto; // cho item tự co dãn
+          min-width: 40px; // giới hạn nhỏ nhất
+          max-width: 200px; // giới hạn lớn nhất (tuỳ ý)
+
+          position: relative;
+          font-weight: 600;
+          color: var(--textColor);
+          text-transform: uppercase;
+          cursor: pointer;
+          padding: 0.25rem 0;
+          transition: all 0.3s ease;
+          // white-space: nowrap; // giữ chữ không bị xuống dòng
+          text-align: center;
+
+          // Underline animation gradient
+          &::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 0;
+            height: 3px;
+            border-radius: 2px;
+            background: linear-gradient(
+              90deg,
+              var(--PrimaryColor),
+              var(--SecondaryColor)
+            );
+            transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+          }
+
+          &:hover {
+            color: var(--PrimaryColor);
+            transform: scale(1.05);
+
+            &::after {
+              width: 100%;
+            }
+          }
+
+          &.active {
+            color: var(--PrimaryColor);
+            font-weight: 700;
+
+            &::after {
+              width: 100%;
+            }
+          }
+
+          // Optional: subtle shadow effect on hover
+          &:hover::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -6px;
+            width: 100%;
+            height: 6px;
+            background: rgba(25, 118, 210, 0.1); // subtle glow
+            border-radius: 3px;
+          }
+        }
+
+        .user-info {
+          position: relative;
+          margin-left: 1rem;
+          display: flex;
+          align-items: center;
+          font-family: "Poppins", sans-serif;
+
+          .btn {
+            font-weight: 600;
+            color: var(--whiteColor);
+            background: var(--PrimaryColor);
+            padding: 0.55rem 1.2rem;
+            border-radius: 0.6rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+
+            &:hover {
+              background: var(--SecondaryColor);
+              transform: translateY(-1px);
+            }
+          }
+
+          /* Dropdown container */
+          .dropdown-container {
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+
+            .dropdown-toggle {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 0.4rem;
+              font-weight: 600;
+              font-size: 0.95rem;
+              color: var(--PrimaryColor);
+              background: var(--whiteColor);
+              border: 1px solid var(--PrimaryColor);
+              padding: 0.45rem 0.9rem;
+              border-radius: 50px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+              transition: all 0.25s ease;
+
+              .user-icon {
+                font-size: 1.3rem;
+                color: var(--PrimaryColor);
+              }
+
+              .user-icon,
+              .chevron-icon {
+                color: var(--PrimaryColor);
+                transition: color 0.25s ease, transform 0.25s ease;
+                /* nếu SVG không đổi màu, bật dòng này */
+                /* svg { fill: currentColor; } */
+              }
+
+              .chevron-icon {
+                font-size: 0.8rem;
+                transition: transform 0.3s ease;
+              }
+
+              .chevron-icon.rotated {
+                transform: rotate(180deg);
+              }
+
+              &:hover {
+                background: var(--PrimaryColor);
+                color: var(--whiteColor);
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+                .user-icon,
+                .chevron-icon {
+                  color: var(--whiteColor);
+                }
+              }
+
+              span {
+                max-width: 120px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              }
+            }
+
+            /* Dropdown menu */
+            .dropdown-menu {
+              position: absolute;
+              right: 0;
+              top: calc(100% + 0.7rem);
+              background: var(--whiteColor);
+              border-radius: 0.75rem;
+              box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+              min-width: 200px;
+              z-index: 999;
+              animation: slideDown 0.25s ease forwards;
+              overflow: hidden; /* giữ item đều, tránh lệch */
+              padding: 0; /* loại bỏ khoảng trắng thừa */
+
+              ul {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+
+                li {
+                  display: flex;
+                  align-items: center;
+                  justify-content: flex-start;
+                  gap: 0.6rem;
+                  padding: 0.75rem 1rem;
+                  cursor: pointer;
+                  font-weight: 500;
+                  color: var(--textColor);
+                  background: transparent;
+                  transition: all 0.2s ease;
+                  width: 100%;
+                  font-size: 0.95rem;
+
+                  &:hover {
+                    background: var(--whiteColorDeam);
+                    color: var(--PrimaryColor);
+                    transform: translateX(4px);
+                  }
+
+                  /* icon (nếu có) */
+                  svg {
+                    font-size: 1rem;
+                  }
+                }
+
+                li + li {
+                  border-top: 1px solid rgba(0, 0, 0, 0.05);
+                }
+
+                li:last-child {
+                  color: #e63946;
+
+                  &:hover {
+                    background: rgba(230, 57, 70, 0.1);
+                    color: #e63946;
+                  }
+                }
+              }
+            }
+          }
+
+          @keyframes slideDown {
+            from {
+              opacity: 0;
+              transform: translateY(-5px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        }
+      }
+
+      .close-navbar {
+        display: none;
+      }
+    }
+
+    /* TOGGLE ICON (MOBILE) */
+    .toggle-navbar {
+      display: none;
+      cursor: pointer;
+
+      .icon {
+        font-size: 1.7rem;
+        color: var(--PrimaryColor);
+      }
+    }
+  }
+}
+
+/* Hiệu ứng dropdown */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation dropdown */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+// MEDIA QUERIES ============================
+/* ===== RESPONSIVE ===== */
+
+@media screen and (max-width: 768px) {
+  .navbar-section {
+    .navbar-header {
+      padding: 0.8rem 1rem;
+      position: relative;
+
+      .logo-div {
+        .logo {
+          gap: 0.4rem;
+
+          .icon {
+            font-size: 1.4rem;
+          }
+
+          h1 {
+            font-size: 1.2rem;
+          }
+        }
+      }
+
+      .toggle-navbar {
+        display: flex;
+        cursor: pointer;
+        z-index: 1001;
+
+        .icon {
+          font-size: 1.7rem;
+          color: var(--PrimaryColor);
+        }
+
+        &.hidden {
+          display: none;
+        }
+      }
+
+      .navbar-menu {
+        position: absolute;
+        top: -500%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 400px;
+        background: var(--whiteColorDeam);
+        border-radius: 1rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        flex-direction: column;
+        padding: 1.5rem 1.2rem;
+        transition: top 0.4s ease, opacity 0.3s ease;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 1000;
+
+        &.active {
+          top: 0.5rem;
+          opacity: 1;
+          pointer-events: auto;
+        }
+
+        .nav-list {
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+
+          .nav-item {
+            font-size: 1rem;
+            text-align: center;
+            padding: 0.6rem 1rem;
+          }
+
+          .user-info {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+
+            .dropdown-container {
+              width: 100%;
+              position: relative;
+
+              .dropdown-toggle {
+                width: 100%;
+                justify-content: space-between;
+                padding: 0.6rem 1rem;
+              }
+
+              .dropdown-menu {
+                position: absolute; // quan trọng: không giãn navbar-menu
+                top: 100%; // ngay dưới dropdown-toggle
+                left: 0;
+                width: 100%;
+                background: var(--whiteColorDeam);
+                border-radius: 0.5rem;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                z-index: 1002;
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 0.5rem 0;
+              }
+            }
+
+            .btn {
+              width: 100%;
+              padding: 0.6rem 1rem;
+            }
+          }
+        }
+
+        .close-navbar {
+          display: block;
+          position: absolute;
+          top: 1rem;
+          right: 1.5rem;
+
+          .icon {
+            font-size: 1.8rem;
+            color: var(--PrimaryColor);
+            &:hover {
+              color: var(--SecondaryColor);
+            }
+          }
+        }
+      }
+    }
+  }
+}

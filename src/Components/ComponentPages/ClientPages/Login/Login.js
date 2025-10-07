@@ -152,7 +152,7 @@ const Login = () => {
           </div>
 
           <div className="forgot">
-            <Link to="/forget-pass" className="forget-link">
+            <Link to="/forget-pass" className="forget-link" tabIndex={-1}>
               Quên mật khẩu?
             </Link>
           </div>

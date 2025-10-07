@@ -116,7 +116,8 @@ const Footer = () => {
           <div className="footerIntro flex">
             <div className="logoDiv">
               <Link to="/" className="logo flex">
-                <MdTravelExplore className="icon" /> RoadLines
+                <MdTravelExplore className="icon" />
+                <span className="logo-text">RoadLines</span>
               </Link>
             </div>
 

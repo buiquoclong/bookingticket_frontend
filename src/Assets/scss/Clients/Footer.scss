@@ -164,15 +164,37 @@
         flex-direction: column;
         row-gap: 0.5rem;
 
-        .logoDiv .logo {
-          color: var(--blackColor);
-          font-weight: 600;
-          font-size: 30px;
-
-          .icon {
-            font-size: 45px;
+        .logoDiv {
+          .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem; // khoảng cách hợp lý giữa icon và chữ
             color: var(--blackColor);
-            margin-right: 10px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s ease, color 0.2s ease;
+            font-size: 2rem;
+            color: var(--PrimaryColor);
+            transition: transform 0.3s ease;
+          }
+
+          .logo-text {
+            font-family: "Great Vibes", cursive;
+            font-size: 2rem;
+            color: var(--PrimaryColor);
+            letter-spacing: 1px;
+            transition: color 0.3s ease, transform 0.3s ease;
+          }
+
+          &:hover {
+            .icon {
+              transform: rotate(-10deg) scale(1.1);
+            }
+            .logo-text {
+              color: var(--SecondaryColor);
+              transform: scale(1.05);
+            }
           }
         }
 
