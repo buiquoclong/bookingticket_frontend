@@ -1,5 +1,3 @@
-import React from "react";
-
 import "./ComponentParts.scss";
 
 const BookingTicketInfo = ({ kind, data, formatDate }) => {
@@ -43,11 +41,15 @@ const BookingTicketInfo = ({ kind, data, formatDate }) => {
               <div className="ticket-line seat">
                 <span className="label">Ghế đã đặt:</span>
                 <div className="seat-badges">
-                  {detail.seatName.split(",").map((seat) => (
-                    <span key={seat.trim()} className="seat-badge">
-                      {seat.trim()}
-                    </span>
-                  ))}
+                  {detail.seatName ? (
+                    detail.seatName.split(",").map((seat) => (
+                      <span key={seat.trim()} className="seat-badge">
+                        {seat.trim()}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="no-seat">Chưa có ghế</span>
+                  )}
                 </div>
               </div>
 
