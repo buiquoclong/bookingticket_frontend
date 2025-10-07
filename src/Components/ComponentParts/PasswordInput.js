@@ -11,6 +11,7 @@ const PasswordInput = ({
   toggleShow,
   errorMessage,
   hintText,
+  name,
 }) => {
   return (
     <div className="passwordGroup">
@@ -18,7 +19,7 @@ const PasswordInput = ({
       <div className="inputWrapper">
         <input
           type={showPassword ? "text" : "password"}
-          name="password"
+          name={name}
           className="inputField"
           placeholder={placeholder}
           required

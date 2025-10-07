@@ -1,144 +1,144 @@
 import React, { useState } from "react";
-import "./Register.scss";
-// import { FaPhoneAlt } from "react-icons/fa";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import "../../../../Assets/scss/Clients/Register.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import PasswordInput from "../../../ComponentParts/PasswordInput";
 
 const Register = () => {
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({
+    email: "",
+    userName: "",
+    password: "",
+    rePassword: "",
+  });
+
+  const [errors, setErrors] = useState({
+    email: "",
+    userName: "",
+    password: "",
+    rePassword: "",
+  });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
 
-  const [emailErrorMessage, setEmailErrorMessage] = useState("");
-  const [userNameErrorMessage, setUserNameErrorMessage] = useState("");
-  const [newPassErrorMessage, setNewPassErrorMessage] = useState("");
-  const [renewPassErrorMessage, setReNewPassErrorMessage] = useState("");
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  const toggleRePasswordVisibility = () => setShowRePassword((prev) => !prev);
 
-  const [email, setEmail] = useState("");
-  const [userName, setUserName] = useState("");
-  const [newPass, setNewPass] = useState("");
-  const [reNewPass, setReNewPass] = useState("");
-  const navigate = useNavigate();
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+  const validateEmail = (email) => {
+    const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return pattern.test(email) ? "" : "Email không hợp lệ.";
   };
 
-  const toggleRePasswordVisibility = () => {
-    setShowRePassword(!showRePassword);
-  };
-  const handleEmailChange = (event) => {
-    // setEmail(event.target.value);
-    const emailAddress = event.target.value;
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Biểu thức chính quy kiểm tra email
-
-    // Kiểm tra xem email nhập vào có khớp với biểu thức chính quy không
-    if (!emailPattern.test(emailAddress)) {
-      setEmailErrorMessage("Email không hợp lệ.");
-    } else {
-      setEmailErrorMessage(""); // Nếu hợp lệ, xóa thông báo lỗi
-    }
-    setEmail(emailAddress);
-  };
-  const handleUserNameChange = (event) => {
-    const newUserName = event.target.value;
-
-    if (newUserName.trim() === "") {
-      setUserNameErrorMessage("Tên người dùng không được để trống");
-    } else {
-      setUserNameErrorMessage("");
-    }
-    setUserName(newUserName);
-  };
-  const handleNewPassChange = (event) => {
-    const newPassword = event.target.value;
-
-    if (!validatePassword(newPassword)) {
-      setNewPassErrorMessage(
-        "Mật khẩu phải dài từ 8 đến 32 ký tự, bao gồm chữ và số"
-      );
-    } else {
-      setNewPassErrorMessage("");
-    }
-    setNewPass(newPassword);
-  };
-
-  const handleReNewPassChange = (event) => {
-    const reNewPassword = event.target.value;
-
-    if (!validatePassword(reNewPassword)) {
-      setReNewPassErrorMessage("Mật khẩu không đúng định dạng");
-    } else {
-      setReNewPassErrorMessage("");
-    }
-    setReNewPass(reNewPassword);
-  };
   const validatePassword = (password) => {
-    return (
-      password.length >= 8 &&
-      password.length <= 32 &&
-      /[a-zA-Z]/.test(password) &&
-      /[0-9]/.test(password)
-    );
+    if (!password) return "Vui lòng nhập mật khẩu";
+    if (
+      password.length < 8 ||
+      password.length > 32 ||
+      !/[a-zA-Z]/.test(password) ||
+      !/[0-9]/.test(password)
+    )
+      return "Mật khẩu phải dài từ 8 đến 32 ký tự, bao gồm chữ và số";
+    return "";
   };
-  const canRegister = email && userName && newPass && reNewPass;
+
+  const validateUserName = (name) => {
+    return name.trim() === "" ? "Tên người dùng không được để trống" : "";
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setForm((prev) => ({ ...prev, [name]: value }));
+
+    let errorMessage = "";
+    switch (name) {
+      case "email":
+        errorMessage = validateEmail(value);
+        break;
+      case "userName":
+        errorMessage = validateUserName(value);
+        break;
+      case "password":
+        errorMessage = validatePassword(value);
+        break;
+      case "rePassword":
+        errorMessage =
+          value !== form.password ? "Mật khẩu nhập lại không khớp" : "";
+        break;
+      default:
+        break;
+    }
+
+    setErrors((prev) => ({ ...prev, [name]: errorMessage }));
+  };
+
+  const canRegister =
+    form.email &&
+    form.userName &&
+    form.password &&
+    form.rePassword &&
+    !errors.email &&
+    !errors.userName &&
+    !errors.password &&
+    !errors.rePassword;
+
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (newPass !== reNewPass) {
-      setReNewPassErrorMessage("Mật khẩu nhập lại không khớp.");
-      return;
-    } else {
-      setReNewPassErrorMessage("");
-      if (!validatePassword(newPass)) {
-        setNewPassErrorMessage("Mật khẩu không đúng định dạng");
-        return;
-      } else {
-        setNewPassErrorMessage("");
-        const registerUser = {
-          name: userName,
-          password: newPass,
-          email: email,
-          phone: "",
-          role: 1,
-          status: 1,
-          type: "Đăng ký",
-        };
-        try {
-          const regiterUserResponse = await fetch(
-            `http://localhost:8081/api/user/register`,
-            {
-              method: "POST", // hoặc 'PATCH' tùy vào API của bạn
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(registerUser), // Cập nhật trạng thái của booking thành 'cancelled'
-            }
-          );
 
-          if (regiterUserResponse.ok) {
-            const data = await regiterUserResponse.text();
-            if (data === "Email đã tồn tại") {
-              toast.error("Email đã tồn tại");
-              return;
-            }
-            if (isNaN(parseInt(data))) {
-              // Nếu dữ liệu trả về không phải là một số, nó là một thông báo lỗi
-              toast.error(data);
-            } else {
-              const userId = parseInt(data);
-              navigate("/confirm-account", { state: { userId: userId } });
-            }
-          } else {
-            // Xử lý lỗi nếu có
-            console.error(
-              "Failed to register:",
-              regiterUserResponse.statusText
-            );
-          }
-        } catch (error) {
-          console.error("Error register:", error);
-        }
+    // Kiểm tra lại validation trước khi submit
+    const newErrors = {
+      email: validateEmail(form.email),
+      userName: validateUserName(form.userName),
+      password: validatePassword(form.password),
+      rePassword:
+        form.rePassword !== form.password ? "Mật khẩu nhập lại không khớp" : "",
+    };
+
+    setErrors(newErrors);
+
+    const hasError = Object.values(newErrors).some((e) => e);
+    if (hasError) return;
+
+    const registerUser = {
+      name: form.userName,
+      password: form.password,
+      email: form.email,
+      phone: "",
+      role: 1,
+      status: 1,
+      type: "Đăng ký",
+    };
+
+    try {
+      const response = await fetch("http://localhost:8081/api/user/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(registerUser),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to register:", response.statusText);
+        return;
       }
+
+      const data = await response.text();
+
+      if (data === "Email đã tồn tại") {
+        toast.error("Email đã tồn tại");
+        return;
+      }
+
+      if (isNaN(parseInt(data))) {
+        toast.error(data);
+        return;
+      }
+
+      navigate("/confirm-account", { state: { userId: parseInt(data) } });
+    } catch (err) {
+      console.error("Error register:", err);
     }
   };
 
@@ -148,161 +148,96 @@ const Register = () => {
   };
 
   return (
-    <section className="main container section">
-      <div className="register">
-        <div className="wrapper">
-          <form action="" className="infoRegister">
-            <h1>Đăng ký</h1>
-            <div className="form-feild">
-              <input
-                type="email"
-                className="input"
-                placeholder="Nhập Email"
-                required
-                value={email}
-                onChange={handleEmailChange}
-              />
-              {emailErrorMessage && (
-                <p
-                  style={{
-                    lineHeight: "1.5",
-                    fontSize: "12px",
-                    color: "red",
-                    paddingLeft: ".5rem",
-                  }}
-                >
-                  {emailErrorMessage}
-                </p>
-              )}
-            </div>
-            <div className="form-feild">
-              <input
-                type="email"
-                className="input"
-                placeholder="Tên người dùng"
-                required
-                value={userName}
-                onChange={handleUserNameChange}
-              />
-              {userNameErrorMessage && (
-                <p
-                  style={{
-                    lineHeight: "1.5",
-                    fontSize: "12px",
-                    color: "red",
-                    paddingLeft: ".5rem",
-                  }}
-                >
-                  {userNameErrorMessage}
-                </p>
-              )}
-            </div>
-            <div className="form-feild">
-              <input
-                type={showPassword ? "text" : "password"}
-                className="input"
-                placeholder="Nhập mật khẩu"
-                required
-                value={newPass}
-                onChange={handleNewPassChange}
-              />
-              {showPassword ? (
-                <FaEyeSlash
-                  onClick={togglePasswordVisibility}
-                  className="icon"
-                />
-              ) : (
-                <FaEye onClick={togglePasswordVisibility} className="icon" />
-              )}
-              {newPassErrorMessage ? (
-                <p
-                  style={{
-                    lineHeight: "1.5",
-                    fontSize: "12px",
-                    color: "red",
-                    paddingLeft: ".5rem",
-                  }}
-                >
-                  {newPassErrorMessage}
-                </p>
-              ) : (
-                <p
-                  style={{
-                    lineHeight: "1.5",
-                    fontSize: "12px",
-                    color: "black",
-                    paddingLeft: ".5rem",
-                  }}
-                >
-                  Mật khẩu phải dài từ 8 đến 32 ký tự, bao gồm chữ và số
-                </p>
-              )}
-            </div>
-            <div className="form-feild">
-              <input
-                type={showRePassword ? "text" : "password"}
-                className="input"
-                placeholder="Nhập lại mật khẩu"
-                required
-                value={reNewPass}
-                onChange={handleReNewPassChange}
-              />
-              {showRePassword ? (
-                <FaEyeSlash
-                  onClick={toggleRePasswordVisibility}
-                  className="icon"
-                />
-              ) : (
-                <FaEye onClick={toggleRePasswordVisibility} className="icon" />
-              )}
-              {renewPassErrorMessage && (
-                <p
-                  style={{
-                    lineHeight: "1.5",
-                    fontSize: "12px",
-                    color: "red",
-                    paddingLeft: ".5rem",
-                  }}
-                >
-                  {renewPassErrorMessage}
-                </p>
-              )}
-            </div>
-            <div className="buttonSave">
-              <button
-                className={canRegister ? "btn save" : " disabled"}
-                disabled={!canRegister}
-                onClick={handleRegister}
-              >
-                Đăng ký
-              </button>
-            </div>
+    <section className="register-section">
+      <div className="register-container">
+        <form className="register-form" onSubmit={handleRegister}>
+          <h1 className="register-title">Đăng ký</h1>
 
-            <div className="line-container">
-              <div className="line"></div>
-              <span className="text" style={{ paddingInline: "10px" }}>
-                Hoặc
-              </span>
-              <div className="line"></div>
-            </div>
-          </form>
-
-          <button className="btn" onClick={googleLogin}>
-            Tiếp tục với Google
-          </button>
-
-          <div className="register-link">
-            <p>
-              Bạn đã có tài khoản
-              <Link to="/login" className="register">
-                {" "}
-                Đăng nhập
-              </Link>
-            </p>
+          <div className="input-group">
+            <input
+              type="text"
+              name="userName"
+              placeholder="Nhập tên người dùng"
+              value={form.userName}
+              onChange={handleChange}
+              className="input-field"
+            />
+            {errors.userName && <p className="error-text">{errors.userName}</p>}
           </div>
+
+          <div className="input-group">
+            <input
+              type="email"
+              name="email"
+              placeholder="Nhập email"
+              value={form.email}
+              onChange={handleChange}
+              className="input-field"
+            />
+            {errors.email && <p className="error-text">{errors.email}</p>}
+          </div>
+
+          <PasswordInput
+            label="Mật khẩu"
+            name="password"
+            placeholder="Nhập mật khẩu"
+            value={form.password}
+            onChange={handleChange}
+            showPassword={showPassword}
+            toggleShow={togglePasswordVisibility}
+            errorMessage={errors.password}
+            hintText="Mật khẩu phải dài từ 8 đến 32 ký tự, bao gồm chữ và số"
+          />
+
+          <PasswordInput
+            label="Nhập lại mật khẩu"
+            name="rePassword"
+            placeholder="Nhập lại mật khẩu"
+            value={form.rePassword}
+            onChange={handleChange}
+            showPassword={showRePassword}
+            toggleShow={toggleRePasswordVisibility}
+            errorMessage={errors.rePassword}
+          />
+
+          <button
+            className={`btn primary-btn ${!canRegister ? "disabled" : ""}`}
+            type="submit"
+            disabled={!canRegister}
+          >
+            Đăng nhập
+          </button>
+          {/* <div className="buttonSave">
+            <button
+              className={canRegister ? "btn save" : " disabled"}
+              type="submit"
+              disabled={!canRegister}
+              onClick={handleRegister}
+            >
+              Đăng ký
+            </button>
+          </div> */}
+        </form>
+
+        <div className="divider">
+          <span>Hoặc</span>
+        </div>
+
+        <button className="btn google-btn" onClick={googleLogin}>
+          Tiếp tục với Google
+        </button>
+
+        <div className="login-link">
+          <p>
+            Bạn đã có tài khoản?
+            <Link to="/login" className="login-text">
+              Đăng nhập
+            </Link>
+          </p>
         </div>
       </div>
     </section>
   );
 };
+
 export default Register;

@@ -1,5 +1,6 @@
-import "./ResponsePay.scss";
+import "../../../../Assets/scss/Clients/ResponsePay.scss";
 import { useNavigate } from "react-router-dom";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 const ResponseFailed = () => {
   const navigate = useNavigate();
@@ -20,14 +21,19 @@ const ResponseFailed = () => {
 
   return (
     <section className="main container section">
-      <div className="reponseInfo ">
-        <div className="secTitle">
-          <p>Thanh toán thất bại</p>
-          <p>Giao dịch của bạn đã bị hủy bỏ</p>
+      <div className="response-card failure">
+        <div className="icon-wrapper">
+          <CancelIcon className="failure-icon" />{" "}
+          {/* icon đỏ, bạn có thể dùng Material UI hoặc bất kỳ icon nào */}
         </div>
 
-        <form className="infoTicket">
-          <button className="btn search" onClick={handleBack}>
+        <div className="response-content">
+          <h2 className="response-title">Thanh toán thất bại</h2>
+          <p className="response-message">Giao dịch của bạn đã bị hủy bỏ</p>
+        </div>
+
+        <form className="action-form">
+          <button type="button" className="btn back-btn" onClick={handleBack}>
             Quay lại
           </button>
         </form>

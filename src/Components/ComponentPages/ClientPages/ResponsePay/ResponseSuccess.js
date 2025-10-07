@@ -1,70 +1,66 @@
-import React, { useState, useEffect } from "react";
-import "./ResponsePay.scss";
+import React, { useEffect } from "react";
+import "../../../../Assets/scss/Clients/ResponsePay.scss";
 import { useNavigate, useLocation } from "react-router-dom";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
-import CheckCircleSharpIcon from "@mui/icons-material/CheckCircleSharp";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 const ResponseSuccess = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const bookingDetails = JSON.parse(localStorage.getItem("bookingDetails"));
-  const bookingId = JSON.parse(localStorage.getItem("bookingId"));
+  // Lấy dữ liệu từ localStorage một lần, fallback về null nếu không có
+  const bookingDetails = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("bookingDetails"));
+    } catch {
+      return null;
+    }
+  })();
+
+  const bookingId = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("bookingId"));
+    } catch {
+      return null;
+    }
+  })();
+
   const kind = bookingDetails?.kind || "";
 
   const handleContinue = () => {
     if (bookingId && kind) {
-      navigate("/pay-success", { state: { bookingId: bookingId, kind: kind } });
+      navigate("/pay-success", { state: { bookingId, kind } });
       localStorage.removeItem("bookingDetails");
+      localStorage.removeItem("bookingId"); // Nếu muốn dọn luôn bookingId
     } else {
-      // Xử lý khi kind không tồn tại hoặc là null
-      console.error("Kind is null or undefined");
-      // Thực hiện các hành động phù hợp như báo lỗi hoặc xử lý thay thế
+      console.error("BookingId hoặc kind không hợp lệ");
     }
   };
 
+  // Tự động redirect nếu truy cập trực tiếp vào page thành công mà không có bookingId
   useEffect(() => {
-    if (location.pathname === "/payment-success") {
-      if (!bookingId) {
-        navigate("/");
-      }
+    if (location.pathname === "/payment-success" && !bookingId) {
+      navigate("/");
     }
   }, [location.pathname, bookingId, navigate]);
 
-  function LoadingOverlay() {
-    return (
-      <div className="loading-overlay">
-        <div className="loader"></div>
-      </div>
-    );
-  }
-
   return (
-    <section className="main container section">
-      {isLoading && (
-        <Backdrop
-          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={isLoading}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
-      )}
-      <div className="reponseInfo ">
-        <div className="imgsucces">
-          <CheckCircleSharpIcon className="icon" />
-        </div>
-        <div className="secTitle">
-          <p>Thanh toán thành công</p>
-          <p>Giao dịch của bạn đã được ghi nhận</p>
+    <section className="payment-success section">
+      <div className="success-card">
+        <div className="icon-wrapper">
+          <CheckCircleOutlineIcon className="success-icon" />
+          <span className="icon-shadow"></span>
         </div>
 
-        <form className="infoTicket">
-          <button className="btn search" onClick={handleContinue}>
+        <div className="success-content">
+          <h2 className="title">Thanh toán thành công</h2>
+          <p className="message">Giao dịch của bạn đã được ghi nhận</p>
+        </div>
+
+        <div className="action-wrapper">
+          <button className="btn continue-btn" onClick={handleContinue}>
             Tiếp tục
           </button>
-        </form>
+        </div>
       </div>
     </section>
   );

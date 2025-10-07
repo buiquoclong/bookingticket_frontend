@@ -141,6 +141,7 @@ const Login = () => {
           <div className="form-group">
             <PasswordInput
               label="Mật khẩu"
+              name="password"
               placeholder="Nhập mật khẩu"
               value={form.password}
               onChange={handleChange}
@@ -181,7 +182,7 @@ const Login = () => {
           <div className="register-link">
             <p>
               Bạn chưa có tài khoản?{" "}
-              <Link to="/register" className="register">
+              <Link to="/register" className="registerLink">
                 Đăng ký
               </Link>
             </p>

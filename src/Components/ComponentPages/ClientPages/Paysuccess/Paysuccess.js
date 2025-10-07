@@ -77,10 +77,11 @@ const Paysuccess = () => {
         <div className="success-content">
           <div className="icon-wrapper">
             <CheckCircleOutlineIcon className="success-icon" />
-            {/* 🔹 Vòng tròn phát sáng */}
             <span className="icon-glow"></span>
             <span className="icon-glow"></span>
             <span className="icon-glow"></span>
+
+            <span className="icon-shadow"></span>
           </div>
 
           <div className="text-center">
