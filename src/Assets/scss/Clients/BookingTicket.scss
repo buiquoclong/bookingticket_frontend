@@ -1,0 +1,397 @@
+@import "../variables.scss";
+
+body {
+  background: var(--whiteColor);
+}
+
+.payment-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+
+  .modal-box {
+    position: relative;
+    width: min(90%, 450px);
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    animation: slideUp 0.35s ease;
+
+    .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 28px;
+      height: 28px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 2px;
+        background: #333;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(45deg);
+        transition: 0.2s;
+      }
+
+      &::after {
+        transform: translate(-50%, -50%) rotate(-45deg);
+      }
+
+      &:hover {
+        transform: rotate(90deg);
+      }
+
+      &:hover::before,
+      &:hover::after {
+        background: #04aa6d;
+      }
+    }
+
+    .icon-wrapper {
+      position: relative;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 6rem;
+      height: 6rem;
+
+      .success-icon {
+        color: #04aa6d;
+        font-size: 6rem;
+        z-index: 2;
+        transition: transform 0.3s ease, color 0.3s ease;
+        animation: bounce 1.2s infinite ease-in-out;
+        z-index: 1; // đảm bảo icon trên bóng
+        &:hover {
+          transform: scale(1.2) rotate(-10deg);
+          color: #02864b;
+        }
+      }
+      .icon-shadow {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%) scaleX(1);
+        width: 60px;
+        height: 10px;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 50%;
+        filter: blur(4px);
+        animation: shadowBounce 1s infinite ease-in-out;
+        z-index: 0;
+      }
+    }
+
+    .title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #222;
+    }
+
+    .desc {
+      color: #555;
+      margin: 0.8rem 0 1.8rem;
+      line-height: 1.5;
+    }
+
+    .payment-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+
+      .btn {
+        border: none;
+        border-radius: 0.6rem;
+        padding: 0.8rem 1.2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
+      }
+
+      .vnpay {
+        background: #fff;
+        border: 1px solid #ccc;
+        &:hover {
+          border-color: #04aa6d;
+          transform: translateY(-2px);
+        }
+
+        .vnpay-red {
+          color: #ed3237;
+        }
+        .vnpay-blue {
+          color: #0f62ac;
+        }
+      }
+
+      .cod {
+        background: #04aa6d;
+        color: #fff;
+        &:hover {
+          background: #028a58;
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
+}
+
+.booking-section {
+  width: 100%;
+  max-width: 1128px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+
+  .booking-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2.5rem;
+
+    // -----------------
+    // Bên trái
+    // -----------------
+    .left-column {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+
+      .ticket-info {
+        display: flex;
+        gap: 1rem;
+        flex-direction: row;
+        justify-content: center;
+
+        &.round-trip {
+          display: flex;
+          flex-direction: row; // web: ngang hàng
+          gap: 1rem;
+          justify-content: center;
+          flex-wrap: wrap; // nếu quá nhỏ thì xuống dòng
+        }
+
+        .infoTicket {
+          flex: 1;
+          min-width: 20rem;
+        }
+      }
+
+      .user-card {
+        background: #fff;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+
+        min-width: 22rem; // chiều rộng nhỏ nhất
+        width: 100%; // co giãn
+        max-width: 41rem; // chiều rộng tối đa
+        margin: 0 auto; // căn giữa
+        flex-shrink: 1; // co giãn nếu cần
+
+        &:hover {
+          box-shadow: 0 10px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+          font-size: 1.5rem;
+          font-weight: 700;
+          margin-bottom: 0.5rem;
+          padding-left: 1rem;
+          position: relative;
+
+          &::before {
+            content: "";
+            position: absolute;
+            left: 0rem;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background-color: #2563eb;
+            border-radius: 2px;
+          }
+        }
+        .user-form {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+
+          .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+
+            label {
+              font-weight: 600;
+              color: #374151;
+              display: flex;
+              gap: 0.25rem;
+
+              .required {
+                color: #ef4444;
+              }
+            }
+
+            .input-wrapper {
+              display: flex;
+              flex-direction: column;
+              transition: all 0.25s ease;
+
+              .input-field {
+                width: 100%;
+                height: 3rem;
+                border-radius: 0.5rem;
+                border: 1px solid #d1d5db;
+                padding: 0 1rem;
+                font-size: 1rem;
+                transition: all 0.25s ease;
+                background: #f9fafb;
+
+                &:hover {
+                  border-color: #3b82f6;
+                  background: #fff;
+                }
+
+                &:focus {
+                  border-color: #2563eb;
+                  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+                  background: #fff;
+                  outline: none;
+                }
+              }
+
+              .error-msg {
+                font-size: 0.85rem;
+                color: red;
+                min-height: 1rem; // giữ chỗ để layout không nhảy
+                line-height: 1rem;
+                visibility: hidden;
+
+                margin-top: 0.4rem;
+                padding-left: 0.3rem;
+              }
+
+              &.has-error {
+                .error-msg {
+                  visibility: visible;
+                }
+
+                .input-field {
+                  border-color: #ef4444;
+                  animation: shakeError 0.3s;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // -----------------
+    // Bên phải
+    // -----------------
+    .right-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      justify-content: center; // căn giữa
+      align-items: center;
+
+      .policy-discount-card {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        .discount-card {
+          display: flex;
+          justify-content: center; // căn giữa
+          align-items: center;
+          gap: 1rem;
+          background: #fff;
+          border-radius: 1rem;
+          padding: 1rem;
+          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+          border: 1px solid #e5e7eb;
+          transition: all 0.3s ease;
+          min-width: 22rem;
+          max-width: 41rem;
+
+          &:hover {
+            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.1);
+          }
+
+          .MuiTextField-root {
+            width: 200px; // bạn có thể điều chỉnh
+            border: none;
+          }
+          .MuiButton-root {
+            background-color: #2563eb; // xanh dương chủ đạo
+            color: #fff;
+            font-weight: 600;
+            text-transform: none;
+            padding: 0.5rem 1.25rem;
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+
+            &:hover {
+              background-color: #1e40af; // xanh đậm hơn
+              box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+              transform: translateY(-1px);
+            }
+
+            &:active {
+              background-color: #1d4ed8; // nhấn nhẹ
+              transform: translateY(0);
+              box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+            }
+
+            &:disabled {
+              background-color: #d1d5db; // xám nhẹ
+              color: #6b7280;
+              box-shadow: none;
+              cursor: not-allowed;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // -----------------
+  // Responsive: xếp dọc
+  // -----------------
+  @media (max-width: 1082px) {
+    .booking-container {
+      flex-direction: column;
+    }
+
+    .ticket-info {
+      flex-direction: column;
+
+      .infoTicket {
+        width: 100%;
+      }
+    }
+  }
+}
