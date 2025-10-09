@@ -1,0 +1,588 @@
+@import "../../../Assets/scss/variables.scss";
+
+/* ============ SEAT NOTE ============ */
+.seatNoteColumn {
+  display: flex;
+  flex-direction: column; // cột dọc
+  gap: 0.75rem; // khoảng cách giữa các item
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--textColor);
+
+  .seatNoteItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; // khoảng cách giữa icon và text
+
+    .seatIcon {
+      width: 1rem;
+      height: 1rem;
+      border-radius: 0.25rem;
+    }
+
+    .seatSaled {
+      background-color: #d5d9dd;
+      border: 1px solid #c0c6cc;
+    }
+    .seatNonChose {
+      background-color: #def3ff;
+      border: 1px solid #96c5e7;
+    }
+    .seatChosing {
+      background-color: #fdede8;
+      border: 1px solid hsl(14.81deg 84.62% 82.16%);
+    }
+  }
+}
+@media (max-width: 575px) {
+  .seatNoteColumn {
+    flex-direction: row; // chuyển thành hàng ngang
+    justify-content: flex-start; // căn trái, hoặc center nếu muốn
+    gap: 1rem; // khoảng cách giữa các item, có thể tăng để đẹp hơn
+
+    .seatNoteItem {
+      .seatIcon {
+        width: 0.9rem; // giảm size icon nếu muốn
+        height: 0.9rem;
+      }
+
+      span {
+        font-size: 12px; // giảm font-size cho mobile
+      }
+    }
+  }
+}
+
+/* ============ SEAT TABLE ============ */
+
+table {
+  text-indent: 0;
+  border-color: inherit;
+  border-collapse: collapse;
+  tbody {
+    .seatNum {
+      gap: 0.25rem;
+      justify-content: center;
+      display: flex;
+      .singleSeat {
+        text-align: center;
+        justify-content: center;
+        cursor: pointer; // chưa chọn, nếu đã chọn rồi thì về cursor: not-allowed
+        display: flex;
+        margin-top: 0.25rem;
+        position: relative;
+
+        .numSeatA {
+          //vị trí của ghế hiển thị màu chữ theo trang thái của ghế
+          font-size: 10px !important;
+          color: rgb(
+            51 154 244/ 1
+          ); // nếu chưa chọn có màu này, đã chọn có màu là #A2ABB3, đang chọn có màu #EF5222
+          font-weight: 600 !important;
+          line-height: 1.25rem;
+          top: 0.25rem;
+          position: absolute;
+        }
+      }
+    }
+  }
+}
+
+/* ============ SEAT INFO TO BOOK ============ */
+.seatBook {
+  width: 100%;
+  max-width: 280px;
+  background: #ffffff;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  font-family: "Inter", sans-serif;
+  font-size: 0.875rem;
+
+  // Top section
+  .seatBook-top {
+    background: #dbeafe; // xanh nhạt (blue-100)
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+
+    .ticketInfo {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .numOfTicket {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e293b;
+      }
+
+      .seatNames {
+        font-size: 0.875rem;
+        font-weight: 400;
+        color: #475569;
+        line-height: 1.3rem;
+        word-wrap: break-word;
+      }
+    }
+  }
+
+  // Bottom section
+  .seatBook-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .totalPrice {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #3b82f6;
+      text-align: right;
+    }
+
+    .chooseButton {
+      background: #3b82f6;
+      color: #ffffff;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.6rem 0;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: #2563eb;
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+      }
+    }
+  }
+}
+/* Khi chưa chọn ghế */
+.seatBook-empty {
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem 1rem;
+  background: #f9fafc;
+  border-radius: 1rem;
+  border: 1.5px dashed #cbd5e1;
+  text-align: center;
+  transition: all 0.3s ease;
+  color: #334155;
+
+  // Hiệu ứng khi hover
+  &:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+  }
+
+  .empty-icon {
+    font-size: 3rem;
+    color: #2563eb; // xanh dương tươi
+    margin-bottom: 1rem;
+    animation: floatIcon 2s ease-in-out infinite;
+  }
+
+  p {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #1e293b;
+  }
+
+  span {
+    font-size: 0.95rem;
+    color: #64748b;
+  }
+
+  @keyframes floatIcon {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+}
+
+@media (max-width: 575px) {
+  .seatBook-empty {
+    padding: 1rem 1rem;
+    display: block;
+    height: auto;
+  }
+}
+
+.chooseTab {
+  flex: auto;
+  min-width: 0;
+  min-height: 0;
+
+  .chooseListTab {
+    display: flex;
+    width: 100%;
+
+    .chooseSeatTab {
+      flex: none;
+      width: 100%;
+      outline: none;
+      .chooseSeatContent {
+        padding-bottom: 1rem !important;
+        padding-inline: 0.25rem !important;
+        border-bottom-right-radius: 0.75rem !important;
+        border-bottom-left-radius: 0.75rem !important;
+        overflow-y: auto !important;
+        justify-content: center;
+        height: 24rem;
+        display: flex;
+        margin-top: 0.5rem !important;
+        .seatCenter {
+          align-items: center !important;
+          flex-direction: column !important;
+          width: 100%;
+
+          .seatLoca {
+            max-width: 28rem;
+            margin-inline: auto;
+            .seatLocaInfo {
+              width: auto;
+              margin-inline: auto !important;
+              padding-inline: 1.5rem !important;
+              padding-top: 0.25rem;
+              padding-bottom: 0.25rem;
+              flex-direction: column !important;
+              max-width: 42rem;
+              .seatNote {
+                font-weight: 400 !important;
+                font-size: 13px;
+                justify-content: space-between;
+                display: flex;
+                .seatNote1 {
+                  align-items: center !important;
+                  display: flex;
+                  margin-right: 2rem;
+                  .seatSaled {
+                    border-radius: 0.25rem;
+                    width: 1rem;
+                    height: 1rem;
+                    margin-right: 0.5rem;
+                    background: #d5d9dd;
+                  }
+                  .seatNonChose {
+                    border-radius: 0.25rem;
+                    width: 1rem;
+                    height: 1rem;
+                    margin-right: 0.5rem;
+                    background: #def3ff;
+                  }
+                  .seatChosing {
+                    border-radius: 0.25rem;
+                    width: 1rem;
+                    height: 1rem;
+                    margin-right: 0.5rem;
+                    background: #fdede8;
+                  }
+                }
+                .seatNote2 {
+                  margin-right: 0;
+                }
+              }
+              .numSeat {
+                gap: 1.5rem !important;
+                font-weight: 500 !important;
+                text-align: center;
+                justify-content: center;
+                flex-direction: row;
+                display: flex;
+                margin-top: 1rem !important;
+                margin-bottom: 1rem !important;
+                .bottomSeat {
+                  min-width: 153px;
+                  flex-direction: column;
+                  display: flex;
+                  .nameBottomSeat {
+                    font-size: 0.875rem;
+                    line-height: 1.25rem;
+                    padding: 0.5rem;
+                    justify-content: center;
+                    width: 100%;
+                    display: inline;
+                    .icon {
+                      border-radius: 2px;
+                      color: var(--textColor);
+                      font-size: 20px;
+                      display: none;
+                    }
+                  }
+                  .devide {
+                    width: 100%;
+                    background: var(--greyText);
+                    height: 0.5px;
+                    margin-bottom: 1rem;
+                    display: none;
+                  }
+                  table {
+                    text-indent: 0;
+                    border-color: inherit;
+                    border-collapse: collapse;
+                    tbody {
+                      .seatNum {
+                        gap: 0.25rem;
+                        justify-content: center;
+                        display: flex;
+                        .singleSeat {
+                          text-align: center;
+                          justify-content: center;
+                          cursor: pointer; // chưa chọn, nếu đã chọn rồi thì về cursor: not-allowed
+                          display: flex;
+                          margin-top: 0.25rem;
+                          position: relative;
+                          // &:hover{
+                          //     .numSeatA{
+                          //         color: #EF5222;
+                          //     }
+                          // }
+
+                          .numSeatA {
+                            //vị trí của ghế hiển thị màu chữ theo trang thái của ghế
+                            font-size: 10px !important;
+                            color: rgb(
+                              51 154 244/ 1
+                            ); // nếu chưa chọn có màu này, đã chọn có màu là #A2ABB3, đang chọn có màu #EF5222
+                            font-weight: 600 !important;
+                            line-height: 1.25rem;
+                            top: 0.25rem;
+                            position: absolute;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          .devide {
+            width: 100%;
+            background: rbga(0, 0, 0, 0.1);
+            height: 0.5px;
+            margin-bottom: 0.75rem;
+          }
+          .seatBook {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            padding-inline: 1rem;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            display: flex;
+            .numTicket {
+              justify-content: space-between;
+              align-items: center;
+              display: flex;
+              .numOfTicket {
+                font-weight: 600 !important;
+                color: var(--textColor);
+                span {
+                  color: var(--blackColor);
+                }
+              }
+            }
+            .priceTicket {
+              gap: 0.75rem;
+              align-items: center;
+              display: flex;
+              .price {
+                text-align: right;
+                color: var(--blackColor);
+                .totalPrice {
+                  color: var(--PrimaryColor);
+                  font-weight: 600;
+                  font-size: 1rem;
+                  line-height: 1.5rem;
+                }
+              }
+
+              .chooseButton {
+                background: #75caf1;
+                color: var(--PrimaryColor);
+                border: none;
+                display: block;
+                z-index: 10;
+                right: 1.25rem;
+                width: 10rem;
+
+                span {
+                  font-weight: bold;
+                }
+
+                &:hover,
+                &:focus {
+                  background: var(--PrimaryColor);
+                  color: var(--whiteColor);
+                  border: 1px solid var(--gradientColor);
+                }
+              }
+            }
+          }
+        }
+        .routeCenter {
+          padding-bottom: 5rem !important;
+          overflow: auto !important;
+          flex-direction: column !important;
+          width: 100%;
+          display: flex;
+          .routePoint {
+            color: var(--blackColor);
+            font-size: 15px;
+            padding-inline: 1rem;
+            align-items: flex-start;
+            display: flex;
+            position: relative;
+            .dotLine {
+              border-style: dotted !important;
+              border-right-width: 0 !important;
+              height: 100%;
+              top: 0.5rem !important;
+              left: 77px !important;
+              position: absolute;
+              border-color: var(--greyText);
+            }
+            img {
+              margin-top: 0.25rem !important;
+              margin-inline: 1rem !important;
+              z-index: 10 !important;
+              width: 16px !important;
+              height: 19px !important;
+              display: block !important;
+            }
+            .location {
+              margin-bottom: 1rem !important;
+              .addressLoca {
+                color: var(--textColor);
+                line-height: 1rem;
+                font-size: 13px;
+              }
+            }
+          }
+          .noteRoute {
+            font-size: 13px;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            padding-inline: 1rem;
+            background-color: rgb(247 247 247/ 1) !important;
+            border-bottom-right-radius: 0.5rem !important;
+            border-bottom-left-radius: 0.5rem !important;
+            z-index: 20 !important;
+            bottom: 0;
+            position: absolute;
+            .noteRoute1 {
+              font-weight: 500 !important;
+              font-size: 15px !important;
+            }
+          }
+        }
+        .policyCenter {
+          overflow: auto;
+          width: 45.6rem;
+          .policyItem {
+            flex-direction: column;
+            display: flex;
+            .content {
+              padding-top: 0.5rem;
+              padding-bottom: 0.5rem;
+              padding-inline: 1rem;
+              .itemContent {
+                font-weight: 500;
+                font-size: 1.125rem;
+                line-height: 1.75rem;
+                padding-bottom: 0.5rem;
+              }
+              .listpolicy {
+                flex-direction: column;
+                width: 100%;
+                display: flex;
+                .listpolicyItem {
+                  font-size: 15px;
+                  ul {
+                    list-style-type: disc;
+                    margin: 0 1rem;
+                    li::marker {
+                      color: #a2abb3;
+                      width: 6px !important;
+                      height: 6px !important;
+                    }
+                    li {
+                      list-style: initial;
+
+                      ::marker {
+                        color: #a2abb3 !important;
+                        width: 6px !important;
+                        height: 6px !important;
+                      }
+                      p {
+                        font-size: 15px;
+                        margin-bottom: 0;
+                        font-weight: 500;
+                        position: relative;
+                        word-wrap: break-word;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        .policyCenter::-webkit-scrollbar {
+          width: 10px;
+        }
+
+        .policyCenter::-webkit-scrollbar-track {
+          // background: #f1f1f1;
+          background: var(--whiteColor);
+        }
+
+        .policyCenter::-webkit-scrollbar-thumb {
+          background: #888;
+          border-radius: 10px;
+        }
+
+        .policyCenter::-webkit-scrollbar-thumb:hover {
+          background: var(--SecondaryColor);
+        }
+      }
+      .chooseSeatContent::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      .chooseSeatContent::-webkit-scrollbar-track {
+        background: var(--whiteColor);
+      }
+
+      .chooseSeatContent::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+      }
+
+      .chooseSeatContent::-webkit-scrollbar-thumb:hover {
+        background: var(--SecondaryColor);
+      }
+    }
+  }
+}
