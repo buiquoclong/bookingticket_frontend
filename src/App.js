@@ -34,7 +34,7 @@ import Login from "./Components/ComponentPages/ClientPages/Login/Login";
 import Register from "./Components/ComponentPages/ClientPages/Register/Register";
 import BookingTicket from "./Components/ComponentPages/ClientPages/BookingTicket/BookingTicket";
 import BookTicket from "./Components/ComponentPages/ClientPages/BookTicket/BookTicket";
-import BookTicketReturn from "./Components/ComponentPages/ClientPages/BookTicketReturn/BookTicketReturn";
+import BookTicketReturn from "./Components/ComponentPages/ClientPages/BookTicket/BookTicketReturn";
 import InfoUser from "./Components/ComponentPages/ClientPages/InfoUser/InfoUser";
 import Paysuccess from "./Components/ComponentPages/ClientPages/Paysuccess/Paysuccess";
 import Contact from "./Components/ComponentPages/ClientPages/Contact/Contact";
