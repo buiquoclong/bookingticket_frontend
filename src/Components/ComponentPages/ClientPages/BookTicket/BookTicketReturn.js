@@ -1,8 +1,8 @@
 import React, { useCallback, useState, useEffect } from "react";
-import "./BookTicket.scss";
+import "../../../../Assets/scss/Clients/BookTicket.scss";
 import { toast } from "react-toastify";
 import TripList from "../../../ComponentParts/TripResultComponents/TripList";
-import SearchResultsHeader from "../../../ComponentParts/SearchResultsHeader";
+import SearchResultsHeader from "../../../ComponentParts/TripResultComponents/SearchResultsHeader";
 
 import { useNavigate, useLocation } from "react-router-dom";
 

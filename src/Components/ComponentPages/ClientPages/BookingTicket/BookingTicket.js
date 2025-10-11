@@ -9,8 +9,8 @@ import Button from "@mui/material/Button";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
-import InfoTicket from "../../../ComponentParts/InfoTicket";
-import PolicyInfo from "../../../ComponentParts/PolicyInfo";
+import InfoTicket from "../../../ComponentParts/TicketInfoComponents/InfoTicket";
+import PolicyInfo from "../../../ComponentParts/PolicyComponents/PolicyInfo";
 import BookingSummary from "../../../ComponentParts/BookingSummary";
 
 const BookingTicket = () => {
@@ -281,7 +281,7 @@ const BookingTicket = () => {
       selectedSeatIds: selectedSeatIds,
       selectedSeatNames: selectedSeatsNames,
       totalPrice: totalPrice,
-      pickupLocation: pickupLocation,
+      pickupLocation: pickupLocation || "Tại nhà xe",
       note: note,
 
       // Lượt về (nếu khứ hồi)
@@ -289,7 +289,7 @@ const BookingTicket = () => {
       selectedSeatIdsReturn: selectedSeatIdsReturn,
       selectedSeatNamesReturn: selectedSeatsNamesReturn,
       totalPriceReturn: totalPriceReturn,
-      pickupLocationReturn: pickupLocationReturn,
+      pickupLocationReturn: pickupLocationReturn || "Tại nhà xe",
       noteReturn: noteReturn,
 
       kindPay, // "CASH" hoặc "VNPAY"
