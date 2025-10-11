@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import "./MyBooking.scss";
+import "../../../../Assets/scss/Clients/MyBooking.scss";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
@@ -9,7 +9,7 @@ import {
   InputLabel,
   FormControl,
 } from "@mui/material";
-import BookingTicketInfo from "../../../ComponentParts/BookingTicketInfo";
+import BookingTicketInfo from "../../../ComponentParts/TicketInfoComponents/BookingTicketInfo";
 
 const MyBooking = () => {
   const userId = localStorage.getItem("userId");

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import DataTable from "react-data-table-component";
-import "./MyRating.scss";
+import "../../../../Assets/scss/Clients/MyRating.scss";
 import { useNavigate } from "react-router-dom";
 import StarRatings from "react-star-ratings";
 import { toast } from "react-toastify";

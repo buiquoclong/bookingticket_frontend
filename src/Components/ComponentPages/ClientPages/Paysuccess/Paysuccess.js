@@ -3,7 +3,7 @@ import React, { useCallback, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import BookingTicketInfo from "../../../ComponentParts/BookingTicketInfo";
+import BookingTicketInfo from "../../../ComponentParts/TicketInfoComponents/BookingTicketInfo";
 import "../../../../Assets/scss/Clients/Paysuccess.scss";
 
 const Paysuccess = () => {
