@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../../../../Assets/scss/Clients/SearchTicket.scss";
 import { toast } from "react-toastify";
-import BookingTicketInfo from "../../../ComponentParts/BookingTicketInfo";
+import BookingTicketInfo from "../../../ComponentParts/TicketInfoComponents/BookingTicketInfo";
 import { FaSearch } from "react-icons/fa";
 
 const SearchTicket = () => {
