@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../../../../Assets/scss/Clients/SearchRoute.scss";
+import "../../../Assets/scss/Clients/SearchRoute.scss";
 import DataTable from "react-data-table-component";
 import { useNavigate } from "react-router-dom";
 

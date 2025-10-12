@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
-import "../../../../Assets/scss/Clients/TicketHistory.scss";
+import "../../../Assets/scss/Clients/TicketHistory.scss";
 import { useNavigate } from "react-router-dom";
 import { Pagination } from "@mui/material";
 import { toast } from "react-toastify";
 // import TicketCard from "../../../ComponentParts/TicketCard";
-import TicketCard from "../../../ComponentParts/TicketInfoComponents/TicketCard";
-import RatingModal from "../../../ComponentParts/ModelComponents/RatingModal";
+import TicketCard from "../../ComponentParts/TicketInfoComponents/TicketCard";
+import RatingModal from "../../ComponentParts/ModelComponents/RatingModal";
 
 const TicketHistory = () => {
   const [tickets, setTickets] = useState([]);

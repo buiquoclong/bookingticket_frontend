@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import "../../../../Assets/scss/Clients/Register.scss";
+import "../../../Assets/scss/Clients/Register.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import PasswordInput from "../../../ComponentParts/PasswordInput";
+import PasswordInput from "../../ComponentParts/PasswordInput";
 
 const Register = () => {
   const navigate = useNavigate();

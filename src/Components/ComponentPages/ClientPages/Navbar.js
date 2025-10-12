@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import "../../../../Assets/scss/Clients/Navbar.scss";
+import "../../../Assets/scss/Clients/Navbar.scss";
 import { MdTravelExplore } from "react-icons/md";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { TbGridDots } from "react-icons/tb";
 import { Link } from "react-router-dom";
-import useNavbar from "../../../ComponentParts/useNavbar";
+import useNavbar from "../../ComponentParts/useNavbar";
 import {
   FaUserCircle,
   FaStar,
