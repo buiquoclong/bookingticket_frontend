@@ -1,0 +1,644 @@
+@import "../../../Assets/scss/variables.scss";
+
+/* ============ BOOKING TICKET INFO (THÔNG TIN VÉ ĐÃ ĐẶT) ============ */
+
+.booking-ticket-wrapper {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+
+  .ticket-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--PrimaryColor);
+    text-align: center;
+    position: relative;
+    letter-spacing: 0.5px;
+
+    &::after {
+      content: "";
+      display: block;
+      width: 80px;
+      height: 3.5px;
+      background: var(--gradientColor);
+      margin: 0.6rem auto 0 auto;
+      border-radius: 5px;
+    }
+  }
+
+  .ticket-grid {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(360px, 420px)
+    ); /* 🔹 rộng hơn một chút */
+    justify-content: center;
+    gap: 2rem;
+    width: 100%;
+    max-width: 1300px; /* Giới hạn cho bố cục đẹp */
+  }
+
+  .ticket-card {
+    background: linear-gradient(145deg, #ffffff, #f6f8fb);
+    border-radius: 1rem;
+    padding: 1.8rem 2rem; /* 🔹 rộng hơn */
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    position: relative;
+    transition: all 0.3s ease;
+    max-width: 420px;
+    min-width: 340px;
+    margin-inline: auto;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradientColor);
+      border-radius: 1rem 1rem 0 0;
+    }
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .ticket-header {
+      text-align: left;
+      margin-bottom: 1rem;
+
+      h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--PrimaryColor);
+        margin-bottom: 0.3rem;
+      }
+
+      .trip-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #333;
+      }
+    }
+
+    .ticket-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+
+      .ticket-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.95rem;
+        color: #444;
+        line-height: 1.5;
+
+        .label {
+          font-weight: 600;
+          color: #555;
+          flex-shrink: 0; // giữ nhãn không bị co
+          margin-right: 0.5rem;
+        }
+
+        span:last-child {
+          font-weight: 500;
+          text-align: right;
+        }
+
+        &.seat {
+          display: flex;
+          flex-wrap: wrap; // xuống dòng nếu nhiều ghế
+          gap: 0.4rem;
+          align-items: center;
+
+          .seat-badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end; // căn phải
+            gap: 0.3rem;
+            flex: 1; // chiếm toàn bộ khoảng còn lại
+          }
+
+          .seat-badge {
+            background: var(--SecondaryColor);
+            color: #fff;
+            padding: 0.3rem 0.7rem;
+            border-radius: 0.4rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap; // tránh badge bị cắt dòng giữa
+          }
+        }
+
+        &.price {
+          margin-top: 0.6rem;
+
+          .price-value {
+            color: var(--PrimaryColor);
+            font-weight: 700;
+            font-size: 1.1rem;
+          }
+        }
+      }
+    }
+  }
+
+  /* 🔹 Responsive cải tiến */
+  @media (max-width: 992px) {
+    .ticket-grid {
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .ticket-card {
+      padding: 1.5rem 1.7rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .ticket-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .ticket-card {
+      width: 92%;
+      padding: 1.3rem;
+    }
+  }
+}
+
+/* ============ INFO TICKET (HIỂN THỊ THÔNG TIN CÁC GHẾ ĐÃ CHỌN ĐỂ ĐẶT)============ */
+.ticket-card {
+  width: 20rem;
+  max-width: 24rem;
+  background: #fff;
+  border-radius: 1rem;
+  border: 1px solid #e0e0e0;
+  padding: 1rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  font-family: "Inter", sans-serif;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  &__header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+
+    h3 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #111;
+      position: relative;
+
+      &::after {
+        content: "";
+        display: block;
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(90deg, #1976d2, #42a5f5);
+        border-radius: 2px;
+        margin: 0.5rem auto 0;
+      }
+    }
+  }
+
+  .ticket-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem; // khoảng cách giữa các row
+
+    .ticket-card__row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #555;
+        flex: 1;
+      }
+
+      .value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #111;
+        text-align: right;
+        flex: 2;
+        white-space: normal;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-word; // ngắt chữ dài quá
+        max-width: 70%; // vẫn giới hạn chiều rộng
+      }
+
+      &.ticket-card__switch {
+        justify-content: center;
+        padding: 0.6rem 0.8rem;
+        border-radius: 0.75rem;
+        background-color: #f9fafb;
+        margin-bottom: 0.2rem;
+        // box-shadow: inset 0 0 0 1px #e5e7eb;
+        transition: all 0.25s ease;
+        gap: 0.75rem;
+        cursor: pointer;
+        &:hover {
+          background-color: #f1f5f9;
+          box-shadow: inset 0 0 0 1px #d1d5db;
+        }
+        .MuiFormControlLabel-root {
+          margin: 0;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          user-select: none;
+        }
+
+        .MuiFormControlLabel-label {
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: #374151;
+          transition: color 0.2s ease;
+
+          &:hover {
+            color: #1976d2;
+          }
+        }
+        .MuiSwitch-root {
+          transform: scale(1.05); // nhẹ để switch rõ hơn
+        }
+      }
+      .MuiSwitch-thumb {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      }
+
+      .MuiSwitch-track {
+        background-color: #d1d5db;
+        opacity: 1;
+        transition: all 0.25s ease;
+      }
+
+      .Mui-checked + .MuiSwitch-track {
+        background-color: #1976d2 !important;
+      }
+
+      .ticket-card__seats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+
+        .ticket-card__seat {
+          background-color: #1976d2;
+          color: #fff;
+          font-size: 0.85rem;
+          font-weight: 600;
+          padding: 0.2rem 0.5rem;
+          border-radius: 0.3rem;
+        }
+      }
+
+      .ticket-card__input {
+        flex: 2;
+        font-size: 0.95rem;
+        padding: 0.5rem 0.75rem; // tăng padding để nhìn thoáng
+        border: 1px solid #ccc;
+        border-radius: 0.5rem; // bo góc mềm mại hơn
+        outline: none;
+        background-color: #fafafa; // nền nhẹ, dễ nhìn
+        transition: all 0.25s ease;
+
+        &::placeholder {
+          color: #999;
+          font-style: italic;
+        }
+
+        &:focus {
+          border-color: #1976d2;
+          box-shadow: 0 4px 8px rgba(25, 118, 210, 0.15); // shadow nhẹ, hiện đại
+          background-color: #fff; // đổi nền khi focus để nổi bật
+        }
+
+        &:disabled {
+          background-color: #f5f5f5;
+          cursor: not-allowed;
+          color: #aaa;
+        }
+      }
+
+      select.ticket-card__input {
+        appearance: none;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 0.4rem;
+        padding: 0.3rem 0.5rem;
+        cursor: pointer;
+
+        &:focus {
+          border-color: #1976d2;
+          box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+        }
+      }
+    }
+
+    .ticket-card__pickup {
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+
+      // Tạo sẵn không gian cho khu vực pickup
+      min-height: 1.5rem; // ✅ đảm bảo layout không co rút
+      transition: all 0.3s ease; // ✅ mượt mà khi bật/tắt
+
+      // Nếu muốn ẩn mượt (fade + co giãn)
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-5px);
+      height: 0;
+      overflow: hidden;
+
+      &.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        height: auto;
+        min-height: 1rem;
+        // margin-top: 0.2rem;
+      }
+
+      .label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #444;
+        flex: 0 0 30%; // cố định độ rộng nhãn để cân
+      }
+
+      .pickup-select-wrapper {
+        flex: 1;
+        position: relative;
+        max-width: 100%;
+      }
+
+      .ticket-card__select {
+        width: 100%;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #333;
+        background-color: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        outline: none;
+        appearance: none;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap; // ✅ tránh vỡ layout
+        display: block;
+
+        &:focus {
+          border-color: #1976d2;
+          box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+        }
+
+        &:hover {
+          border-color: #1976d2;
+        }
+
+        option {
+          white-space: normal; // ✅ bên trong dropdown có thể xuống dòng
+          word-break: break-word;
+        }
+      }
+    }
+
+    .ticket-card__note {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      height: 1rem;
+
+      .ticket-card__text {
+        flex: 2;
+        cursor: pointer;
+        color: #111;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: right;
+
+        &:hover {
+          text-decoration: underline;
+          color: #1976d2;
+        }
+      }
+
+      .note-input-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        flex: 2;
+        max-width: 77%;
+
+        .ticket-card__input {
+          flex: 1 1 auto;
+          min-width: 0;
+          font-size: 0.95rem;
+          padding: 0.4rem 0.6rem;
+          border: 1px solid #ccc;
+          border-radius: 0.4rem;
+          outline: none;
+          background-color: #fafafa;
+          transition: all 0.2s ease;
+
+          &::placeholder {
+            color: #999;
+            font-style: italic;
+          }
+
+          &:focus {
+            border-color: #1976d2;
+            box-shadow: 0 4px 8px rgba(25, 118, 210, 0.15);
+            background-color: #fff;
+          }
+        }
+
+        .note-btn {
+          flex: 0 0 auto;
+          padding: 0.35rem 0.7rem;
+          border: none;
+          border-radius: 0.4rem;
+          cursor: pointer;
+          font-weight: 600;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 2.2rem;
+
+          &.save {
+            background-color: #1976d2;
+            color: #fff;
+
+            &:hover {
+              background-color: #1565c0;
+            }
+          }
+
+          &.cancel {
+            background-color: #e0e0e0;
+            color: #555;
+
+            &:hover {
+              background-color: #bdbdbd;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* ============ TICKET CARD(HIỂN THỊ THÔNG TIN VÉ TRONG TICKET HISTORY)============ */
+
+.ticket-card {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 1.5rem 1.8rem;
+  border-top: 4px solid var(--PrimaryColor);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  transition: 0.3s;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 19rem;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+
+  .ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--PrimaryColor);
+      margin-right: 1rem; // khoảng cách với tên tuyến
+    }
+
+    .trip-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
+      text-align: right;
+      max-width: 60%;
+      white-space: normal; // cho phép xuống dòng
+      overflow: visible; // không ẩn
+      text-overflow: unset; // bỏ ellipsis
+      word-break: break-word; // nếu quá dài sẽ xuống dòng
+    }
+  }
+
+  .ticket-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: #444;
+
+    .line {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+
+      &:not(.seat-list) span:first-child {
+        font-weight: 600;
+        color: #555;
+        min-width: 100px;
+      }
+    }
+
+    .seat-list {
+      display: flex;
+      flex-wrap: wrap; // xuống dòng nếu nhiều ghế
+      gap: 0.4rem;
+      align-items: center;
+
+      .label {
+        font-weight: 600;
+        color: #555;
+        min-width: 100px;
+      }
+
+      .seat-badges {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end; // căn phải
+        gap: 0.3rem;
+        flex: 1; // chiếm toàn bộ khoảng còn lại
+      }
+
+      .seat-badge {
+        background: var(--SecondaryColor);
+        color: #fff;
+        padding: 0.1rem 0.5rem;
+        border-radius: 0.4rem;
+        font-weight: 600;
+        font-size: 0.8rem;
+        white-space: nowrap; // tránh badge bị cắt dòng giữa
+      }
+      .no-seat {
+        font-style: italic;
+        color: #888;
+      }
+    }
+
+    .price-value {
+      color: var(--PrimaryColor);
+      font-weight: 700;
+    }
+
+    .status-section {
+      margin-top: 1rem;
+      text-align: right;
+
+      .status {
+        font-weight: 600;
+        margin-right: 1rem;
+      }
+
+      .canceled {
+        color: red;
+      }
+
+      .rating-btn {
+        background: #3b82f6;
+        color: #fff;
+        border: none;
+        border-radius: 0.4rem;
+        padding: 0.4rem 1rem;
+        cursor: pointer;
+        transition: background 0.2s ease;
+
+        &:hover {
+          background: #2563eb;
+        }
+      }
+    }
+  }
+}
