@@ -1,0 +1,165 @@
+@import "../../../Assets/scss/variables.scss";
+
+/* ============ POLICY TAB IN RESULT SEARCH ============ */
+.policyCenter {
+  overflow: auto;
+  width: 45.6rem;
+  .policyItem {
+    flex-direction: column;
+    display: flex;
+    .content {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      padding-inline: 1rem;
+      .itemContent {
+        font-weight: 500;
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+        padding-bottom: 0.5rem;
+      }
+      .listpolicy {
+        flex-direction: column;
+        width: 100%;
+        display: flex;
+        .listpolicyItem {
+          font-size: 15px;
+          ul {
+            list-style-type: disc;
+            margin: 0 1rem;
+            li::marker {
+              color: #a2abb3;
+              width: 6px !important;
+              height: 6px !important;
+            }
+            li {
+              list-style: initial;
+
+              ::marker {
+                color: #a2abb3 !important;
+                width: 6px !important;
+                height: 6px !important;
+              }
+              p {
+                font-size: 15px;
+                margin-bottom: 0;
+                font-weight: 500;
+                position: relative;
+                word-wrap: break-word;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+.policyCenter::-webkit-scrollbar {
+  width: 10px;
+}
+
+.policyCenter::-webkit-scrollbar-track {
+  // background: #f1f1f1;
+  background: var(--whiteColor);
+}
+
+.policyCenter::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.policyCenter::-webkit-scrollbar-thumb:hover {
+  background: var(--SecondaryColor);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============ POLICY INFO (THÔNG TIN CHÍNH SÁCH) ============ */
+.policy {
+  width: 100%;
+  max-width: 41rem;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  background: linear-gradient(180deg, #ffffff, #f9fafb);
+  border-radius: 1.5rem;
+  border: 1px solid var(--greyText);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  animation: fade-slide-down 0.5s ease both;
+
+  &__header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+
+    & .policy__title {
+      font-size: 2rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 1.3;
+      letter-spacing: 1px;
+
+      & .policy__highlight {
+        color: red;
+      }
+    }
+
+    & .policy__divider {
+      width: 60px;
+      height: 3px;
+      background-color: var(--greyText);
+      margin: 0.5rem auto 0;
+      border-radius: 2px;
+    }
+  }
+
+  &__content {
+    text-align: left;
+    line-height: 1.8;
+    font-size: 1rem;
+
+    & p {
+      margin: 1rem 0;
+      opacity: 0;
+      animation: fade-in 0.5s ease forwards;
+    }
+
+    & p:nth-child(1) {
+      animation-delay: 0.2s;
+    }
+    & p:nth-child(2) {
+      animation-delay: 0.4s;
+    }
+
+    & .policy__icon {
+      margin-right: 0.3rem;
+    }
+
+    & .policy__important {
+      color: red;
+      font-weight: 600;
+      margin-right: 0.2rem;
+    }
+
+    & .policy__time {
+      color: red;
+      font-weight: 600;
+    }
+  }
+}
