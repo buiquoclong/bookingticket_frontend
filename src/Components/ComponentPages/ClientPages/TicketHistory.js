@@ -26,13 +26,6 @@ const TicketHistory = () => {
   const statusMap = { 1: "Đã xác nhận", 2: "Đã hoàn thành" };
   const statusColorMap = { 1: "#efcf7f", 2: "green" };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return `${String(date.getDate()).padStart(2, "0")}/${String(
-      date.getMonth() + 1
-    ).padStart(2, "0")}/${date.getFullYear()}`;
-  };
-
   // --- FETCH DATA ---
   const fetchBookingDetails = useCallback(async () => {
     try {
@@ -137,7 +130,6 @@ const TicketHistory = () => {
                 kindTrip={kindTrip}
                 statusMap={statusMap}
                 statusColorMap={statusColorMap}
-                formatDate={formatDate}
                 handleRating={handleRating}
               />
             ))}
@@ -162,15 +154,15 @@ const TicketHistory = () => {
       {isRating && (
         <RatingModal
           isOpen={isRating}
+          mode="create"
           selectedTrip={selectedTrip}
           rating={rating}
           setRating={setRating}
           content={content}
           setContent={setContent}
-          handleCancelRating={handleCancelRating}
-          handleCreateRating={handleCreateRating}
+          onCancel={handleCancelRating}
+          onSubmit={handleCreateRating}
           ratingsDescription={ratingsDescription}
-          formatDate={formatDate}
         />
       )}
     </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import "../../../Assets/scss/Clients/Navbar.scss";
 import { MdTravelExplore } from "react-icons/md";
 import { AiFillCloseCircle } from "react-icons/ai";
@@ -43,6 +44,12 @@ const Navbar = React.forwardRef((props, ref) => {
     setActiveItem(path); // cập nhật item active
     handleNavigation(path); // navigate
   };
+
+  const location = useLocation();
+
+  useEffect(() => {
+    setActiveItem(location.pathname);
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleScroll = () => setScrolling(window.scrollY > 10);

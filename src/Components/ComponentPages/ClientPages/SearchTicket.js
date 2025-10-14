@@ -11,11 +11,6 @@ const SearchTicket = () => {
   const [isSearch, setIsSearch] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("vi-VN");
-  };
-
   const handleTicketCodeChange = (e) => {
     const value = e.target.value.trimStart();
     setTicketCode(value);
@@ -115,7 +110,6 @@ const SearchTicket = () => {
           <BookingTicketInfo
             kind={data[0]?.roundTrip === 1 ? "Khứ hồi" : "Một chiều"}
             data={data}
-            formatDate={formatDate}
           />
         </div>
       )}
