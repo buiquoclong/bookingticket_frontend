@@ -16,6 +16,10 @@
   --cardBG: rgb(225, 225, 235);
 }
 
+body {
+  background: var(--whiteColor);
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);

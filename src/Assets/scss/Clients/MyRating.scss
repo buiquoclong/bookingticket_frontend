@@ -1,85 +1,4 @@
-:root {
-  --PrimaryColor: hsl(199, 100%, 33%);
-  --SecondaryColor: hsl(187, 85%, 43%);
-  --gradientColor: linear-gradient(
-    to right,
-    hsl(187, 85%, 43%),
-    hsl(199, 100%, 33%)
-  );
-  --whiteColor: hsl(0, 0%, 100%);
-  --blackColor: hsl(201, 33%, 16%);
-  --textColor: hsl(240, 4%, 36%);
-  --whiteColorDeam: hsl(0, 0%, 93%);
-  --greyText: rgb(190, 190, 190);
-  --inputColor: rgb(239, 239, 239);
-  --bodyColor: rgb(240, 240, 246);
-  --cardBG: rgb(225, 225, 235);
-  --cardHover: rgb(255, 255, 255);
-}
-body {
-  background: var(--whiteColor);
-}
-// .main{
-//     width: 100%;
-// margin-inline: 1rem;
-// padding-inline: 5rem;
-// background: var(--whiteColor);
-
-.HisContent {
-  padding-top: 2rem;
-  .searchIn {
-    padding-bottom: 2rem;
-    .findTuyen {
-      width: 18rem;
-      height: 2.5rem;
-      background: var(--whiteColor);
-      border-radius: 0.5rem;
-      padding-left: 1rem;
-      border: 1px solid var(--greyText);
-      outline: none;
-    }
-  }
-
-  .HistoryTick {
-    width: 100%;
-    // display: flex;
-
-    border: 1px solid var(--greyText);
-    border-radius: 0.6rem;
-    .contentTikcet {
-      width: 100%;
-      height: 5rem;
-      display: flex;
-      justify-content: space-between;
-      border-radius: 0.6rem;
-      border: 1px solid var(--greyText);
-      padding-inline: 1rem;
-      margin-bottom: 2rem;
-      .title {
-        color: var(--blackColor);
-        font-size: 25px;
-        font-weight: 600;
-        margin-top: auto;
-        margin-bottom: auto;
-      }
-      .back {
-        border-radius: 0.6rem;
-        width: 6rem;
-        height: 3rem;
-        padding: 0;
-        font-weight: 600;
-        margin-top: auto;
-        margin-bottom: auto;
-        color: var(--whiteColor);
-      }
-    }
-    .devide {
-      width: 100%;
-      background-color: var(--greyText);
-      height: 0.5px;
-    }
-  }
-}
+@use "../variables.scss";
 
 .modal {
   position: fixed;
@@ -214,3 +133,143 @@ body {
 // }
 
 // }
+.my-rating-wrapper {
+  width: 100%;
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-family: "Inter", sans-serif;
+
+  .HisContent {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
+
+  .searchIn {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.2rem;
+  }
+
+  .contentTicket {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+  }
+
+  .devide {
+    width: 100%;
+    height: 1px;
+    background: #e2e8f0;
+    margin: 1rem 0;
+  }
+
+  /* Danh sách card */
+  .rating-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 1.5rem;
+
+    .rating-card {
+      background: #f9fafb;
+      border-radius: 0.8rem;
+      padding: 1rem 1.2rem;
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .rating-info {
+        .lineInfo {
+          display: flex;
+          justify-content: space-between;
+          margin: 0.2rem 0;
+
+          .label {
+            font-weight: 500;
+            color: #475569;
+          }
+
+          .value {
+            color: #1e293b;
+            font-weight: 600;
+          }
+        }
+      }
+
+      .rating-stars {
+        margin: 0.8rem 0;
+        text-align: center;
+      }
+
+      .rating-comment {
+        font-style: italic;
+        color: #334155;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .rating-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+
+        .btn {
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+          border: none;
+          padding: 0.4rem 0.8rem;
+          border-radius: 6px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          cursor: pointer;
+          color: #fff;
+          transition: 0.3s ease;
+
+          &.edit {
+            background: #3b82f6;
+            &:hover {
+              background: #2563eb;
+            }
+          }
+
+          &.delete {
+            background: #ef4444;
+            &:hover {
+              background: #dc2626;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .no-data {
+    text-align: center;
+    font-size: 1rem;
+    color: #94a3b8;
+    margin-top: 2rem;
+  }
+
+  .center-pagination {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+}
