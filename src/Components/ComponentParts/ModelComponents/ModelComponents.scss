@@ -108,3 +108,200 @@
     }
   }
 }
+
+/* ============ CONFIRM MODDEL ============ */
+.confirm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.confirm-modal-content {
+  background: #fff;
+  padding: 2rem 2.5rem;
+  border-radius: 1.5rem;
+  width: 90%;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+  position: relative;
+  overflow: hidden;
+  transform-origin: center;
+  transition: all 0.3s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 0, 0.08), transparent);
+    pointer-events: none;
+  }
+
+  .modal-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #ffcc00;
+    animation: pulse 1.2s infinite ease-in-out;
+  }
+
+  .modal-message {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 1.8rem;
+    line-height: 1.5;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+
+    .btn {
+      padding: 0.6rem 1.4rem;
+      border: none;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+
+      &:active {
+        transform: scale(0.95);
+      }
+
+      &.confirm {
+        color: #fff;
+        background-color: #ffb300;
+
+        &:hover {
+          background-color: #ffa000;
+        }
+      }
+
+      &.cancel {
+        background-color: #e0e0e0;
+        color: #fff;
+
+        &:hover {
+          color: #333;
+          background-color: #cfcfcf;
+        }
+      }
+    }
+  }
+
+  /* === Variants === */
+  &.delete {
+    .modal-icon {
+      color: #e53935;
+    }
+
+    .btn.confirm {
+      background-color: #e53935;
+
+      &:hover {
+        background-color: #c62828;
+      }
+    }
+  }
+
+  &.info {
+    .modal-icon {
+      color: #42a5f5;
+    }
+
+    .btn.confirm {
+      background-color: #42a5f5;
+
+      &:hover {
+        background-color: #1e88e5;
+      }
+    }
+  }
+}
+
+/* === Animations === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.scale-in {
+  animation: scaleIn 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+.scale-out {
+  animation: scaleOut 0.25s ease forwards;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.85) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.8) translateY(20px);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.shake {
+  animation: shakeAnim 0.4s ease;
+}
+
+@keyframes shakeAnim {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-8px);
+  }
+  40% {
+    transform: translateX(8px);
+  }
+  60% {
+    transform: translateX(-5px);
+  }
+  80% {
+    transform: translateX(5px);
+  }
+}

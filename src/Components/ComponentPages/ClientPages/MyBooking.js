@@ -27,7 +27,7 @@ const MyBooking = () => {
   const formatDate1 = (dateString) => {
     const date = new Date(dateString);
     const pad = (n) => (n < 10 ? "0" + n : n);
-    return `${pad(date.getHours())}:${pad(date.getMinutes())} ${pad(
+    return `${pad(date.getHours())}:${pad(date.getMinutes())} - ${pad(
       date.getDate()
     )}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
   };
@@ -277,16 +277,6 @@ const MyBooking = () => {
                           : "round_trip_ticket"
                       }
                       data={[ticket]}
-                      formatDate={(dateString) => {
-                        const date = new Date(dateString);
-                        return `${String(date.getDate()).padStart(
-                          2,
-                          "0"
-                        )}/${String(date.getMonth() + 1).padStart(
-                          2,
-                          "0"
-                        )}/${date.getFullYear()}`;
-                      }}
                     />
                   </div>
                 ))}
