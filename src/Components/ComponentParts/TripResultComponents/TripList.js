@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import TripCard from "./TripCard";
 import empty_list from "../../../Assets/img/empty_list.svg";
 import { Link } from "react-router-dom";
-import "../TripList.scss";
+import "./TripResultComponents.scss";
 
 const TripList = ({
   data,

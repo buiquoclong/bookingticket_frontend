@@ -1,7 +1,7 @@
 import React from "react";
 import { FaAngleLeft } from "react-icons/fa";
-import "./TripList.scss";
-
+import "./TripResultComponents.scss";
+import { formatDate } from "../../../Utils/bookingUtils";
 const SearchResultsHeader = ({
   diemDiName,
   diemDenName,
@@ -43,13 +43,6 @@ const SearchResultsHeader = ({
     { label: "Xếp giá vé:", options: sortOptions, onChange: handleSortChange },
     { label: "Chọn xe:", options: vehicleOptions, onChange: handleKindChange },
   ];
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
 
   const displayDiName = isReturn ? diemDenName : diemDiName;
   const displayDenName = isReturn ? diemDiName : diemDenName;

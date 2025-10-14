@@ -1,7 +1,7 @@
 import SeatTable from "../SeatComponents/SeatTable";
 import SeatNote from "../SeatComponents/SeatNote";
 import SeatInfo from "../SeatComponents/SeatInfo";
-import PolicyTab from "../PolicyTab";
+import PolicyTab from "../PolicyComponents/PolicyTab";
 
 import "./TripResultComponents.scss";
 

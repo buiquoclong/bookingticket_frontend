@@ -14,31 +14,6 @@ const TripCardMain = ({ trip }) => {
   }
   return (
     <div className="trip-card">
-      {/* Lộ trình */}
-
-      {/* <div className="trip-left">
-        <div className="time-route">
-          <span className="time-start">{trip.timeStart.slice(0, 5)}</span>
-          <div className="route-line">
-            <FaBus className="icon" />
-            <span className="line-dot"></span>
-            <span className="duration">
-              {trip.route.timeOfRoute} giờ
-              <br />
-              <span className="timezone">(Asia/Ho Chi Minh)</span>
-            </span>
-            <span className="line-dot"></span>
-            <FaMapMarkerAlt className="icon" />
-          </div>
-          <span className="time-end">{getTripEndTime(trip)}</span>
-        </div>
-
-        <div className="locations">
-          <span className="from">{trip.route.diemDi.name}</span>
-          <span className="to">{trip.route.diemDen.name}</span>
-        </div>
-      </div> */}
-
       <div className="trip-left">
         <div className="trip-route">
           {/* Điểm bắt đầu */}

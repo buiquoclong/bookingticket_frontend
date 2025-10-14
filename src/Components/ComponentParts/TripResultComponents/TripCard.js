@@ -1,5 +1,5 @@
 import React from "react";
-import "../TripList.scss";
+import "./TripResultComponents.scss";
 import TripTabs from "./TripTabs";
 import TripCardMain from "./TripCardMain";
 
