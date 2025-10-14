@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { FormGroup, FormControlLabel, Switch } from "@mui/material";
 import "./TicketInfoComponents.scss";
+import { formatDate } from "../../../Utils/bookingUtils";
 
 const InfoTicket = ({
   title,
@@ -35,13 +36,6 @@ const InfoTicket = ({
   };
 
   if (!data) return null;
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
   return (
     <div className="ticket-card">
       <div className="ticket-card__header">

@@ -1,6 +1,7 @@
 import "./TicketInfoComponents.scss";
+import { formatDate } from "../../../Utils/bookingUtils";
 
-const BookingTicketInfo = ({ kind, data, formatDate }) => {
+const BookingTicketInfo = ({ kind, data }) => {
   if (!data || data.length === 0) return null;
 
   return (

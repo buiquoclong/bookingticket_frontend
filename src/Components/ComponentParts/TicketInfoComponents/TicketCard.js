@@ -1,12 +1,12 @@
 import React from "react";
 import "./TicketInfoComponents.scss";
+import { formatDate } from "../../../Utils/bookingUtils";
 
 const TicketCard = ({
   detail,
   kindTrip,
   statusMap,
   statusColorMap,
-  formatDate,
   handleRating,
 }) => {
   return (
