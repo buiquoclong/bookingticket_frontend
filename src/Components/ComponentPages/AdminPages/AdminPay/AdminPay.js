@@ -7,6 +7,10 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import InfoTicket from "../../../ComponentParts/TicketInfoComponents/InfoTicket";
+import PolicyInfo from "../../../ComponentParts/PolicyComponents/PolicyInfo";
+import BookingSummary from "../../../ComponentParts/BookingSummary";
 
 const AdminPay = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +28,7 @@ const AdminPay = () => {
   } = location.state || {};
   const totalAmount = totalPrice + totalPriceReturn;
   const [showLocationInput, setShowLocationInput] = useState(false);
+  const [showLocationReturnInput, setShowLocationReturnInput] = useState(false);
   const [showLocationRetrunInput, setShowLocationRetrunInput] = useState(false);
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
@@ -46,31 +51,33 @@ const AdminPay = () => {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
 
+  const [catchPoints, setCatchPoints] = useState([]);
+  const [catchPointsReturn, setCatchPointsReturn] = useState([]);
   const [routeId, setRouteId] = useState("");
   const [routeReturnId, setRouteReturnId] = useState("");
 
-  // Xử lý chọn nhập nơi đón
-  const handleSelectChange = (event) => {
-    setShowLocationInput(event.target.value === "Yes");
-  };
-  // Xử lý chọn nhập nơi đón cho chuyến về
-  const handleSelectRetrunChange = (event) => {
-    setShowLocationRetrunInput(event.target.value === "Yes");
+  // Xử lý input ghi chú
+  const handleNoteChange = (newNote) => {
+    setNote(newNote);
   };
 
-  // Xử lý input ghi chú
-  const handleNoteChange = (event) => {
-    setNote(event.target.value);
+  // Xử lý input ghi chú cho chuyến về
+  const handleNoteReturnChange = (newNote) => {
+    setNoteReturn(newNote);
+  };
+
+  // Xử lý chọn nhập nơi đón
+  const handleSwitchChange = (event) => {
+    setShowLocationInput(event.target.checked);
+  };
+  // Xử lý chọn nhập nơi đón cho chuyến về
+  const handleSwitchReturnChange = (event) => {
+    setShowLocationReturnInput(event.target.checked);
   };
 
   // Xử lý input nơi đón
   const handlePickupLocationChange = (event) => {
     setPickupLocation(event.target.value);
-  };
-
-  // Xử lý input ghi chú cho chuyến về
-  const handleNoteReturnChange = (event) => {
-    setNoteReturn(event.target.value);
   };
 
   // Xử lý input nơi đón cho chuyến về
@@ -123,6 +130,13 @@ const AdminPay = () => {
     } else if (phoneErrorMessage) {
       // Kiểm tra nếu có errorMessage cho phone
       toast.error(phoneErrorMessage); // Hiển thị errorMessage nếu có
+      return; // Dừng xử lý tiếp theo nếu có lỗi
+    }
+    if (!email) {
+      missingInfo.push("Email");
+    } else if (emailErrorMessage) {
+      // Kiểm tra nếu có errorMessage cho email
+      toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
       return; // Dừng xử lý tiếp theo nếu có lỗi
     }
     if (missingInfo.length > 0) {
@@ -184,6 +198,45 @@ const AdminPay = () => {
     }
   }, [kind, fetchTripInfo, fetchTripReturnInfo, userId]);
 
+  // Lấy danh sách điểm đón khi chọn nhập điểm đón
+  useEffect(() => {
+    if (showLocationInput) {
+      const fetchCatchPoints = async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:8081/api/catch-point/route/${routeId}`
+          );
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          const data = await response.json();
+          console.log(data);
+          setCatchPoints(data);
+        } catch (error) {
+          console.error("Error fetching catch points:", error);
+        }
+      };
+      fetchCatchPoints();
+    }
+    if (showLocationReturnInput) {
+      const fetchCatchPointsReturn = async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:8081/api/catch-point/route/${routeReturnId}`
+          );
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          const dataReturn = await response.json();
+          setCatchPointsReturn(dataReturn);
+        } catch (error) {
+          console.error("Error fetching catch points:", error);
+        }
+      };
+      fetchCatchPointsReturn();
+    }
+  }, [showLocationInput, showLocationReturnInput, routeId, routeReturnId]);
+
   const checkSeatsBeforeBooking = async () => {
     const requestBody = {
       tripId: tripId,
@@ -226,7 +279,7 @@ const AdminPay = () => {
       selectedSeatIds: selectedSeatIds,
       selectedSeatNames: selectedSeatsNames,
       totalPrice: totalPrice,
-      pickupLocation: pickupLocation,
+      pickupLocation: pickupLocation || "Tại nhà xe",
       note: note,
 
       // Lượt về (nếu khứ hồi)
@@ -234,11 +287,11 @@ const AdminPay = () => {
       selectedSeatIdsReturn: selectedSeatIdsReturn,
       selectedSeatNamesReturn: selectedSeatsNamesReturn,
       totalPriceReturn: totalPriceReturn,
-      pickupLocationReturn: pickupLocationReturn,
+      pickupLocationReturn: pickupLocationReturn || "Tại nhà xe",
       noteReturn: noteReturn,
 
       kindPay,
-      isPaid: 0,
+      isPaid: 1,
     };
   };
 
@@ -334,567 +387,229 @@ const AdminPay = () => {
     toast.info("Đã hủy áp dụng mã giảm giá");
   };
   return (
-    <div className="main-container">
+    <>
       {isLoading && (
         <Backdrop
-          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          sx={{
+            color: "#fff",
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+            transition: "all 0.3s ease",
+          }}
           open={isLoading}
         >
-          <CircularProgress color="inherit" />
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              animation: "pulse 1.2s infinite ease-in-out",
+            }}
+          >
+            <CircularProgress
+              thickness={5}
+              size={60}
+              sx={{
+                color: "#00e676",
+                filter: "drop-shadow(0 0 8px rgba(0, 230, 118, 0.8))",
+              }}
+            />
+            <span style={{ fontSize: "1.2rem", fontWeight: 500 }}>
+              Đang tải dữ liệu...
+            </span>
+          </div>
         </Backdrop>
       )}
+
       {showPaymentPopup && (
-        <div className="modal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-body">
-                <button
-                  className="closePopup"
-                  onClick={() => setShowPaymentPopup(false)}
-                ></button>
-                <div className="payContent">
-                  <div className="imgsucces">
-                    <img src={success} alt="succes" />
-                  </div>
-                  <div className="content">
-                    <div className="titlePay">Thanh toán</div>
-                    <div>
-                      Quý khách vui lòng lựa chọn phương thức thanh toán bên
-                      dưới để thanh toán và nhận vé
-                    </div>
-                  </div>
-                  <div className="payMent" style={{ marginBottom: "1rem" }}>
-                    <button
-                      className="btn trasau"
-                      onClick={() => handlePayment("COD")}
-                    >
-                      Tiền mặt
-                    </button>
-                  </div>
-                </div>
+        <div className="payment-modal">
+          <div className="modal-box">
+            <button
+              className="close-btn"
+              onClick={() => setShowPaymentPopup(false)}
+            ></button>
+
+            <div className="payment-content">
+              <div className="icon-wrapper">
+                <CheckCircleOutlineIcon className="success-icon" />
+                <span className="icon-shadow"></span>
+              </div>
+              <h2 className="title">Thanh toán</h2>
+              <p className="desc">
+                Quý khách vui lòng lựa chọn phương thức thanh toán bên dưới để
+                nhận vé.
+              </p>
+
+              <div className="payment-actions">
+                {userId && (
+                  <button
+                    className="btn cod"
+                    onClick={() => handlePayment("COD")}
+                  >
+                    Thanh toán khi lên xe
+                  </button>
+                )}
               </div>
             </div>
           </div>
         </div>
       )}
-      <div className="bookingContent flex">
-        {kind === "Một chiều" && (
-          <div>
-            <div className="flex" style={{ justifyContent: "center" }}>
-              {data && (
-                <div className="infoTicket">
-                  <h3>Thông tin lượt đi</h3>
-                  <div className="lineInfo">
-                    <span>Tuyến:</span>
-                    <div className="rightInfo">
-                      <span>{data.route.name}</span>
-                    </div>
-                  </div>
-                  <div className="lineInfo">
-                    <span>Loại xe:</span>
-                    <div className="rightInfo">
-                      <span>{data.vehicle.kindVehicle.name}</span>
-                    </div>
-                  </div>
-                  <div className="lineInfo">
-                    <span>Ngày:</span>
-                    <div className="rightInfo">
-                      <span>{formatDate(data.dayStart)}</span>
-                    </div>
-                  </div>
-                  <div className="lineInfo">
-                    <span>Thời gian:</span>
-                    <div className="rightInfo">
-                      <span>{data.timeStart.slice(0, 5)}</span>
-                    </div>
-                  </div>
-                  <div className="lineInfo">
-                    <span>Số ghế:</span>
-                    <div className="seatInfo">
-                      <span>{selectedSeatsNames}</span>
-                    </div>
-                  </div>
-                  <div className="lineInfo">
-                    <span>Giá:</span>
-                    <div className="rightInfo">
-                      <span>{totalPrice.toLocaleString("vi-VN")}VND</span>
-                    </div>
-                  </div>
-                  <div className="lineInfo">
-                    <span>Ghi chú:</span>
-                    <div>
-                      <input
-                        type="text"
-                        className="Note"
-                        placeholder="Thêm ghi chú ở đây"
-                        onChange={handleNoteChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="lineInfo">
-                    <span>Chọn điểm đón:</span>
-                    <div className="selectChoose">
-                      <select onChange={handleSelectChange}>
-                        <option value="No">Không</option>
-                        <option value="Yes">Có</option>
-                      </select>
-                    </div>
-                  </div>
-                  {showLocationInput && (
-                    <div className="lineInfo">
-                      <span>Nơi đón:</span>
-                      <div>
-                        <input
-                          type="text"
-                          className="Note"
-                          placeholder="Nhập nơi đón ở đây"
-                          onChange={handlePickupLocationChange}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
+
+      <section className="booking-section">
+        <div className="booking-container">
+          {/* Bên trái: vé + người đặt */}
+          <div className="left-column">
+            <div
+              className={`ticket-info ${
+                kind === "Khứ hồi" ? "round-trip" : ""
+              }`}
+            >
+              {kind === "Một chiều" && (
+                <InfoTicket
+                  title="Thông tin lượt đi"
+                  data={data}
+                  selectedSeatsNames={selectedSeatsNames}
+                  totalPrice={totalPrice}
+                  note={note}
+                  onNoteChange={handleNoteChange}
+                  showLocationInput={showLocationInput}
+                  handleSwitchChange={handleSwitchChange}
+                  pickupLocation={pickupLocation}
+                  handlePickupLocationChange={handlePickupLocationChange}
+                  catchPoints={catchPoints}
+                />
+              )}
+              {kind === "Khứ hồi" && (
+                <>
+                  <InfoTicket
+                    title="Thông tin lượt đi"
+                    data={data}
+                    selectedSeatsNames={selectedSeatsNames}
+                    totalPrice={totalPrice}
+                    note={note}
+                    onNoteChange={handleNoteChange}
+                    showLocationInput={showLocationInput}
+                    handleSwitchChange={handleSwitchChange}
+                    pickupLocation={pickupLocation}
+                    handlePickupLocationChange={handlePickupLocationChange}
+                    catchPoints={catchPoints}
+                  />
+                  <InfoTicket
+                    title="Thông tin lượt về"
+                    data={dataReturn}
+                    selectedSeatsNames={selectedSeatsNamesReturn}
+                    totalPrice={totalPriceReturn}
+                    note={noteReturn}
+                    onNoteChange={handleNoteReturnChange}
+                    showLocationInput={showLocationReturnInput}
+                    handleSwitchChange={handleSwitchReturnChange}
+                    pickupLocation={pickupLocationReturn}
+                    handlePickupLocationChange={
+                      handlePickupLocationReturnChange
+                    }
+                    catchPoints={catchPointsReturn}
+                  />
+                </>
               )}
             </div>
 
-            <div className="policyInfo">
-              <div className="titlePolicy">
-                <h1>
-                  <span>ĐIỀU KHOẢN &</span>
-                  <span style={{ color: "red" }}> LƯU Ý</span>
-                </h1>
-              </div>
-              <div className="devide"></div>
-              <div className="contentPolicy">
-                <div>
-                  <span style={{ color: "red" }}>(*)</span> Quý khách vui lòng
-                  mang email có chứa mã vé đến văn phòng để đổi vé lên xe trước
-                  giờ xuất bến ít nhất{" "}
-                  <span style={{ color: "red", fontWeight: "600" }}>
-                    20 phút
-                  </span>{" "}
-                  để thực hiện đổi vé.
-                </div>
-                <div>
-                  <span style={{ color: "red" }}>(*)</span> Thông tin hành khách
-                  phải chính xác, nếu không sẽ không thể lên xe hoặc hủy/ đổi vé{" "}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-        {kind === "Khứ hồi" && (
-          <div>
-            <div className="flex" style={{ gap: "1rem" }}>
-              <div>
-                {data && (
-                  <div className="infoTicket">
-                    <h3>Thông tin lượt đi</h3>
-                    <div className="lineInfo">
-                      <span>Tuyến:</span>
-                      <div className="rightInfo">
-                        <span>{data.route.name}</span>
-                      </div>
+            <div className="user-card">
+              <h3>Thông tin người đặt</h3>
+              <form className="user-form">
+                {[
+                  {
+                    label: "Họ và tên",
+                    value: userName,
+                    onChange: handleUserNameChange,
+                    placeholder: "Nhập họ và tên",
+                    error: "",
+                  },
+                  {
+                    label: "Số điện thoại",
+                    value: phone,
+                    onChange: handlePhoneChange,
+                    placeholder: "Nhập số điện thoại",
+                    error: phoneErrorMessage,
+                  },
+                  {
+                    label: "Email",
+                    value: email,
+                    onChange: handleEmailChange,
+                    placeholder: "Nhập Email",
+                    error: emailErrorMessage,
+                  },
+                ].map((field, idx) => (
+                  <div className="form-row" key={idx}>
+                    <label>
+                      {field.label}
+                      <span className="required">*</span>
+                    </label>
+                    <div
+                      className={`input-wrapper ${
+                        field.error ? "has-error" : ""
+                      }`}
+                    >
+                      <input
+                        type="text"
+                        className="input-field"
+                        placeholder={field.placeholder}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                      <p className="error-msg">{field.error || " "}</p>
                     </div>
-                    <div className="lineInfo">
-                      <span>Loại xe:</span>
-                      <div className="rightInfo">
-                        <span>{data.vehicle.kindVehicle.name}</span>
-                      </div>
-                    </div>
-                    <div className="lineInfo">
-                      <span>Ngày:</span>
-                      <div className="rightInfo">
-                        <span>{formatDate(data.dayStart)}</span>
-                      </div>
-                    </div>
-                    <div className="lineInfo">
-                      <span>Thời gian:</span>
-                      <div className="rightInfo">
-                        <span>{data.timeStart.slice(0, 5)}</span>
-                      </div>
-                    </div>
-                    <div className="lineInfo">
-                      <span>Số ghế:</span>
-                      <div className="seatInfo">
-                        <span>{selectedSeatsNames}</span>
-                      </div>
-                    </div>
-                    <div className="lineInfo">
-                      <span>Giá:</span>
-                      <div className="rightInfo">
-                        <span>{totalPrice.toLocaleString("vi-VN")}VND</span>
-                      </div>
-                    </div>
-                    <div className="lineInfo">
-                      <span>Ghi chú:</span>
-                      <div>
-                        <input
-                          type="text"
-                          className="Note"
-                          placeholder="Thêm ghi chú ở đây"
-                          onChange={handleNoteChange}
-                        />
-                      </div>
-                    </div>
-                    <div className="lineInfo">
-                      <span>Chọn điểm đón:</span>
-                      <div className="selectChoose">
-                        <select onChange={handleSelectChange}>
-                          <option value="No">Không</option>
-                          <option value="Yes">Có</option>
-                        </select>
-                      </div>
-                    </div>
-                    {showLocationInput && (
-                      <div className="lineInfo">
-                        <span>Nơi đón:</span>
-                        <div>
-                          <input
-                            type="text"
-                            className="Note"
-                            placeholder="Nhập nơi đón ở đây"
-                            onChange={handlePickupLocationChange}
-                          />
-                        </div>
-                      </div>
-                    )}
                   </div>
-                )}
-              </div>
-              <div>
-                {dataReturn && (
-                  <div className="infoTicket">
-                    <h3>Thông tin lượt về</h3>
-                    <div className="lineInfo">
-                      <span>Tuyến:</span>
-                      <div className="rightInfo">
-                        <span>{dataReturn.route.name}</span>
-                      </div>
-                    </div>
-                    <div className="lineInfo">
-                      <span>Loại xe:</span>
-                      <div className="rightInfo">
-                        <span>{dataReturn.vehicle.kindVehicle.name}</span>
-                      </div>
-                    </div>
-                    <div className="lineInfo">
-                      <span>Ngày:</span>
-                      <div className="rightInfo">
-                        <span>{formatDate(dataReturn.dayStart)}</span>
-                      </div>
-                    </div>
-                    <div className="lineInfo">
-                      <span>Thời gian:</span>
-                      <div className="rightInfo">
-                        <span>{dataReturn.timeStart.slice(0, 5)}</span>
-                      </div>
-                    </div>
-                    <div className="lineInfo">
-                      <span>Số ghế:</span>
-                      <div className="seatInfo">
-                        <span>{selectedSeatsNamesReturn}</span>
-                      </div>
-                    </div>
-                    <div className="lineInfo">
-                      <span>Giá:</span>
-                      <div className="rightInfo">
-                        <span>
-                          {totalPriceReturn.toLocaleString("vi-VN")}VND
-                        </span>
-                      </div>
-                    </div>
-                    <div className="lineInfo">
-                      <span>Ghi chú:</span>
-                      <div>
-                        <input
-                          type="text"
-                          className="Note"
-                          placeholder="Thêm ghi chú ở đây"
-                          onChange={handleNoteReturnChange}
-                        />
-                      </div>
-                    </div>
-                    <div className="lineInfo">
-                      <span>Chọn điểm đón:</span>
-                      <div className="selectChoose">
-                        <select onChange={handleSelectRetrunChange}>
-                          <option value="No">Không</option>
-                          <option value="Yes">Có</option>
-                        </select>
-                      </div>
-                    </div>
-                    {showLocationRetrunInput && (
-                      <div className="lineInfo">
-                        <span>Nơi đón:</span>
-                        <div>
-                          <input
-                            type="text"
-                            className="Note"
-                            placeholder="Nhập nơi đón ở đây"
-                            onChange={handlePickupLocationReturnChange}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="policyInfo">
-              <div className="titlePolicy">
-                <h1>
-                  <span>ĐIỀU KHOẢN &</span>
-                  <span style={{ color: "red" }}> LƯU Ý</span>
-                </h1>
-              </div>
-              <div className="devide"></div>
-              <div className="contentPolicy">
-                <div>
-                  <span style={{ color: "red" }}>(*)</span> Quý khách vui lòng
-                  mang email có chứa mã vé đến văn phòng để đổi vé lên xe trước
-                  giờ xuất bến ít nhất{" "}
-                  <span style={{ color: "red", fontWeight: "600" }}>
-                    20 phút
-                  </span>{" "}
-                  để thực hiện đổi vé.
-                </div>
-                <div>
-                  <span style={{ color: "red" }}>(*)</span> Thông tin hành khách
-                  phải chính xác, nếu không sẽ không thể lên xe hoặc hủy/ đổi vé{" "}
-                </div>
-              </div>
+                ))}
+              </form>
             </div>
           </div>
-        )}
-        <div>
-          <div className=" infoUser">
-            <h3>Thông tin người đặt</h3>
-            <div className="lineInfo">
-              <span>
-                Họ và tên<span style={{ color: "red" }}>*</span>:
-              </span>
-              <div className="infoInput">
-                <input
-                  type="text"
-                  className="info"
-                  placeholder="Nhập họ và tên"
-                  value={userName}
-                  onChange={handleUserNameChange}
+
+          {/* Bên phải: policy + discount + summary */}
+          <div className="right-column">
+            <div className="policy-discount-card">
+              <PolicyInfo className="policy-info-card" />
+
+              <div className="discount-card">
+                <TextField
+                  label="Mã giảm giá"
+                  size="small"
+                  value={discountCode}
+                  onChange={(e) => setDiscountCode(e.target.value)}
+                  disabled={isDiscountApplied}
                 />
+                <Button
+                  variant="contained"
+                  onClick={
+                    isDiscountApplied
+                      ? handleCancelDiscount
+                      : handleApplyDiscount
+                  }
+                >
+                  {isDiscountApplied ? "Hủy" : "Áp dụng"}
+                </Button>
               </div>
             </div>
-            <div className="lineInfo">
-              <span>
-                Số điện thoại<span style={{ color: "red" }}>*</span>:
-              </span>
-              <div className="infoInput">
-                <input
-                  type="text"
-                  className="info"
-                  placeholder="Nhập số điện thoại"
-                  value={phone}
-                  onChange={handlePhoneChange}
-                />
-                {phoneErrorMessage && (
-                  <p
-                    style={{
-                      lineHeight: "1.5",
-                      fontSize: "12px",
-                      color: "red",
-                      paddingLeft: ".5rem",
-                    }}
-                  >
-                    {phoneErrorMessage}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="lineInfo">
-              <span>
-                Email<span style={{ color: "red" }}>*</span>:
-              </span>
-              <div className="infoInput">
-                <input
-                  type="text"
-                  className="info"
-                  placeholder="Nhập Email"
-                  value={email}
-                  onChange={handleEmailChange}
-                />
-                {emailErrorMessage && (
-                  <p
-                    style={{
-                      lineHeight: "1.5",
-                      fontSize: "12px",
-                      color: "red",
-                      paddingLeft: ".5rem",
-                    }}
-                  >
-                    {emailErrorMessage}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="discount">
-            <TextField
-              id=""
-              label="Mã giảm giá"
-              size="small"
-              className="textdiscount"
-              value={discountCode}
-              onChange={(e) => setDiscountCode(e.target.value)}
-              disabled={isDiscountApplied}
+
+            <BookingSummary
+              className="bookingSummaryCard"
+              kind={kind}
+              totalPrice={totalPrice}
+              totalPriceReturn={totalPriceReturn}
+              discountPercent={discountPercent}
+              discountAmount={discountAmount}
+              finalPrice={finalPrice}
+              isChecked={isChecked}
+              setIsChecked={setIsChecked}
+              handleValidateBeforePayment={handleValidateBeforePayment}
             />
-            {/* <Button variant="contained" onClick={handleApplyDiscount}>Áp dụng</Button> */}
-            {isDiscountApplied ? (
-              <Button variant="contained" onClick={handleCancelDiscount}>
-                Hủy
-              </Button>
-            ) : (
-              <Button variant="contained" onClick={handleApplyDiscount}>
-                Áp dụng
-              </Button>
-            )}
-          </div>
-          <div className="policyInfo">
-            <div className="titlePolicy">
-              <h1>
-                <span>Chi tiết giá</span>
-              </h1>
-            </div>
-            <div className="devide"></div>
-            {kind === "Một chiều" && (
-              <div className="contentPolicy">
-                <div className="lineInfo">
-                  <span>Giá vé lượt đi:</span>
-                  <div className="rightInfo">
-                    <span>{totalPrice.toLocaleString("vi-VN")}VND</span>
-                  </div>
-                </div>
-                {discountPercent !== null && (
-                  <div className="lineInfo">
-                    <span>Giảm giá ({discountPercent}%):</span>
-                    <div className="rightInfo">
-                      <span>-{discountAmount.toLocaleString("vi-VN")} VND</span>
-                    </div>
-                  </div>
-                )}
-                <div className="lineInfo">
-                  <span>Phí thanh toán:</span>
-                  <div className="rightInfo">
-                    <span>0VND</span>
-                  </div>
-                </div>
-                <div className="devide"></div>
-                <div className="lineInfo" style={{ marginTop: ".5rem" }}>
-                  <span>Tổng tiền:</span>
-                  <div className="rightInfo">
-                    <span>{finalPrice.toLocaleString("vi-VN")}VND</span>
-                  </div>
-                </div>
-                <div className="policyCheckbox">
-                  <label className="chekcBox">
-                    <span>
-                      <span>
-                        <input
-                          type="checkbox"
-                          className="checkbox-input"
-                          value="1"
-                          checked={isChecked}
-                          onChange={(e) => setIsChecked(e.target.checked)}
-                        />
-                      </span>
-                      <span className="yes" style={{ marginLeft: "10px" }}>
-                        Tôi chấp nhận với các điều khoản
-                      </span>
-                    </span>
-                  </label>
-                </div>
-                <div className="buttonList">
-                  <button className="btn cancle">
-                    <Link to="/">Hủy</Link>
-                  </button>
-                  <button
-                    className="btn pay"
-                    onClick={handleValidateBeforePayment}
-                  >
-                    Thanh toán
-                  </button>
-                </div>
-              </div>
-            )}
-            {kind === "Khứ hồi" && (
-              <div className="contentPolicy">
-                <div className="lineInfo">
-                  <span>Tổng giá lượt đi:</span>
-                  <div className="rightInfo">
-                    <span>{totalPrice.toLocaleString("vi-VN")}VND</span>
-                  </div>
-                </div>
-                <div className="lineInfo">
-                  <span>Tổng giá lượt về:</span>
-                  <div className="rightInfo">
-                    <span>{totalPriceReturn.toLocaleString("vi-VN")}VND</span>
-                  </div>
-                </div>
-                {discountPercent !== null && (
-                  <div className="lineInfo">
-                    <span>Giảm giá ({discountPercent}%):</span>
-                    <div className="rightInfo">
-                      <span>-{discountAmount.toLocaleString("vi-VN")} VND</span>
-                    </div>
-                  </div>
-                )}
-                <div className="lineInfo">
-                  <span>Phí thanh toán:</span>
-                  <div className="rightInfo">
-                    <span>0VND</span>
-                  </div>
-                </div>
-                <div className="devide"></div>
-                <div className="lineInfo" style={{ marginTop: ".5rem" }}>
-                  <span>Tổng tiền:</span>
-                  <div className="rightInfo">
-                    <span>{finalPrice.toLocaleString("vi-VN")}VND</span>
-                  </div>
-                </div>
-                <div className="policyCheckbox">
-                  <label className="chekcBox">
-                    <span>
-                      <span>
-                        <input
-                          type="checkbox"
-                          className="checkbox-input"
-                          value="1"
-                          checked={isChecked}
-                          onChange={(e) => setIsChecked(e.target.checked)}
-                        />
-                      </span>
-                      <span className="yes" style={{ marginLeft: "10px" }}>
-                        Tôi chấp nhận với các điều khoản
-                      </span>
-                    </span>
-                  </label>
-                </div>
-                <div className="buttonList">
-                  <button className="btn cancle">
-                    <Link to="/">Hủy</Link>
-                  </button>
-                  <button
-                    className="btn pay"
-                    onClick={handleValidateBeforePayment}
-                  >
-                    Thanh toán
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </>
   );
 };
 export default AdminPay;
