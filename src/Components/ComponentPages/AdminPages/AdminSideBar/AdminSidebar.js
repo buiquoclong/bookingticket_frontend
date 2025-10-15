@@ -1,243 +1,125 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
-import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
-import LocationCityIcon from "@mui/icons-material/LocationCity";
-import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import EventSeatIcon from "@mui/icons-material/EventSeat";
-import ReceiptIcon from "@mui/icons-material/Receipt";
-import DiscountIcon from "@mui/icons-material/Discount";
-import ReviewsIcon from "@mui/icons-material/Reviews";
-import ContactsIcon from "@mui/icons-material/Contacts";
-import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
-import ScheduleIcon from "@mui/icons-material/Schedule";
-import BookOnlineIcon from "@mui/icons-material/BookOnline";
+import { Avatar } from "@mui/material";
+import {
+  Dashboard,
+  BookOnline,
+  DirectionsBus,
+  ReceiptLong,
+  EventSeat,
+  LocalOffer,
+  RateReview,
+  ContactMail,
+  People,
+  LocationCity,
+  Commute,
+  HistoryEdu,
+  Map,
+  AirportShuttle,
+} from "@mui/icons-material";
+import "./AdminSidebar.scss";
+
+// Menu chung
+const MENU_ITEMS = [
+  { path: "", label: "Thống kê", icon: <Dashboard /> },
+  { path: "book-ticket", label: "Đặt vé", icon: <BookOnline /> },
+  { path: "trips", label: "Chuyến đi", icon: <DirectionsBus /> },
+  { path: "bookings", label: "Hóa đơn", icon: <ReceiptLong /> },
+  { path: "seat-reservation", label: "Ghế đặt trước", icon: <EventSeat /> },
+  { path: "promotions", label: "Khuyến mãi", icon: <LocalOffer /> },
+  { path: "reviews", label: "Đánh giá", icon: <RateReview /> },
+  { path: "contacts", label: "Liên hệ", icon: <ContactMail /> },
+];
+
+// Admin only
+const ADMIN_MENU = [
+  { path: "users", label: "Người dùng", icon: <People /> },
+  { path: "cities", label: "Thành phố", icon: <LocationCity /> },
+  { path: "vehicles", label: "Phương tiện", icon: <Commute /> },
+  { path: "seats", label: "Ghế ngồi", icon: <EventSeat /> },
+  { path: "routes", label: "Tuyến đi", icon: <Map /> },
+  { path: "drivers", label: "Tài xế", icon: <People /> },
+  { path: "catch-point", label: "Điểm đón tuyến", icon: <AirportShuttle /> },
+  { path: "kind-vehicle", label: "Loại xe", icon: <Commute /> },
+  { path: "logs", label: "Log", icon: <HistoryEdu /> },
+];
 
 function AdminSidebar({ openSidebarToggle, OpenSidebar }) {
   const [activeTab, setActiveTab] = useState(null);
-  const [data, setData] = useState(null);
-  const userId = localStorage.getItem("userId");
+  const [userData, setUserData] = useState(null);
   const location = useLocation();
+  const userId = localStorage.getItem("userId");
 
-  // Dùng useCallback để không tạo lại fetchUserInfo khi render lại
   const fetchUserInfo = useCallback(async () => {
     if (!userId) return;
-
     try {
-      const response = await fetch(`http://localhost:8081/api/user/${userId}`);
-      const data = await response.json();
-      setData(data);
+      const res = await fetch(`http://localhost:8081/api/user/${userId}`);
+      const data = await res.json();
+      setUserData(data);
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("Error fetching user info:", error);
     }
   }, [userId]);
 
-  // useEffect để gọi fetchUserInfo khi userId thay đổi
   useEffect(() => {
     fetchUserInfo();
-  }, [userId, fetchUserInfo]);
+  }, [fetchUserInfo]);
 
-  // useEffect để cập nhật activeTab khi location thay đổi
   useEffect(() => {
-    const currentPath = location.pathname.split("/")[2] || "dashboard";
+    const currentPath = location.pathname.split("/")[2] || "";
     setActiveTab(currentPath);
   }, [location]);
 
   return (
-    <aside
-      id="sidebar"
-      className={openSidebarToggle ? "sidebar-responsive" : ""}
-    >
-      <div className="sidebar-title">
-        <div className="sidebar-brand">
-          <BookOnlineIcon className="icon_header" /> BOOKING
+    <aside className={`admin-sidebar ${openSidebarToggle ? "open" : ""}`}>
+      <div className="sidebar-header">
+        <div className="brand">
+          <BookOnline className="brand-icon" />
+          <span>BOOKING</span>
         </div>
-        <span className="icon close_icon" onClick={OpenSidebar}>
-          X
-        </span>
+        <button className="close-btn" onClick={OpenSidebar}>
+          ×
+        </button>
       </div>
-      <ul className="sidebar-list">
-        <Link to="/admin" style={{ color: "#9e9ea4" }}>
-          <li
-            className={`sidebar-list-item ${
-              activeTab === "dashboard" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("dashboard")}
-          >
-            <SpaceDashboardIcon className="icon" /> Thống kê
-          </li>
-        </Link>
-        <Link to="/admin/book-ticket" style={{ color: "#9e9ea4" }}>
-          <li
-            className={`sidebar-list-item ${
-              activeTab === "book-ticket" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("book-ticket")}
-          >
-            <BookOnlineIcon className="icon" /> Đặt vé
-          </li>
-        </Link>
-        {data && data.role === 3 && (
-          <>
-            <Link to="/admin/users" style={{ color: "#9e9ea4" }}>
-              <li
-                className={`sidebar-list-item ${
-                  activeTab === "users" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("users")}
-              >
-                <ManageAccountsIcon className="icon" /> Người dùng
-              </li>
-            </Link>
-            <Link to="/admin/cities" style={{ color: "#9e9ea4" }}>
-              <li
-                className={`sidebar-list-item ${
-                  activeTab === "cities" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("cities")}
-              >
-                <LocationCityIcon className="icon" /> Thành phố
-              </li>
-            </Link>
-            <Link to="/admin/vehicles" style={{ color: "#9e9ea4" }}>
-              <li
-                className={`sidebar-list-item ${
-                  activeTab === "vehicles" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("vehicles")}
-              >
-                <DirectionsCarIcon className="icon" /> Phương tiện
-              </li>
-            </Link>
-            <Link to="/admin/seats" style={{ color: "#9e9ea4" }}>
-              <li
-                className={`sidebar-list-item ${
-                  activeTab === "seats" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("seats")}
-              >
-                <EventSeatIcon className="icon" /> Ghế ngồi
-              </li>
-            </Link>
-            <Link to="/admin/routes" style={{ color: "#9e9ea4" }}>
-              <li
-                className={`sidebar-list-item ${
-                  activeTab === "routes" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("routes")}
-              >
-                <ScheduleIcon className="icon" /> Tuyến đi
-              </li>
-            </Link>
-          </>
-        )}
-        <Link to="/admin/trips" style={{ color: "#9e9ea4" }}>
-          <li
-            className={`sidebar-list-item ${
-              activeTab === "trips" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("trips")}
-          >
-            <DirectionsCarIcon className="icon" /> Chuyến đi
-          </li>
-        </Link>
-        <Link to="/admin/bookings" style={{ color: "#9e9ea4" }}>
-          <li
-            className={`sidebar-list-item ${
-              activeTab === "bookings" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("bookings")}
-          >
-            <ReceiptIcon className="icon" /> Hóa đơn
-          </li>
-        </Link>
-        <Link to="/admin/seat-reservation" style={{ color: "#9e9ea4" }}>
-          <li
-            className={`sidebar-list-item ${
-              activeTab === "seat-reservation" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("seat-reservation")}
-          >
-            <EventSeatIcon className="icon" /> Ghế đặt trước
-          </li>
-        </Link>
-        {data && data.role === 3 && (
-          <>
-            <Link to="/admin/drivers" style={{ color: "#9e9ea4" }}>
-              <li
-                className={`sidebar-list-item ${
-                  activeTab === "drivers" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("drivers")}
-              >
-                <ManageAccountsIcon className="icon" /> Tài xế
-              </li>
-            </Link>
-            <Link to="/admin/catch-point" style={{ color: "#9e9ea4" }}>
-              <li
-                className={`sidebar-list-item ${
-                  activeTab === "catch-point" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("catch-point")}
-              >
-                <ManageAccountsIcon className="icon" /> Điểm đón tuyến
-              </li>
-            </Link>
-            <Link to="/admin/kind-vehicle" style={{ color: "#9e9ea4" }}>
-              <li
-                className={`sidebar-list-item ${
-                  activeTab === "kind-vehicle" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("kind-vehicle")}
-              >
-                <ManageAccountsIcon className="icon" /> Loại xe
-              </li>
-            </Link>
-          </>
-        )}
-        <Link to="/admin/promotions" style={{ color: "#9e9ea4" }}>
-          <li
-            className={`sidebar-list-item ${
-              activeTab === "promotions" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("promotions")}
-          >
-            <DiscountIcon className="icon" /> Khuyến mãi
-          </li>
-        </Link>
-        <Link to="/admin/reviews" style={{ color: "#9e9ea4" }}>
-          <li
-            className={`sidebar-list-item ${
-              activeTab === "reviews" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("reviews")}
-          >
-            <ReviewsIcon className="icon" /> Đánh giá
-          </li>
-        </Link>
-        <Link to="/admin/contacts" style={{ color: "#9e9ea4" }}>
-          <li
-            className={`sidebar-list-item ${
-              activeTab === "contacts" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("contacts")}
-          >
-            <ContactsIcon className="icon" /> Liên hệ
-          </li>
-        </Link>
-        {data && data.role === 3 && (
-          <Link to="/admin/logs" style={{ color: "#9e9ea4" }}>
+
+      <ul className="sidebar-menu">
+        {MENU_ITEMS.map((item) => (
+          <Link key={item.path} to={`/admin/${item.path}`}>
             <li
-              className={`sidebar-list-item ${
-                activeTab === "logs" ? "active" : ""
-              }`}
-              onClick={() => setActiveTab("logs")}
+              className={`menu-item ${activeTab === item.path ? "active" : ""}`}
+              onClick={() => setActiveTab(item.path)}
             >
-              <WorkHistoryIcon className="icon" /> Log
+              {item.icon}
+              <span>{item.label}</span>
             </li>
           </Link>
-        )}
+        ))}
+
+        {userData &&
+          userData.role === 3 &&
+          ADMIN_MENU.map((item) => (
+            <Link key={item.path} to={`/admin/${item.path}`}>
+              <li
+                className={`menu-item ${
+                  activeTab === item.path ? "active" : ""
+                }`}
+                onClick={() => setActiveTab(item.path)}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </li>
+            </Link>
+          ))}
       </ul>
+
+      {userData && (
+        <div className="sidebar-footer">
+          <Avatar sx={{ width: 40, height: 40 }}>
+            {userData.name[0].toUpperCase()}
+          </Avatar>
+          <span>{userData.name}</span>
+        </div>
+      )}
     </aside>
   );
 }
