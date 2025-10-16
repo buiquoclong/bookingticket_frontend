@@ -1,7 +1,6 @@
 import React, { useCallback, useState, useEffect } from "react";
 import "./AdminPay.scss";
-import success from "../../../../Assets/img/success.png";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -29,7 +28,6 @@ const AdminPay = () => {
   const totalAmount = totalPrice + totalPriceReturn;
   const [showLocationInput, setShowLocationInput] = useState(false);
   const [showLocationReturnInput, setShowLocationReturnInput] = useState(false);
-  const [showLocationRetrunInput, setShowLocationRetrunInput] = useState(false);
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [note, setNote] = useState("");
@@ -341,13 +339,6 @@ const AdminPay = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
   };
   const handleApplyDiscount = async () => {
     try {
