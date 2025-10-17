@@ -1,267 +1,30 @@
 import React, { useState, useEffect, useCallback } from "react";
-import DataTable from "react-data-table-component";
-// import "../AdminPromotion/AdminPromotion.scss"
 import { toast } from "react-toastify";
-import { Pagination, Breadcrumbs, Link } from "@mui/material";
-import { FiEdit, FiTrash } from "react-icons/fi";
 import useDebounce from "./useDebounce";
+import AdminTable from "../../ComponentParts/AdminComponents/AdminTable";
+import ConfirmDeleteModal from "../../ComponentParts/ModelComponents/ConfirmDeleteModal";
+import EditModal from "../../ComponentParts/ModelComponents/EditModal";
+import AddModal from "../../ComponentParts/ModelComponents/AddModal";
+import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
+import { promotionColumn, promotionFields } from "../../../Utils/bookingUtils";
 
 const AdminPromotion = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isAdd, setIsAdd] = useState(false);
   const [currentPromotion, setcurrentPromotion] = useState();
   const [records, setRecords] = useState([]);
-  const [description, setDescription] = useState("");
-  const [startDay, setStartDay] = useState("");
-  const [endDay, setEndDay] = useState("");
-  const [discount, setDiscount] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
   const [promotionToDelete, setPromotionToDelete] = useState(null);
+  const [searchCriteria, setSearchCriteria] = useState("code");
   const [searchValue, setSearchValue] = useState("");
   const searchDebounce = useDebounce(searchValue.trim(), 500);
-  const formatDateTime = (dateString) => {
-    const date = new Date(dateString);
-
-    const optionsDate = { year: "numeric", month: "2-digit", day: "2-digit" };
-    const optionsTime = { hour: "2-digit", minute: "2-digit" };
-
-    const formattedDate = date
-      .toLocaleDateString("vi-VN", optionsDate)
-      .replace(/\//g, "/");
-    const formattedTime = date
-      .toLocaleTimeString("vi-VN", optionsTime)
-      .replace(/:/g, ":");
-
-    return `${formattedTime} ${formattedDate}`;
-  };
-  const columns = [
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          ID
-        </div>
-      ),
-      selector: (row) => row.id,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.id}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Mã giảm giá
-        </div>
-      ),
-      selector: (row) => row.code,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.code}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Mô tả
-        </div>
-      ),
-      selector: (row) => row.description,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.description}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Ngày bắt đầu
-        </div>
-      ),
-      selector: (row) => row.startDay,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {formatDateTime(row.startDay)}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Ngày kết thúc
-        </div>
-      ),
-      selector: (row) => row.endDay,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {formatDateTime(row.endDay)}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Mức giảm giá
-        </div>
-      ),
-      selector: (row) => row.discount,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.discount} %
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Hành động
-        </div>
-      ),
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "1rem",
-            width: "100%",
-          }}
-        >
-          <FiEdit
-            size={24}
-            style={{
-              color: "#3b82f6",
-              cursor: "pointer",
-              transition: "color 0.3s ease",
-            }}
-            onClick={() => handleEditClick(row)}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#2563eb")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#3b82f6")}
-            title="Chỉnh sửa"
-          />
-          <FiTrash
-            size={24}
-            style={{
-              color: "#ef4444",
-              cursor: "pointer",
-              transition: "color 0.3s ease",
-            }}
-            onClick={() => handleRemoveClick(row)}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#dc2626")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#ef4444")}
-            title="Xóa"
-          />
-        </div>
-      ),
-    },
-  ];
   const fetchPromotions = useCallback(
-    async (searchDebounce) => {
+    async (searchDebounce, searchCriteria) => {
       try {
         const response = await fetch(
-          `http://localhost:8081/api/promotion/page?page=${page}&size=10&description=${searchDebounce}`
+          `http://localhost:8081/api/promotion/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
         );
         const data = await response.json();
         return data;
@@ -271,12 +34,12 @@ const AdminPromotion = () => {
       }
     },
     [page]
-  ); // Chỉ phụ thuộc vào page vì searchDebounce sẽ được truyền vào hàm khi gọi
+  );
 
   // Dùng useEffect để gọi API khi page hoặc searchDebounce thay đổi
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchPromotions(searchDebounce);
+      const data = await fetchPromotions(searchDebounce, searchCriteria);
 
       // Cập nhật trạng thái nếu dữ liệu có
       if (data) {
@@ -286,7 +49,8 @@ const AdminPromotion = () => {
     };
 
     fetchData();
-  }, [page, searchDebounce, fetchPromotions]);
+  }, [page, searchDebounce, searchCriteria, fetchPromotions]);
+
   const handleEditClick = (promo) => {
     setcurrentPromotion(promo);
     setIsEditing(true);
@@ -294,169 +58,125 @@ const AdminPromotion = () => {
   const handleCreateClick = () => {
     setIsAdd(true);
   };
-  const handleDescriptionChange = (event) => {
-    setDescription(event.target.value);
+
+  const handleRemoveClick = (promotion) => {
+    setPromotionToDelete(promotion);
+    setIsDeleteConfirmVisible(true);
   };
-  const handleStartDayChange = (event) => {
-    setStartDay(event.target.value);
-    if (endDay && endDay < event.target.value) {
-      setEndDay("");
-    }
+
+  const handleCriteriaChange = (event) => {
+    setSearchCriteria(event.target.value);
+    setSearchValue(""); // Reset input mỗi khi đổi tiêu chí
   };
-  const handleEndDayChange = (event) => {
-    setEndDay(event.target.value);
-  };
-  const handleDiscountChange = (event) => {
-    setDiscount(event.target.value);
-  };
-  function getCurrentDateTimeLocal() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = (now.getMonth() + 1).toString().padStart(2, "0"); // thêm '0' nếu cần
-    const day = now.getDate().toString().padStart(2, "0");
-    const hours = now.getHours().toString().padStart(2, "0");
-    const minutes = now.getMinutes().toString().padStart(2, "0");
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  }
-  const handleCreatePromotion = async (e) => {
-    e.preventDefault();
-    let missingInfo = [];
-    if (!description) {
-      missingInfo.push("Mô tả");
-    }
-    if (!startDay) {
-      missingInfo.push("Ngày bắt đầu");
-    }
-    if (!endDay) {
-      missingInfo.push("Ngày kết thúc");
-    }
-    if (!discount) {
-      missingInfo.push("Giảm giá");
-    }
+
+  // Hàm kiểm tra thông tin thiếu
+  const checkMissingInfo = (promo, requiredFields) => {
+    const missingInfo = requiredFields
+      .filter((field) => !promo[field.key])
+      .map((field) => field.label);
+
     if (missingInfo.length > 0) {
-      const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
-        ",  "
-      )}`;
-      toast.error(message);
-    } else {
-      try {
-        const token = localStorage.getItem("token");
-        const newPromotionData = {
-          description: description,
-          startDay: startDay,
-          endDay: endDay,
-          discount: discount,
-        };
-
-        const response = await fetch("http://localhost:8081/api/promotion", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(newPromotionData),
-        });
-
-        if (response.ok) {
-          // Xử lý thành công
-          console.log("Mã giảm giá đã được tạo thành công!");
-          toast.success("Mã giảm giá đã được tạo thành công!");
-          const newPromo = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
-          // Thêm người dùng mới vào danh sách
-          setRecords((prevRecords) => [...prevRecords, newPromo]);
-          // Reset form hoặc làm gì đó khác
-          setDescription("");
-          setStartDay("");
-          setEndDay("");
-          setDiscount("");
-          setIsAdd(false);
-          // window.location.reload();
-        } else {
-          console.error("Có lỗi xảy ra khi tạo mã!");
-          toast.error("Có lỗi xảy ra khi tạo mã!");
-        }
-      } catch (error) {
-        console.error("Lỗi:", error);
-        toast.error("Lỗi:", error);
-      }
+      toast.error(
+        `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`
+      );
+      return true; // Có missing info
     }
+    return false; // Không có missing info
   };
-  const handleUpdatePromotion = async (e) => {
-    e.preventDefault();
-    let missingInfo = [];
-    if (!currentPromotion.code) {
-      missingInfo.push("Mã giảm giá");
-    }
-    if (!currentPromotion.description) {
-      missingInfo.push("Mô tả");
-    }
-    if (!currentPromotion.startDay) {
-      missingInfo.push("Ngày bắt đầu");
-    }
-    if (!currentPromotion.endDay) {
-      missingInfo.push("Ngày kết thúc");
-    }
-    if (!currentPromotion.discount) {
-      missingInfo.push("Giảm giá");
-    }
-    if (missingInfo.length > 0) {
-      const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
-        ",  "
-      )}`;
-      toast.error(message);
-    } else {
-      try {
-        const token = localStorage.getItem("token");
-        const newPromotionData = {
-          code: currentPromotion.code,
-          description: currentPromotion.description,
-          startDay: currentPromotion.startDay,
-          endDay: currentPromotion.endDay,
-          discount: currentPromotion.discount,
-        };
-        console.log("newPromotionData", newPromotionData);
 
-        const response = await fetch(
-          `http://localhost:8081/api/promotion/${currentPromotion.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(newPromotionData),
-          }
+  // Hàm gửi request chung
+  const sendPromotionRequest = async (
+    url,
+    method,
+    promo,
+    successMessage,
+    resetStateCallback
+  ) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          code: promo.code,
+          description: promo.description,
+          startDay: promo.startDay,
+          endDay: promo.endDay,
+          discount: promo.discount,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Có lỗi xảy ra khi ${method === "POST" ? "tạo" : "cập nhật"} mã!`
         );
-
-        if (response.ok) {
-          // Xử lý thành công
-          console.log("Mã giảm giá đã được cập nhật thành công!");
-          toast.success("Mã giảm giá đã được cập nhật thành công!");
-          const updatedPromo = await response.json();
-          const updatedPromos = records.map((promo) => {
-            if (promo.id === updatedPromo.id) {
-              return updatedPromo;
-            }
-            return promo;
-          });
-          setRecords(updatedPromos);
-          // Reset form hoặc làm gì đó khác
-          setDescription("");
-          setStartDay("");
-          setEndDay("");
-          setDiscount("");
-          setIsEditing(false);
-          // window.location.reload();
-        } else {
-          console.error("Có lỗi xảy ra khi cập nhật mã!");
-          toast.error("Có lỗi xảy ra khi cập nhật mã!");
-        }
-      } catch (error) {
-        console.error("Lỗi:", error);
-        toast.error("Lỗi:", error);
       }
+
+      const result = await response.json();
+
+      if (method === "POST") {
+        setRecords((prev) => [...prev, result]);
+      } else if (method === "PUT") {
+        setRecords((prev) =>
+          prev.map((p) => (p.id === result.id ? result : p))
+        );
+      }
+
+      toast.success(successMessage);
+      resetStateCallback && resetStateCallback();
+    } catch (error) {
+      console.error("Lỗi:", error);
+      toast.error(`Lỗi: ${error.message}`);
     }
   };
+
+  // Create Promotion
+  const handleCreatePromotion = (newPromo) => {
+    if (
+      checkMissingInfo(newPromo, [
+        { key: "description", label: "Mô tả" },
+        { key: "startDay", label: "Ngày bắt đầu" },
+        { key: "endDay", label: "Ngày kết thúc" },
+        { key: "discount", label: "Giảm giá" },
+      ])
+    )
+      return;
+
+    sendPromotionRequest(
+      "http://localhost:8081/api/promotion",
+      "POST",
+      newPromo,
+      "Mã giảm giá đã được tạo thành công!",
+      () => setIsAdd(false)
+    );
+  };
+
+  // Update Promotion
+  const handleUpdatePromotion = (updatePromo) => {
+    if (
+      checkMissingInfo(updatePromo, [
+        { key: "code", label: "Mã giảm giá" },
+        { key: "description", label: "Mô tả" },
+        { key: "startDay", label: "Ngày bắt đầu" },
+        { key: "endDay", label: "Ngày kết thúc" },
+        { key: "discount", label: "Giảm giá" },
+      ])
+    )
+      return;
+
+    sendPromotionRequest(
+      `http://localhost:8081/api/promotion/${updatePromo.id}`,
+      "PUT",
+      updatePromo,
+      "Mã giảm giá đã được cập nhật thành công!",
+      () => setIsEditing(false)
+    );
+  };
+
+  // Delete Promotion
   const removePromotion = async () => {
     const promotionId = promotionToDelete.id;
     try {
@@ -465,289 +185,83 @@ const AdminPromotion = () => {
         `http://localhost:8081/api/promotion/${promotionId}`,
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`, // Thêm token vào header
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-      if (response.ok) {
-        // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
-        const updatedPromo = records.filter(
-          (record) => record.id !== promotionId
-        );
-        setRecords(updatedPromo);
-        toast.success("Promotion đã được xóa thành công!");
-        setIsDeleteConfirmVisible(false);
-      } else {
-        console.error("Có lỗi xảy ra khi xóa Promotion!");
-        toast.error("Có lỗi xảy ra khi xóa Promotion!");
-      }
+
+      if (!response.ok) throw new Error("Có lỗi xảy ra khi xóa Promotion!");
+
+      setRecords((prev) => prev.filter((record) => record.id !== promotionId));
+      toast.success("Promotion đã được xóa thành công!");
+      setIsDeleteConfirmVisible(false);
     } catch (error) {
       console.error("Lỗi:", error);
-      toast.error("Lỗi:", error.message);
+      toast.error(`Lỗi: ${error.message}`);
     }
   };
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-  const handleRemoveClick = (promotion) => {
-    setPromotionToDelete(promotion);
-    setIsDeleteConfirmVisible(true);
-  };
-  const NoDataComponent = () => (
-    <div className="emptyData">Không có dữ liệu</div>
-  );
+
   return (
     <div className="main-container">
-      {/* <section className="main section"> */}
-      <Breadcrumbs aria-label="breadcrumb">
-        <Link underline="hover" color="inherit" href="/admin">
-          Admin
-        </Link>
-        <Link underline="hover" color="inherit" href="/admin/promotions">
-          Mã giảm giá
-        </Link>
-      </Breadcrumbs>
+      <GenericAdminHeader
+        title="Quản lý mã giảm giá"
+        breadcrumbLinks={[
+          { label: "Admin", href: "/admin" },
+          { label: "Mã giảm giá", href: "/admin/promotions" },
+        ]}
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        searchOptions={[
+          { value: "code", label: "Mã giảm giá" },
+          { value: "description", label: "Mô tả" },
+          { value: "startDay", label: "Ngày bắt đầu" },
+          { value: "endDay", label: "Ngày kết thúc" },
+        ]}
+        searchCriteria={searchCriteria}
+        handleCriteriaChange={handleCriteriaChange}
+        addButtonLabel="Tạo mã giảm giá"
+        onAddClick={handleCreateClick}
+      />
 
       <div className="HisContent">
-        <div className="searchIn">
-          <input
-            type="text"
-            onChange={(e) => setSearchValue(e.target.value)}
-            placeholder="Tìm kiếm"
-            className="findTuyen"
-          />
-        </div>
         <div className="HistoryTick">
-          <div className="contentTikcet">
-            <div className="title">Quản lý mã giảm giá</div>
-            <button className="btn back" onClick={() => handleCreateClick()}>
-              Tạo mã giảm giá
-            </button>
-          </div>
           <div className="devide"></div>
-          <DataTable
-            columns={columns}
+          <AdminTable
+            columns={promotionColumn}
             data={records}
-            // pagination
-            noDataComponent={<NoDataComponent />}
-          ></DataTable>
-          <Pagination
-            count={totalPages}
-            boundaryCount={1}
-            siblingCount={1}
-            color="primary"
-            showFirstButton
-            showLastButton
-            style={{ float: "right", padding: "1rem" }}
-            page={page}
-            onChange={handleChangePage}
+            onEdit={handleEditClick}
+            onDelete={handleRemoveClick}
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
           />
         </div>
       </div>
 
-      {isEditing && (
-        <div className="modal" id="deleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Sửa Chi tiết mã giảm giá</h2>
-              </div>
-              <div className="modal-body">
-                <form>
-                  <div className="infoCity">
-                    <label className="info">Mã giảm giá:</label>
-                    <input
-                      type="text"
-                      value={currentPromotion.code}
-                      onChange={(e) =>
-                        setcurrentPromotion({
-                          ...currentPromotion,
-                          code: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Mô tả:</label>
-                    <input
-                      type="text"
-                      value={currentPromotion.description}
-                      onChange={(e) =>
-                        setcurrentPromotion({
-                          ...currentPromotion,
-                          description: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Ngày bắt đầu:</label>
-                    <input
-                      className="inputValue"
-                      type="datetime-local"
-                      value={currentPromotion.startDay}
-                      onChange={(e) =>
-                        setcurrentPromotion({
-                          ...currentPromotion,
-                          startDay: e.target.value,
-                        })
-                      }
-                      min={getCurrentDateTimeLocal()}
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label>Ngày kết thúc:</label>
-                    <input
-                      className="inputValue"
-                      type="datetime-local"
-                      value={currentPromotion.endDay}
-                      onChange={(e) =>
-                        setcurrentPromotion({
-                          ...currentPromotion,
-                          endDay: e.target.value,
-                        })
-                      }
-                      min={startDay ? startDay : undefined}
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label>Mức giảm:</label>
-                    <input
-                      className="inputValue"
-                      type="number"
-                      value={currentPromotion.discount}
-                      onChange={(e) =>
-                        setcurrentPromotion({
-                          ...currentPromotion,
-                          discount: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="listButton">
-                    <button
-                      type="button"
-                      onClick={() => setIsEditing(false)}
-                      className="cancel"
-                    >
-                      Hủy
-                    </button>
-                    <button
-                      type="submit"
-                      className="save"
-                      onClick={handleUpdatePromotion}
-                    >
-                      Lưu
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditModal
+        visible={isEditing}
+        title="Sửa thông tin mã giảm giá"
+        data={currentPromotion}
+        fields={promotionFields}
+        onSave={handleUpdatePromotion}
+        onCancel={() => setIsEditing(false)}
+      />
 
-      {isAdd && (
-        <div className="modal" id="deleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Thêm mã giảm giá</h2>
-              </div>
-              <div className="modal-body">
-                <form>
-                  <div className="infoCity">
-                    <label className="info">Mô tả:</label>
-                    <input
-                      type="text"
-                      value={description}
-                      onChange={handleDescriptionChange}
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">ngày bắt đầu:</label>
-                    <input
-                      className="inputValue"
-                      type="datetime-local"
-                      value={startDay}
-                      onChange={handleStartDayChange}
-                      min={getCurrentDateTimeLocal()}
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label>Ngày kết thúc:</label>
-                    <input
-                      className="inputValue"
-                      type="datetime-local"
-                      value={endDay}
-                      onChange={handleEndDayChange}
-                      min={startDay ? startDay : undefined}
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label>Mức giảm:</label>
-                    <input
-                      type="number"
-                      className="inputValue"
-                      value={discount}
-                      onChange={handleDiscountChange}
-                    />
-                  </div>
-                  <div className="listButton">
-                    <button
-                      type="button"
-                      onClick={() => setIsAdd(false)}
-                      className="cancel"
-                    >
-                      Hủy
-                    </button>
-                    <button
-                      type="submit"
-                      className="save"
-                      onClick={handleCreatePromotion}
-                    >
-                      Tạo
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      {isDeleteConfirmVisible && (
-        <div className="modal" id="confirmDeleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Xác nhận xóa</h2>
-              </div>
-              <div className="modal-body">
-                <p className="textConfirm">
-                  Bạn có chắc chắn muốn xóa mã giảm giá này?
-                </p>
-                <div className="listButton">
-                  <button
-                    type="button"
-                    onClick={() => setIsDeleteConfirmVisible(false)}
-                    className="cancel"
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="button"
-                    className="save"
-                    onClick={removePromotion}
-                  >
-                    Xóa
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddModal
+        visible={isAdd}
+        title="Tạo mã giảm giá"
+        fields={promotionFields}
+        defaultValues={{ status: 1 }} // mặc định status = 1
+        onSave={handleCreatePromotion}
+        onCancel={() => setIsAdd(false)}
+      />
+
+      <ConfirmDeleteModal
+        visible={isDeleteConfirmVisible}
+        message="Bạn có chắc chắn muốn xóa tài xế này?"
+        onConfirm={removePromotion} // khi xác nhận
+        onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+        type="delete"
+      />
     </div>
   );
 };
