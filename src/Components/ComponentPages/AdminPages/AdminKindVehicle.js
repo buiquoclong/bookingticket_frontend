@@ -1,10 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
-import DataTable from "react-data-table-component";
 // import "../AdminContact/AdminContact.scss"
 import { toast } from "react-toastify";
-import { Pagination, Breadcrumbs, Link } from "@mui/material";
 import { FiEdit, FiTrash } from "react-icons/fi";
 import useDebounce from "./useDebounce";
+import AdminTable from "../../ComponentParts/AdminComponents/AdminTable";
+import ConfirmDeleteModal from "../../ComponentParts/ModelComponents/ConfirmDeleteModal";
+import EditModal from "../../ComponentParts/ModelComponents/EditModal";
+import AddModal from "../../ComponentParts/ModelComponents/AddModal";
+import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
+import {
+  kindVehicleColumn,
+  kindVehicleFields,
+} from "../../../Utils/bookingUtils";
+import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 
 const AdminKindVehicle = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -165,314 +173,128 @@ const AdminKindVehicle = () => {
   const handleCreateClick = () => {
     setIsAdd(true);
   };
-  const handleNameChange = (event) => {
-    setName(event.target.value);
-  };
-  const handleCreateKindVehicle = async (e) => {
-    e.preventDefault();
-    let missingInfo = [];
-    if (!name) {
-      missingInfo.push("Loại xe");
-    }
-    if (missingInfo.length > 0) {
-      const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
-        ",  "
-      )}`;
-      toast.error(message);
-    } else {
-      try {
-        const token = localStorage.getItem("token");
-        const newContactData = {
-          name: name,
-        };
 
-        const response = await fetch("http://localhost:8081/api/kindVehicle", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(newContactData),
-        });
+  const handleCreateKindVehicle = async (newKindVehicle) => {
+    // Validate dữ liệu đầu vào
+    if (!validateFields({ "Loại xe": newKindVehicle.name })) return;
 
-        if (response.ok) {
-          // Xử lý thành công
-          toast.success("Loại xe mới đã được tạo thành công!");
-          const newKindvehicle = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
-          // Thêm người dùng mới vào danh sách
-          setRecords((prevRecords) => [...prevRecords, newKindvehicle]);
-          // Reset form hoặc làm gì đó khác
-          setName("");
-          setIsAdd(false);
-          // window.location.reload();
-        } else {
-          console.error("Có lỗi xảy ra khi tạo loại xe!");
-          toast.error("Có lỗi xảy ra khi tạo loại xe!");
-        }
-      } catch (error) {
-        console.error("Lỗi:", error);
-        toast.error("Lỗi:", error);
-      }
+    try {
+      // Gửi request tạo loại xe
+      const created = await sendRequest(
+        "http://localhost:8081/api/kindVehicle",
+        "POST",
+        { name: newKindVehicle.name }
+      );
+
+      // Hiển thị thông báo & cập nhật danh sách
+      toast.success("Loại xe mới đã được tạo thành công!");
+      setRecords((prev) => [...prev, created]);
+      setIsAdd(false);
+    } catch (error) {
+      console.error("Lỗi khi tạo loại xe:", error);
     }
   };
 
-  const handleUpdateKindVehicle = async (e) => {
-    e.preventDefault();
-    let missingInfo = [];
-    if (!currentKindVehicle.name) {
-      missingInfo.push("Loại xe");
-    }
-    if (missingInfo.length > 0) {
-      const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
-        ",  "
-      )}`;
-      toast.error(message);
-    } else {
-      try {
-        const token = localStorage.getItem("token");
-        const newKindVehicleData = {
-          name: currentKindVehicle.name,
-        };
+  // 🎯 Cập nhật loại xe
+  const handleUpdateKindVehicle = async (updateKindVehicle) => {
+    if (!validateFields({ "Loại xe": updateKindVehicle.name })) return;
 
-        const response = await fetch(
-          `http://localhost:8081/api/kindVehicle/${currentKindVehicle.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Thêm token vào header
-            },
-            body: JSON.stringify(newKindVehicleData),
-          }
-        );
+    try {
+      const updated = await sendRequest(
+        `http://localhost:8081/api/kindVehicle/${updateKindVehicle.id}`,
+        "PUT",
+        { name: updateKindVehicle.name }
+      );
 
-        if (response.ok) {
-          // Xử lý thành công
-          toast.success("Loại xe đã được cập nhật thành công!");
-          const updatedKindVehicle = await response.json();
-          const updatedKindVehicles = records.map((contact) => {
-            if (contact.id === updatedKindVehicle.id) {
-              return updatedKindVehicle;
-            }
-            return contact;
-          });
-          setRecords(updatedKindVehicles);
-          setIsEditing(false);
-          // window.location.reload();
-        } else {
-          console.error("Có lỗi xảy ra khi cập nhật loại xe!");
-          toast.error("Có lỗi xảy ra khi cập nhật loại xe!");
-        }
-      } catch (error) {
-        console.error("Lỗi:", error);
-        toast.error("Lỗi:", error);
-      }
+      toast.success("Loại xe đã được cập nhật thành công!");
+      setRecords((prev) =>
+        prev.map((item) => (item.id === updated.id ? updated : item))
+      );
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Lỗi khi update loại xe:", error);
     }
   };
+
+  // 🎯 Xóa loại xe
   const removeKindVehicle = async () => {
     const kindVehicleId = kindVehicleToDelete.id;
+
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
+      await sendRequest(
         `http://localhost:8081/api/kindVehicle/${kindVehicleId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`, // Thêm token vào header
-          },
-        }
+        "DELETE"
       );
-      if (response.ok) {
-        // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
-        const updatedKindVehicle = records.filter(
-          (record) => record.id !== kindVehicleId
-        );
-        setRecords(updatedKindVehicle);
-        toast.success("Loại xe đã được xóa thành công!");
-        setIsDeleteConfirmVisible(false);
-      } else {
-        console.error("Có lỗi xảy ra khi xóa loại xe!");
-        toast.error("Có lỗi xảy ra khi xóa loại xe!");
-      }
+
+      setRecords((prev) =>
+        prev.filter((record) => record.id !== kindVehicleId)
+      );
+      toast.success("Loại xe đã được xóa thành công!");
+      setIsDeleteConfirmVisible(false);
     } catch (error) {
-      console.error("Lỗi:", error);
-      toast.error("Lỗi:", error.message);
+      console.error("Lỗi khi xóa loại xe:", error);
     }
   };
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+
   const handleRemoveClick = (kindVehicle) => {
     setKindVehicleToDelete(kindVehicle);
     setIsDeleteConfirmVisible(true);
   };
-  const NoDataComponent = () => (
-    <div className="emptyData">Không có dữ liệu</div>
-  );
   return (
     <div className="main-container">
-      {/* <section className="main section"> */}
-      <Breadcrumbs aria-label="breadcrumb">
-        <Link underline="hover" color="inherit" href="/admin">
-          Admin
-        </Link>
-        <Link underline="hover" color="inherit" href="/admin/kind-vehicle">
-          Loại xe
-        </Link>
-      </Breadcrumbs>
+      <GenericAdminHeader
+        title="Quản lý loại xe"
+        breadcrumbLinks={[
+          { label: "Admin", href: "/admin" },
+          { label: "Loại xe", href: "/admin/kind-vehicle" },
+        ]}
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        searchOptions={[{ value: "name", label: "Tên" }]}
+        addButtonLabel="Thêm loại xe"
+        onAddClick={handleCreateClick}
+      />
 
       <div className="HisContent">
-        <div className="searchIn">
-          <input
-            type="text"
-            onChange={(e) => setSearchValue(e.target.value)}
-            placeholder="Tìm kiếm"
-            className="findTuyen"
-          />
-        </div>
         <div className="HistoryTick">
-          <div className="contentTikcet">
-            <div className="title">Loại xe</div>
-            <button className="btn back" onClick={() => handleCreateClick()}>
-              Tạo loại xe
-            </button>
-          </div>
           <div className="devide"></div>
-          <DataTable
-            columns={columns}
+          <AdminTable
+            columns={kindVehicleColumn}
             data={records}
-            // pagination
-            noDataComponent={<NoDataComponent />}
-          ></DataTable>
-          <Pagination
-            count={totalPages}
-            boundaryCount={1}
-            siblingCount={1}
-            color="primary"
-            showFirstButton
-            showLastButton
-            style={{ float: "right", padding: "1rem" }}
-            page={page}
-            onChange={handleChangePage}
+            onEdit={handleEditClick}
+            onDelete={handleRemoveClick}
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
           />
         </div>
       </div>
 
-      {isEditing && (
-        <div className="modal" id="deleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Sửa loại xe</h2>
-              </div>
-              <div className="modal-body">
-                <form>
-                  <div className="infoCity">
-                    <label className="info">Loại xe:</label>
-                    <input
-                      type="text"
-                      value={currentKindVehicle.name}
-                      onChange={(e) =>
-                        setcurrentKindVehicle({
-                          ...currentKindVehicle,
-                          name: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="listButton">
-                    <button
-                      type="button"
-                      onClick={() => setIsEditing(false)}
-                      className="cancel"
-                    >
-                      Hủy
-                    </button>
-                    <button
-                      type="submit"
-                      className="save"
-                      onClick={handleUpdateKindVehicle}
-                    >
-                      Lưu
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      {isAdd && (
-        <div className="modal" id="deleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Thêm loại xe</h2>
-              </div>
-              <div className="modal-body">
-                <form>
-                  <div className="infoCity">
-                    <label className="info">Loại xe:</label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={handleNameChange}
-                    />
-                  </div>
-                  <div className="listButton">
-                    <button
-                      type="button"
-                      onClick={() => setIsAdd(false)}
-                      className="cancel"
-                    >
-                      Hủy
-                    </button>
-                    <button
-                      type="submit"
-                      className="save"
-                      onClick={handleCreateKindVehicle}
-                    >
-                      Tạo
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      {isDeleteConfirmVisible && (
-        <div className="modal" id="confirmDeleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Xác nhận xóa</h2>
-              </div>
-              <div className="modal-body">
-                <p className="textConfirm">
-                  Bạn có chắc chắn muốn xóa loại xe này?
-                </p>
-                <div className="listButton">
-                  <button
-                    type="button"
-                    onClick={() => setIsDeleteConfirmVisible(false)}
-                    className="cancel"
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="button"
-                    className="save"
-                    onClick={removeKindVehicle}
-                  >
-                    Xóa
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditModal
+        visible={isEditing}
+        title="Sửa thông loại xe"
+        data={currentKindVehicle}
+        fields={kindVehicleFields}
+        onSave={handleUpdateKindVehicle}
+        onCancel={() => setIsEditing(false)}
+      />
+
+      <AddModal
+        visible={isAdd}
+        title="Thêm loại xe"
+        fields={kindVehicleFields}
+        defaultValues={{ status: 1 }} // mặc định status = 1
+        onSave={handleCreateKindVehicle}
+        onCancel={() => setIsAdd(false)}
+      />
+
+      <ConfirmDeleteModal
+        visible={isDeleteConfirmVisible}
+        message="Bạn có chắc chắn muốn xóa loại xe này?"
+        onConfirm={removeKindVehicle} // khi xác nhận
+        onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+        type="delete"
+      />
     </div>
   );
 };
