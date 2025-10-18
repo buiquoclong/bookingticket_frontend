@@ -34,6 +34,7 @@ const Home = () => {
     kind: "Một chiều",
     origin: "",
     destination: "",
+    originId: null,
     destinationId: null,
     dayStart: "",
     dayReturn: "",
@@ -113,6 +114,7 @@ const Home = () => {
             formValues={formValues}
             setFormValues={setFormValues}
             cities={cities}
+            navigateTo="/book-ticket"
           />
 
           <div className="homeFooterIcons">

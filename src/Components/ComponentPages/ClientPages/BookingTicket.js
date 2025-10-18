@@ -61,14 +61,14 @@ const BookingTicket = () => {
     setNote(newNote);
   };
 
-  // Xử lý input nơi đón
-  const handlePickupLocationChange = (event) => {
-    setPickupLocation(event.target.value);
-  };
-
   // Xử lý input ghi chú cho chuyến về
   const handleNoteReturnChange = (newNote) => {
     setNoteReturn(newNote);
+  };
+
+  // Xử lý input nơi đón
+  const handlePickupLocationChange = (event) => {
+    setPickupLocation(event.target.value);
   };
 
   // Xử lý input nơi đón cho chuyến về

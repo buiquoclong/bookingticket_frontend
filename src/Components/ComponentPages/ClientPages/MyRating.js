@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "../../../Assets/scss/Clients/MyRating.scss";
 import StarRatings from "react-star-ratings";
-import ConfirmModal from "../../ComponentParts/ModelComponents/ConfirmModal";
+import ConfirmDeleteModal from "../../ComponentParts/ModelComponents/ConfirmDeleteModal";
 import RatingModal from "../../ComponentParts/ModelComponents/RatingModal";
 import { formatDate } from "../../../Utils/bookingUtils";
 import {
@@ -245,7 +245,7 @@ const MyRating = () => {
         </div>
 
         {/* Hộp xác nhận xóa */}
-        <ConfirmModal
+        <ConfirmDeleteModal
           visible={isDeleteConfirmVisible}
           message="Bạn có chắc muốn xóa đánh giá này không?"
           onConfirm={removeReview}
