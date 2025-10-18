@@ -20,122 +20,12 @@ const AdminKindVehicle = () => {
   const [currentKindVehicle, setcurrentKindVehicle] = useState();
   const [records, setRecords] = useState([]);
 
-  const [name, setName] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
   const [kindVehicleToDelete, setKindVehicleToDelete] = useState(null);
   const [searchValue, setSearchValue] = useState("");
   const searchDebounce = useDebounce(searchValue.trim(), 500);
-  const columns = [
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          ID
-        </div>
-      ),
-      selector: (row) => row.id,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.id}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Loại xe
-        </div>
-      ),
-      selector: (row) => row.name,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.name}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Hành động
-        </div>
-      ),
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "1rem",
-            width: "100%",
-          }}
-        >
-          <FiEdit
-            size={24}
-            style={{
-              color: "#3b82f6",
-              cursor: "pointer",
-              transition: "color 0.3s ease",
-            }}
-            onClick={() => handleEditClick(row)}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#2563eb")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#3b82f6")}
-            title="Chỉnh sửa"
-          />
-          <FiTrash
-            size={24}
-            style={{
-              color: "#ef4444",
-              cursor: "pointer",
-              transition: "color 0.3s ease",
-            }}
-            onClick={() => handleRemoveClick(row)}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#dc2626")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#ef4444")}
-            title="Xóa"
-          />
-        </div>
-      ),
-    },
-  ];
   const fetchKindVehicle = useCallback(
     async (searchDebounce) => {
       try {
