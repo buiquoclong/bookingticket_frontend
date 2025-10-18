@@ -1,217 +1,58 @@
 import React, { useState, useEffect, useCallback } from "react";
-import DataTable from "react-data-table-component";
-// import "../AdminSeat/AdminSeat.scss"
 import { toast } from "react-toastify";
-import { Pagination, Breadcrumbs, Link } from "@mui/material";
-import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import { FiEdit, FiTrash } from "react-icons/fi";
 import useDebounce from "./useDebounce";
+import AdminTable from "../../ComponentParts/AdminComponents/AdminTable";
+import ConfirmDeleteModal from "../../ComponentParts/ModelComponents/ConfirmDeleteModal";
+import EditModal from "../../ComponentParts/ModelComponents/EditModal";
+import AddModal from "../../ComponentParts/ModelComponents/AddModal";
+import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
+import { seatColumn, seatFields } from "../../../Utils/bookingUtils";
+import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 
 const AdminSeat = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [currentSeat, setcurrentSeat] = useState({
-    id: null,
-    kindVehicle: {
-      id: "",
-      name: "",
-    },
-    image: "",
-  });
+  const [currentSeat, setcurrentSeat] = useState({});
 
   const [isAdd, setIsAdd] = useState(false);
   const [records, setRecords] = useState([]);
 
-  const [name, setName] = useState("");
-  const [kindVehicle, setKindVehicle] = useState("");
-
   const [page, setPage] = useState(1);
+  const [kindVehicles, setKindVehicles] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
   const [seatToDelete, setSeatToDelete] = useState(null);
   const [searchCriteria, setSearchCriteria] = useState("name");
   const [searchValue, setSearchValue] = useState("");
-  const searchDebounce = useDebounce(searchValue.trim(), 500);
-  const columns = [
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          ID
-        </div>
-      ),
-      selector: (row) => row.id,
-      width: "5rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.id}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Tên ghế
-        </div>
-      ),
-      selector: (row) => row.name,
-      sortable: true,
-      width: "20rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.name}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Loại xe
-        </div>
-      ),
-      selector: (row) => row.kindVehicle.name,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.kindVehicle.name}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Trạng thái
-        </div>
-      ),
-      selector: (row) => row.status,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {statusMap[row.status] || "Unknown Status"}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Hành động
-        </div>
-      ),
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "1rem",
-            width: "100%",
-          }}
-        >
-          <FiEdit
-            size={24}
-            style={{
-              color: "#3b82f6",
-              cursor: "pointer",
-              transition: "color 0.3s ease",
-            }}
-            onClick={() => handleEditClick(row)}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#2563eb")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#3b82f6")}
-            title="Chỉnh sửa"
-          />
-          <FiTrash
-            size={24}
-            style={{
-              color: "#ef4444",
-              cursor: "pointer",
-              transition: "color 0.3s ease",
-            }}
-            onClick={() => handleRemoveClick(row)}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#dc2626")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#ef4444")}
-            title="Xóa"
-          />
-        </div>
-      ),
-    },
-  ];
+  const searchDebounce = useDebounce(
+    typeof searchValue === "string" ? searchValue.trim() : searchValue,
+    500
+  );
 
   const statusMap = {
     0: "Đang hoạt động",
     1: "Tạm dừng hoạt động",
-  };
-  const kindVehicleMap = {
-    1: "Giường nằm",
-    2: "Limousine",
-    3: "Ghế ngồi",
+    2: "Ngừng hoạt động",
   };
 
+  const statusColorMap = {
+    0: "#008000b3", // Đang làm
+    1: "#ffa9008a", // Tạm nghỉ
+    2: "#ff0000c2", // Tạm khóa
+  };
+  const fetchKindVehicles = useCallback(async () => {
+    try {
+      const response = await fetch("http://localhost:8081/api/kindVehicle");
+      const data = await response.json();
+      setKindVehicles(data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching routes:", error);
+      return null;
+    }
+  }, []);
   const fetchSeats = useCallback(
-    async (searchDebounce) => {
+    async (searchDebounce, searchCriteria) => {
       try {
         const response = await fetch(
           `http://localhost:8081/api/seat/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
@@ -223,13 +64,13 @@ const AdminSeat = () => {
         return null;
       }
     },
-    [page, searchCriteria]
+    [page]
   ); // Chỉ tái tạo khi `page` hoặc `searchCriteria` thay đổi
 
   // Dùng useEffect để gọi API khi page hoặc searchDebounce thay đổi
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchSeats(searchDebounce);
+      const data = await fetchSeats(searchDebounce, searchCriteria);
 
       // Cập nhật state nếu dữ liệu có
       if (data) {
@@ -239,424 +80,177 @@ const AdminSeat = () => {
     };
 
     fetchData();
-  }, [page, searchDebounce, searchCriteria, fetchSeats]);
-  const handleEditClick = (seatName) => {
-    setcurrentSeat(seatName);
+    fetchKindVehicles();
+  }, [page, searchDebounce, fetchKindVehicles, searchCriteria, fetchSeats]);
+  const handleEditClick = (seat) => {
+    setcurrentSeat(seat);
     setIsEditing(true);
   };
   const handleCreateClick = () => {
     setIsAdd(true);
   };
-  const handleNameChange = (event) => {
-    setName(event.target.value);
-  };
-  const handkindVehicleChange = (event) => {
-    setKindVehicle(event.target.value);
-  };
-  const handleCreateSeat = async (e) => {
-    e.preventDefault();
-    let missingInfo = [];
-    if (!name) {
-      missingInfo.push("Tên ghế");
-    }
-    if (!kindVehicle) {
-      missingInfo.push("Loại xe");
-    }
-    if (missingInfo.length > 0) {
-      const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
-        ",  "
-      )}`;
-      toast.error(message);
-    } else {
-      try {
-        const token = localStorage.getItem("token");
-        const newSeatData = {
-          name: name,
-          kindVehicleId: kindVehicle,
-          status: 0,
-        };
 
-        const response = await fetch("http://localhost:8081/api/seat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(newSeatData),
-        });
+  const handleCreateSeat = async (newSeat) => {
+    // Validate dữ liệu đầu vào
+    if (
+      !validateFields({
+        "Loại xe": newSeat.kindVehicleId,
+        "Tên điểm đón": newSeat.name,
+        "Địa chỉ": newSeat.status,
+      })
+    )
+      return;
+    const newSeatData = {
+      kindVehicleId: newSeat.kindVehicleId,
+      name: newSeat.name,
+      status: newSeat.status,
+    };
+    try {
+      // Gửi request tạo loại xe
+      const created = await sendRequest(
+        "http://localhost:8081/api/seat",
+        "POST",
+        newSeatData
+      );
 
-        if (response.ok) {
-          // Xử lý thành công
-          console.log("Ghế đã được tạo thành công!");
-          toast.success("Ghế đã được tạo thành công!");
-          const newSeat = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
-          // Thêm người dùng mới vào danh sách
-          setRecords((prevRecords) => [...prevRecords, newSeat]);
-          // Reset form hoặc làm gì đó khác
-          setName("");
-          setKindVehicle("");
-          setIsAdd(false);
-          // window.location.reload();
-        } else {
-          // console.error("Có lỗi xảy ra khi tạo ghế!");
-          // toast.error("Có lỗi xảy ra khi tạo ghế!");
-          console.error("Tên ghế đã tồn tại trong loại xe này");
-          toast.error("Tên ghế đã tồn tại trong loại xe này");
-        }
-      } catch (error) {
-        console.error("Lỗi:", error);
-        toast.error("Lỗi:", error);
-      }
+      // Hiển thị thông báo & cập nhật danh sách
+      toast.success("Ghế ngồi mới đã được tạo thành công!");
+      setRecords((prev) => [...prev, created]);
+      setIsAdd(false);
+    } catch (error) {
+      console.error("Lỗi khi tạo ghế ngồi:", error);
     }
   };
-  const handleUpdateSeat = async (e) => {
-    e.preventDefault();
-    let missingInfo = [];
-    if (!currentSeat.name) {
-      missingInfo.push("Tên ghế");
-    }
-    if (!currentSeat.kindVehicle) {
-      missingInfo.push("Loại xe");
-    }
-    if (currentSeat.status === null || currentSeat.status === undefined) {
-      missingInfo.push("Trạng thái");
-    }
-    if (missingInfo.length > 0) {
-      const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
-        ",  "
-      )}`;
-      toast.error(message);
-    } else {
-      try {
-        const token = localStorage.getItem("token");
-        const updateSeatData = {
-          name: currentSeat.name,
-          kindVehicleId: currentSeat.kindVehicle.id,
-          status: currentSeat.status,
-        };
 
-        const response = await fetch(
-          `http://localhost:8081/api/seat/${currentSeat.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(updateSeatData),
-          }
-        );
+  const handleUpdateSeat = async (updateSeat) => {
+    if (
+      !validateFields({
+        "Loại xe": updateSeat.kindVehicleId,
+        "Tên điểm đón": updateSeat.name,
+        "Địa chỉ": updateSeat.status,
+      })
+    )
+      return;
+    const updateSeatData = {
+      kindVehicleId: updateSeat.kindVehicleId,
+      name: updateSeat.name,
+      status: updateSeat.status,
+    };
 
-        if (response.ok) {
-          // Xử lý thành công
-          console.log("Ghế đã được cập nhật thành công!");
-          toast.success("Ghế đã được cập nhật thành công!");
-          const updatedSeat = await response.json();
-          const updatedSeats = records.map((seat) => {
-            if (seat.id === updatedSeat.id) {
-              return updatedSeat;
-            }
-            return seat;
-          });
-          setRecords(updatedSeats);
-          // Reset form hoặc làm gì đó khác
-          setcurrentSeat({
-            id: null,
-            kindSeat: { id: "", name: "" },
-            name: "",
-            seatNumber: "",
-            value: "",
-            status: "",
-          });
-          setIsEditing(false);
-          // window.location.reload();
-        } else {
-          console.error("Có lỗi xảy ra khi cập nhật ghế!");
-          toast.error("Có lỗi xảy ra khi cập nhật ghế!");
-        }
-      } catch (error) {
-        console.error("Lỗi:", error);
-        toast.error("Lỗi:", error);
-      }
+    try {
+      const updated = await sendRequest(
+        `http://localhost:8081/api/seat/${updateSeat.id}`,
+        "PUT",
+        updateSeatData
+      );
+
+      toast.success("Ghế ngồi đã được cập nhật thành công!");
+      setRecords((prev) =>
+        prev.map((item) => (item.id === updated.id ? updated : item))
+      );
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Lỗi khi update ghế ngồi:", error);
     }
   };
 
   const removeSeat = async () => {
     const seatId = seatToDelete.id;
+
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8081/api/seat/${seatId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`, // Thêm token vào header
-        },
-      });
-      if (response.ok) {
-        // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
-        const updateSeat = records.filter((record) => record.id !== seatId);
-        setRecords(updateSeat);
-        toast.success("seat đã được xóa thành công!");
-        setIsDeleteConfirmVisible(false);
-      } else {
-        console.error("Có lỗi xảy ra khi xóa seat!");
-        toast.error("Có lỗi xảy ra khi xóa ghế!");
-      }
+      await sendRequest(`http://localhost:8081/api/seat/${seatId}`, "DELETE");
+
+      setRecords((prev) => prev.filter((record) => record.id !== seatId));
+      toast.success("Ghế ngồi đã được xóa thành công!");
+      setIsDeleteConfirmVisible(false);
     } catch (error) {
-      console.error("Lỗi:", error);
-      toast.error("Lỗi:", error.message);
+      console.error("Lỗi khi xóa ghế ngồi:", error);
     }
   };
-  const handleChangePage = (event, value) => {
-    setPage(value);
-  };
+
   const handleRemoveClick = (seat) => {
     setSeatToDelete(seat);
     setIsDeleteConfirmVisible(true);
   };
-  const NoDataComponent = () => (
-    <div className="emptyData">Không có dữ liệu</div>
-  );
   const handleCriteriaChange = (event) => {
     setSearchCriteria(event.target.value);
   };
+  const searchOptions = seatFields.map((field) => {
+    if (field.type === "select") {
+      if (field.key === "kindVehicleId") {
+        // 🔹 Gắn danh sách loại xe
+        return { ...field, value: field.key, options: kindVehicles };
+      }
+
+      if (field.key === "status") {
+        // 🔹 Gắn danh sách trạng thái từ statusMap (object)
+        return { ...field, value: field.key, options: statusMap };
+      }
+    }
+
+    // Các field còn lại
+    return { ...field, value: field.key };
+  });
+
   return (
     <div className="main-container">
-      {/* <section className="main section"> */}
-      <Breadcrumbs aria-label="breadcrumb">
-        <Link underline="hover" color="inherit" href="/admin">
-          Admin
-        </Link>
-        <Link underline="hover" color="inherit" href="/admin/seats">
-          Ghế ngồi
-        </Link>
-      </Breadcrumbs>
+      <GenericAdminHeader
+        title="Quản lý ghế ngồi"
+        breadcrumbLinks={[
+          { label: "Admin", href: "/admin" },
+          { label: "Ghế ngồi", href: "/admin/seats" },
+        ]}
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        searchOptions={searchOptions}
+        searchCriteria={searchCriteria}
+        handleCriteriaChange={handleCriteriaChange}
+        addButtonLabel="Thêm ghế ngồi"
+        onAddClick={handleCreateClick}
+      />
 
       <div className="HisContent">
-        <div className="searchIn">
-          {/* <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/> */}
-          <input
-            type="text"
-            onChange={(e) => setSearchValue(e.target.value)}
-            placeholder={`Tìm kiếm`}
-            value={searchValue}
-            className="findTuyen"
-            style={{ marginRight: "1rem" }}
-          />
-          <FormControl
-            sx={{ minWidth: 150 }}
-            variant="outlined"
-            className="searchCriteria"
-            size="small"
-          >
-            <InputLabel id="search-criteria-label">Tìm kiếm bằng</InputLabel>
-            <Select
-              labelId="search-criteria-label"
-              id="search-criteria"
-              value={searchCriteria}
-              onChange={handleCriteriaChange}
-              label="Tiềm kiếm bằng"
-            >
-              <MenuItem value="name">Tên ghế</MenuItem>
-              <MenuItem value="kindVehicleName">Loại xe</MenuItem>
-            </Select>
-          </FormControl>
-        </div>
         <div className="HistoryTick">
-          <div className="contentTikcet">
-            <div className="title">Quản lý ghế ngồi</div>
-            <button className="btn back" onClick={() => handleCreateClick()}>
-              Thêm ghế ngồi
-            </button>
-          </div>
           <div className="devide"></div>
-          <DataTable
-            columns={columns}
+          <AdminTable
+            columns={seatColumn}
             data={records}
-            // pagination
-            noDataComponent={<NoDataComponent />}
-          ></DataTable>
-          <Pagination
-            count={totalPages}
-            boundaryCount={1}
-            siblingCount={1}
-            color="primary"
-            showFirstButton
-            showLastButton
-            style={{ float: "right", padding: "1rem" }}
-            page={page}
-            onChange={handleChangePage}
+            onEdit={handleEditClick}
+            onDelete={handleRemoveClick}
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            statusColorMap={statusColorMap}
+            statusMap={statusMap}
           />
         </div>
       </div>
 
-      {isEditing && (
-        <div className="modal" id="deleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Sửa ghế ngồi</h2>
-              </div>
-              <div className="modal-body">
-                <form>
-                  <div className="infoCity">
-                    <label>Tên ghế:</label>
-                    <input
-                      type="text"
-                      value={currentSeat.name}
-                      onChange={(e) =>
-                        setcurrentSeat({ ...currentSeat, name: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Loại xe:</label>
-                    {/* <input type="text" value={currentSeat.kindVehicle} onChange={(e) => setcurrentSeat({ ...currentSeat, kindVehicle: e.target.value })} /> */}
-                    <select
-                      className="inputValue"
-                      value={currentSeat.kindVehicle.id}
-                      onChange={(e) =>
-                        setcurrentSeat({
-                          ...currentSeat,
-                          kindVehicle: {
-                            ...currentSeat.kindVehicle,
-                            id: e.target.value,
-                          },
-                        })
-                      }
-                    >
-                      {Object.keys(kindVehicleMap).map((key) => (
-                        <option key={key} value={key}>
-                          {kindVehicleMap[key]}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="infoCity">
-                    <label>Trạn thái:</label>
-                    {/* <input type="text" value={currentSeat.vehicleNumber} onChange={(e) => setcurrentSeat({ ...currentSeat, vehicleNumber: e.target.value })} /> */}
-                    <select
-                      className="inputValue"
-                      value={currentSeat.status}
-                      onChange={(e) =>
-                        setcurrentSeat({
-                          ...currentSeat,
-                          status: e.target.value,
-                        })
-                      }
-                    >
-                      {Object.keys(statusMap).map((key) => (
-                        <option key={key} value={key}>
-                          {statusMap[key]}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="listButton">
-                    <button
-                      type="button"
-                      onClick={() => setIsEditing(false)}
-                      className="cancel"
-                    >
-                      Hủy
-                    </button>
-                    <button
-                      type="submit"
-                      className="save"
-                      onClick={handleUpdateSeat}
-                    >
-                      Lưu
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditModal
+        visible={isEditing}
+        title="Sửa thông tin ghế ngồi"
+        data={currentSeat}
+        fields={searchOptions}
+        onSave={handleUpdateSeat}
+        onCancel={() => setIsEditing(false)}
+      />
 
-      {isAdd && (
-        <div className="modal" id="deleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Thêm ghế ngồi</h2>
-              </div>
-              <div className="modal-body">
-                <form>
-                  <div className="infoCity">
-                    <label>Tên ghế:</label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={handleNameChange}
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Loại xe:</label>
-                    {/* <input type="text" value={currentSeat.kindVehicle} onChange={(e) => setcurrentSeat({ ...currentSeat, kindVehicle: e.target.value })} /> */}
-                    <select
-                      className="inputValue"
-                      value={kindVehicle}
-                      onChange={handkindVehicleChange}
-                    >
-                      <option value="">Chọn loại xe</option>
-                      {Object.keys(kindVehicleMap).map((key) => (
-                        <option key={key} value={key}>
-                          {kindVehicleMap[key]}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="listButton">
-                    <button
-                      type="button"
-                      onClick={() => setIsAdd(false)}
-                      className="cancel"
-                    >
-                      Hủy
-                    </button>
-                    <button
-                      type="submit"
-                      className="save"
-                      onClick={handleCreateSeat}
-                    >
-                      Tạo
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      {isDeleteConfirmVisible && (
-        <div className="modal" id="confirmDeleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Xác nhận xóa</h2>
-              </div>
-              <div className="modal-body">
-                <p className="textConfirm">
-                  Bạn có chắc chắn muốn xóa ghế này?
-                </p>
-                <div className="listButton">
-                  <button
-                    type="button"
-                    onClick={() => setIsDeleteConfirmVisible(false)}
-                    className="cancel"
-                  >
-                    Hủy
-                  </button>
-                  <button type="button" className="save" onClick={removeSeat}>
-                    Xóa
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddModal
+        visible={isAdd}
+        title="Thêm ghế ngồi"
+        fields={searchOptions}
+        defaultValues={{ status: 0 }} // mặc định status = 1
+        onSave={handleCreateSeat}
+        onCancel={() => setIsAdd(false)}
+      />
+
+      <ConfirmDeleteModal
+        visible={isDeleteConfirmVisible}
+        message="Bạn có chắc chắn muốn xóa ghế ngồi này?"
+        onConfirm={removeSeat} // khi xác nhận
+        onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+        type="delete"
+      />
     </div>
   );
 };
