@@ -1,227 +1,44 @@
 import React, { useState, useEffect, useCallback } from "react";
-import DataTable from "react-data-table-component";
-// import "../AdminTrip/AdminTrip.scss"
 import { toast } from "react-toastify";
-import { Pagination, Breadcrumbs, Link } from "@mui/material";
-import { FiEdit, FiTrash } from "react-icons/fi";
 
 import useDebounce from "./useDebounce";
+import AdminTable from "../../ComponentParts/AdminComponents/AdminTable";
+import ConfirmDeleteModal from "../../ComponentParts/ModelComponents/ConfirmDeleteModal";
+import EditModal from "../../ComponentParts/ModelComponents/EditModal";
+import AddModal from "../../ComponentParts/ModelComponents/AddModal";
+import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
+import {
+  catchPointColumn,
+  catchPointFields,
+} from "../../../Utils/bookingUtils";
+import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 
 const AdminCatchPoint = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [currentPoint, setCurrentPoint] = useState({
-    id: null,
-    route: { id: "", name: "" },
-    name: "",
-    address: "",
-  });
+  const [currentPoint, setCurrentPoint] = useState({});
   const [isAdd, setIsAdd] = useState(false);
   const [routes, setRoutes] = useState([]);
   const [records, setRecords] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-
-  const [route, setRoute] = useState("");
-  const [namePoint, setNamePoint] = useState("");
-  const [address, setAddress] = useState("");
   const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
   const [pointToDelete, setPointToDelete] = useState(null);
   const [searchValue, setSearchValue] = useState("");
-  const searchDebounce = useDebounce(searchValue.trim(), 500);
-  const columns = [
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          ID
-        </div>
-      ),
-      selector: (row) => row.id,
-      width: "3rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.id}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Tên chuyến
-        </div>
-      ),
-      selector: (row) => row.route.name,
-      sortable: true,
-      // width: '10rem',
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.route.name}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Tên điểm đón
-        </div>
-      ),
-      selector: (row) => row.vehicle.kindVehicle.name,
-      // width: '7rem',
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.name}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Địa chỉ
-        </div>
-      ),
-      selector: (row) => row.vehicle.name,
-      // width: '7rem',
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.address}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Hành động
-        </div>
-      ),
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "1rem",
-            width: "100%",
-          }}
-        >
-          <FiEdit
-            size={24}
-            style={{
-              color: "#3b82f6",
-              cursor: "pointer",
-              transition: "color 0.3s ease",
-            }}
-            onClick={() => handleEditClick(row)}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#2563eb")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#3b82f6")}
-            title="Chỉnh sửa"
-          />
-          <FiTrash
-            size={24}
-            style={{
-              color: "#ef4444",
-              cursor: "pointer",
-              transition: "color 0.3s ease",
-            }}
-            onClick={() => handleRemoveClick(row)}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#dc2626")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#ef4444")}
-            title="Xóa"
-          />
-        </div>
-      ),
-    },
-  ];
-
-  const handleRouteChange = (event) => {
-    setRoute(event.target.value);
-  };
+  const [searchCriteria, setSearchCriteria] = useState("name");
+  const searchDebounce = useDebounce(
+    typeof searchValue === "string" ? searchValue.trim() : searchValue,
+    500
+  );
 
   const handleCreateClick = () => {
     setIsAdd(true);
   };
-  const handleNamePointChange = (event) => {
-    setNamePoint(event.target.value);
-  };
-  const handleAddressChange = (event) => {
-    setAddress(event.target.value);
-  };
 
   const fetchCatchPoint = useCallback(
-    async (searchDebounce) => {
+    async (searchDebounce, searchCriteria) => {
       try {
         const response = await fetch(
-          `http://localhost:8081/api/catch-point/page?page=${page}&size=10&address=${searchDebounce}`
+          `http://localhost:8081/api/catch-point/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
         );
         const data = await response.json();
         return data;
@@ -249,7 +66,7 @@ const AdminCatchPoint = () => {
       try {
         // Sử dụng Promise.all để gọi đồng thời
         const [catchPointsData, routesData] = await Promise.all([
-          fetchCatchPoint(searchDebounce),
+          fetchCatchPoint(searchDebounce, searchCriteria),
           fetchRoutes(),
         ]);
 
@@ -268,414 +85,164 @@ const AdminCatchPoint = () => {
     };
 
     fetchData();
-  }, [page, searchDebounce, fetchCatchPoint, fetchRoutes]);
+  }, [page, searchDebounce, searchCriteria, fetchCatchPoint, fetchRoutes]);
 
-  const handleEditClick = (row) => {
-    if (row && row.route) {
-      setCurrentPoint({
-        id: row.id,
-        route: {
-          id: row.route.id,
-          name: row.route.name,
-        },
-        name: row.name,
-        address: row.address,
-      });
-      setIsEditing(true);
+  const handleEditClick = (catchPoints) => {
+    setCurrentPoint(catchPoints);
+
+    setIsEditing(true);
+  };
+
+  const handleCreateCatchPoint = async (newCatchPoint) => {
+    // Validate dữ liệu đầu vào
+    if (
+      !validateFields({
+        Tuyến: newCatchPoint.routeId,
+        "Tên điểm đón": newCatchPoint.name,
+        "Địa chỉ": newCatchPoint.address,
+      })
+    )
+      return;
+    const newPointData = {
+      routeId: newCatchPoint.routeId,
+      name: newCatchPoint.name,
+      address: newCatchPoint.address,
+    };
+    try {
+      // Gửi request tạo loại xe
+      const created = await sendRequest(
+        "http://localhost:8081/api/catch-point",
+        "POST",
+        newPointData
+      );
+
+      // Hiển thị thông báo & cập nhật danh sách
+      toast.success("Điểm đón mới đã được tạo thành công!");
+      setRecords((prev) => [...prev, created]);
+      setIsAdd(false);
+    } catch (error) {
+      console.error("Lỗi khi tạo loại điểm đón:", error);
     }
   };
 
-  const handleRoute1Change = (e) => {
-    const selectedRouteId = e.target.value;
-    setCurrentPoint((current) => ({
-      ...current,
-      route: {
-        ...current.route,
-        id: selectedRouteId,
-      },
-    }));
-  };
+  const handleUpdateCatchPoint = async (updateCatchPoint) => {
+    if (
+      !validateFields({
+        Tuyến: updateCatchPoint.routeId,
+        "Tên điểm đón": updateCatchPoint.name,
+        "Địa chỉ": updateCatchPoint.address,
+      })
+    )
+      return;
+    const updatePointData = {
+      routeId: updateCatchPoint.routeId,
+      name: updateCatchPoint.name,
+      address: updateCatchPoint.address,
+    };
 
-  const handleCreateCatchPoint = async (e) => {
-    e.preventDefault();
-    let missingInfo = [];
-    if (!route) {
-      missingInfo.push("Tuyến");
-    }
-    if (!namePoint) {
-      missingInfo.push("Tên điểm đón");
-    }
-    if (!address) {
-      missingInfo.push("Địa chỉ");
-    }
-    if (missingInfo.length > 0) {
-      const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
-        ",  "
-      )}`;
-      toast.error(message);
-    } else {
-      try {
-        const token = localStorage.getItem("token");
-        const newPointData = {
-          routeId: route,
-          name: namePoint,
-          address: address,
-        };
+    try {
+      const updated = await sendRequest(
+        `http://localhost:8081/api/catch-point/${updateCatchPoint.id}`,
+        "PUT",
+        updatePointData
+      );
 
-        const response = await fetch("http://localhost:8081/api/catch-point", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(newPointData),
-        });
-
-        if (response.ok) {
-          // Xử lý thành công
-          toast.success("Điểm đón đã được tạo thành công!");
-          const newPoint = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
-          // Thêm người dùng mới vào danh sách
-          setRecords((prevRecords) => [...prevRecords, newPoint]);
-          // Reset form hoặc làm gì đó khác
-          setRoute("");
-          setNamePoint("");
-          setAddress("");
-          setIsAdd(false);
-          // window.location.reload();
-        } else {
-          console.error("Có lỗi xảy ra khi tạo điểm đón!");
-          toast.error("Có lỗi xảy ra khi tạo điểm đón!");
-        }
-      } catch (error) {
-        console.error("Lỗi:", error);
-        toast.error("Lỗi:", error);
-      }
-    }
-  };
-
-  const handleUpdateCatchPoint = async (e) => {
-    e.preventDefault();
-    let missingInfo = [];
-    if (!currentPoint.route) {
-      missingInfo.push("Tuyến");
-    }
-    if (!currentPoint.name) {
-      missingInfo.push("Tên điểm đón");
-    }
-    if (!currentPoint.address) {
-      missingInfo.push("Địa chỉ");
-    }
-    if (missingInfo.length > 0) {
-      const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
-        ",  "
-      )}`;
-      toast.error(message);
-    } else {
-      try {
-        const token = localStorage.getItem("token");
-        const newPointData = {
-          routeId: currentPoint.route.id,
-          name: currentPoint.name,
-          address: currentPoint.address,
-        };
-
-        const response = await fetch(
-          `http://localhost:8081/api/catch-point/${currentPoint.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(newPointData),
-          }
-        );
-
-        if (response.ok) {
-          // Xử lý thành công
-          toast.success("điểm đón đã được cập nhật thành công!");
-          const updatedTrip = await response.json();
-          const updatedTrips = records.map((trip) => {
-            if (trip.id === updatedTrip.id) {
-              return updatedTrip;
-            }
-            return trip;
-          });
-          setRecords(updatedTrips);
-          // Reset form hoặc làm gì đó khác
-          setCurrentPoint({
-            id: null,
-            route: { id: "", name: "" },
-            name: "",
-            address: "",
-          });
-          setIsEditing(false);
-          // window.location.reload();
-        } else {
-          console.error("Có lỗi xảy ra khi cập nhật điểm đón!");
-          toast.error("Có lỗi xảy ra khi cập nhật điểm đón!");
-        }
-      } catch (error) {
-        console.error("Lỗi:", error);
-        toast.error("Lỗi:", error);
-      }
+      toast.success("Điểm đón đã được cập nhật thành công!");
+      setRecords((prev) =>
+        prev.map((item) => (item.id === updated.id ? updated : item))
+      );
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Lỗi khi update điểm đón:", error);
     }
   };
   const removeCatchPoint = async () => {
     const pointId = pointToDelete.id;
+
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
+      await sendRequest(
         `http://localhost:8081/api/catch-point/${pointId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`, // Thêm token vào header
-          },
-        }
+        "DELETE"
       );
-      if (response.ok) {
-        // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
-        const updatePoint = records.filter((record) => record.id !== pointId);
-        setRecords(updatePoint);
-        toast.success("điểm đón đã được xóa thành công!");
-        setIsDeleteConfirmVisible(false);
-      } else {
-        console.error("Có lỗi xảy ra khi xóa trip!");
-        toast.error("Có lỗi xảy ra khi xóa trip!");
-      }
+
+      setRecords((prev) => prev.filter((record) => record.id !== pointId));
+      toast.success("Điểm đón đã được xóa thành công!");
+      setIsDeleteConfirmVisible(false);
     } catch (error) {
-      console.error("Lỗi:", error);
-      toast.error("Lỗi:", error.message);
+      console.error("Lỗi khi xóa điểm đón:", error);
     }
-  };
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
   };
   const handleRemoveClick = (point) => {
     setPointToDelete(point);
     setIsDeleteConfirmVisible(true);
   };
-  const NoDataComponent = () => (
-    <div className="emptyData">Không có dữ liệu</div>
-  );
+  const handleCriteriaChange = (event) => {
+    setSearchCriteria(event.target.value);
+    setSearchValue(""); // reset value khi đổi tiêu chí
+  };
+  const searchOptions = catchPointFields.map((field) => {
+    if (field.type === "select" && field.key === "routeId") {
+      return { ...field, value: field.key, options: routes };
+    }
+    return { ...field, value: field.key };
+  });
   return (
     <div className="main-container">
-      {/* <section className="main section"> */}
-      <Breadcrumbs aria-label="breadcrumb">
-        <Link underline="hover" color="inherit" href="/admin">
-          Admin
-        </Link>
-        <Link underline="hover" color="inherit" href="/admin/catch-point">
-          Điểm đón tuyến
-        </Link>
-      </Breadcrumbs>
+      <GenericAdminHeader
+        title="Quản lý điểm đón tuyến"
+        breadcrumbLinks={[
+          { label: "Admin", href: "/admin" },
+          { label: "Điểm đón tuyến", href: "/admin/catch-point" },
+        ]}
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        searchOptions={searchOptions}
+        searchCriteria={searchCriteria}
+        handleCriteriaChange={handleCriteriaChange}
+        addButtonLabel="Thêm điểm đón"
+        onAddClick={handleCreateClick}
+      />
 
       <div className="HisContent">
-        <div className="searchIn">
-          <input
-            type="text"
-            onChange={(e) => setSearchValue(e.target.value)}
-            placeholder="Tìm kiếm địa chỉ"
-            className="findTuyen"
-          />
-        </div>
         <div className="HistoryTick">
-          <div className="contentTikcet">
-            <div className="title">Quản lý Điểm đón</div>
-            <button className="btn back" onClick={() => handleCreateClick()}>
-              Thêm điểm đón
-            </button>
-          </div>
           <div className="devide"></div>
-          <DataTable
-            columns={columns}
+          <AdminTable
+            columns={catchPointColumn}
             data={records}
-            // pagination
-            noDataComponent={<NoDataComponent />}
-          ></DataTable>
-          <Pagination
-            count={totalPages}
-            boundaryCount={1}
-            siblingCount={1}
-            color="primary"
-            showFirstButton
-            showLastButton
-            style={{ float: "right", padding: "1rem" }}
-            page={page}
-            onChange={handleChangePage}
+            onEdit={handleEditClick}
+            onDelete={handleRemoveClick}
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
           />
         </div>
       </div>
 
-      {isEditing && (
-        <div className="modal" id="deleteModal">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h2 class="modal-title">Sửa điểm đón</h2>
-              </div>
-              <div class="modal-body">
-                <form>
-                  <div className="infoCity">
-                    <label className="info">Tên tuyến:</label>
-                    <select
-                      className="inputValue"
-                      value={currentPoint.route ? currentPoint.route.id : ""}
-                      onChange={handleRoute1Change}
-                    >
-                      {routes.map((route) => (
-                        <option key={route.id} value={route.id}>
-                          {route.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Tên điểm đón:</label>
-                    <input
-                      type="text"
-                      value={currentPoint.name}
-                      onChange={(e) =>
-                        setCurrentPoint({
-                          ...currentPoint,
-                          name: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Địa chỉ:</label>
-                    <input
-                      type="text"
-                      value={currentPoint.address}
-                      onChange={(e) =>
-                        setCurrentPoint({
-                          ...currentPoint,
-                          address: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="listButton">
-                    <button
-                      type="button"
-                      onClick={() => setIsEditing(false)}
-                      className="cancel"
-                    >
-                      Hủy
-                    </button>
-                    <button
-                      type="submit"
-                      className="save"
-                      onClick={handleUpdateCatchPoint}
-                    >
-                      Lưu
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditModal
+        visible={isEditing}
+        title="Sửa thông tin điểm đón"
+        data={currentPoint}
+        fields={searchOptions}
+        onSave={handleUpdateCatchPoint}
+        onCancel={() => setIsEditing(false)}
+      />
 
-      {isAdd && (
-        <div className="modal" id="deleteModal">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h2 class="modal-title">Thêm điểm đón</h2>
-              </div>
-              <div class="modal-body">
-                <form>
-                  <div className="infoCity">
-                    <label>Tên tuyến:</label>
-                    {/* <input type="text" value={currentTrip.route.name} onChange={(e) => setcurrentTrip({ ...currentTrip, route: {...currentTrip.route, name: e.target.value }})} /> */}
-                    <select
-                      className="inputValue"
-                      value={route}
-                      onChange={handleRouteChange}
-                    >
-                      <option value="">Chọn tuyến</option>
-                      {routes.map((route) => (
-                        <option key={route.id} value={route.id}>
-                          {route.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Tên điểm đón:</label>
-                    <input
-                      type="text"
-                      value={namePoint}
-                      onChange={handleNamePointChange}
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Địa chỉ:</label>
-                    <input
-                      type="text"
-                      value={address}
-                      onChange={handleAddressChange}
-                    />
-                  </div>
-                  <div className="listButton">
-                    <button
-                      type="button"
-                      onClick={() => setIsAdd(false)}
-                      className="cancel"
-                    >
-                      Hủy
-                    </button>
-                    <button
-                      type="submit"
-                      className="save"
-                      onClick={handleCreateCatchPoint}
-                    >
-                      Tạo
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      {isDeleteConfirmVisible && (
-        <div className="modal" id="confirmDeleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Xác nhận xóa</h2>
-              </div>
-              <div className="modal-body">
-                <p className="textConfirm">
-                  Bạn có chắc chắn muốn xóa điểm đón này?
-                </p>
-                <div className="listButton">
-                  <button
-                    type="button"
-                    onClick={() => setIsDeleteConfirmVisible(false)}
-                    className="cancel"
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="button"
-                    className="save"
-                    onClick={removeCatchPoint}
-                  >
-                    Xóa
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddModal
+        visible={isAdd}
+        title="Thêm điểm đón"
+        fields={searchOptions}
+        defaultValues={{ status: 1 }} // mặc định status = 1
+        onSave={handleCreateCatchPoint}
+        onCancel={() => setIsAdd(false)}
+      />
+
+      <ConfirmDeleteModal
+        visible={isDeleteConfirmVisible}
+        message="Bạn có chắc chắn muốn xóa điểm đón này?"
+        onConfirm={removeCatchPoint} // khi xác nhận
+        onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+        type="delete"
+      />
     </div>
   );
 };
