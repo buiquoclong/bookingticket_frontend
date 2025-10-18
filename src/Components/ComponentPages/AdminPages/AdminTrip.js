@@ -951,9 +951,6 @@ const AdminTrip = () => {
             <div className="modal-content">
               <div className="modal-header">
                 <h2 className="modal-title">Danh sách ghế đã đặt</h2>
-                {/* <button type="button" className="close" onClick={() => setIsDetail(false)}>
-                                    &times;
-                                </button> */}
               </div>
               {seatData && (
                 <div className="modal-body" style={{ overflowY: "auto" }}>

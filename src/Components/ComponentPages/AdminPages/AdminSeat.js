@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
-import { FiEdit, FiTrash } from "react-icons/fi";
 import useDebounce from "./useDebounce";
 import AdminTable from "../../ComponentParts/AdminComponents/AdminTable";
 import ConfirmDeleteModal from "../../ComponentParts/ModelComponents/ConfirmDeleteModal";
