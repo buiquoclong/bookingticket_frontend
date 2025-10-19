@@ -631,7 +631,7 @@
       }
 
       .seats-right {
-        // width: 320px;
+        width: 320px;
         min-height: 250px;
         background: var(--whiteColor); // nền trắng trung tính
         border: 1px solid #e5e7eb; // viền xám nhạt (tông neutral)
@@ -663,7 +663,7 @@
      RESPONSIVE
   ========================== */
 
-  @media (max-width: 768px) {
+  @media (max-width: 780px) {
     .tabContainer .tabListWrapper {
       .tabList {
         justify-content: flex-start;

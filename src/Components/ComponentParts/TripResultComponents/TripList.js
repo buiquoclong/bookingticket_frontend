@@ -17,14 +17,27 @@ const TripList = ({
   const cardRefs = useRef({}); // chứa ref theo trip.id
   const [activeTripId, setActiveTripId] = useState(null); // 👈 quản lý trip nào đang mở
   const [activeTab, setActiveTab] = useState(null); // 1: chọn ghế, 3: chính sách
+
   const handleScrollToTrip = (tripId) => {
     const card = cardRefs.current[tripId];
-    if (card) {
-      const offset = -70; // 👈 khoảng cách muốn chừa trên cùng (px)
+    if (!card) return;
+
+    const offset = -70; // khoảng cách chừa trên cùng
+
+    // Kiểm tra xem đang ở admin layout không
+    const adminMain = document.querySelector(".admin-main");
+
+    if (adminMain) {
+      // Scroll trong container admin
+      const elementPosition = card.offsetTop;
+      adminMain.scrollTo({
+        top: elementPosition + offset,
+        behavior: "smooth",
+      });
+    } else {
+      // Scroll window như client
       const elementPosition = card.getBoundingClientRect().top + window.scrollY;
       const offsetPosition = elementPosition + offset;
-      console.log(offsetPosition);
-
       window.scrollTo({
         top: offsetPosition,
         behavior: "smooth",

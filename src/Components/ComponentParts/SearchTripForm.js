@@ -3,8 +3,14 @@ import { HiFilter } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./ComponentParts.scss";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import "./ComponentParts.scss";
 
-const SearchTripForm = ({ formValues, setFormValues, cities }, ref) => {
+const SearchTripForm = (
+  { formValues, setFormValues, cities, navigateTo },
+  ref
+) => {
   const navigate = useNavigate();
   const startRef = useRef(null);
   const returnRef = useRef(null);
@@ -17,6 +23,10 @@ const SearchTripForm = ({ formValues, setFormValues, cities }, ref) => {
     dayStart,
     dayReturn,
   } = formValues;
+
+  useEffect(() => {
+    AOS.init({ duration: 1000, once: true });
+  }, []);
 
   const handleChangeKind = (e) => {
     setFormValues((prev) => ({ ...prev, kind: e.target.value }));
@@ -95,7 +105,7 @@ const SearchTripForm = ({ formValues, setFormValues, cities }, ref) => {
     }
 
     // Map formValues sang format cũ
-    navigate("/book-ticket", {
+    navigate(navigateTo, {
       state: {
         diemDiId: formValues.originId,
         diemDiName: formValues.origin,
