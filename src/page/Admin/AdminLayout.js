@@ -1,23 +1,30 @@
 import { useState } from "react";
-import "./Admin.scss";
+import { Outlet } from "react-router-dom";
 import AdminHeader from "../../Components/ComponentPages/AdminPages/AdminHeader/AdminHeader";
 import AdminSidebar from "../../Components/ComponentPages/AdminPages/AdminSideBar/AdminSidebar";
+import "./Admin.scss";
 
-const AdminLayout = ({ children }) => {
-  const [openSidebarToggle, setOpenSidebarToggle] = useState(false);
+const AdminLayout = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  const OpenSidebar = () => {
-    setOpenSidebarToggle(!openSidebarToggle);
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   return (
-    <div className="grid-container">
-      <AdminHeader OpenSidebar={OpenSidebar} />
+    <div
+      className={`admin-layout ${
+        isSidebarOpen ? "sidebar-open" : "sidebar-closed"
+      }`}
+    >
+      <AdminHeader OpenSidebar={toggleSidebar} />
       <AdminSidebar
-        openSidebarToggle={openSidebarToggle}
-        OpenSidebar={OpenSidebar}
+        openSidebarToggle={isSidebarOpen}
+        OpenSidebar={toggleSidebar}
       />
-      {children}
+      <main className="admin-main">
+        <Outlet />
+      </main>
     </div>
   );
 };
