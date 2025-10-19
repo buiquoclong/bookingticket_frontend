@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import "./ModelComponents.scss";
 
-const ConfirmModal = ({
+const ConfirmDeleteModal = ({
   visible,
   message,
   onConfirm,
@@ -60,4 +60,4 @@ const ConfirmModal = ({
   );
 };
 
-export default ConfirmModal;
+export default ConfirmDeleteModal;
