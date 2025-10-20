@@ -94,7 +94,7 @@ const AdminSeat = () => {
     if (
       !validateFields({
         "Loại xe": newSeat.kindVehicleId,
-        "Tên điểm đón": newSeat.name,
+        "Tên ghế": newSeat.name,
         "Địa chỉ": newSeat.status,
       })
     )
@@ -125,7 +125,7 @@ const AdminSeat = () => {
     if (
       !validateFields({
         "Loại xe": updateSeat.kindVehicleId,
-        "Tên điểm đón": updateSeat.name,
+        "Tên ghế": updateSeat.name,
         "Địa chỉ": updateSeat.status,
       })
     )
