@@ -34,6 +34,7 @@ const AdminTable = ({
   onPageChange,
   statusColorMap = {},
   statusMap = {},
+  roleMap = {},
   showActions = true,
 }) => {
   return (
@@ -78,6 +79,12 @@ const AdminTable = ({
                         </div>
                       </td>
                     );
+                  }
+
+                  if (col.key === "role") {
+                    const label =
+                      roleMap[cellValue] || cellValue || "Không xác định";
+                    return <td key={col.key}>{label}</td>;
                   }
 
                   return (

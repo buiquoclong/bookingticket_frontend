@@ -205,7 +205,7 @@ const Register = () => {
             type="submit"
             disabled={!canRegister}
           >
-            Đăng nhập
+            Đăng ký
           </button>
           {/* <div className="buttonSave">
             <button
