@@ -10,6 +10,7 @@ const AddModal = ({
   defaultValues = {}, // { status: 1 }
 }) => {
   const [formData, setFormData] = useState({});
+  const [previewImage, setPreviewImage] = useState(null);
   const inputRefs = useRef({});
 
   // Convert table "HH:mm DD/MM/YYYY" -> "YYYY-MM-DDTHH:mm" (input)
@@ -28,15 +29,20 @@ const AddModal = ({
   // Khi mở modal, set default values + format datetime
   useEffect(() => {
     if (visible) {
-      const newData = { ...defaultValues };
+      const newData = {};
       fields.forEach((field) => {
-        if (field.type === "datetime" && defaultValues[field.key]) {
-          newData[field.key] = formatToInput(defaultValues[field.key]);
+        const val = defaultValues?.[field.key];
+        if (field.type === "datetime" && val) {
+          newData[field.key] = formatToInput(val);
+        } else {
+          newData[field.key] = val ?? "";
         }
       });
+      setPreviewImage(null);
       setFormData(newData);
     }
-  }, [visible, defaultValues, fields]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
 
   if (!visible) return null;
 
@@ -56,6 +62,19 @@ const AddModal = ({
 
       return updated;
     });
+  };
+  const handleFileChange = (key, file) => {
+    if (!file) return;
+    setFormData((prev) => ({ ...prev, [key]: file }));
+
+    // Nếu là ảnh thì hiển thị preview
+    if (file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => setPreviewImage(e.target.result);
+      reader.readAsDataURL(file);
+    } else {
+      setPreviewImage(null);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -107,6 +126,26 @@ const AddModal = ({
                       onChange={(e) => handleChange(field.key, e.target.value)}
                       style={{ cursor: "pointer" }}
                     />
+                  </div>
+                ) : field.type === "file" ? (
+                  /* --- FILE UPLOAD --- */
+                  <div className="file-upload-wrapper">
+                    <input
+                      type="file"
+                      accept={field.accept || "*/*"}
+                      onChange={(e) =>
+                        handleFileChange(field.key, e.target.files[0])
+                      }
+                    />
+                    {previewImage && (
+                      <div className="image-preview">
+                        <img
+                          src={previewImage}
+                          alt="preview"
+                          className="preview-img"
+                        />
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <input
