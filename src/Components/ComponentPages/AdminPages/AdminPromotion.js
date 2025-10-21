@@ -210,12 +210,7 @@ const AdminPromotion = () => {
         ]}
         searchValue={searchValue}
         setSearchValue={setSearchValue}
-        searchOptions={[
-          { value: "code", label: "Mã giảm giá" },
-          { value: "description", label: "Mô tả" },
-          { value: "startDay", label: "Ngày bắt đầu" },
-          { value: "endDay", label: "Ngày kết thúc" },
-        ]}
+        searchOptions={promotionFields}
         searchCriteria={searchCriteria}
         handleCriteriaChange={handleCriteriaChange}
         addButtonLabel="Tạo mã giảm giá"
