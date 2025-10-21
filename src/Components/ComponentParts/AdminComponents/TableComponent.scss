@@ -50,6 +50,19 @@
       transition: background-color 0.3s, transform 0.2s ease;
     }
 
+    img {
+      width: 260px; /* chiều rộng lớn hơn */
+      height: 100px; /* chiều cao cố định */
+      object-fit: cover; /* cắt cho vừa khung, không méo hình */
+      border-radius: 10px; /* bo góc nhẹ cho đẹp */
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.25s ease;
+    }
+
+    img:hover {
+      transform: scale(1.05); /* zoom nhẹ khi hover */
+    }
+
     tr.even-row {
       background-color: #f3f6f9;
     }
@@ -92,6 +105,7 @@
 
     .action-buttons {
       display: flex;
+      align-items: center; /* căn giữa theo chiều dọc */
       justify-content: center;
       gap: 0.5rem;
 

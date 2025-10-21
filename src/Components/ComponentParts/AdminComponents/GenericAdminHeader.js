@@ -24,7 +24,7 @@ const GenericAdminHeader = ({
 
   // 🔹 Tìm option hiện tại dựa trên searchCriteria
   const selectedOption = searchOptions.find(
-    (opt) => opt.value === searchCriteria
+    (opt) => opt.key === searchCriteria
   );
   const optionLabel = selectedOption ? selectedOption.label : "";
   const fieldType = selectedOption ? selectedOption.type : "text";
@@ -51,6 +51,7 @@ const GenericAdminHeader = ({
         <div className="actions">
           {searchOptions.length > 0 && (
             <div className="search-group">
+              {/* 🔸 Hiển thị input phù hợp theo type */}
               {/* 🔸 Hiển thị input phù hợp theo type */}
               {fieldType === "select" ? (
                 <FormControl
@@ -88,18 +89,33 @@ const GenericAdminHeader = ({
                         )}
                   </Select>
                 </FormControl>
-              ) : fieldType === "date" ? (
+              ) : fieldType === "date" || fieldType === "datetime" ? (
                 <div
                   style={{ display: "inline-block" }}
                   onClick={() => dateInputRef.current?.showPicker?.()}
                 >
                   <TextField
-                    type="date"
+                    type={fieldType === "datetime" ? "datetime-local" : "date"}
                     label={optionLabel}
                     variant="outlined"
                     size="small"
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
+                    value={
+                      searchValue
+                        ? fieldType === "datetime"
+                          ? searchValue.replace(" ", "T") // hiển thị đúng định dạng cho datetime-local
+                          : searchValue
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      // Nếu là datetime-local → format lại giá trị trước khi lưu
+                      if (fieldType === "datetime") {
+                        const formatted = val.replace("T", " ");
+                        setSearchValue(formatted);
+                      } else {
+                        setSearchValue(val);
+                      }
+                    }}
                     inputRef={dateInputRef}
                     InputLabelProps={{ shrink: true }}
                     sx={{
@@ -155,7 +171,7 @@ const GenericAdminHeader = ({
                   label="Tìm kiếm bằng"
                 >
                   {searchOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
+                    <MenuItem key={option.key} value={option.key}>
                       {option.label}
                     </MenuItem>
                   ))}
