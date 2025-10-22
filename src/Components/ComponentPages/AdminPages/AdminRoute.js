@@ -1,301 +1,49 @@
 import React, { useState, useEffect, useCallback } from "react";
-import DataTable from "react-data-table-component";
-// import "../AdminRoute/AdminRoute.scss"
 import { toast } from "react-toastify";
-import { Pagination, Breadcrumbs, Link } from "@mui/material";
-import { FiEdit, FiTrash } from "react-icons/fi";
 import useDebounce from "./useDebounce";
+import { routeColumn, routeField } from "../../../Utils/bookingUtils";
+import AdminTable from "../../ComponentParts/AdminComponents/AdminTable";
+import ConfirmDeleteModal from "../../ComponentParts/ModelComponents/ConfirmDeleteModal";
+import EditModal from "../../ComponentParts/ModelComponents/EditModal";
+import AddModal from "../../ComponentParts/ModelComponents/AddModal";
+import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
+import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 
 const AdminRoute = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [currentRoute, setcurrentRoute] = useState({
-    id: null,
-    city: "",
-    image: "",
-  });
+  const [currentRoute, setcurrentRoute] = useState({});
   const [isAdd, setIsAdd] = useState(false);
   const [records, setRecords] = useState([]);
   const [cities, setCities] = useState([]);
 
-  const [diemDiName, setDiemDiName] = useState("");
-  const [diemDenName, setDiemDenName] = useState("");
-  const [diemDi, setDiemDi] = useState("");
-  const [diemDen, setDiemDen] = useState("");
-  const [khoangCach, setKhoangCach] = useState("");
-  const [timeOfRoute, setTimeOfRoute] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
   const [routeToDelete, setRouteToDelete] = useState(null);
   const [searchValue, setSearchValue] = useState("");
-  const searchDebounce = useDebounce(searchValue.trim(), 500);
-  const columns = [
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          ID
-        </div>
-      ),
-      selector: (row) => row.id,
-      width: "5rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.id}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Tên tuyến
-        </div>
-      ),
-      selector: (row) => row.name,
-      // width: '12rem',
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.name}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Điểm đi
-        </div>
-      ),
-      selector: (row) => row.diemDi.name,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.diemDi.name}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Điểm đến
-        </div>
-      ),
-      selector: (row) => row.diemDen.name,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.diemDen.name}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Khoảng cách
-        </div>
-      ),
-      selector: (row) => row.khoangCach,
-      // width: '10rem',
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.khoangCach} km
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Thời gian di chuyển
-        </div>
-      ),
-      selector: (row) => row.timeOfRoute,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.timeOfRoute} giờ
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Trạng thái
-        </div>
-      ),
-      selector: (row) => row.status,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {statusMap[row.status] || "Unknown Status"}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Hành động
-        </div>
-      ),
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "1rem",
-            width: "100%",
-          }}
-        >
-          <FiEdit
-            size={24}
-            style={{
-              color: "#3b82f6",
-              cursor: "pointer",
-              transition: "color 0.3s ease",
-            }}
-            onClick={() => handleEditClick(row)}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#2563eb")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#3b82f6")}
-            title="Chỉnh sửa"
-          />
-          <FiTrash
-            size={24}
-            style={{
-              color: "#ef4444",
-              cursor: "pointer",
-              transition: "color 0.3s ease",
-            }}
-            onClick={() => handleRemoveClick(row)}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#dc2626")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#ef4444")}
-            title="Xóa"
-          />
-        </div>
-      ),
-    },
-  ];
+  const [searchCriteria, setSearchCriteria] = useState("name");
+  const searchDebounce = useDebounce(
+    typeof searchValue === "string" ? searchValue.trim() : searchValue,
+    500
+  );
   const statusMap = {
     1: "Đang hoạt động",
     2: "Tạm dừng hoạt động",
+    3: "Ngưng hoạt động",
+  };
+
+  const statusColorMap = {
+    1: "#008000b3",
+    2: "#ffa9008a",
+    3: "#ff0000c2",
   };
   const fetchRoutes = useCallback(
-    async (searchDebounce) => {
+    async (searchDebounce, searchCriteria) => {
       try {
         const response = await fetch(
-          `http://localhost:8081/api/route/page?page=${page}&size=10&name=${searchDebounce}`
+          `http://localhost:8081/api/route/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
         );
         const data = await response.json();
         return data;
@@ -323,7 +71,7 @@ const AdminRoute = () => {
   useEffect(() => {
     const fetchData = async () => {
       const [routesData, citiesData] = await Promise.all([
-        fetchRoutes(searchDebounce),
+        fetchRoutes(searchDebounce, searchCriteria),
         fetchCities(),
       ]);
 
@@ -338,7 +86,7 @@ const AdminRoute = () => {
     };
 
     fetchData();
-  }, [page, searchDebounce, fetchRoutes, fetchCities]);
+  }, [page, searchDebounce, searchCriteria, fetchRoutes, fetchCities]);
   const handleEditClick = (routeName) => {
     setcurrentRoute(routeName);
     setIsEditing(true);
@@ -346,509 +94,187 @@ const AdminRoute = () => {
   const handleCreateClick = () => {
     setIsAdd(true);
   };
-  const handleDiemDiChange = (e) => {
-    const selectedCity = cities.find(
-      (city) => city.id === parseInt(e.target.value)
-    );
-    setDiemDi(selectedCity.id);
-    setDiemDiName(selectedCity.name);
-  };
-  const handleDiemDenChange = (e) => {
-    const selectedCity = cities.find(
-      (city) => city.id === parseInt(e.target.value)
-    );
-    setDiemDen(selectedCity.id);
-    setDiemDenName(selectedCity.name);
-  };
-  const handleKhoangCachChange = (event) => {
-    setKhoangCach(event.target.value);
-  };
-  const handleTimeOfRouteChange = (event) => {
-    setTimeOfRoute(event.target.value);
-  };
-  const nameRoute = `${diemDiName} - ${diemDenName}`;
-  const handleCreateRoute = async (e) => {
-    e.preventDefault();
-    let missingInfo = [];
-    if (!diemDi) {
-      missingInfo.push("Điểm đi");
-    }
-    if (!diemDen) {
-      missingInfo.push("Điểm đến");
-    }
-    if (!khoangCach) {
-      missingInfo.push("Khoảng cách");
-    }
-    if (!timeOfRoute) {
-      missingInfo.push("Thời gian di chuyển");
-    }
-    if (missingInfo.length > 0) {
-      const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
-        ",  "
-      )}`;
-      toast.error(message);
-    } else {
-      try {
-        const token = localStorage.getItem("token");
-        const newRouteData = {
-          name: nameRoute,
-          diemdi: diemDi,
-          diemden: diemDen,
-          khoangCach: khoangCach,
-          timeOfRoute: timeOfRoute,
-          status: 1,
-        };
-
-        const response = await fetch("http://localhost:8081/api/route", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(newRouteData),
-        });
-
-        if (response.ok) {
-          // Xử lý thành công
-          console.log("Tuyến đã được tạo thành công!");
-          toast.success("Tuyến đã được tạo thành công!");
-          const newRoute = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
-          // Thêm người dùng mới vào danh sách
-          setRecords((prevRecords) => [...prevRecords, newRoute]);
-          // Reset form hoặc làm gì đó khác
-          setDiemDi("");
-          setDiemDen("");
-          setKhoangCach("");
-          setTimeOfRoute("");
-          setIsAdd(false);
-          // window.location.reload();
-        } else {
-          console.error("Có lỗi xảy ra khi tạo tuyến!");
-          toast.error("Có lỗi xảy ra khi tạo tuyến!");
-        }
-      } catch (error) {
-        console.error("Lỗi:", error);
-        toast.error("Lỗi:", error);
-      }
-    }
-  };
-  const handleUpdateRoute = async (e) => {
-    e.preventDefault();
-    let missingInfo = [];
-    if (!currentRoute.diemDi) {
-      missingInfo.push("Điểm đi");
-    }
-    if (!currentRoute.diemDen) {
-      missingInfo.push("Điểm đến");
-    }
-    if (!currentRoute.khoangCach) {
-      missingInfo.push("Khoảng cách");
-    }
-    if (!currentRoute.timeOfRoute) {
-      missingInfo.push("Thời gian di chuyển");
-    }
-    if (!currentRoute.status === null || currentRoute.status === undefined) {
-      missingInfo.push("Trạng thái");
-    }
-    if (missingInfo.length > 0) {
-      const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
-        ",  "
-      )}`;
-      toast.error(message);
-    } else {
-      try {
-        const token = localStorage.getItem("token");
-        const newRouteData = {
-          name: currentRoute.name,
-          diemdi: currentRoute.diemDi.id,
-          diemden: currentRoute.diemDen.id,
-          khoangCach: currentRoute.khoangCach,
-          timeOfRoute: currentRoute.timeOfRoute,
-          status: currentRoute.status,
-        };
-
-        const response = await fetch(
-          `http://localhost:8081/api/route/${currentRoute.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(newRouteData),
-          }
-        );
-
-        if (response.ok) {
-          // Xử lý thành công
-          console.log("Tuyến đã được cập nhật thành công!");
-          toast.success("Tuyến đã được cập nhật thành công!");
-          const updatedRoute = await response.json();
-          const updatedRoutes = records.map((route) => {
-            if (route.id === updatedRoute.id) {
-              return updatedRoute;
-            }
-            return route;
-          });
-
-          setRecords(updatedRoutes);
-          // Reset form hoặc làm gì đó khác
-          setDiemDi("");
-          setDiemDen("");
-          setKhoangCach("");
-          setTimeOfRoute("");
-          setIsEditing(false);
-          // window.location.reload();
-        } else {
-          console.error("Có lỗi xảy ra khi cập nhật tuyến!");
-          toast.error("Có lỗi xảy ra khi cập nhật tuyến!");
-        }
-      } catch (error) {
-        console.error("Lỗi:", error);
-        toast.error("Lỗi:", error);
-      }
-    }
-  };
-  const removeRoute = async (route) => {
-    const routeId = routeToDelete.id;
+  const handleCreateRoute = async (newRoute) => {
+    // Validate dữ liệu đầu vào
+    if (
+      !validateFields({
+        "Tên tuyến": newRoute.name,
+        "Điểm đi": newRoute.diemdi,
+        "Điểm đến": newRoute.diemden,
+        "Quãng đường": newRoute.khoangCach,
+        "Thời gian di chuyển": newRoute.timeOfRoute,
+        "Trạng thái": newRoute.status,
+      })
+    )
+      return;
+    const newRouteData = {
+      name: newRoute.name,
+      diemdi: newRoute.diemdi,
+      diemden: newRoute.diemden,
+      khoangCach: newRoute.khoangCach,
+      timeOfRoute: newRoute.timeOfRoute,
+      status: newRoute.status,
+    };
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:8081/api/route/${routeId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`, // Thêm token vào header
-          },
-        }
+      setIsLoading(true);
+      // Gửi request tạo loại xe
+      const created = await sendRequest(
+        "http://localhost:8081/api/route",
+        "POST",
+        newRouteData
       );
-      if (response.ok) {
-        // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
-        const updatedRoute = records.filter((record) => record.id !== routeId);
-        setRecords(updatedRoute);
-        toast.success("Tuyến đã được xóa thành công!");
-        setIsDeleteConfirmVisible(false);
-      } else {
-        console.error("Có lỗi xảy ra khi xóa tuyến!");
-        toast.error("Có lỗi xảy ra khi xóa tuyến!");
-      }
+
+      // Hiển thị thông báo & cập nhật danh sách
+      toast.success("Tuyến mới đã được tạo thành công!");
+      setRecords((prev) => [...prev, created]);
+      setIsAdd(false);
     } catch (error) {
-      console.error("Lỗi:", error);
-      toast.error("Lỗi:", error.message);
+      console.error("Lỗi khi tạo tuyến:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+
+  const handleUpdateRoute = async (updateRoute) => {
+    if (
+      !validateFields({
+        "Tên tuyến": updateRoute.name,
+        "Điểm đi": updateRoute.diemdi,
+        "Điểm đến": updateRoute.diemden,
+        "Quãng đường": updateRoute.khoangCach,
+        "Thời gian di chuyển": updateRoute.timeOfRoute,
+        "Trạng thái": updateRoute.status,
+      })
+    )
+      return;
+    const updateRouteData = {
+      name: updateRoute.name,
+      diemdi: updateRoute.diemdi,
+      diemden: updateRoute.diemden,
+      khoangCach: updateRoute.khoangCach,
+      timeOfRoute: updateRoute.timeOfRoute,
+      status: updateRoute.status,
+    };
+
+    try {
+      setIsLoading(true);
+      const updated = await sendRequest(
+        `http://localhost:8081/api/route/${updateRoute.id}`,
+        "PUT",
+        updateRouteData
+      );
+
+      toast.success("Tuyến đã được cập nhật thành công!");
+      setRecords((prev) =>
+        prev.map((item) => (item.id === updated.id ? updated : item))
+      );
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Lỗi khi update tuyến:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const removeRoute = async () => {
+    const routeId = routeToDelete.id;
+
+    try {
+      setIsLoading(true);
+      await sendRequest(`http://localhost:8081/api/route/${routeId}`, "DELETE");
+
+      setRecords((prev) => prev.filter((record) => record.id !== routeId));
+      toast.success("Tuyến đã được xóa thành công!");
+      setIsDeleteConfirmVisible(false);
+    } catch (error) {
+      console.error("Lỗi khi xóa tuyến:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRemoveClick = (route) => {
     setRouteToDelete(route);
     setIsDeleteConfirmVisible(true);
   };
-  const NoDataComponent = () => (
-    <div className="emptyData">Không có dữ liệu</div>
-  );
+  const searchOptions = routeField.map((field) => {
+    if (field.type === "select") {
+      if (field.key === "status") {
+        // 🔹 Gắn danh sách trạng thái từ statusMap (object)
+        return { ...field, value: field.key, options: statusMap };
+      }
+    }
+    if (field.key === "diemdi" || field.key === "diemden") {
+      // 🔹 Gắn danh sách thành phố
+      return { ...field, value: field.key, options: cities };
+    }
+
+    // Các field còn lại
+    return { ...field, value: field.key };
+  });
+  const handleCriteriaChange = (event) => {
+    setSearchCriteria(event.target.value);
+    setSearchValue(""); // Reset input mỗi khi đổi tiêu chí
+  };
   return (
     <div className="main-container">
-      {/* <section className="main section"> */}
-      <Breadcrumbs aria-label="breadcrumb">
-        <Link underline="hover" color="inherit" href="/admin">
-          Admin
-        </Link>
-        <Link underline="hover" color="inherit" href="/admin/routes">
-          Tuyến
-        </Link>
-      </Breadcrumbs>
+      <LoadingBackdrop open={isLoading} message="Đang xử lý yêu cầu..." />
+      <GenericAdminHeader
+        title="Quản lý tuyến"
+        breadcrumbLinks={[
+          { label: "Admin", href: "/admin" },
+          { label: "Tuyến", href: "/admin/routes" },
+        ]}
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        searchOptions={searchOptions}
+        searchCriteria={searchCriteria}
+        handleCriteriaChange={handleCriteriaChange}
+        addButtonLabel="Thêm tuyến"
+        onAddClick={handleCreateClick}
+      />
 
       <div className="HisContent">
-        <div className="searchIn">
-          <input
-            type="text"
-            onChange={(e) => setSearchValue(e.target.value)}
-            placeholder="Tìm kiếm"
-            className="findTuyen"
-          />
-        </div>
         <div className="HistoryTick">
-          <div className="contentTikcet">
-            <div className="title">Quản lý Tuyến xe</div>
-            <button className="btn back" onClick={() => handleCreateClick()}>
-              Thêm tuyến xe
-            </button>
-          </div>
           <div className="devide"></div>
-          <DataTable
-            columns={columns}
+          <AdminTable
+            columns={routeColumn}
             data={records}
-            // pagination
-            noDataComponent={<NoDataComponent />}
-          ></DataTable>
-          <Pagination
-            count={totalPages}
-            boundaryCount={1}
-            siblingCount={1}
-            color="primary"
-            showFirstButton
-            showLastButton
-            style={{ float: "right", padding: "1rem" }}
-            page={page}
-            onChange={handleChangePage}
+            onEdit={handleEditClick}
+            onDelete={handleRemoveClick}
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            statusColorMap={statusColorMap}
+            statusMap={statusMap}
           />
         </div>
       </div>
 
-      {isEditing && (
-        <div className="modal" id="deleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Sửa tuyến xe</h2>
-              </div>
-              <div className="modal-body">
-                <form>
-                  <div className="infoCity">
-                    <label>Tên tuyến:</label>
-                    <input
-                      type="text"
-                      value={currentRoute.name}
-                      onChange={(e) =>
-                        setcurrentRoute({
-                          ...currentRoute,
-                          name: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Điểm đi:</label>
-                    {/* <input type="text" value={currentRoute.diemdi} onChange={(e) => setcurrentRoute({ ...currentRoute, diemdi: e.target.value })} /> */}
-                    <select
-                      className="inputValue"
-                      value={currentRoute.diemDi.id}
-                      onChange={(e) =>
-                        setcurrentRoute({
-                          ...currentRoute,
-                          diemDi: {
-                            ...currentRoute.diemDi,
-                            id: e.target.value,
-                          },
-                        })
-                      }
-                    >
-                      {cities.map((city) => (
-                        <option key={city.id} value={city.id}>
-                          {city.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="infoCity">
-                    <label>Điểm đến:</label>
-                    {/* <input type="text" value={currentRoute.diemden} onChange={(e) => setcurrentRoute({ ...currentRoute, diemden: e.target.value })} /> */}
-                    <select
-                      className="inputValue"
-                      value={currentRoute.diemDen.id}
-                      onChange={(e) =>
-                        setcurrentRoute({
-                          ...currentRoute,
-                          diemDen: {
-                            ...currentRoute.diemDen,
-                            id: e.target.value,
-                          },
-                        })
-                      }
-                    >
-                      {cities.map((city) => (
-                        <option key={city.id} value={city.id}>
-                          {city.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Khoảng cách:</label>
-                    <input
-                      type="number"
-                      className="inputValue"
-                      value={currentRoute.khoangCach.toString()}
-                      onChange={(e) =>
-                        setcurrentRoute({
-                          ...currentRoute,
-                          khoangCach: parseInt(e.target.value) || "",
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label>Thời gian di chuyển:</label>
-                    <input
-                      type="number"
-                      className="inputValue"
-                      value={currentRoute.timeOfRoute.toString()}
-                      onChange={(e) =>
-                        setcurrentRoute({
-                          ...currentRoute,
-                          timeOfRoute: parseInt(e.target.value) || "",
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label>Trạng thái:</label>
-                    {/* <input type="text" value={currentRoute.status} onChange={(e) => setcurrentRoute({ ...currentRoute, status: e.target.value })} /> */}
-                    <select
-                      className="inputValue"
-                      value={currentRoute.status}
-                      onChange={(e) =>
-                        setcurrentRoute({
-                          ...currentRoute,
-                          status: e.target.value,
-                        })
-                      }
-                    >
-                      {Object.keys(statusMap).map((key) => (
-                        <option key={key} value={key}>
-                          {statusMap[key]}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="listButton">
-                    <button
-                      type="button"
-                      onClick={() => setIsEditing(false)}
-                      className="cancel"
-                    >
-                      Hủy
-                    </button>
-                    <button
-                      type="submit"
-                      className="save"
-                      onClick={handleUpdateRoute}
-                    >
-                      Lưu
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditModal
+        visible={isEditing}
+        title="Sửa thông tin tuyến"
+        data={currentRoute}
+        fields={searchOptions}
+        onSave={handleUpdateRoute}
+        onCancel={() => setIsEditing(false)}
+      />
 
-      {isAdd && (
-        <div className="modal" id="deleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Thêm tuyến xe</h2>
-              </div>
-              <div className="modal-body">
-                <form>
-                  <div className="infoCity">
-                    <label>Tên tuyến:</label>
-                    <input type="text" value={nameRoute} readOnly />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Điểm đi:</label>
-                    {/* <input type="text" value={currentRoute.diemdi} onChange={(e) => setcurrentRoute({ ...currentRoute, diemdi: e.target.value })} /> */}
-                    <select
-                      className="inputValue"
-                      value={diemDi}
-                      onChange={handleDiemDiChange}
-                    >
-                      <option value="">Chọn điểm đi</option>
-                      {cities.map((city) => (
-                        <option key={city.id} value={city.id}>
-                          {city.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="infoCity">
-                    <label>Điểm đến:</label>
-                    {/* <input type="text" value={currentRoute.diemden} onChange={(e) => setcurrentRoute({ ...currentRoute, diemden: e.target.value })} /> */}
-                    <select
-                      className="inputValue"
-                      value={diemDen}
-                      onChange={handleDiemDenChange}
-                    >
-                      <option value="">Chọn điểm đến</option>
-                      {cities.map((city) => (
-                        <option key={city.id} value={city.id}>
-                          {city.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Khoảng cách:</label>
-                    <input
-                      type="number"
-                      className="inputValue"
-                      value={khoangCach}
-                      onChange={handleKhoangCachChange}
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label>Thời gian di chuyển:</label>
-                    <input
-                      type="number"
-                      className="inputValue"
-                      value={timeOfRoute}
-                      onChange={handleTimeOfRouteChange}
-                    />
-                  </div>
-                  <div className="listButton">
-                    <button
-                      type="button"
-                      onClick={() => setIsAdd(false)}
-                      className="cancel"
-                    >
-                      Hủy
-                    </button>
-                    <button
-                      type="submit"
-                      className="save"
-                      onClick={handleCreateRoute}
-                    >
-                      Tạo
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      {isDeleteConfirmVisible && (
-        <div className="modal" id="confirmDeleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Xác nhận xóa</h2>
-              </div>
-              <div className="modal-body">
-                <p className="textConfirm">
-                  Bạn có chắc chắn muốn xóa tuyến này?
-                </p>
-                <div className="listButton">
-                  <button
-                    type="button"
-                    onClick={() => setIsDeleteConfirmVisible(false)}
-                    className="cancel"
-                  >
-                    Hủy
-                  </button>
-                  <button type="button" className="save" onClick={removeRoute}>
-                    Xóa
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddModal
+        visible={isAdd}
+        title="Thêm tuyến"
+        fields={searchOptions}
+        defaultValues={{ status: 1 }} // mặc định status = 1
+        onSave={handleCreateRoute}
+        onCancel={() => setIsAdd(false)}
+      />
+
+      <ConfirmDeleteModal
+        visible={isDeleteConfirmVisible}
+        message="Bạn có chắc chắn muốn xóa tuyến này?"
+        onConfirm={removeRoute} // khi xác nhận
+        onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+        type="delete"
+      />
     </div>
   );
 };
