@@ -86,6 +86,15 @@ const AdminTable = ({
                       roleMap[cellValue] || cellValue || "Không xác định";
                     return <td key={col.key}>{label}</td>;
                   }
+                  if (col.key === "khoangCach") {
+                    return <td key={col.key}>{cellValue} km</td>;
+                  }
+                  if (col.key === "timeOfRoute") {
+                    return <td key={col.key}>{cellValue} giờ</td>;
+                  }
+                  if (col.key === "discount") {
+                    return <td key={col.key}>{cellValue} %</td>;
+                  }
 
                   return (
                     <td key={col.key}>

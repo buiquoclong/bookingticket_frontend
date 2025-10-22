@@ -22,9 +22,13 @@ const GenericAdminHeader = ({
 }) => {
   const dateInputRef = useRef();
 
-  // 🔹 Tìm option hiện tại dựa trên searchCriteria
+  // 🔹 Xác định searchCriteria hiệu quả
+  const effectiveCriteria =
+    searchOptions.length === 1 ? searchOptions[0].key : searchCriteria || "";
+
+  // 🔹 Tìm option hiện tại dựa trên effectiveCriteria
   const selectedOption = searchOptions.find(
-    (opt) => opt.key === searchCriteria
+    (opt) => opt.key === effectiveCriteria
   );
   const optionLabel = selectedOption ? selectedOption.label : "";
   const fieldType = selectedOption ? selectedOption.type : "text";
@@ -51,7 +55,6 @@ const GenericAdminHeader = ({
         <div className="actions">
           {searchOptions.length > 0 && (
             <div className="search-group">
-              {/* 🔸 Hiển thị input phù hợp theo type */}
               {/* 🔸 Hiển thị input phù hợp theo type */}
               {fieldType === "select" ? (
                 <FormControl
@@ -82,7 +85,16 @@ const GenericAdminHeader = ({
                         ))
                       : Object.entries(selectedOption.options || {}).map(
                           ([key, label]) => (
-                            <MenuItem key={key} value={key}>
+                            <MenuItem
+                              key={key}
+                              value={key}
+                              sx={{
+                                display: "flex",
+                                justifyContent: "center", // căn giữa
+                                color: "gold",
+                                fontSize: "18px",
+                              }}
+                            >
                               {label}
                             </MenuItem>
                           )
@@ -102,13 +114,12 @@ const GenericAdminHeader = ({
                     value={
                       searchValue
                         ? fieldType === "datetime"
-                          ? searchValue.replace(" ", "T") // hiển thị đúng định dạng cho datetime-local
+                          ? searchValue.replace(" ", "T")
                           : searchValue
                         : ""
                     }
                     onChange={(e) => {
                       const val = e.target.value;
-                      // Nếu là datetime-local → format lại giá trị trước khi lưu
                       if (fieldType === "datetime") {
                         const formatted = val.replace("T", " ");
                         setSearchValue(formatted);
@@ -137,7 +148,7 @@ const GenericAdminHeader = ({
                   label={`Tìm kiếm bằng ${optionLabel}`}
                   variant="outlined"
                   size="small"
-                  value={searchValue}
+                  value={searchValue || ""}
                   onChange={(e) => setSearchValue(e.target.value)}
                   sx={{
                     "& .MuiOutlinedInput-root": {
@@ -150,33 +161,35 @@ const GenericAdminHeader = ({
                 />
               )}
 
-              {/* 🔹 Bộ chọn tiêu chí tìm kiếm */}
-              <FormControl
-                variant="outlined"
-                size="small"
-                className="search-select"
-                sx={{
-                  minWidth: "160px",
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "8px",
-                    height: "40px",
-                  },
-                }}
-              >
-                <InputLabel id="criteria-label">Tìm kiếm bằng</InputLabel>
-                <Select
-                  labelId="criteria-label"
-                  value={searchCriteria}
-                  onChange={handleCriteriaChange}
-                  label="Tìm kiếm bằng"
+              {/* 🔹 Chỉ hiển thị dropdown "Tìm kiếm bằng" nếu có >1 option */}
+              {searchOptions.length > 1 && (
+                <FormControl
+                  variant="outlined"
+                  size="small"
+                  className="search-select"
+                  sx={{
+                    minWidth: "160px",
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "8px",
+                      height: "40px",
+                    },
+                  }}
                 >
-                  {searchOptions.map((option) => (
-                    <MenuItem key={option.key} value={option.key}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                  <InputLabel id="criteria-label">Tìm kiếm bằng</InputLabel>
+                  <Select
+                    labelId="criteria-label"
+                    value={effectiveCriteria}
+                    onChange={handleCriteriaChange}
+                    label="Tìm kiếm bằng"
+                  >
+                    {searchOptions.map((option) => (
+                      <MenuItem key={option.key} value={option.key}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
             </div>
           )}
 
