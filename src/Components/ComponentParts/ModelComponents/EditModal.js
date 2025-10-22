@@ -44,13 +44,15 @@ const EditModal = ({
           newData[field.key] = formatToInput(data[field.key]);
         }
       });
+      if (data.diemDi) newData.diemdi = data.diemDi.id;
+      if (data.diemDen) newData.diemden = data.diemDen.id;
 
       setFormData(newData);
     }
   }, [data, fields]);
 
   if (!visible) return null;
-
+  const cities = fields.find((f) => f.key === "diemdi")?.options || [];
   const handleChange = (key, value) => {
     setFormData((prev) => {
       const updated = { ...prev, [key]: value };
@@ -61,6 +63,13 @@ const EditModal = ({
       }
       if (key === "endDay" && updated.startDay && updated.startDay > value) {
         updated.startDay = "";
+      }
+      if (key === "diemdi" || key === "diemden") {
+        const diemDiName =
+          cities.find((c) => c.id === parseInt(updated.diemdi))?.name ?? "";
+        const diemDenName =
+          cities.find((c) => c.id === parseInt(updated.diemden))?.name ?? "";
+        updated.name = `${diemDiName} - ${diemDenName}`;
       }
 
       return updated;
@@ -73,6 +82,9 @@ const EditModal = ({
     // Nếu status không có, mặc định 1
     if (!finalData.status) finalData.status = 1;
     // Gửi ISO 8601 trực tiếp, backend Spring Boot parse được LocalDateTime
+    if (formData.newImage) {
+      finalData.file = formData.newImage; // thêm file mới
+    }
     onSave(finalData);
   };
 
@@ -87,7 +99,54 @@ const EditModal = ({
             {fields.map((field) => (
               <div className="form-group" key={field.key}>
                 <label>{field.label}</label>
-                {field.type === "select" && field.options ? (
+
+                {/* 🔹 Nếu là file ảnh */}
+                {field.type === "file" ? (
+                  <>
+                    {/* Hiển thị ảnh hiện tại nếu có */}
+                    {formData.imgUrl && !formData.newImage && (
+                      <div className="image-preview">
+                        <img
+                          src={
+                            formData.imgUrl.startsWith("http")
+                              ? formData.imgUrl
+                              : `http://localhost:8081${formData.imgUrl}`
+                          }
+                          alt="Current"
+                          className="current-image"
+                        />
+                      </div>
+                    )}
+
+                    {/* Hiển thị ảnh mới nếu người dùng đã chọn */}
+                    {formData.newImage && (
+                      <div className="image-preview">
+                        <img
+                          src={formData.newImagePreview}
+                          alt="New Preview"
+                          className="current-image"
+                        />
+                      </div>
+                    )}
+
+                    {/* Input chọn ảnh mới */}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          const preview = URL.createObjectURL(file);
+                          setFormData((prev) => ({
+                            ...prev,
+                            newImage: file,
+                            newImagePreview: preview,
+                          }));
+                        }
+                      }}
+                    />
+                  </>
+                ) : field.type === "select" && field.options ? (
                   <select
                     value={
                       formData[field.key] !== undefined &&
@@ -101,7 +160,7 @@ const EditModal = ({
                     {Array.isArray(field.options)
                       ? field.options.map((opt) => (
                           <option key={opt.id} value={opt.id}>
-                            {opt.name} {/* hoặc opt.label nếu có */}
+                            {opt.name}
                           </option>
                         ))
                       : Object.entries(field.options).map(([key, label]) => (

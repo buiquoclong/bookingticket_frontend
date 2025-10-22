@@ -10,7 +10,6 @@ const AddModal = ({
   defaultValues = {}, // { status: 1 }
 }) => {
   const [formData, setFormData] = useState({});
-  const [previewImage, setPreviewImage] = useState(null);
   const inputRefs = useRef({});
 
   // Convert table "HH:mm DD/MM/YYYY" -> "YYYY-MM-DDTHH:mm" (input)
@@ -38,14 +37,13 @@ const AddModal = ({
           newData[field.key] = val ?? "";
         }
       });
-      setPreviewImage(null);
       setFormData(newData);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   if (!visible) return null;
-
+  const cities = fields.find((f) => f.key === "diemdi")?.options || [];
   const handleChange = (key, value) => {
     setFormData((prev) => {
       const updated = { ...prev, [key]: value };
@@ -60,21 +58,16 @@ const AddModal = ({
         updated.startDay = "";
       }
 
+      if (key === "diemdi" || key === "diemden") {
+        const diemDiName =
+          cities.find((c) => c.id === parseInt(updated.diemdi))?.name ?? "";
+        const diemDenName =
+          cities.find((c) => c.id === parseInt(updated.diemden))?.name ?? "";
+        updated.name = `${diemDiName} - ${diemDenName}`;
+      }
+
       return updated;
     });
-  };
-  const handleFileChange = (key, file) => {
-    if (!file) return;
-    setFormData((prev) => ({ ...prev, [key]: file }));
-
-    // Nếu là ảnh thì hiển thị preview
-    if (file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (e) => setPreviewImage(e.target.result);
-      reader.readAsDataURL(file);
-    } else {
-      setPreviewImage(null);
-    }
   };
 
   const handleSubmit = (e) => {
@@ -82,6 +75,9 @@ const AddModal = ({
     const finalData = { ...formData };
     // Nếu status không có, mặc định là 1
     if (!finalData.status) finalData.status = 1;
+    if (formData.newImage) {
+      finalData.file = formData.newImage; // thêm file mới
+    }
     onSave(finalData);
   };
 
@@ -96,16 +92,68 @@ const AddModal = ({
             {fields.map((field) => (
               <div className="form-group" key={field.key}>
                 <label>{field.label}</label>
-                {field.type === "select" && field.options ? (
+
+                {/* 🔹 Nếu là file ảnh */}
+                {field.type === "file" ? (
+                  <>
+                    {/* Hiển thị ảnh hiện tại nếu có */}
+                    {formData.imgUrl && !formData.newImage && (
+                      <div className="image-preview">
+                        <img
+                          src={
+                            formData.imgUrl.startsWith("http")
+                              ? formData.imgUrl
+                              : `http://localhost:8081${formData.imgUrl}`
+                          }
+                          alt="Current"
+                          className="current-image"
+                        />
+                      </div>
+                    )}
+
+                    {/* Hiển thị ảnh mới nếu người dùng đã chọn */}
+                    {formData.newImage && (
+                      <div className="image-preview">
+                        <img
+                          src={formData.newImagePreview}
+                          alt="New Preview"
+                          className="current-image"
+                        />
+                      </div>
+                    )}
+
+                    {/* Input chọn ảnh mới */}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          const preview = URL.createObjectURL(file);
+                          setFormData((prev) => ({
+                            ...prev,
+                            newImage: file,
+                            newImagePreview: preview,
+                          }));
+                        }
+                      }}
+                    />
+                  </>
+                ) : field.type === "select" && field.options ? (
                   <select
-                    value={formData[field.key] || ""}
+                    value={
+                      formData[field.key] !== undefined &&
+                      formData[field.key] !== null
+                        ? String(formData[field.key])
+                        : ""
+                    }
                     onChange={(e) => handleChange(field.key, e.target.value)}
                   >
                     <option value="">-- Chọn --</option>
                     {Array.isArray(field.options)
                       ? field.options.map((opt) => (
                           <option key={opt.id} value={opt.id}>
-                            {opt.name} {/* hoặc opt.label nếu có */}
+                            {opt.name}
                           </option>
                         ))
                       : Object.entries(field.options).map(([key, label]) => (
@@ -126,26 +174,6 @@ const AddModal = ({
                       onChange={(e) => handleChange(field.key, e.target.value)}
                       style={{ cursor: "pointer" }}
                     />
-                  </div>
-                ) : field.type === "file" ? (
-                  /* --- FILE UPLOAD --- */
-                  <div className="file-upload-wrapper">
-                    <input
-                      type="file"
-                      accept={field.accept || "*/*"}
-                      onChange={(e) =>
-                        handleFileChange(field.key, e.target.files[0])
-                      }
-                    />
-                    {previewImage && (
-                      <div className="image-preview">
-                        <img
-                          src={previewImage}
-                          alt="preview"
-                          className="preview-img"
-                        />
-                      </div>
-                    )}
                   </div>
                 ) : (
                   <input
