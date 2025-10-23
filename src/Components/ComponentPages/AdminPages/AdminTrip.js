@@ -1,510 +1,48 @@
 import React, { useState, useEffect, useCallback } from "react";
-import DataTable from "react-data-table-component";
-// import "../AdminTrip/AdminTrip.scss"
 import { toast } from "react-toastify";
-import { Pagination, Breadcrumbs, Link } from "@mui/material";
-import { FiEdit, FiTrash, FiList } from "react-icons/fi";
+
+import {
+  tripColumn,
+  tripFields,
+  tripDetailColumns,
+} from "../../../Utils/bookingUtils";
+import AdminTable from "../../ComponentParts/AdminComponents/AdminTable";
+import ConfirmDeleteModal from "../../ComponentParts/ModelComponents/ConfirmDeleteModal";
+import EditModal from "../../ComponentParts/ModelComponents/EditModal";
+import AddModal from "../../ComponentParts/ModelComponents/AddModal";
+import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
+import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import DetailModal from "../../ComponentParts/ModelComponents/DetailModal";
 
 const AdminTrip = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [currentTrip, setcurrentTrip] = useState({
-    id: null,
-    route: { id: "", name: "" },
-    vehicle: { id: "", name: "" },
-    dayStart: "",
-    timeStart: "",
-    price: "",
-    driver: { id: "", name: "" },
-    emptySeat: 0,
-    status: 0,
-  });
+  const [currentTrip, setcurrentTrip] = useState({});
   const [isAdd, setIsAdd] = useState(false);
   const [kindVehicledata, setKindVehicledata] = useState([]);
-
+  const [searchValue, setSearchValue] = useState("");
   const [vehicleOfKind, setVehicleOfKind] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [routes, setRoutes] = useState([]);
   const [records, setRecords] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
 
-  const [daySearch, setDaySearch] = useState("");
-
-  const [route, setRoute] = useState("");
-  const [vehicle, setVehicle] = useState("");
-  const [timeStart, setTimeStart] = useState("");
-  const [dayStart, setDayStart] = useState("");
-  const [price, setPrice] = useState("");
-  const [driver, setDriver] = useState("");
+  // const [dayStart, setDayStart] = useState("");
   const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
   const [tripToDelete, setTripToDelete] = useState(null);
-  const columns = [
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          ID
-        </div>
-      ),
-      selector: (row) => row.id,
-      width: "3rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.id}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Tên chuyến
-        </div>
-      ),
-      selector: (row) => row.route.name,
-      sortable: true,
-      // width: '10rem',
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.route.name}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          {" "}
-          Loại xe
-        </div>
-      ),
-      selector: (row) => row.vehicle.kindVehicle.name,
-      // width: '7rem',
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.vehicle.kindVehicle.name}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          {" "}
-          Tên xe
-        </div>
-      ),
-      selector: (row) => row.vehicle.name,
-      // width: '7rem',
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.vehicle.name}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Biển số
-        </div>
-      ),
-      selector: (row) => row.vehicle.vehicleNumber,
-      // width: '5rem',
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.vehicle.vehicleNumber}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Thời gian khởi hành{" "}
-        </div>
-      ),
-      // width: '9rem',
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.timeStart.slice(0, 5)} - {formatDate(row.dayStart)}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Giá vé
-        </div>
-      ),
-      selector: (row) => row.price,
-      // width: '7rem',
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.price.toLocaleString("vi-VN")}VND
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Tài xế
-        </div>
-      ),
-      selector: (row) => row.driver.name,
-      // width: '8rem',
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.driver.name}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Trạng thái
-        </div>
-      ),
-      selector: (row) => row.status,
-      // width: '8rem',
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {statusMap[row.status] || "Unknown Status"}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Hành động
-        </div>
-      ),
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "1rem",
-            width: "100%",
-          }}
-        >
-          <FiList
-            size={24}
-            style={{
-              color: "#3b82f6",
-              cursor: "pointer",
-              transition: "color 0.3s ease",
-            }}
-            onClick={() => handleDetailClick(row)}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#2563eb")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#3b82f6")}
-            title="Xem danh sách ghế đã đặt"
-          />
-          <FiEdit
-            size={24}
-            style={{
-              color: "#3b82f6",
-              cursor: "pointer",
-              transition: "color 0.3s ease",
-            }}
-            onClick={() => handleEditClick(row)}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#2563eb")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#3b82f6")}
-            title="Chỉnh sửa"
-          />
-          <FiTrash
-            size={24}
-            style={{
-              color: "#ef4444",
-              cursor: "pointer",
-              transition: "color 0.3s ease",
-            }}
-            onClick={() => handleRemoveClick(row)}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#dc2626")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#ef4444")}
-            title="Xóa"
-          />
-        </div>
-      ),
-    },
-  ];
+
   const statusMap = {
     1: "Đã xác nhận",
     2: "Đã hoàn thành",
     3: "Đã bị hủy",
   };
+  const statusColorMap = {
+    1: "#ffa9008a", // Chưa kích hoạt
+    2: "#008000b3", // Đã kích hoạt
+    3: "#ff0000c2", // Tạm khóa
+  };
 
-  const columnDetails = [
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Ghế đặt
-        </div>
-      ),
-      selector: (row) => row.seat.name,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.seat.name}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Tên
-        </div>
-      ),
-      selector: (row) => row.booking.userName,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.booking.userName}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Email
-        </div>
-      ),
-      selector: (row) => row.booking.email,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.booking.email}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Số điện thoại
-        </div>
-      ),
-      selector: (row) => row.booking.phone,
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.booking.phone}
-        </div>
-      ),
-    },
-  ];
   const [seatData, setSeatData] = useState([]);
 
   const [isDetail, setIsDetail] = useState(false);
@@ -523,7 +61,7 @@ const AdminTrip = () => {
   const fetchTrips = useCallback(async () => {
     try {
       const response = await fetch(
-        `http://localhost:8081/api/trip/page?page=${page}&size=10&routeId=&dayStart=${daySearch}`
+        `http://localhost:8081/api/trip/page?page=${page}&size=10&routeId=&dayStart=${searchValue}`
       );
       const data = await response.json();
       setRecords(data.trips);
@@ -531,7 +69,7 @@ const AdminTrip = () => {
     } catch (error) {
       console.error("Error fetching trips:", error);
     }
-  }, [page, daySearch]);
+  }, [page, searchValue]);
 
   const fetchRoutes = useCallback(async () => {
     try {
@@ -580,59 +118,32 @@ const AdminTrip = () => {
         // Dữ liệu đã được xử lý và set ở trên
       }
     };
-
     fetchData();
-  }, [page, daySearch, fetchTrips, fetchRoutes, fetchKindVehicles]);
-  const handleEditClick = (row) => {
-    if (row && row.route && row.vehicle && row.driver) {
-      setcurrentTrip({
-        id: row.id,
-        route: {
-          id: row.route.id,
-          name: row.route.name,
-        },
-        kindVehicle: {
-          id: row.vehicle.kindVehicle.id,
-        },
-        vehicle: {
-          id: row.vehicle.id,
-          name: row.vehicle.name,
-          vehicleNumber: row.vehicle.vehicleNumber,
-        },
-        timeStart: row.timeStart,
-        dayStart: row.dayStart,
-        price: row.price,
-        driver: {
-          id: row.driver.id,
-          name: row.driver.name,
-        },
-        emptySeat: row.emptySeat,
-        status: row.status,
-      });
-      setIsEditing(true);
+  }, [page, fetchTrips, fetchRoutes, fetchKindVehicles, fetchDrivers]);
+  const handleEditClick = (trip) => {
+    setcurrentTrip(trip);
+    setIsEditing(true);
 
-      fetchVehiclesByKind(row.vehicle.kindVehicle.id);
-      fetchDrivers(row.dayStart);
+    // Gọi API lấy xe sẵn cho kindVehicle và dayStart hiện tại của trip
+    const kindVehicleId = trip.vehicle.kindVehicle.id;
+    const dayStart = trip.dayStart; // đã có sẵn
+    if (kindVehicleId && dayStart) {
+      fetchVehiclesByKind(kindVehicleId, dayStart);
+    }
+
+    // Lấy danh sách driver theo dayStart
+    if (dayStart) {
+      fetchDrivers(dayStart);
     }
   };
 
-  const handleKindVehicleChange = (e) => {
-    const selectedKindVehicleId = e.target.value;
-    setcurrentTrip((current) => ({
-      ...current,
-      kindVehicle: {
-        ...current.kindVehicle,
-        id: selectedKindVehicleId,
-      },
-    }));
-    fetchVehiclesByKind(selectedKindVehicleId);
-  };
-  const fetchVehiclesByKind = async (kindVehicleId) => {
+  const fetchVehiclesByKind = async (kindVehicleId, dayStart) => {
     try {
       const response = await fetch(
         `http://localhost:8081/api/vehicle/available/${kindVehicleId}?dayStart=${dayStart}`
       );
       const data = await response.json();
+      console.log(data);
       setVehicleOfKind(data);
     } catch (error) {
       console.error(
@@ -641,649 +152,218 @@ const AdminTrip = () => {
       );
     }
   };
-  const handleVehicleChange = (e) => {
-    const selectedVehicleId = e.target.value;
-    console.log(selectedVehicleId);
-
-    // const selectedVehicle = vehicleOfKind.find(vehicle => vehicle.id === selectedVehicleId);
-    setcurrentTrip((current) => ({
-      ...current,
-      vehicle: {
-        ...current.vehicle,
-        id: selectedVehicleId, // Cập nhật biển số
-      },
-    }));
-  };
   const handleCreateClick = () => {
     setIsAdd(true);
   };
-  const handleRouteChange = (event) => {
-    setRoute(event.target.value);
-  };
-  const handleVehicle1Change = (event) => {
-    setVehicle(event.target.value);
-  };
-  const handleDayStartChange = (event) => {
-    const newDayStart = event.target.value;
-    setDayStart(newDayStart);
-    setcurrentTrip({ ...currentTrip, kindVehicle: null });
-    setcurrentTrip((prevTrip) => ({
-      ...prevTrip,
-      dayStart: newDayStart,
-    }));
-    setVehicleOfKind([]);
-    fetchDrivers(newDayStart);
-  };
-  const handleTimeStartChange = (event) => {
-    setTimeStart(event.target.value);
-  };
-  const handlePriceChange = (event) => {
-    setPrice(event.target.value);
-  };
-  const handleDriverChange = (event) => {
-    setDriver(event.target.value);
-  };
-  const handleCreateTrip = async (e) => {
-    e.preventDefault();
-    let missingInfo = [];
-    if (!route) {
-      missingInfo.push("Tuyến");
-    }
-    if (!vehicle) {
-      missingInfo.push("Phương tiện");
-    }
-    if (!dayStart) {
-      missingInfo.push("Ngày khởi hành");
-    }
-    if (!timeStart) {
-      missingInfo.push("Thời gian khởi hành");
-    }
-    if (!price) {
-      missingInfo.push("Giá vé");
-    }
-    if (!driver) {
-      missingInfo.push("Tài xế");
-    }
-    if (missingInfo.length > 0) {
-      const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
-        ",  "
-      )}`;
-      toast.error(message);
-    } else {
-      try {
-        const token = localStorage.getItem("token");
-        const newTripData = {
-          routeId: route,
-          vehicleId: vehicle,
-          dayStart: dayStart,
-          timeStart: timeStart,
-          price: price,
-          driverId: driver,
-          status: 1,
-        };
-        console.log("newTripData", newTripData);
 
-        const response = await fetch("http://localhost:8081/api/trip", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(newTripData),
-        });
+  const handleCreateTrip = async (newTrip) => {
+    // Validate dữ liệu đầu vào
+    if (
+      !validateFields({
+        "Tên chuyến đi": newTrip.routeId,
+        "Ngày khởi hành": newTrip.dayStart,
+        "Thời gian khởi hành": newTrip.timeStart,
+        "Loại xe": newTrip.kindVehicleId,
+        "Phương tiện": newTrip.vehicleId,
+        "Giá vé": newTrip.price,
+        "Tài xế": newTrip.driverId,
+      })
+    )
+      return;
+    const newTripData = {
+      routeId: newTrip.routeId,
+      dayStart: newTrip.dayStart,
+      timeStart: newTrip.timeStart,
+      kindVehicleId: newTrip.kindVehicleId,
+      vehicleId: newTrip.vehicleId,
+      price: newTrip.price,
+      driverId: newTrip.driverId,
+      status: newTrip.status,
+    };
+    try {
+      // Gửi request tạo chuyến đi
+      const created = await sendRequest(
+        "http://localhost:8081/api/trip",
+        "POST",
+        newTripData
+      );
 
-        if (response.ok) {
-          // Xử lý thành công
-          toast.success("Chuyến đi đã được tạo thành công!");
-          const newTrip = await response.json(); // Nhận thông tin của người dùng mới từ phản hồi
-          // Thêm người dùng mới vào danh sách
-          setRecords((prevRecords) => [...prevRecords, newTrip]);
-          // Reset form hoặc làm gì đó khác
-          setRoute("");
-          setVehicle("");
-          setDayStart("");
-          setTimeStart("");
-          setPrice("");
-          setDriver("");
-          setIsAdd(false);
-          // window.location.reload();
-        } else {
-          console.error("Có lỗi xảy ra khi tạo trip!");
-          toast.error("Có lỗi xảy ra khi tạo chuyến đi!");
-        }
-      } catch (error) {
-        console.error("Lỗi:", error);
-        toast.error("Lỗi:", error);
-      }
+      // Hiển thị thông báo & cập nhật danh sách
+      toast.success("Chuyến đi mới đã được tạo thành công!");
+      setRecords((prev) => [...prev, created]);
+      setIsAdd(false);
+    } catch (error) {
+      console.error("Lỗi khi tạo chuyến đi:", error);
     }
   };
-  const handleUpdateTrip = async (e) => {
-    e.preventDefault();
-    let missingInfo = [];
-    if (!currentTrip.route) {
-      missingInfo.push("Tuyến");
-    }
-    if (!currentTrip.vehicle) {
-      missingInfo.push("Phương tiện");
-    }
-    if (!currentTrip.dayStart) {
-      missingInfo.push("Ngày khởi hành");
-    }
-    if (!currentTrip.timeStart) {
-      missingInfo.push("Thời gian khởi hành");
-    }
-    if (!currentTrip.price) {
-      missingInfo.push("Giá vé");
-    }
-    if (!currentTrip.driver) {
-      missingInfo.push("Tài xế");
-    }
-    if (currentTrip.status === null || currentTrip.status === undefined) {
-      missingInfo.push("Trạng thái");
-    }
-    if (missingInfo.length > 0) {
-      const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
-        ",  "
-      )}`;
-      toast.error(message);
-    } else {
-      try {
-        const token = localStorage.getItem("token");
-        const newTripData = {
-          routeId: currentTrip.route.id,
-          vehicleId: currentTrip.vehicle.id,
-          dayStart: currentTrip.dayStart,
-          timeStart: currentTrip.timeStart,
-          price: currentTrip.price,
-          driverId: currentTrip.driver.id,
-          emptySeat: currentTrip.emptySeat,
-          status: currentTrip.status,
-        };
-        console.log("newTripData", newTripData);
+  const handleUpdateTrip = async (updateTrip) => {
+    if (
+      !validateFields({
+        "Tên chuyến đi": updateTrip.routeId,
+        "Ngày khởi hành": updateTrip.dayStart,
+        "Thời gian khởi hành": updateTrip.timeStart,
+        "Loại xe": updateTrip.kindVehicleId,
+        "Phương tiện": updateTrip.vehicleId,
+        "Giá vé": updateTrip.price,
+        "Tài xế": updateTrip.driverId,
+      })
+    )
+      return;
+    const updateTripData = {
+      routeId: updateTrip.routeId,
+      dayStart: updateTrip.dayStart,
+      timeStart: updateTrip.timeStart,
+      kindVehicleId: updateTrip.kindVehicleId,
+      vehicleId: updateTrip.vehicleId,
+      price: updateTrip.price,
+      driverId: updateTrip.driverId,
+      status: updateTrip.status,
+    };
 
-        const response = await fetch(
-          `http://localhost:8081/api/trip/${currentTrip.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(newTripData),
-          }
-        );
+    try {
+      const updated = await sendRequest(
+        `http://localhost:8081/api/trip/${updateTrip.id}`,
+        "PUT",
+        updateTripData
+      );
 
-        if (response.ok) {
-          // Xử lý thành công
-          console.log("Chuyến đi đã được cập nhật thành công!");
-          toast.success("Chuyến đi đã được cập nhật thành công!");
-          const updatedTrip = await response.json();
-          const updatedTrips = records.map((trip) => {
-            if (trip.id === updatedTrip.id) {
-              return updatedTrip;
-            }
-            return trip;
-          });
-          setRecords(updatedTrips);
-          // Reset form hoặc làm gì đó khác
-          setcurrentTrip({
-            id: null,
-            route: { id: "", name: "" },
-            vehicle: { id: "", name: "" },
-            dayStart: "",
-            timeStart: "",
-            price: "",
-            driver: { id: "", name: "" },
-            emptySeat: 0,
-            status: 0,
-          });
-          setIsEditing(false);
-          // window.location.reload();
-        } else {
-          console.error("Có lỗi xảy ra khi cập nhật chuyến đi!");
-          toast.error("Có lỗi xảy ra khi cập nhật chuyến đi!");
-        }
-      } catch (error) {
-        console.error("Lỗi:", error);
-        toast.error("Lỗi:", error);
-      }
+      toast.success("Chuyến đi đã được cập nhật thành công!");
+      setRecords((prev) =>
+        prev.map((item) => (item.id === updated.id ? updated : item))
+      );
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Lỗi khi update chuyến đi:", error);
     }
   };
   const removeTrip = async () => {
     const tripId = tripToDelete.id;
+
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8081/api/trip/${tripId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`, // Thêm token vào header
-        },
-      });
-      if (response.ok) {
-        // Lọc danh sách các thành phố để loại bỏ thành phố đã xóa
-        const updateTrip = records.filter((record) => record.id !== tripId);
-        setRecords(updateTrip);
-        toast.success("trip đã được xóa thành công!");
-        setIsDeleteConfirmVisible(false);
-      } else {
-        console.error("Có lỗi xảy ra khi xóa chuyến đi!");
-        toast.error("Có lỗi xảy ra khi xóa chuyến đi!");
-      }
+      await sendRequest(`http://localhost:8081/api/trip/${tripId}`, "DELETE");
+
+      setRecords((prev) => prev.filter((record) => record.id !== tripId));
+      toast.success("Chuyến đi đã được xóa thành công!");
+      setIsDeleteConfirmVisible(false);
     } catch (error) {
-      console.error("Lỗi:", error);
-      toast.error("Lỗi:", error.message);
+      console.error("Lỗi khi xóa chuyến đi:", error);
     }
-  };
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
   };
   const handleRemoveClick = (trip) => {
     setTripToDelete(trip);
     setIsDeleteConfirmVisible(true);
   };
-  const NoDataComponent = () => (
-    <div className="emptyData">Không có dữ liệu</div>
-  );
-  function getCurrentDateTimeLocal() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = (now.getMonth() + 1).toString().padStart(2, "0"); // thêm '0' nếu cần
-    const day = now.getDate().toString().padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  }
-  const handleOutsideClick = (e) => {
-    // Đóng modal khi click vào phần tử có class 'modal'
-    if (e.target.classList.contains("modal")) {
-      setIsDetail(false);
+
+  const searchOptions = tripFields.map((field) => {
+    if (field.type === "select") {
+      if (field.key === "routeId") {
+        // 🔹 Gắn danh sách loại xe
+        return { ...field, value: field.key, options: routes };
+      }
+      if (field.key === "kindVehicleId") {
+        // 🔹 Gắn danh sách loại xe
+        return { ...field, value: field.key, options: kindVehicledata };
+      }
+      if (field.key === "vehicleId") {
+        // 🔹 Gắn danh sách loại xe
+        return { ...field, value: field.key, options: vehicleOfKind };
+      }
+      if (field.key === "driverId") {
+        // 🔹 Gắn danh sách loại xe
+        return { ...field, value: field.key, options: drivers };
+      }
+
+      if (field.key === "status") {
+        // 🔹 Gắn danh sách trạng thái từ statusMap (object)
+        return { ...field, value: field.key, options: statusMap };
+      }
     }
+
+    // Các field còn lại
+    return { ...field, value: field.key };
+  });
+  const handleFieldChange = (key, value, dayStart) => {
+    console.log(dayStart);
+    if (key === "kindVehicleId" && dayStart) {
+      fetchVehiclesByKind(value, dayStart);
+    }
+    if (key === "dayStart") fetchDrivers(value);
   };
+
   return (
-    <div className="main-container">
-      {/* <section className="main section"> */}
-      <Breadcrumbs aria-label="breadcrumb">
-        <Link underline="hover" color="inherit" href="/admin">
-          Admin
-        </Link>
-        <Link underline="hover" color="inherit" href="/admin/trips">
-          Chuyến đi
-        </Link>
-      </Breadcrumbs>
+    <>
+      <div className="main-container">
+        <GenericAdminHeader
+          title="Quản lý chuyến đi"
+          breadcrumbLinks={[
+            { label: "Admin", href: "/admin" },
+            { label: "Chuyến đi", href: "/admin/trips" },
+          ]}
+          searchValue={searchValue}
+          setSearchValue={setSearchValue}
+          searchOptions={[
+            { key: "dayStart", label: "Ngày bắt đầu", type: "date" }, // có thể thêm nhiều option khác
+          ]}
+          addButtonLabel="Thêm chuyến đi"
+          onAddClick={handleCreateClick}
+        />
 
-      <div className="HisContent">
-        <div className="searchIn">
-          <input
-            type="date"
-            onChange={(e) => setDaySearch(e.target.value)}
-            placeholder="Tìm kiếm theo ngày khởi hành"
-            className="findTuyen"
-          />
-        </div>
-        <div className="HistoryTick">
-          <div className="contentTikcet">
-            <div className="title">Quản lý Chuyến đi</div>
-            <button className="btn back" onClick={() => handleCreateClick()}>
-              Thêm chuyến đi
-            </button>
+        <div className="HisContent">
+          <div className="HistoryTick">
+            <div className="devide"></div>
+            <AdminTable
+              columns={tripColumn}
+              data={records}
+              onEdit={handleEditClick}
+              onDelete={handleRemoveClick}
+              onDetail={handleDetailClick} // 👉 thêm dòng này
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              statusColorMap={statusColorMap}
+              statusMap={statusMap}
+            />
           </div>
-          <div className="devide"></div>
-          <DataTable
-            columns={columns}
-            data={records}
-            // pagination
-            noDataComponent={<NoDataComponent />}
-          ></DataTable>
-          <Pagination
-            count={totalPages}
-            boundaryCount={1}
-            siblingCount={1}
-            color="primary"
-            showFirstButton
-            showLastButton
-            style={{ float: "right", padding: "1rem" }}
-            page={page}
-            onChange={handleChangePage}
-          />
         </div>
+        <EditModal
+          visible={isEditing}
+          title="Sửa thông tin chuyến đi"
+          data={currentTrip}
+          fields={searchOptions}
+          onSave={handleUpdateTrip}
+          onCancel={() => setIsEditing(false)}
+          onFieldChange={handleFieldChange}
+        />
+
+        <AddModal
+          visible={isAdd}
+          title="Thêm chuyến đi"
+          fields={searchOptions}
+          defaultValues={{ status: 1 }} // mặc định status = 1
+          onSave={handleCreateTrip}
+          onCancel={() => setIsAdd(false)}
+          onFieldChange={handleFieldChange}
+        />
+
+        <ConfirmDeleteModal
+          visible={isDeleteConfirmVisible}
+          message="Bạn có chắc chắn muốn xóa chuyến đi này?"
+          onConfirm={removeTrip} // khi xác nhận
+          onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+          type="delete"
+        />
       </div>
-      {isDetail && (
-        <div className="modal" id="deleteModal" onClick={handleOutsideClick}>
-          <div className="modal-dialog" style={{ width: "50%" }}>
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Danh sách ghế đã đặt</h2>
-              </div>
-              {seatData && (
-                <div className="modal-body" style={{ overflowY: "auto" }}>
-                  <DataTable
-                    columns={columnDetails}
-                    data={seatData}
-                    noDataComponent={<NoDataComponent />}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isEditing && (
-        <div className="modal" id="deleteModal">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h2 class="modal-title">Sửa chuyến đi</h2>
-              </div>
-              <div class="modal-body">
-                <form>
-                  <div className="infoCity">
-                    <label>Tên chuyến:</label>
-                    <input
-                      type="text"
-                      value={currentTrip.route.name}
-                      onChange={(e) =>
-                        setcurrentTrip({
-                          ...currentTrip,
-                          route: { ...currentTrip.route, name: e.target.value },
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Giờ khởi hành:</label>
-                    <input
-                      className="inputValue"
-                      type="time"
-                      value={
-                        currentTrip.timeStart &&
-                        currentTrip.timeStart.slice(0, 5)
-                      }
-                      onChange={(e) =>
-                        setcurrentTrip({
-                          ...currentTrip,
-                          timeStart: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Ngày khởi hành:</label>
-                    <input
-                      className="inputValue"
-                      type="date"
-                      value={currentTrip.dayStart}
-                      onChange={handleDayStartChange}
-                      min={getCurrentDateTimeLocal()}
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Loại xe:</label>
-                    <select
-                      className="inputValue"
-                      value={
-                        currentTrip.kindVehicle
-                          ? currentTrip.kindVehicle.id
-                          : ""
-                      }
-                      onChange={handleKindVehicleChange}
-                    >
-                      {kindVehicledata.map((kind) => (
-                        <option key={kind.id} value={kind.id}>
-                          {kind.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="infoCity">
-                    <label>Tên xe:</label>
-                    <select
-                      className="inputValue"
-                      value={currentTrip.vehicle.id || ""}
-                      // onChange={(e) => setcurrentTrip({...currentTrip, vehicle: {...currentTrip.vehicle, id: e.target.value }})}
-                      onChange={handleVehicleChange}
-                    >
-                      <option value="">Chọn tên xe</option>
-                      {vehicleOfKind.map((vehicle) => (
-                        <option key={vehicle.id} value={vehicle.id}>
-                          {vehicle.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="infoCity">
-                    <label>Giá vé:</label>
-                    <input
-                      type="number"
-                      className="inputValue"
-                      value={currentTrip.price}
-                      onChange={(e) =>
-                        setcurrentTrip({
-                          ...currentTrip,
-                          price: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Tài xế:</label>
-                    <select
-                      className="inputValue"
-                      value={currentTrip.driver ? currentTrip.driver.id : ""}
-                      onChange={(e) =>
-                        setcurrentTrip((current) => ({
-                          ...current,
-                          driver: {
-                            ...current.driver,
-                            id: e.target.value,
-                          },
-                        }))
-                      }
-                    >
-                      {drivers &&
-                        drivers.map((driver) => (
-                          <option key={driver.id} value={driver.id}>
-                            {driver.name}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                  <div className="infoCity">
-                    <label>Trạng thái:</label>
-                    {/* <input type="text" value={currentTrip.status} onChange={(e) => setcurrentTrip({ ...currentTrip, status: e.target.value })} /> */}
-                    <select
-                      className="inputValue"
-                      value={currentTrip.status}
-                      onChange={(e) =>
-                        setcurrentTrip({
-                          ...currentTrip,
-                          status: e.target.value,
-                        })
-                      }
-                    >
-                      {Object.keys(statusMap).map((key) => (
-                        <option key={key} value={key}>
-                          {statusMap[key]}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="listButton">
-                    <button
-                      type="button"
-                      onClick={() => setIsEditing(false)}
-                      className="cancel"
-                    >
-                      Hủy
-                    </button>
-                    <button
-                      type="submit"
-                      className="save"
-                      onClick={handleUpdateTrip}
-                    >
-                      Lưu
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isAdd && (
-        <div className="modal" id="deleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Thêm chuyến đi</h2>
-              </div>
-              <div className="modal-body">
-                <form>
-                  <div className="infoCity">
-                    <label>Tên chuyến:</label>
-                    {/* <input type="text" value={currentTrip.route.name} onChange={(e) => setcurrentTrip({ ...currentTrip, route: {...currentTrip.route, name: e.target.value }})} /> */}
-                    <select
-                      className="inputValue"
-                      value={route}
-                      onChange={handleRouteChange}
-                    >
-                      <option value="">Chọn tuyến</option>
-                      {routes.map((route) => (
-                        <option key={route.id} value={route.id}>
-                          {route.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Giờ khởi hành:</label>
-                    <input
-                      className="inputValue"
-                      type="time"
-                      value={timeStart}
-                      onChange={handleTimeStartChange}
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Ngày khởi hành:</label>
-                    <input
-                      className="inputValue"
-                      type="date"
-                      value={dayStart}
-                      onChange={handleDayStartChange}
-                      min={getCurrentDateTimeLocal()}
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Loại xe:</label>
-                    <select
-                      className="inputValue"
-                      value={
-                        currentTrip.kindVehicle
-                          ? currentTrip.kindVehicle.id
-                          : ""
-                      }
-                      onChange={handleKindVehicleChange}
-                    >
-                      <option value="">Chọn loại xe</option>
-                      {kindVehicledata.map((kind) => (
-                        <option key={kind.id} value={kind.id}>
-                          {kind.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="infoCity">
-                    <label>Tên xe:</label>
-                    <select
-                      className="inputValue"
-                      value={vehicle}
-                      // onChange={(e) => setcurrentTrip({...currentTrip, vehicle: {...currentTrip.vehicle, id: e.target.value }})}
-                      onChange={handleVehicle1Change}
-                    >
-                      <option value="">Chọn tên xe</option>
-                      {vehicleOfKind.map((vehicle) => (
-                        <option key={vehicle.id} value={vehicle.id}>
-                          {vehicle.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="infoCity">
-                    <label>Giá vé:</label>
-                    <input
-                      type="number"
-                      className="inputValue"
-                      value={price}
-                      onChange={handlePriceChange}
-                    />
-                  </div>
-                  <div className="infoCity">
-                    <label className="info">Tài xế:</label>
-                    <select
-                      className="inputValue"
-                      value={driver}
-                      onChange={handleDriverChange}
-                    >
-                      <option value="">Chọn tài xế</option>
-                      {drivers &&
-                        drivers.map((driver) => (
-                          <option key={driver.id} value={driver.id}>
-                            {driver.name}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                  <div className="listButton">
-                    <button
-                      type="button"
-                      onClick={() => setIsAdd(false)}
-                      className="cancel"
-                    >
-                      Hủy
-                    </button>
-                    <button
-                      type="submit"
-                      className="save"
-                      onClick={handleCreateTrip}
-                    >
-                      Tạo
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      {isDeleteConfirmVisible && (
-        <div className="modal" id="confirmDeleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Xác nhận xóa</h2>
-              </div>
-              <div className="modal-body">
-                <p className="textConfirm">
-                  Bạn có chắc chắn muốn xóa chuyến đi này?
-                </p>
-                <div className="listButton">
-                  <button
-                    type="button"
-                    onClick={() => setIsDeleteConfirmVisible(false)}
-                    className="cancel"
-                  >
-                    Hủy
-                  </button>
-                  <button type="button" className="save" onClick={removeTrip}>
-                    Xóa
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      <DetailModal
+        visible={isDetail}
+        title="Danh sách ghế đã đặt"
+        data={seatData}
+        columns={tripDetailColumns}
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        onClose={() => setIsDetail(false)}
+      />
+    </>
   );
 };
 export default AdminTrip;
