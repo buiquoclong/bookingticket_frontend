@@ -1,5 +1,12 @@
 import React from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
+// import { FaEdit, FaTrash, FaList } from "react-icons/fa";
+import {
+  FaEdit,
+  FaTrash,
+  FaList,
+  FaMoneyBillWave,
+  FaBan,
+} from "react-icons/fa";
 import Pagination from "@mui/material/Pagination";
 import Tooltip from "@mui/material/Tooltip";
 import "./TableComponent.scss";
@@ -29,6 +36,9 @@ const AdminTable = ({
   data = [],
   onEdit,
   onDelete,
+  onDetail,
+  onPay,
+  onCancel,
   currentPage = 1,
   totalPages = 1,
   onPageChange,
@@ -36,9 +46,11 @@ const AdminTable = ({
   statusMap = {},
   roleMap = {},
   showActions = true,
+  disablePagination = false,
+  isDetail = false,
 }) => {
   return (
-    <div className="admin-table">
+    <div className={`admin-table ${isDetail ? "scrollable-table" : ""}`}>
       <table className="custom-table">
         <thead>
           <tr>
@@ -65,7 +77,11 @@ const AdminTable = ({
                   }
 
                   // 👉 Hiển thị status/level với màu
-                  if (col.key === "status" || col.key === "level") {
+                  if (
+                    col.key === "status" ||
+                    col.key === "level" ||
+                    col.key === "isPaid"
+                  ) {
                     const color = statusColorMap[cellValue] || "#ccc";
                     const label =
                       statusMap[cellValue] || cellValue || "Unknown";
@@ -103,8 +119,19 @@ const AdminTable = ({
                   );
                 })}
 
-                {showActions && (
+                {/* {showActions && (
                   <td className="action-buttons">
+                    {onDetail && (
+                      <Tooltip title="Chi tiết" arrow>
+                        <button
+                          className="btn detail"
+                          onClick={() => onDetail(item)}
+                        >
+                          <FaList />
+                        </button>
+                      </Tooltip>
+                    )}
+
                     {onEdit && (
                       <Tooltip title="Sửa" arrow>
                         <button
@@ -115,6 +142,7 @@ const AdminTable = ({
                         </button>
                       </Tooltip>
                     )}
+
                     {onDelete && (
                       <Tooltip title="Xóa" arrow>
                         <button
@@ -125,6 +153,66 @@ const AdminTable = ({
                         </button>
                       </Tooltip>
                     )}
+                  </td>
+                )} */}
+                {showActions && (
+                  <td className="action-buttons">
+                    <div className="action-container">
+                      {onDetail && (
+                        <Tooltip title="Chi tiết" arrow>
+                          <button
+                            className="btn-action detail"
+                            onClick={() => onDetail(item)}
+                          >
+                            <FaList />
+                          </button>
+                        </Tooltip>
+                      )}
+
+                      {onPay && item.isPaid === 0 && (
+                        <Tooltip title="Thanh toán" arrow>
+                          <button
+                            className="btn-action pay"
+                            onClick={() => onPay(item)}
+                          >
+                            <FaMoneyBillWave />
+                          </button>
+                        </Tooltip>
+                      )}
+
+                      {onCancel && (
+                        <Tooltip title="Hủy" arrow>
+                          <button
+                            className="btn-action cancel"
+                            onClick={() => onCancel(item)}
+                          >
+                            <FaBan />
+                          </button>
+                        </Tooltip>
+                      )}
+
+                      {onEdit && (
+                        <Tooltip title="Sửa" arrow>
+                          <button
+                            className="btn-action edit"
+                            onClick={() => onEdit(item)}
+                          >
+                            <FaEdit />
+                          </button>
+                        </Tooltip>
+                      )}
+
+                      {onDelete && (
+                        <Tooltip title="Xóa" arrow>
+                          <button
+                            className="btn-action delete"
+                            onClick={() => onDelete(item)}
+                          >
+                            <FaTrash />
+                          </button>
+                        </Tooltip>
+                      )}
+                    </div>
                   </td>
                 )}
               </tr>
@@ -141,19 +229,20 @@ const AdminTable = ({
           )}
         </tbody>
       </table>
-
-      <div className="pagination-container">
-        <Pagination
-          count={totalPages}
-          page={currentPage}
-          boundaryCount={1}
-          siblingCount={1}
-          color="primary"
-          showFirstButton
-          showLastButton
-          onChange={(e, page) => onPageChange(page)}
-        />
-      </div>
+      {!disablePagination && (
+        <div className="pagination-container">
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            boundaryCount={1}
+            siblingCount={1}
+            color="primary"
+            showFirstButton
+            showLastButton
+            onChange={(e, page) => onPageChange(page)}
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -105,36 +105,73 @@
 
     .action-buttons {
       display: flex;
-      align-items: center; /* căn giữa theo chiều dọc */
       justify-content: center;
-      gap: 0.5rem;
+      align-items: center;
 
-      .btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 18px;
-        padding: 8px;
-        border-radius: 8px;
-        transition: 0.25s ease;
-        position: relative;
+      .action-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
 
-        &.edit {
-          color: #1976d2;
-          font-size: 20px;
+        .btn-action {
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-size: 18px;
+          padding: 8px;
+          border-radius: 8px;
+          transition: all 0.25s ease;
+          position: relative;
 
-          &:hover {
-            background-color: rgba(25, 118, 210, 0.1);
-            animation: shake 0.3s ease-in-out;
+          &.detail {
+            color: #388e3c; // xanh lá
+            font-size: 20px;
+
+            &:hover {
+              background-color: rgba(56, 142, 60, 0.1);
+              animation: shake 0.3s ease-in-out;
+            }
           }
-        }
 
-        &.delete {
-          color: #d32f2f;
+          &.pay {
+            color: #f9a825; // vàng gold
+            font-size: 20px;
 
-          &:hover {
-            background-color: rgba(211, 47, 47, 0.1);
-            animation: shake 0.3s ease-in-out;
+            &:hover {
+              background-color: rgba(249, 168, 37, 0.1);
+              animation: shake 0.3s ease-in-out;
+            }
+          }
+
+          &.cancel {
+            color: #6a1b9a; // tím
+            font-size: 20px;
+
+            &:hover {
+              background-color: rgba(106, 27, 154, 0.1);
+              animation: shake 0.3s ease-in-out;
+            }
+          }
+
+          &.edit {
+            color: #1976d2;
+            font-size: 20px;
+
+            &:hover {
+              background-color: rgba(25, 118, 210, 0.1);
+              animation: shake 0.3s ease-in-out;
+            }
+          }
+
+          &.delete {
+            color: #d32f2f;
+            font-size: 20px;
+
+            &:hover {
+              background-color: rgba(211, 47, 47, 0.1);
+              animation: shake 0.3s ease-in-out;
+            }
           }
         }
       }
@@ -152,6 +189,54 @@
     text-align: center;
     color: #999;
     font-style: italic;
+  }
+}
+.scrollable-table {
+  max-height: 60vh; // chiều cao tối đa table trong modal
+  overflow-y: auto;
+  padding-top: 0;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      position: sticky;
+      top: 0;
+      background-color: #1976d2;
+      color: #fff;
+      z-index: 1;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
+
+    tbody tr:hover {
+      background-color: #e0f0ff;
+    }
+
+    .status-badge {
+      padding: 0.3rem 0.6rem;
+      border-radius: 12px;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 0.3rem;
+      .btn {
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-size: 18px;
+      }
+    }
   }
 }
 
