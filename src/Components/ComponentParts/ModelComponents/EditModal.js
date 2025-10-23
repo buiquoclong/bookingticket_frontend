@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./ModelComponents.scss";
+import { getCurrentDateTimeLocal } from "../../../Utils/bookingUtils";
 
 const EditModal = ({
   visible,
@@ -8,6 +9,7 @@ const EditModal = ({
   fields = [], // [{ key: "name", label: "Tên", type: "text" }, { key: "startDay", label: "Ngày bắt đầu", type: "datetime" }, ...]
   onSave,
   onCancel,
+  onFieldChange,
 }) => {
   const [formData, setFormData] = useState({});
   const inputRefs = useRef({});
@@ -35,8 +37,21 @@ const EditModal = ({
           newData.routeId = data.route.id;
         }
         // 🔹 Nếu field là kindVehicleId nhưng data chỉ có kindVehicle.id
-        if (field.key === "kindVehicleId" && data.kindVehicle?.id) {
-          newData.kindVehicleId = data.kindVehicle.id;
+        if (
+          field.key === "kindVehicleId" &&
+          (data.kindVehicle?.id || data.vehicle?.kindVehicle?.id)
+        ) {
+          newData.kindVehicleId =
+            data.kindVehicle?.id || data.vehicle?.kindVehicle?.id;
+        }
+        // ✅ Map tên xe (vehicle)
+        if (field.key === "vehicleId" && data.vehicle?.id) {
+          newData.vehicleId = data.vehicle.id;
+        }
+
+        // ✅ Map tài xế
+        if (field.key === "driverId" && data.driver?.id) {
+          newData.driverId = data.driver.id;
         }
 
         // 🔹 Chuyển datetime ISO sang input
@@ -71,7 +86,22 @@ const EditModal = ({
           cities.find((c) => c.id === parseInt(updated.diemden))?.name ?? "";
         updated.name = `${diemDiName} - ${diemDenName}`;
       }
+      if (key === "price") {
+        // Loại bỏ tất cả ký tự không phải số
+        const numericValue = value.toString().replace(/\D/g, "");
+        updated[key] = numericValue;
+      } else {
+        updated[key] = value;
+      }
+      if (onFieldChange) {
+        // lấy dayStart hiện tại: nếu key đang thay đổi là "dayStart" thì lấy value mới, còn không lấy formData.dayStart
+        const currentDayStart = key === "dayStart" ? value : formData.dayStart;
 
+        // chỉ gọi nếu dayStart hợp lệ
+        if (currentDayStart) {
+          onFieldChange(key, value, currentDayStart);
+        }
+      }
       return updated;
     });
   };
@@ -87,7 +117,10 @@ const EditModal = ({
     }
     onSave(finalData);
   };
-
+  const formatPrice = (value) => {
+    if (!value) return "";
+    return new Intl.NumberFormat("vi-VN").format(value);
+  };
   return (
     <div className="edit-modal-overlay">
       <div className="edit-modal-content">
@@ -182,6 +215,25 @@ const EditModal = ({
                       style={{ cursor: "pointer" }}
                     />
                   </div>
+                ) : field.type === "date" ? (
+                  <input
+                    type="date"
+                    min={getCurrentDateTimeLocal()}
+                    value={formData[field.key] || ""}
+                    onChange={(e) => handleChange(field.key, e.target.value)}
+                  />
+                ) : field.type === "time" ? (
+                  <input
+                    type="time"
+                    value={formData[field.key] || ""}
+                    onChange={(e) => handleChange(field.key, e.target.value)}
+                  />
+                ) : field.key === "price" ? (
+                  <input
+                    type="text"
+                    value={formatPrice(formData.price)}
+                    onChange={(e) => handleChange("price", e.target.value)}
+                  />
                 ) : (
                   <input
                     type="text"

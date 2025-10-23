@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./ModelComponents.scss";
+import { getCurrentDateTimeLocal } from "../../../Utils/bookingUtils";
 
 const AddModal = ({
   visible,
@@ -8,6 +9,7 @@ const AddModal = ({
   onSave,
   onCancel,
   defaultValues = {}, // { status: 1 }
+  onFieldChange,
 }) => {
   const [formData, setFormData] = useState({});
   const inputRefs = useRef({});
@@ -65,6 +67,22 @@ const AddModal = ({
           cities.find((c) => c.id === parseInt(updated.diemden))?.name ?? "";
         updated.name = `${diemDiName} - ${diemDenName}`;
       }
+      if (key === "price") {
+        // Loại bỏ tất cả ký tự không phải số
+        const numericValue = value.toString().replace(/\D/g, "");
+        updated[key] = numericValue;
+      } else {
+        updated[key] = value;
+      }
+      if (onFieldChange) {
+        // lấy dayStart hiện tại: nếu key đang thay đổi là "dayStart" thì lấy value mới, còn không lấy formData.dayStart
+        const currentDayStart = key === "dayStart" ? value : formData.dayStart;
+
+        // chỉ gọi nếu dayStart hợp lệ
+        if (currentDayStart) {
+          onFieldChange(key, value, currentDayStart);
+        }
+      }
 
       return updated;
     });
@@ -80,7 +98,10 @@ const AddModal = ({
     }
     onSave(finalData);
   };
-
+  const formatPrice = (value) => {
+    if (!value) return "";
+    return new Intl.NumberFormat("vi-VN").format(value);
+  };
   return (
     <div className="edit-modal-overlay">
       <div className="edit-modal-content">
@@ -175,6 +196,25 @@ const AddModal = ({
                       style={{ cursor: "pointer" }}
                     />
                   </div>
+                ) : field.type === "date" ? (
+                  <input
+                    type="date"
+                    min={getCurrentDateTimeLocal()}
+                    value={formData[field.key] || ""}
+                    onChange={(e) => handleChange(field.key, e.target.value)}
+                  />
+                ) : field.type === "time" ? (
+                  <input
+                    type="time"
+                    value={formData[field.key] || ""}
+                    onChange={(e) => handleChange(field.key, e.target.value)}
+                  />
+                ) : field.key === "price" ? (
+                  <input
+                    type="text"
+                    value={formatPrice(formData.price)}
+                    onChange={(e) => handleChange("price", e.target.value)}
+                  />
                 ) : (
                   <input
                     type="text"

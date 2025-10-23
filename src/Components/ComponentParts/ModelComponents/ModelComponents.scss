@@ -400,7 +400,58 @@
   }
 }
 
-/* ============ ADD MODAL ============ */
+/* ============ DETAIL MODAL ============ */
+.detail-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.detail-modal-dialog {
+  background-color: #fff;
+  border-radius: 10px;
+  width: 70%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.detail-modal-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.detail-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+
+  h2 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+
+  .close-btn {
+    font-size: 1.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+}
+
+.detail-modal-body {
+  flex: 1;
+  padding: 15px 20px;
+  overflow-y: auto; // scroll nếu dữ liệu dài
+}
 
 /* === Animations === */
 @keyframes fadeIn {
