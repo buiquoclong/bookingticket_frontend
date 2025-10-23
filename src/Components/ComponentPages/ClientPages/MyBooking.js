@@ -259,6 +259,7 @@ const MyBooking = () => {
       {isDetailVisible && selectedBookingDetail && (
         <div className="modal-detail">
           <div className="modal-content-detail">
+            {/* Header chỉ để tiêu đề và nút đóng */}
             <div className="modal-header">
               <h3>Chi tiết vé</h3>
               <button className="close-btn" onClick={handleCloseDetail}>
@@ -266,18 +267,20 @@ const MyBooking = () => {
               </button>
             </div>
 
+            {/* Body */}
             <div className="modal-body">
+              {/* ✅ Đưa phần “Một chiều / Khứ hồi” vào trong body */}
+              <div className="ticket-kind">
+                <strong>Loại vé:</strong>{" "}
+                <span className="kind-label">
+                  {selectedBookingKind === 0 ? "Một chiều" : "Khứ hồi"}
+                </span>
+              </div>
+
               <div className="tickets-container">
                 {selectedBookingDetail.map((ticket) => (
                   <div key={ticket.id} className="booking-ticket">
-                    <BookingTicketInfo
-                      kind={
-                        selectedBookingKind === 0
-                          ? "one_way_ticket"
-                          : "round_trip_ticket"
-                      }
-                      data={[ticket]}
-                    />
+                    <BookingTicketInfo data={[ticket]} />
                   </div>
                 ))}
               </div>
