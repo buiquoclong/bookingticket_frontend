@@ -180,7 +180,7 @@ const AdminTable = ({
                         </Tooltip>
                       )}
 
-                      {onCancel && (
+                      {onCancel && item.isPaid !== 2 && (
                         <Tooltip title="Hủy" arrow>
                           <button
                             className="btn-action cancel"
