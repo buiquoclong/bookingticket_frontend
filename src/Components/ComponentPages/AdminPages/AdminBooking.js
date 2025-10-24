@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
-import DataTable from "react-data-table-component";
-// import "../AdminBooking/AdminBooking.scss"
 import { toast } from "react-toastify";
-import { Pagination, Breadcrumbs, Link } from "@mui/material";
-import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
+import AdminTable from "../../ComponentParts/AdminComponents/AdminTable";
+import { bookingColumn, bookingFieldSearch } from "../../../Utils/bookingUtils";
+import BookingTicketInfo from "../../ComponentParts/TicketInfoComponents/BookingTicketInfo";
+
+import ConfirmDeleteModal from "../../ComponentParts/ModelComponents/ConfirmDeleteModal";
+import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
+import { sendRequest } from "../../../Utils/apiHelper";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 
 const AdminBooking = () => {
   const [isDetail, setIsDetail] = useState(false);
@@ -13,735 +17,25 @@ const AdminBooking = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [isCancelConfirmVisible, setIsCancelConfirmVisible] = useState(false);
   const [bookingToCancel, setBookingToCancel] = useState(null);
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-  function formatDate1(dateString) {
-    const date = new Date(dateString);
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
 
-    // Đảm bảo rằng các giá trị có hai chữ số
-    const formattedHours = hours < 10 ? "0" + hours : hours;
-    const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
-    const formattedDay = day < 10 ? "0" + day : day;
-    const formattedMonth = month < 10 ? "0" + month : month;
-
-    return `${formattedHours}:${formattedMinutes} ${formattedDay}/${formattedMonth}/${year}`;
-  }
+  const [selectedBookingKind, setSelectedBookingKind] = useState(0);
 
   const [searchCriteria, setSearchCriteria] = useState("email");
   const [searchValue, setSearchValue] = useState("");
-  const columns = [
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          ID
-        </div>
-      ),
-      selector: (row) => row.id,
-      width: "3rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.id}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Người đặt
-        </div>
-      ),
-      selector: (row) => row.userName,
-      width: "8rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.userName}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Email
-        </div>
-      ),
-      selector: (row) => row.email,
-      width: "9rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.email}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Số điện thoại
-        </div>
-      ),
-      selector: (row) => row.phone,
-      width: "6rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.phone}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Ngày đặt
-        </div>
-      ),
-      selector: (row) => row.dayBook,
-      width: "9rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {formatDate1(row.dayBook)}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Tổng tiền
-        </div>
-      ),
-      selector: (row) => row.total,
-      width: "6rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.total.toLocaleString("vi-VN")}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Hình thức thanh toán
-        </div>
-      ),
-      selector: (row) => row.kindPay,
-      width: "8rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.kindPay}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Đặt vé
-        </div>
-      ),
-      selector: (row) => row.roundTrip,
-      width: "6rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {roundTrip[row.roundTrip] || "Unknown roundTrip"}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Trạng thái
-        </div>
-      ),
-      selector: (row) => row.isPaid,
-      width: "7rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {isPaid[row.isPaid] || "Unknown isPaid"}
-        </div>
-      ),
-    },
-    {
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.isPaid === 0 && (
-            <>
-              <button
-                style={{
-                  background: "white",
-                  color: "blue",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleDetailClick(row)}
-              >
-                {" "}
-                Chi tiết{" "}
-              </button>{" "}
-              |
-              <button
-                style={{
-                  background: "#3b82f6",
-                  paddingInline: ".3rem",
-                  paddingTop: ".3rem",
-                  paddingBottom: ".3rem",
-                  borderRadius: ".5rem",
-                  color: "white",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-                onClick={() => handlePayClick(row)}
-              >
-                {" "}
-                Thanh toán
-              </button>{" "}
-              |
-              <button
-                style={{
-                  background: "#ef4444",
-                  paddingInline: ".3rem",
-                  paddingTop: ".3rem",
-                  paddingBottom: ".3rem",
-                  borderRadius: ".5rem",
-                  color: "white",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleCancelBookingClick(row)}
-              >
-                {" "}
-                Hủy{" "}
-              </button>
-            </>
-          )}
-          {row.isPaid === 1 && (
-            <>
-              <button
-                style={{
-                  background: "white",
-                  color: "blue",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleDetailClick(row)}
-              >
-                {" "}
-                Chi tiết{" "}
-              </button>{" "}
-              |
-              <button
-                style={{
-                  background: "white",
-                  color: "red",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleCancelBookingClick(row)}
-              >
-                Hủy
-              </button>
-            </>
-          )}
-        </div>
-      ),
-    },
-  ];
-  const columnDetails = [
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          ID
-        </div>
-      ),
-      selector: (row) => row.id,
-      width: "8rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.id}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Chuyến đi
-        </div>
-      ),
-      selector: (row) => row.trip.route.name,
-      width: "10rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.trip.route.name}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Loại xe
-        </div>
-      ),
-      selector: (row) => row.trip.vehicle.kindVehicle.name,
-      width: "9rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.trip.vehicle.kindVehicle.name}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Biển số
-        </div>
-      ),
-      selector: (row) => row.trip.vehicle.vehicleNumber,
-      width: "6rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.trip.vehicle.vehicleNumber}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Thời gian khởi hành{" "}
-        </div>
-      ),
-      width: "10rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "100%",
-          }}
-        >
-          {row.trip.timeStart.slice(0, 5)} - {formatDate(row.trip.dayStart)}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Lượt
-        </div>
-      ),
-      selector: (row) => row.roundTrip,
-      width: "9rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {kindTrip[row.roundTrip] || "Unknown roundTrip"}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Số ghế
-        </div>
-      ),
-      selector: (row) => row.quantity,
-      width: "6rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.quantity}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Tên ghế
-        </div>
-      ),
-      selector: (row) => row.seatName,
-      width: "10rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.seatName}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Tổng tiền
-        </div>
-      ),
-      selector: (row) => row.price,
-      width: "8rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {row.price.toLocaleString("vi-VN")}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Nơi đón
-        </div>
-      ),
-      selector: (row) => row.pointCatch,
-      width: "20rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.pointCatch}
-        </div>
-      ),
-    },
-    {
-      name: (
-        <div
-          style={{
-            color: "blue",
-            fontWeight: "bold",
-            fontSize: "16px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          Ghi chú
-        </div>
-      ),
-      selector: (row) => row.note,
-      width: "7rem",
-      cell: (row) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          {row.note}
-        </div>
-      ),
-    },
-  ];
-  const roundTrip = {
-    0: "Một chiều",
-    1: "Khứ hồi",
-  };
-  const isPaid = {
+
+  const statusMap = {
     0: "Chưa thanh toán",
     1: "Đã thanh toán",
     2: "Đã hủy",
   };
-  const kindTrip = {
-    0: "Lượt đi",
-    1: "Lượt về",
+  const statusColorMap = {
+    0: "#ffa9008a", // Chưa kích hoạt
+    1: "#008000b3", // Đã kích hoạt
+    2: "#ff0000c2", // Tạm khóa
   };
 
   const fetchBookings = useCallback(async () => {
     try {
-      // const response = await fetch(`http://localhost:8081/api/booking/page?page=${page}&size=10`);
       const response = await fetch(
         `http://localhost:8081/api/booking/page?page=${page}&size=5&${searchCriteria}=${searchValue}`
       );
@@ -759,44 +53,28 @@ const AdminBooking = () => {
 
   const handlePayClick = async (booking) => {
     try {
-      const token = localStorage.getItem("token");
       const newBookingData = {
-        userName: booking.userName,
-        email: booking.email,
-        phone: booking.phone,
         isPaid: 1,
       };
 
-      const response = await fetch(
+      // Gọi API qua sendRequest
+      const updatedBooking = await sendRequest(
         `http://localhost:8081/api/booking/${booking.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(newBookingData),
-        }
+        "PUT",
+        newBookingData
       );
 
-      if (response.ok) {
-        // Xử lý thành công
-        toast.success("Hóa đơn đã được cập nhật thành công!");
-        const updatedBooking = await response.json();
-        const updatedBookings = records.map((booking) => {
-          if (booking.id === updatedBooking.id) {
-            return updatedBooking;
-          }
-          return booking;
-        });
-        setRecords(updatedBookings);
-      } else {
-        console.error("Có lỗi xảy ra khi cập nhật Hóa đơn!");
-        toast.error("Có lỗi xảy ra khi cập nhật hóa đơn!");
-      }
+      // ✅ Nếu không lỗi, cập nhật state
+      toast.success("Hóa đơn đã được cập nhật thành công!");
+
+      const updatedBookings = records.map((b) =>
+        b.id === updatedBooking.id ? updatedBooking : b
+      );
+
+      setRecords(updatedBookings);
     } catch (error) {
-      console.error("Lỗi:", error);
-      toast.error("Lỗi:", error);
+      console.error("❌ Lỗi khi thanh toán:", error);
+      toast.error("Có lỗi xảy ra khi cập nhật hóa đơn!");
     }
   };
 
@@ -806,142 +84,43 @@ const AdminBooking = () => {
       .then((response) => response.json())
       .then((data) => {
         setBookingDetails(data);
+        console.log("Booking details:", data);
       })
       .catch((error) => {
         console.error("Error:", error);
       });
+
+    setSelectedBookingKind(booking.roundTrip); // 0 hoặc 1
     setIsDetail(true);
   };
   const handleOutsideClick = (e) => {
     // Đóng modal khi click vào phần tử có class 'modal'
-    if (e.target.classList.contains("modal")) {
+    if (e.target.classList.contains("modal-detail")) {
       setIsDetail(false);
     }
   };
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const handleCloseDetail = () => {
+    setIsDetail(false);
+    setBookingDetails(null);
   };
+
   const cancelBooking = async () => {
     const bookingId = bookingToCancel.id;
 
     try {
-      const response = await fetch(
-        `http://localhost:8081/api/seat_reservation/booking/${bookingId}`,
-        {
-          method: "DELETE",
-        }
+      const canceled = await sendRequest(
+        `http://localhost:8081/api/booking/cancel/${bookingId}`,
+        "PUT"
       );
-      if (!response.ok) {
-        toast.error("Failed to delete booking");
-      }
-      // update emptyseat
-      try {
-        // Fetch booking details
-        const bookingDetailResponse = await fetch(
-          `http://localhost:8081/api/booking_detail/booking/${bookingId}`
-        );
-        const bookingDetails = await bookingDetailResponse.json();
-        console.log("Booking details:", bookingDetails);
 
-        // Duyệt qua từng chi tiết booking
-        for (const bookingDetail of bookingDetails) {
-          // Lấy thông tin trip và quantity từ booking detail
-          const tripId = bookingDetail.trip.id;
-          const quantity = bookingDetail.quantity;
-
-          // Fetch thông tin chi tiết của chuyến đi (trip)
-          const tripResponse = await fetch(
-            `http://localhost:8081/api/trip/${tripId}`
-          );
-          const tripData = await tripResponse.json();
-
-          // Cập nhật số ghế trống (emptySeat) của chuyến đi
-          const updatedEmptySeat = tripData.emptySeat + quantity;
-
-          // Cập nhật dữ liệu số ghế trống (emptySeat) trong tripData
-
-          const token = localStorage.getItem("token");
-          const tripUpdate = {
-            routeId: tripData.route.id,
-            vehicleId: tripData.vehicle.id,
-            dayStart: tripData.dayStart,
-            timeStart: tripData.timeStart,
-            price: tripData.price,
-            driverId: tripData.driver.id,
-            emptySeat: updatedEmptySeat,
-            status: tripData.status,
-          };
-
-          // Gửi request PUT/PATCH để cập nhật dữ liệu trên server hoặc lưu trữ lại dữ liệu mới
-          const updateTripResponse = await fetch(
-            `http://localhost:8081/api/trip/${tripId}`,
-            {
-              method: "PUT", // hoặc 'PATCH' tùy vào API của bạn
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify(tripUpdate),
-            }
-          );
-          if (!updateTripResponse.ok) {
-            toast.error("Failed to update trip");
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching booking details:", error);
-      }
-      // update booking
-      try {
-        // Sau khi cập nhật thành công, cập nhật lại booking
-        const token = localStorage.getItem("token");
-        const updateBooking = {
-          userName: bookingToCancel.userName,
-          email: bookingToCancel.email,
-          phone: bookingToCancel.phone,
-          userId: bookingToCancel.user.id,
-          total: bookingToCancel.total,
-          kindPay: bookingToCancel.kindPay,
-          isPaid: 2,
-          roundTrip: bookingToCancel.roundTrip,
-        };
-        const updateBookingResponse = await fetch(
-          `http://localhost:8081/api/booking/${bookingId}`,
-          {
-            method: "PUT", // hoặc 'PATCH' tùy vào API của bạn
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(updateBooking), // Cập nhật trạng thái của booking thành 'cancelled'
-          }
-        );
-
-        if (updateBookingResponse.ok) {
-          // Booking được cập nhật thành công
-          console.log(`Booking with ID ${bookingId} is cancelled successfully`);
-          toast.success("Bạn đã hủy hóa đơn thành công");
-          setIsCancelConfirmVisible(false);
-          const updatedBooking = await updateBookingResponse.json();
-          const updatedReviews = records.map((bookingData) => {
-            if (bookingData.id === updatedBooking.id) {
-              return updatedBooking;
-            }
-            return bookingData;
-          });
-          setRecords(updatedReviews);
-        } else {
-          // Xử lý lỗi nếu có
-          console.error(
-            "Failed to cancel booking:",
-            updateBookingResponse.statusText
-          );
-        }
-      } catch (error) {
-        console.error("Error update:", error);
-      }
+      // setRecords((prev) => prev.filter((record) => record.id !== bookingId));
+      toast.success("Đặt chỗ đã được hủy thành công!");
+      setRecords((prev) =>
+        prev.map((item) => (item.id === canceled.id ? canceled : item))
+      );
+      setIsCancelConfirmVisible(false);
     } catch (error) {
-      console.error("Error deleting booking:", error);
+      console.error("Lỗi khi xóa hóa đơn:", error);
     }
   };
   const handleCancelBookingClick = (booking) => {
@@ -949,137 +128,84 @@ const AdminBooking = () => {
     setIsCancelConfirmVisible(true);
   };
 
-  const NoDataComponent = () => (
-    <div className="emptyData">Không có dữ liệu</div>
-  );
   const handleCriteriaChange = (event) => {
     setSearchCriteria(event.target.value);
   };
   return (
-    <div className="main-container">
-      {/* <section className="main section"> */}
-      <Breadcrumbs aria-label="breadcrumb">
-        <Link underline="hover" color="inherit" href="/admin">
-          Admin
-        </Link>
-        <Link underline="hover" color="inherit" href="/admin/bookings">
-          Hóa đơn
-        </Link>
-      </Breadcrumbs>
+    <>
+      <div className="main-container">
+        <GenericAdminHeader
+          title="Quản lý chuyến đi"
+          breadcrumbLinks={[
+            { label: "Admin", href: "/admin" },
+            { label: "Chuyến đi", href: "/admin/trips" },
+          ]}
+          searchValue={searchValue}
+          setSearchValue={setSearchValue}
+          searchOptions={bookingFieldSearch}
+          searchCriteria={searchCriteria}
+          handleCriteriaChange={handleCriteriaChange}
+        />
 
-      <div className="HisContent">
-        <div className="searchIn">
-          {/* <input type="text" onChange={handleFilter} placeholder="Tìm kiếm" className="findTuyen"/> */}
-          <input
-            type="text"
-            onChange={(e) => setSearchValue(e.target.value)}
-            placeholder={`Tìm kiếm `}
-            value={searchValue}
-            className="findTuyen"
-            style={{ marginRight: "1rem" }}
-          />
-          <FormControl
-            sx={{ minWidth: 150 }}
-            variant="outlined"
-            className="searchCriteria"
-            size="small"
-          >
-            <InputLabel id="search-criteria-label">Tìm kiếm bằng</InputLabel>
-            <Select
-              labelId="search-criteria-label"
-              id="search-criteria"
-              value={searchCriteria}
-              onChange={handleCriteriaChange}
-              label="Tiềm kiếm bằng"
-            >
-              <MenuItem value="userName">Tên</MenuItem>
-              <MenuItem value="email">Email</MenuItem>
-              <MenuItem value="phone">Số điện thoại</MenuItem>
-              <MenuItem value="kindPay">Hình thức thanh toán</MenuItem>
-            </Select>
-          </FormControl>
-        </div>
-        <div className="HistoryTick">
-          <div className="contentTikcet">
-            <div className="title">Quản lý Hóa đơn</div>
-          </div>
-          <div className="devide"></div>
-          <DataTable
-            columns={columns}
-            data={records}
-            noDataComponent={<NoDataComponent />}
-            // pagination
-          ></DataTable>
-          <Pagination
-            count={totalPages}
-            boundaryCount={1}
-            siblingCount={1}
-            color="primary"
-            showFirstButton
-            showLastButton
-            style={{ float: "right", padding: "1rem" }}
-            page={page}
-            onChange={handleChangePage}
-          />
-        </div>
-      </div>
-
-      {isDetail && (
-        <div className="modal" id="deleteModal" onClick={handleOutsideClick}>
-          <div className="modal-dialog" style={{ width: "100%" }}>
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">Chi tiết vé</h2>
-                {/* <button type="button" className="close" onClick={() => setIsDetail(false)}>
-                                    &times;
-                                </button> */}
-              </div>
-              {bookingDetails && (
-                <div className="modal-body">
-                  <DataTable
-                    columns={columnDetails}
-                    data={bookingDetails}
-                    noDataComponent={<NoDataComponent />}
-                  />
-                </div>
-              )}
-            </div>
+        <div className="HisContent">
+          <div className="HistoryTick">
+            <div className="devide"></div>
+            <AdminTable
+              columns={bookingColumn}
+              data={records}
+              onPay={handlePayClick}
+              onCancel={handleCancelBookingClick}
+              onDetail={handleDetailClick} // 👉 thêm dòng này
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              statusColorMap={statusColorMap}
+              statusMap={statusMap}
+            />
           </div>
         </div>
-      )}
-      {isCancelConfirmVisible && (
-        <div className="modal" id="confirmDeleteModal">
-          <div className="modal-dialog">
-            <div className="modal-content">
+
+        <ConfirmDeleteModal
+          visible={isCancelConfirmVisible}
+          message="Bạn có chắc chắn muốn hủy hóa đơn này?"
+          onConfirm={cancelBooking} // khi xác nhận
+          onCancel={() => setIsCancelConfirmVisible(false)} // khi hủy
+          type="delete"
+        />
+        {isDetail && bookingDetails && (
+          <div className="modal-detail" onClick={handleOutsideClick}>
+            <div className="modal-content-detail">
+              {/* Header chỉ để tiêu đề và nút đóng */}
               <div className="modal-header">
-                <h2 className="modal-title">Xác nhận hủy</h2>
+                <h3>Chi tiết vé</h3>
+                <button className="close-btn" onClick={handleCloseDetail}>
+                  &times;
+                </button>
               </div>
+
+              {/* Body */}
               <div className="modal-body">
-                <p className="textConfirm">
-                  Bạn có chắc chắn muốn hủy hóa đơn này?
-                </p>
-                <div className="listButton">
-                  <button
-                    type="button"
-                    onClick={() => setIsCancelConfirmVisible(false)}
-                    className="cancel"
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="button"
-                    className="save"
-                    onClick={cancelBooking}
-                  >
-                    Xác nhận hủy
-                  </button>
+                {/* ✅ Đưa phần “Một chiều / Khứ hồi” vào trong body */}
+                <div className="ticket-kind">
+                  <strong>Loại vé:</strong>{" "}
+                  <span className="kind-label">
+                    {selectedBookingKind === 0 ? "Một chiều" : "Khứ hồi"}
+                  </span>
+                </div>
+
+                <div className="tickets-container">
+                  {bookingDetails.map((ticket) => (
+                    <div key={ticket.id} className="booking-ticket">
+                      <BookingTicketInfo data={[ticket]} />
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 export default AdminBooking;
