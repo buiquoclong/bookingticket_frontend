@@ -1,18 +1,17 @@
 import "./TicketInfoComponents.scss";
 import { formatDate } from "../../../Utils/bookingUtils";
 
-const BookingTicketInfo = ({ kind, data }) => {
+const BookingTicketInfo = ({ data }) => {
   if (!data || data.length === 0) return null;
-
   return (
     <div className="booking-ticket-wrapper">
-      <h2 className="ticket-title">
-        {kind === "Một chiều" ? "Vé Một Chiều" : "Vé Khứ Hồi"}
-      </h2>
-
       <div className="ticket-grid">
         {data.map((detail) => (
           <div className="ticket-card" key={detail.id}>
+            <h2 className="ticket-title">
+              {detail.roundTrip === 0 ? "Lượt đi" : "Lượt về"}
+            </h2>
+
             <div className="ticket-header">
               <h3>Mã vé: {detail.id}</h3>
               <span className="trip-name">{detail.trip.route.name}</span>
