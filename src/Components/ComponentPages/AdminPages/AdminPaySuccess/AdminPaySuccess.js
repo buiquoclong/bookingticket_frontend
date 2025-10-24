@@ -1,15 +1,14 @@
 import React, { useCallback, useState, useEffect } from "react";
 import "./AdminPaySuccess.scss";
 import { Link, useLocation } from "react-router-dom";
-import CheckCircleSharpIcon from "@mui/icons-material/CheckCircleSharp";
+import BookingTicketInfo from "../../../ComponentParts/TicketInfoComponents/BookingTicketInfo";
 
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 function AdminPaySuccess() {
   const location = useLocation();
-  const { bookingId, kind } = location.state || {};
-  console.log(kind);
+  const { bookingId } = location.state || {};
   const [data, setData] = useState(null);
-  // const orderId = 1;
-  console.log("bookingId", bookingId);
+  // const [loading, setLoading] = useState(true);
 
   // const [orders, setsetOrders] = useState([]);
 
@@ -17,7 +16,6 @@ function AdminPaySuccess() {
     fetch(`http://localhost:8081/api/booking_detail/booking/${bookingId}`)
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setData(data);
       })
       .catch((error) => {
@@ -29,135 +27,39 @@ function AdminPaySuccess() {
     fetchBookingDetail();
   }, [fetchBookingDetail]);
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
   return (
-    <main className="main-container">
-      <div className="paySuccess">
-        <div className="imgsucces">
-          <CheckCircleSharpIcon className="icon" />
-        </div>
-        <div className="content">
-          <div className="titlePay">Mua vé thành công</div>
-        </div>
-        <div className="detailbooking">
-          <div className="title">THÔNG TIN MUA VÉ</div>
-          <div className="devide"></div>
-          <div className="infoTicket">
-            {kind === "Một chiều" && (
-              <div className="detailBoooking">
-                {data &&
-                  data.map((detail) => (
-                    <div className="infoBookingTicket" key={detail.id}>
-                      <h3>Mã vé: {detail.id}</h3>
-                      <div className="lineInfo">
-                        <span>Tuyến:</span>
-                        <div className="rightInfo">
-                          <span>{detail.trip.route.name}</span>
-                        </div>
-                      </div>
-                      <div className="lineInfo">
-                        <span>Loại xe:</span>
-                        <div className="rightInfo">
-                          <span>{detail.trip.vehicle.kindVehicle.name}</span>
-                        </div>
-                      </div>
-                      <div className="lineInfo">
-                        <span>Ngày:</span>
-                        <div className="rightInfo">
-                          <span>{formatDate(detail.trip.dayStart)}</span>
-                        </div>
-                      </div>
-                      <div className="lineInfo">
-                        <span>Thời gian:</span>
-                        <div className="rightInfo">
-                          <span>{detail.trip.timeStart.slice(0, 5)}</span>
-                        </div>
-                      </div>
-                      <div className="lineInfo">
-                        <span>Số ghế:</span>
-                        <div className="seatInfo">
-                          <span>{detail.seatName}</span>
-                        </div>
-                      </div>
-                      <div className="lineInfo">
-                        <span>Giá:</span>
-                        <div className="rightInfo">
-                          <span>{detail.price.toLocaleString("vi-VN")}VND</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            )}
+    <>
+      <section className="pay-success container section">
+        <div className="success-card">
+          <div className="success-content">
+            <div className="icon-wrapper">
+              <CheckCircleOutlineIcon className="success-icon" />
+              <span className="icon-shadow"></span>
+            </div>
 
-            {kind === "Khứ hồi" && (
-              <div className="detailBoooking">
-                {data &&
-                  data.map((detail) => (
-                    <div className="infoBookingTicket" key={detail.id}>
-                      <h3>Mã vé: {detail.id}</h3>
-                      <div className="lineInfo">
-                        <span>Tuyến:</span>
-                        <div className="rightInfo">
-                          <span>{detail.trip.route.name}</span>
-                        </div>
-                      </div>
-                      <div className="lineInfo">
-                        <span>Loại xe:</span>
-                        <div className="rightInfo">
-                          <span>{detail.trip.vehicle.kindVehicle.name}</span>
-                        </div>
-                      </div>
-                      <div className="lineInfo">
-                        <span>Ngày:</span>
-                        <div className="rightInfo">
-                          <span>{formatDate(detail.trip.dayStart)}</span>
-                        </div>
-                      </div>
-                      <div className="lineInfo">
-                        <span>Thời gian:</span>
-                        <div className="rightInfo">
-                          <span>{detail.trip.timeStart.slice(0, 5)}</span>
-                        </div>
-                      </div>
-                      <div className="lineInfo">
-                        <span>Số ghế:</span>
-                        <div className="rightInfo">
-                          <span>{data.quantity}</span>
-                        </div>
-                      </div>
-                      <div className="lineInfo">
-                        <span>Ghế đã đặt:</span>
-                        <div className="seatInfo">
-                          <span>{detail.seatName}</span>
-                        </div>
-                      </div>
-                      <div className="lineInfo">
-                        <span>Giá:</span>
-                        <div className="rightInfo">
-                          <span>{detail.price.toLocaleString("vi-VN")}VND</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            )}
+            <div className="text-center">
+              <h2 className="success-title">Mua vé thành công</h2>
+            </div>
           </div>
-          <div className="devide"></div>
-          <div className="backhome">
-            <Link to="/admin">
-              <button className="btn backhomebtn">Trở về</button>
-            </Link>
+
+          <div className="booking-info-card">
+            <h3 className="section-title">THÔNG TIN MUA VÉ</h3>
+
+            <div className="ticket-section">
+              <BookingTicketInfo data={data} />
+            </div>
+
+            <div className="divider" />
+
+            <div className="backhome">
+              <Link to="/admin/book-ticket">
+                <button className="btn backhome-btn">Trở về trang chủ</button>
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </section>
+    </>
   );
 }
 

@@ -328,7 +328,7 @@ const AdminPay = () => {
         toast.success("Đặt vé thành công! Mail xác nhận đã được gửi.");
 
         setTimeout(() => {
-          navigate("/pay-success", {
+          navigate("/admin/book-cash-payment", {
             state: { bookingId: createdBooking.id, kind },
           });
         }, 1500);
