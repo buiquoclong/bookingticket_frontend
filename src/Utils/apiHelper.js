@@ -31,13 +31,21 @@ export const sendRequest = async (url, method = "GET", body = null) => {
   const token = localStorage.getItem("token");
 
   try {
+    // Xác định header
+    const headers = {};
+    if (!(body instanceof FormData)) {
+      // Nếu body không phải FormData → JSON
+      headers["Content-Type"] = "application/json";
+    }
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, {
       method,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      body: body ? JSON.stringify(body) : null,
+      headers,
+      body:
+        body instanceof FormData ? body : body ? JSON.stringify(body) : null,
     });
 
     if (!response.ok) {
