@@ -6,6 +6,8 @@ import { toast } from "react-toastify";
 // import TicketCard from "../../../ComponentParts/TicketCard";
 import TicketCard from "../../ComponentParts/TicketInfoComponents/TicketCard";
 import RatingModal from "../../ComponentParts/ModelComponents/RatingModal";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 
 const TicketHistory = () => {
   const [tickets, setTickets] = useState([]);
@@ -17,7 +19,7 @@ const TicketHistory = () => {
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [rating, setRating] = useState(0);
   const [content, setContent] = useState("");
-
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
 
@@ -29,6 +31,7 @@ const TicketHistory = () => {
   // --- FETCH DATA ---
   const fetchBookingDetails = useCallback(async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(
         `http://localhost:8081/api/booking_detail/user/${userId}/booking_details/page?page=${page}&size=9&id=${ticketId}`
       );
@@ -37,6 +40,8 @@ const TicketHistory = () => {
       setTotalPages(data.totalPages);
     } catch (error) {
       console.error("Error fetching detail:", error);
+    } finally {
+      setIsLoading(false);
     }
   }, [userId, page, ticketId]);
 
@@ -61,37 +66,36 @@ const TicketHistory = () => {
 
   const handleCreateRating = async (e) => {
     e.preventDefault();
-    if (!rating) return toast.error("Vui lòng chọn số sao!");
+
+    // ✅ Kiểm tra dữ liệu đầu vào
+    const valid = validateFields({
+      rating,
+      content,
+      tripId: selectedTrip?.id,
+      userId: userId,
+    });
+
+    if (!valid) return;
+
+    const newRating = {
+      tripId: selectedTrip.id,
+      userId,
+      rating,
+      content,
+    };
 
     try {
-      const token = localStorage.getItem("token");
-      const newRating = {
-        tripId: selectedTrip.id,
-        userId: userId,
-        rating: rating,
-        content: content,
-      };
+      // ✅ Gọi API qua helper
+      await sendRequest("http://localhost:8081/api/review", "POST", newRating);
 
-      const response = await fetch("http://localhost:8081/api/review", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newRating),
-      });
-
-      if (response.ok) {
-        toast.success("Đánh giá thành công!");
-        setRating(0);
-        setContent("");
-        setIsRating(false);
-      } else {
-        toast.error("Có lỗi xảy ra khi đánh giá!");
-      }
+      // ✅ Xử lý khi thành công
+      toast.success("Đánh giá thành công!");
+      setRating(0);
+      setContent("");
+      setIsRating(false);
     } catch (error) {
-      console.error(error);
-      toast.error("Lỗi hệ thống!");
+      // ❌ sendRequest() đã hiển thị toast lỗi, nên chỉ log thêm nếu cần
+      console.error("❌ Lỗi khi tạo đánh giá:", error);
     }
   };
 
@@ -103,6 +107,7 @@ const TicketHistory = () => {
 
   return (
     <div className="ticket-history-wrapper">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       {/* Search luôn hiện */}
       <div className="search-area">
         <input

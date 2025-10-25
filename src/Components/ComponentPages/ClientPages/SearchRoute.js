@@ -4,6 +4,7 @@ import { FaBus } from "react-icons/fa";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import "../../../Assets/scss/Clients/SearchRoute.scss";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 
 const SearchRoute = () => {
   const [data, setData] = useState([]);
@@ -11,6 +12,7 @@ const SearchRoute = () => {
   const [startFilter, setStartFilter] = useState("");
   const [endFilter, setEndFilter] = useState("");
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchRoutes();
@@ -18,6 +20,7 @@ const SearchRoute = () => {
 
   const fetchRoutes = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch("http://localhost:8081/api/route/active");
       const routes = await response.json();
       const routesWithPrice = routes.map((r) => ({
@@ -28,6 +31,8 @@ const SearchRoute = () => {
       setRecords(routesWithPrice);
     } catch (error) {
       console.error("Error fetching routes:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -67,6 +72,7 @@ const SearchRoute = () => {
 
   return (
     <section className="search-route-container">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       <div className="filters">
         <input
           type="text"

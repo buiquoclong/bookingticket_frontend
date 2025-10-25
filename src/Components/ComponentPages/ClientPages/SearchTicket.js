@@ -3,13 +3,14 @@ import "../../../Assets/scss/Clients/SearchTicket.scss";
 import { toast } from "react-toastify";
 import BookingTicketInfo from "../../ComponentParts/TicketInfoComponents/BookingTicketInfo";
 import { FaSearch } from "react-icons/fa";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 
 const SearchTicket = () => {
   const [ticketCode, setTicketCode] = useState("");
   const [ticketCodeErrorMessage, setTicketCodeErrorMessage] = useState("");
   const [data, setData] = useState([]);
   const [isSearch, setIsSearch] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleTicketCodeChange = (e) => {
     const value = e.target.value.trimStart();
@@ -39,7 +40,7 @@ const SearchTicket = () => {
     }
 
     try {
-      setLoading(true); // bắt đầu loading
+      setIsLoading(true); // bắt đầu loading
       setIsSearch(false);
       setData([]);
 
@@ -66,11 +67,12 @@ const SearchTicket = () => {
       console.error(error);
       toast.error("Không thể kết nối đến máy chủ");
     } finally {
-      setLoading(false); // dừng loading
+      setIsLoading(false); // dừng loading
     }
   };
   return (
     <section className="ticket-lookup container section">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       <div className="ticket-lookup__card">
         <h3 data-aos="fade-right" className="ticket-lookup__title">
           Tra cứu thông tin đặt vé
@@ -98,14 +100,7 @@ const SearchTicket = () => {
         </form>
       </div>
 
-      {loading && (
-        <div className="loading">
-          <div className="loading__spinner"></div>
-          <span className="loading__text">Đang tải dữ liệu...</span>
-        </div>
-      )}
-
-      {!loading && isSearch && data.length > 0 && (
+      {!isLoading && isSearch && data.length > 0 && (
         <div className="ticket-lookup__result">
           <BookingTicketInfo
             kind={data[0]?.roundTrip === 1 ? "Khứ hồi" : "Một chiều"}
