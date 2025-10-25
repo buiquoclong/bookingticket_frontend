@@ -4,6 +4,8 @@ import Aos from "aos";
 import "aos/dist/aos.css";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 
 const Contact = () => {
   const [name, setName] = useState("");
@@ -11,6 +13,7 @@ const Contact = () => {
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -30,67 +33,49 @@ const Contact = () => {
 
   const handleCreateContact = async (e) => {
     e.preventDefault();
-    let missingInfo = [];
-    if (!name) {
-      missingInfo.push("Họ tên");
-    }
-    if (!email) {
-      missingInfo.push("Email");
-    } else if (emailErrorMessage) {
-      // Kiểm tra nếu có errorMessage cho email
-      toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
-      return; // Dừng xử lý tiếp theo nếu có lỗi
-    }
-    if (!title) {
-      missingInfo.push("Tiêu đề");
-    }
-    if (!content) {
-      missingInfo.push("Nội dung");
-    }
-    if (missingInfo.length > 0) {
-      const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
-        ",  "
-      )}`;
-      toast.error(message);
-    } else {
-      try {
-        const newContactData = {
-          content: content,
-          email: email,
-          name: name,
-          title: title,
-        };
 
-        const response = await fetch("http://localhost:8081/api/contact", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newContactData),
-        });
+    // ✅ Kiểm tra các field bắt buộc
+    if (
+      !validateFields({
+        "Họ tên": name,
+        Email: email,
+        "Tiêu đề": title,
+        "Nội dung": content,
+      })
+    )
+      return;
 
-        if (response.ok) {
-          // Xử lý thành công
-          console.log("Contact đã được tạo thành công!");
-          toast.success("Contact đã được tạo thành công!");
+    // ✅ Kiểm tra lỗi email riêng
+    if (emailErrorMessage) {
+      toast.error(emailErrorMessage);
+      return;
+    }
 
-          setTimeout(() => {
-            navigate("/");
-          }, 1000);
+    const newContactData = { name, email, title, content };
 
-          // Reset form hoặc làm gì đó khác
-          setName("");
-          setEmail("");
-          setTitle("");
-          setContent("");
-        } else {
-          console.error("Có lỗi xảy ra khi tạo contact!");
-          toast.error("Có lỗi xảy ra khi tạo contact!");
-        }
-      } catch (error) {
-        console.error("Lỗi:", error);
-        toast.error("Lỗi:", error);
-      }
+    try {
+      setIsLoading(true);
+
+      await sendRequest(
+        "http://localhost:8081/api/contact",
+        "POST",
+        newContactData
+      );
+
+      toast.success("Contact đã được tạo thành công!");
+      setName("");
+      setEmail("");
+      setTitle("");
+      setContent("");
+
+      // ✅ Điều hướng sau 1 giây
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (error) {
+      console.error("❌ Lỗi khi tạo contact:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
   useEffect(() => {
@@ -99,6 +84,7 @@ const Contact = () => {
   }, []);
   return (
     <div className="contact-form container">
+      <LoadingBackdrop open={isLoading} message="Đang xử lý yêu cầu..." />
       {/* Info */}
       <div className="contact-info" data-aos="fade-right" data-aos-offset="0">
         <h2>LIÊN HỆ VỚI CHÚNG TÔI</h2>

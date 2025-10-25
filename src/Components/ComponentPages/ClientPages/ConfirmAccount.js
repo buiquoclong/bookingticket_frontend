@@ -2,10 +2,12 @@ import React, { useState, useEffect, useCallback } from "react";
 import "../../../Assets/scss/Clients/ConfirmAccount.scss";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 
 const ConfirmAccount = () => {
   const [confirmCode, setConfirmCode] = useState("");
   const [confirmCodeErrorMessage, setConfirmCodeErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const [data, setData] = useState([]);
   const navigate = useNavigate();
@@ -47,6 +49,7 @@ const ConfirmAccount = () => {
     }
 
     try {
+      setIsLoading(true);
       const response = await fetch(
         `http://localhost:8081/api/user/confirm-account`,
         {
@@ -74,6 +77,8 @@ const ConfirmAccount = () => {
     } catch (error) {
       console.error("Error confirming account:", error);
       toast.error("Đã xảy ra lỗi khi xác thực tài khoản");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -81,6 +86,7 @@ const ConfirmAccount = () => {
     event.preventDefault();
 
     try {
+      setIsLoading(true);
       const response = await fetch(
         "http://localhost:8081/api/user/change-confirmCode",
         {
@@ -112,6 +118,8 @@ const ConfirmAccount = () => {
     } catch (error) {
       console.error("Error while sending confirm code:", error);
       toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau!");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -123,6 +131,7 @@ const ConfirmAccount = () => {
 
   return (
     <section className="verify-section container">
+      <LoadingBackdrop open={isLoading} message="Đang xử lý yêu cầu..." />
       <div className="verify-wrapper">
         <div className="verify-header">
           <h3 data-aos="fade-right" className="verify-title">

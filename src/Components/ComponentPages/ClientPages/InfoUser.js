@@ -2,16 +2,20 @@ import React, { useState, useEffect, useCallback } from "react";
 import "../../../Assets/scss/Clients/InfoUser.scss";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 
 const InfoUser = () => {
   const [userData, setUserData] = useState({ name: "", email: "", phone: "" });
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
   const fetchUserInfo = useCallback(async () => {
     if (!userId) return;
 
     try {
+      setIsLoading(true);
       const response = await fetch(`http://localhost:8081/api/user/${userId}`);
       const data = await response.json();
 
@@ -26,6 +30,8 @@ const InfoUser = () => {
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
+    } finally {
+      setIsLoading(false);
     }
   }, [userId]);
 
@@ -63,7 +69,7 @@ const InfoUser = () => {
 
   // Submit/cập nhật user
   const handleUpdateUser = async () => {
-    // Validate tất cả fields
+    // ✅ Kiểm tra lỗi từng field bằng validateField (giữ nguyên logic cũ)
     const newErrors = {};
     Object.keys(userData).forEach((key) => {
       newErrors[key] = validateField(key, userData[key]);
@@ -76,31 +82,32 @@ const InfoUser = () => {
       return;
     }
 
+    // ✅ Kiểm tra các field bắt buộc có giá trị (dùng helper)
+    if (
+      !validateFields({
+        "Họ và tên": userData.name,
+        "Số điện thoại": userData.phone,
+        Email: userData.email,
+      })
+    )
+      return;
+
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
+      setIsLoading(true);
+
+      // ✅ Gửi request PUT bằng helper sendRequest
+      await sendRequest(
         `http://localhost:8081/api/user/update/${userId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(userData),
-        }
+        "PUT",
+        userData
       );
 
-      if (response.ok) {
-        console.log("Response status: ok");
-        toast.success("Bạn đã cập nhật thông tin thành công");
-      } else {
-        const resText = await response.text();
-        toast.error(`Cập nhật thất bại: ${resText}`);
-        console.error("Failed to update user:", response.statusText);
-      }
+      toast.success("Bạn đã cập nhật thông tin thành công!");
     } catch (error) {
-      console.error("Error update:", error);
-      toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau!");
+      console.error("❌ Lỗi khi cập nhật thông tin:", error);
+      toast.error("Đã xảy ra lỗi khi cập nhật. Vui lòng thử lại sau!");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -109,104 +116,8 @@ const InfoUser = () => {
   };
 
   return (
-    // <section className="main container section">
-    //   <div className="infoContent">
-    //     <div className="secTitle">
-    //       <h3 data-aos="fade-right" className="title">
-    //         THÔNG TIN CÁ NHÂN
-    //       </h3>
-    //     </div>
-    //     <div className="infoUser">
-    //       <div className="lineInfo">
-    //         <span>Họ và tên:</span>
-    //         <div>
-    //           <input
-    //             type="text"
-    //             name="name"
-    //             className="Note"
-    //             placeholder="Họ và tên"
-    //             value={userData.name}
-    //             onChange={handleChange}
-    //           />
-    //           {errors.name && (
-    //             <p
-    //               style={{
-    //                 color: "red",
-    //                 lineHeight: "1",
-    //                 fontSize: "12px",
-    //                 paddingLeft: ".3rem",
-    //               }}
-    //             >
-    //               {errors.name}
-    //             </p>
-    //           )}
-    //         </div>
-    //       </div>
-
-    //       <div className="lineInfo">
-    //         <span>Số điện thoại:</span>
-    //         <div>
-    //           <input
-    //             type="text"
-    //             name="phone"
-    //             className="Note"
-    //             placeholder="Số điện thoại"
-    //             value={userData.phone}
-    //             onChange={handleChange}
-    //           />
-    //           {errors.phone && (
-    //             <p
-    //               style={{
-    //                 color: "red",
-    //                 lineHeight: "1",
-    //                 fontSize: "12px",
-    //                 paddingLeft: ".3rem",
-    //               }}
-    //             >
-    //               {errors.phone}
-    //             </p>
-    //           )}
-    //         </div>
-    //       </div>
-
-    //       <div className="lineInfo">
-    //         <span>Email:</span>
-    //         <div>
-    //           <input
-    //             type="text"
-    //             name="email"
-    //             className="Note"
-    //             placeholder="Email"
-    //             value={userData.email}
-    //             onChange={handleChange}
-    //           />
-    //           {errors.email && (
-    //             <p
-    //               style={{
-    //                 color: "red",
-    //                 lineHeight: "1",
-    //                 fontSize: "12px",
-    //                 paddingLeft: ".3rem",
-    //               }}
-    //             >
-    //               {errors.email}
-    //             </p>
-    //           )}
-    //         </div>
-    //       </div>
-
-    //       <div className="buttonSaveInfo">
-    //         <button className="btn save" onClick={handleChangePassClick}>
-    //           Đổi mật khẩu
-    //         </button>
-    //         <button className="btn save" onClick={handleUpdateUser}>
-    //           Lưu thay đổi
-    //         </button>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </section>
     <section className="profile-section">
+      <LoadingBackdrop open={isLoading} message="Đang xử lý yêu cầu..." />
       <div className="profile-container">
         <h3 className="profile-title" data-aos="fade-right">
           THÔNG TIN CÁ NHÂN

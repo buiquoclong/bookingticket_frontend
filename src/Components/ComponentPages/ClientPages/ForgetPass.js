@@ -2,10 +2,13 @@ import React, { useState } from "react";
 import "../../../Assets/scss/Clients/ForgetPass.scss";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 
 const ForgetPass = () => {
   const [email, setEmail] = useState("");
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleEmailChange = (event) => {
@@ -38,41 +41,43 @@ const ForgetPass = () => {
   const forgetPass = async (event) => {
     event.preventDefault();
 
-    if (!email) {
-      toast.error("Vui lòng nhập Email");
-      return;
-    }
+    // ✅ Kiểm tra email rỗng
+    if (!validateFields({ Email: email })) return;
 
+    // ✅ Kiểm tra lỗi định dạng email
     if (emailErrorMessage) {
       toast.error(emailErrorMessage);
       return;
     }
 
     try {
-      const response = await fetch(
+      setIsLoading(true);
+
+      // ✅ Gọi API bằng helper chung
+      const result = await sendRequest(
         "http://localhost:8081/api/user/forgot-password",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        }
+        "POST",
+        { email }
       );
 
-      if (!response.ok) {
-        toast.error("Lỗi khi gửi yêu cầu. Vui lòng thử lại sau!");
-        return;
+      // Trường hợp API trả text thay vì JSON (ví dụ: “Đã gửi mail khôi phục”)
+      if (typeof result === "string") {
+        handleForgetResponse(result);
+      } else if (result?.message) {
+        handleForgetResponse(result.message);
+      } else {
+        toast.success("Yêu cầu đặt lại mật khẩu đã được gửi!");
       }
-
-      const result = await response.text();
-      handleForgetResponse(result);
     } catch (error) {
-      console.error("Error while resetting password:", error);
-      toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau!");
+      console.error("❌ Lỗi khi gửi yêu cầu khôi phục mật khẩu:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <section className="forget-password-section">
+      <LoadingBackdrop open={isLoading} message="Đang xử lý yêu cầu..." />
       <div className="forget-password-wrapper">
         <div className="header">
           <h3 className="title">Quên mật khẩu</h3>
