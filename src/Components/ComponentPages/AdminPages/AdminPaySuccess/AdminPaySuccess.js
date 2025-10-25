@@ -2,26 +2,34 @@ import React, { useCallback, useState, useEffect } from "react";
 import "./AdminPaySuccess.scss";
 import { Link, useLocation } from "react-router-dom";
 import BookingTicketInfo from "../../../ComponentParts/TicketInfoComponents/BookingTicketInfo";
-
+import LoadingBackdrop from "../../../ComponentParts/LoadingBackdrop";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 function AdminPaySuccess() {
   const location = useLocation();
   const { bookingId } = location.state || {};
   const [data, setData] = useState(null);
-  // const [loading, setLoading] = useState(true);
-
-  // const [orders, setsetOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchBookingDetail = useCallback(async () => {
-    fetch(`http://localhost:8081/api/booking_detail/booking/${bookingId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setData(data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    setIsLoading(true); // 🔹 Bắt đầu loading
+
+    try {
+      const response = await fetch(
+        `http://localhost:8081/api/booking_detail/booking/${bookingId}`
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      setData(result);
+    } catch (error) {
+      console.error("Error fetching booking details:", error);
+    } finally {
+      setIsLoading(false);
+    }
   }, [bookingId]);
+
   useEffect(() => {
     // Call the API to fetch cities
     fetchBookingDetail();
@@ -30,6 +38,7 @@ function AdminPaySuccess() {
   return (
     <>
       <section className="pay-success container section">
+        <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
         <div className="success-card">
           <div className="success-content">
             <div className="icon-wrapper">

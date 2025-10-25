@@ -19,7 +19,7 @@ const AdminBooking = () => {
   const [bookingToCancel, setBookingToCancel] = useState(null);
 
   const [selectedBookingKind, setSelectedBookingKind] = useState(0);
-
+  const [isLoading, setIsLoading] = useState(false);
   const [searchCriteria, setSearchCriteria] = useState("email");
   const [searchValue, setSearchValue] = useState("");
 
@@ -35,6 +35,7 @@ const AdminBooking = () => {
   };
 
   const fetchBookings = useCallback(async () => {
+    setIsLoading(true);
     try {
       const response = await fetch(
         `http://localhost:8081/api/booking/page?page=${page}&size=5&${searchCriteria}=${searchValue}`
@@ -44,6 +45,8 @@ const AdminBooking = () => {
       setTotalPages(data.totalPages);
     } catch (error) {
       console.error("Error fetching cities:", error);
+    } finally {
+      setIsLoading(false);
     }
   }, [page, searchCriteria, searchValue]);
 
@@ -52,6 +55,7 @@ const AdminBooking = () => {
   }, [fetchBookings]);
 
   const handlePayClick = async (booking) => {
+    setIsLoading(true);
     try {
       const newBookingData = {
         isPaid: 1,
@@ -75,23 +79,36 @@ const AdminBooking = () => {
     } catch (error) {
       console.error("❌ Lỗi khi thanh toán:", error);
       toast.error("Có lỗi xảy ra khi cập nhật hóa đơn!");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleDetailClick = (booking) => {
+  const handleDetailClick = async (booking) => {
     const bookingId = booking.id;
-    fetch(`http://localhost:8081/api/booking_detail/booking/${bookingId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setBookingDetails(data);
-        console.log("Booking details:", data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
 
-    setSelectedBookingKind(booking.roundTrip); // 0 hoặc 1
-    setIsDetail(true);
+    setIsLoading(true); // 🔹 Bắt đầu loading
+
+    try {
+      const response = await fetch(
+        `http://localhost:8081/api/booking_detail/booking/${bookingId}`
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setBookingDetails(data);
+      console.log("Booking details:", data);
+
+      // 🔹 Đặt thông tin lượt đi/lượt về và hiển thị modal
+      setSelectedBookingKind(booking.roundTrip); // 0 hoặc 1
+      setIsDetail(true);
+    } catch (error) {
+      console.error("Error fetching booking details:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
   const handleOutsideClick = (e) => {
     // Đóng modal khi click vào phần tử có class 'modal'
@@ -107,6 +124,7 @@ const AdminBooking = () => {
   const cancelBooking = async () => {
     const bookingId = bookingToCancel.id;
 
+    setIsLoading(true);
     try {
       const canceled = await sendRequest(
         `http://localhost:8081/api/booking/cancel/${bookingId}`,
@@ -121,6 +139,8 @@ const AdminBooking = () => {
       setIsCancelConfirmVisible(false);
     } catch (error) {
       console.error("Lỗi khi xóa hóa đơn:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
   const handleCancelBookingClick = (booking) => {
@@ -134,6 +154,7 @@ const AdminBooking = () => {
   return (
     <>
       <div className="main-container">
+        <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
         <GenericAdminHeader
           title="Quản lý chuyến đi"
           breadcrumbLinks={[

@@ -325,7 +325,7 @@ const AdminPay = () => {
         if (!response.ok) throw new Error("Lỗi khi tạo booking!");
 
         const createdBooking = await response.json();
-        toast.success("Đặt vé thành công! Mail xác nhận đã được gửi.");
+        toast.success("Đặt vé thành công!");
 
         setTimeout(() => {
           navigate("/admin/book-cash-payment", {

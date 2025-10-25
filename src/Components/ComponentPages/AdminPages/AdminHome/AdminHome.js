@@ -20,9 +20,11 @@ import {
   //   Pie,
 } from "recharts";
 import "./AdminHome.scss";
+import LoadingBackdrop from "../../../ComponentParts/LoadingBackdrop";
 
 function AdminHome() {
   // ------------------- State -------------------
+  const [isLoading, setIsLoading] = useState(false);
   const [totalAll, setTotalAll] = useState(0);
   const [totalDay, setTotalDay] = useState(0);
   const [totalMonth, setTotalMonth] = useState(0);
@@ -57,42 +59,52 @@ function AdminHome() {
   // ------------------- useEffect fetch tất cả -------------------
   useEffect(() => {
     const fetchAllData = async () => {
-      const [
-        dayData,
-        monthData,
-        userData,
-        billData,
-        allData,
-        nineMonthData,
-        paidCount,
-        cancelledCount,
-      ] = await Promise.all([
-        fetchData(
-          `http://localhost:8081/api/booking/total-by-day?date=${currentDate}`
-        ),
-        fetchData(
-          `http://localhost:8081/api/booking/total-by-month?yearMonth=${currentMonth}`
-        ),
-        fetchData(`http://localhost:8081/api/user/totalUser`),
-        fetchData(`http://localhost:8081/api/booking/total-bookings`),
-        fetchData(`http://localhost:8081/api/booking/totalAll`),
-        fetchData(`http://localhost:8081/api/booking/total/lastNineMonths`),
-        fetchData(
-          `http://localhost:8081/api/booking/count-paid-by-month?yearMonth=${currentMonth}`
-        ),
-        fetchData(
-          `http://localhost:8081/api/booking/count-cancelled-by-month?yearMonth=${currentMonth}`
-        ),
-      ]);
+      setIsLoading(true); // 🔹 Bắt đầu loading
 
-      setTotalDay(dayData);
-      setTotalMonth(monthData);
-      setTotalUser(userData);
-      setTotalBill(billData);
-      setTotalAll(allData);
-      setTotalNineMonth(nineMonthData);
-      setPaidBookingsCount(paidCount);
-      setCancelledBookingsCount(cancelledCount);
+      try {
+        const [
+          dayData,
+          monthData,
+          userData,
+          billData,
+          allData,
+          nineMonthData,
+          paidCount,
+          cancelledCount,
+        ] = await Promise.all([
+          fetchData(
+            `http://localhost:8081/api/booking/total-by-day?date=${currentDate}`
+          ),
+          fetchData(
+            `http://localhost:8081/api/booking/total-by-month?yearMonth=${currentMonth}`
+          ),
+          fetchData(`http://localhost:8081/api/user/totalUser`),
+          fetchData(`http://localhost:8081/api/booking/total-bookings`),
+          fetchData(`http://localhost:8081/api/booking/totalAll`),
+          fetchData(`http://localhost:8081/api/booking/total/lastNineMonths`),
+          fetchData(
+            `http://localhost:8081/api/booking/count-paid-by-month?yearMonth=${currentMonth}`
+          ),
+          fetchData(
+            `http://localhost:8081/api/booking/count-cancelled-by-month?yearMonth=${currentMonth}`
+          ),
+        ]);
+
+        setTotalDay(dayData);
+        setTotalMonth(monthData);
+        setTotalUser(userData);
+        setTotalBill(billData);
+        setTotalAll(allData);
+        setTotalNineMonth(nineMonthData);
+        setPaidBookingsCount(paidCount);
+        setCancelledBookingsCount(cancelledCount);
+      } catch (error) {
+        console.error("❌ Lỗi khi tải dữ liệu Dashboard:", error);
+      } finally {
+        // ⏳ Nếu muốn chờ 1–2 giây cho hiệu ứng mượt hơn
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        setIsLoading(false); // 🔹 Dừng loading
+      }
     };
 
     fetchAllData();
@@ -115,6 +127,7 @@ function AdminHome() {
   }, []);
   return (
     <main className="main-container">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       <div className="dashboardContent">
         <div className="main-title">
           <h3>Trang quản trị</h3>
