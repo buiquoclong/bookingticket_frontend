@@ -12,7 +12,7 @@ import {
   catchPointFields,
 } from "../../../Utils/bookingUtils";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
-
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 const AdminCatchPoint = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentPoint, setCurrentPoint] = useState({});
@@ -25,6 +25,8 @@ const AdminCatchPoint = () => {
   const [pointToDelete, setPointToDelete] = useState(null);
   const [searchValue, setSearchValue] = useState("");
   const [searchCriteria, setSearchCriteria] = useState("name");
+
+  const [isLoading, setIsLoading] = useState(false);
   const searchDebounce = useDebounce(
     typeof searchValue === "string" ? searchValue.trim() : searchValue,
     500
@@ -64,6 +66,7 @@ const AdminCatchPoint = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoading(true);
         // Sử dụng Promise.all để gọi đồng thời
         const [catchPointsData, routesData] = await Promise.all([
           fetchCatchPoint(searchDebounce, searchCriteria),
@@ -81,6 +84,8 @@ const AdminCatchPoint = () => {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -108,7 +113,9 @@ const AdminCatchPoint = () => {
       name: newCatchPoint.name,
       address: newCatchPoint.address,
     };
+
     try {
+      setIsLoading(true);
       // Gửi request tạo loại xe
       const created = await sendRequest(
         "http://localhost:8081/api/catch-point",
@@ -122,6 +129,8 @@ const AdminCatchPoint = () => {
       setIsAdd(false);
     } catch (error) {
       console.error("Lỗi khi tạo loại điểm đón:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -141,6 +150,7 @@ const AdminCatchPoint = () => {
     };
 
     try {
+      setIsLoading(true);
       const updated = await sendRequest(
         `http://localhost:8081/api/catch-point/${updateCatchPoint.id}`,
         "PUT",
@@ -154,12 +164,15 @@ const AdminCatchPoint = () => {
       setIsEditing(false);
     } catch (error) {
       console.error("Lỗi khi update điểm đón:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
   const removeCatchPoint = async () => {
     const pointId = pointToDelete.id;
 
     try {
+      setIsLoading(true);
       await sendRequest(
         `http://localhost:8081/api/catch-point/${pointId}`,
         "DELETE"
@@ -170,6 +183,8 @@ const AdminCatchPoint = () => {
       setIsDeleteConfirmVisible(false);
     } catch (error) {
       console.error("Lỗi khi xóa điểm đón:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
   const handleRemoveClick = (point) => {
@@ -188,6 +203,7 @@ const AdminCatchPoint = () => {
   });
   return (
     <div className="main-container">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       <GenericAdminHeader
         title="Quản lý điểm đón tuyến"
         breadcrumbLinks={[

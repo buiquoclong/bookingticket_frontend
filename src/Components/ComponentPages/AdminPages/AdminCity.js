@@ -23,6 +23,7 @@ const AdminCity = () => {
   const searchDebounce = useDebounce(searchValue.trim(), 500);
   const fetchCities = useCallback(
     async (searchDebounce) => {
+      setIsLoading(true);
       try {
         const response = await fetch(
           `http://localhost:8081/api/city/page?page=${page}&size=10&name=${searchDebounce}`
@@ -32,6 +33,8 @@ const AdminCity = () => {
       } catch (error) {
         console.error("Error fetching cities:", error);
         return null;
+      } finally {
+        setIsLoading(false);
       }
     },
     [page]

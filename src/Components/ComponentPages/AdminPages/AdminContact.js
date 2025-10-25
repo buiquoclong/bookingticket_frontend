@@ -8,6 +8,7 @@ import AddModal from "../../ComponentParts/ModelComponents/AddModal";
 import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
 import { contactColumn, contactField } from "../../../Utils/bookingUtils";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 
 const AdminContact = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -15,6 +16,7 @@ const AdminContact = () => {
   const [currentContact, setcurrentContact] = useState();
   const [records, setRecords] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
@@ -26,6 +28,7 @@ const AdminContact = () => {
   const fetchContacts = useCallback(
     async (searchDebounce, searchCriteria) => {
       try {
+        setIsLoading(true);
         const response = await fetch(
           `http://localhost:8081/api/contact/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
         );
@@ -34,6 +37,8 @@ const AdminContact = () => {
       } catch (error) {
         console.error("Error fetching contacts:", error);
         return null;
+      } finally {
+        setIsLoading(false);
       }
     },
     [page]
@@ -78,6 +83,7 @@ const AdminContact = () => {
       content: newContact.content,
     };
     try {
+      setIsLoading(true);
       // Gửi request tạo loại xe
       const created = await sendRequest(
         "http://localhost:8081/api/contact",
@@ -91,6 +97,8 @@ const AdminContact = () => {
       setIsAdd(false);
     } catch (error) {
       console.error("Lỗi khi tạo liên hệ:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -132,6 +140,7 @@ const AdminContact = () => {
     const contactId = contactToDelete.id;
 
     try {
+      setIsLoading(true);
       await sendRequest(
         `http://localhost:8081/api/contact/${contactId}`,
         "DELETE"
@@ -142,6 +151,8 @@ const AdminContact = () => {
       setIsDeleteConfirmVisible(false);
     } catch (error) {
       console.error("Lỗi khi xóa liên hệ:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
   const handleRemoveClick = (contact) => {
@@ -153,6 +164,7 @@ const AdminContact = () => {
   };
   return (
     <div className="main-container">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       <GenericAdminHeader
         title="Quản lý liên hệ"
         breadcrumbLinks={[

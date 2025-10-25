@@ -8,7 +8,8 @@ import AddModal from "../../ComponentParts/ModelComponents/AddModal";
 import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
 import { driverFields } from "../../../Utils/bookingUtils";
 import { driverColumn } from "../../../Utils/bookingUtils";
-
+import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 const AdminDriver = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isAdd, setIsAdd] = useState(false);
@@ -21,6 +22,7 @@ const AdminDriver = () => {
   const [searchCriteria, setSearchCriteria] = useState("name");
   const [searchValue, setSearchValue] = useState("");
   const searchDebounce = useDebounce(searchValue.trim(), 500);
+  const [isLoading, setIsLoading] = useState(false);
 
   const statusMap = {
     1: "Đang làm",
@@ -34,7 +36,9 @@ const AdminDriver = () => {
   };
   const fetchDrivers = useCallback(
     async (searchDebounce, searchCriteria) => {
+      console.log("Fetching drivers with:", { searchDebounce, searchCriteria });
       try {
+        setIsLoading(true);
         const response = await fetch(
           `http://localhost:8081/api/driver/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
         );
@@ -43,6 +47,8 @@ const AdminDriver = () => {
       } catch (error) {
         console.error("Error fetching drivers:", error);
         return null;
+      } finally {
+        setIsLoading(false);
       }
     },
     [page]
@@ -71,139 +77,88 @@ const AdminDriver = () => {
     setIsAdd(true);
   };
 
-  // Hàm validate driver chung
-  const validateDriver = (driver) => {
-    const missingInfo = [];
-    if (!driver.name) missingInfo.push("Tên tài xế");
-    if (!driver.email) missingInfo.push("Email");
-    if (!driver.phone) missingInfo.push("Số điện thoại");
+  // ✅ Tạo Driver
+  const handleCreateDriver = async (newDriver) => {
+    if (
+      !validateFields({
+        "Tên tài xế": newDriver.name,
+        Email: newDriver.email,
+        "Số điện thoại": newDriver.phone,
+      })
+    )
+      return;
 
-    if (driver.email) {
-      const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      if (!emailPattern.test(driver.email)) {
-        return { valid: false, error: "Email không hợp lệ." };
-      }
-    }
-
-    if (missingInfo.length > 0) {
-      return {
-        valid: false,
-        error: `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
-          ",  "
-        )}`,
-      };
-    }
-
-    return { valid: true };
-  };
-
-  // Hàm chung gửi request
-  const sendDriverRequest = async ({
-    method,
-    url,
-    driverData,
-    onSuccess,
-    onClose,
-  }) => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(driverData),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        toast.success(
-          method === "POST"
-            ? "Tài xế đã được tạo thành công!"
-            : "Tài xế đã được cập nhật thành công!"
-        );
-        onSuccess(result);
-        if (onClose) onClose();
-      } else {
-        const errorText =
-          method === "POST"
-            ? "Có lỗi xảy ra khi tạo tài xế!"
-            : "Có lỗi xảy ra khi cập nhật tài xế!";
-        console.error(errorText);
-        toast.error(errorText);
-      }
-    } catch (error) {
-      console.error("Lỗi:", error);
-      toast.error(`Lỗi: ${error.message}`);
-    }
-  };
-
-  // Tạo driver
-  const handleCreateDriver = (newDriver) => {
     if (!newDriver.status) newDriver.status = 1; // mặc định status
-    const validation = validateDriver(newDriver);
-    if (!validation.valid) {
-      toast.error(validation.error);
-      return;
-    }
 
-    sendDriverRequest({
-      method: "POST",
-      url: "http://localhost:8081/api/driver",
-      driverData: newDriver,
-      onSuccess: (driver) => setRecords((prev) => [...prev, driver]),
-      onClose: () => setIsAdd(false),
-    });
+    try {
+      setIsLoading(true);
+      const created = await sendRequest(
+        "http://localhost:8081/api/driver",
+        "POST",
+        newDriver
+      );
+
+      toast.success("Tài xế đã được tạo thành công!");
+      setRecords((prev) => [...prev, created]);
+      setIsAdd(false);
+    } catch (error) {
+      console.error("Lỗi khi tạo tài xế:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Cập nhật driver
-  const handleUpdateDriver = (updateDriver) => {
-    const validation = validateDriver(updateDriver);
-    if (!validation.valid) {
-      toast.error(validation.error);
+  // ✅ Cập nhật Driver
+  const handleUpdateDriver = async (updateDriver) => {
+    if (
+      !validateFields({
+        "Tên tài xế": updateDriver.name,
+        Email: updateDriver.email,
+        "Số điện thoại": updateDriver.phone,
+      })
+    )
       return;
-    }
 
-    sendDriverRequest({
-      method: "PUT",
-      url: `http://localhost:8081/api/driver/${updateDriver.id}`,
-      driverData: updateDriver,
-      onSuccess: (updatedDriver) => {
-        const updatedList = records.map((d) =>
-          d.id === updatedDriver.id ? updatedDriver : d
-        );
-        setRecords(updatedList);
-      },
-      onClose: () => setIsEditing(false),
-    });
+    try {
+      setIsLoading(true);
+      const updated = await sendRequest(
+        `http://localhost:8081/api/driver/${updateDriver.id}`,
+        "PUT",
+        updateDriver
+      );
+
+      toast.success("Tài xế đã được cập nhật thành công!");
+      setRecords((prev) =>
+        prev.map((d) => (d.id === updated.id ? updated : d))
+      );
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Lỗi khi cập nhật tài xế:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Xóa driver
+  // ✅ Xóa Driver
   const removeDriver = async () => {
     if (!driverToDelete) return;
 
     const driverId = driverToDelete.id;
+
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
+      setIsLoading(true);
+      await sendRequest(
         `http://localhost:8081/api/driver/${driverId}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        "DELETE"
       );
 
-      if (response.ok) {
-        setRecords(records.filter((d) => d.id !== driverId));
-        toast.success("Driver đã được xóa thành công!");
-        setIsDeleteConfirmVisible(false);
-      } else {
-        toast.error("Có lỗi xảy ra khi xóa Driver!");
-      }
+      setRecords((prev) => prev.filter((d) => d.id !== driverId));
+      toast.success("Tài xế đã được xóa thành công!");
+      setIsDeleteConfirmVisible(false);
     } catch (error) {
-      console.error("Lỗi:", error);
-      toast.error(`Lỗi: ${error.message}`);
+      console.error("Lỗi khi xóa tài xế:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -217,6 +172,7 @@ const AdminDriver = () => {
 
   return (
     <div className="main-container">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       <GenericAdminHeader
         title="Quản lý tài xế"
         breadcrumbLinks={[
@@ -226,9 +182,9 @@ const AdminDriver = () => {
         searchValue={searchValue}
         setSearchValue={setSearchValue}
         searchOptions={[
-          { value: "name", label: "Tên" },
-          { value: "email", label: "Email" },
-          { value: "phone", label: "Số điện thoại" },
+          { key: "name", label: "Tên" },
+          { key: "email", label: "Email" },
+          { key: "phone", label: "Số điện thoại" },
         ]}
         searchCriteria={searchCriteria}
         handleCriteriaChange={handleCriteriaChange}
