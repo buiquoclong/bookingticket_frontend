@@ -27,6 +27,7 @@ const AdminTrip = () => {
   const [records, setRecords] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   // const [dayStart, setDayStart] = useState("");
   const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
@@ -60,6 +61,7 @@ const AdminTrip = () => {
   };
   const fetchTrips = useCallback(async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(
         `http://localhost:8081/api/trip/page?page=${page}&size=10&routeId=&dayStart=${searchValue}`
       );
@@ -68,6 +70,8 @@ const AdminTrip = () => {
       setTotalPages(data.totalPages);
     } catch (error) {
       console.error("Error fetching trips:", error);
+    } finally {
+      setIsLoading(false);
     }
   }, [page, searchValue]);
 
@@ -181,6 +185,7 @@ const AdminTrip = () => {
       status: newTrip.status,
     };
     try {
+      setIsLoading(true);
       // Gửi request tạo chuyến đi
       const created = await sendRequest(
         "http://localhost:8081/api/trip",
@@ -194,6 +199,8 @@ const AdminTrip = () => {
       setIsAdd(false);
     } catch (error) {
       console.error("Lỗi khi tạo chuyến đi:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
   const handleUpdateTrip = async (updateTrip) => {
@@ -221,6 +228,7 @@ const AdminTrip = () => {
     };
 
     try {
+      setIsLoading(true);
       const updated = await sendRequest(
         `http://localhost:8081/api/trip/${updateTrip.id}`,
         "PUT",
@@ -234,12 +242,15 @@ const AdminTrip = () => {
       setIsEditing(false);
     } catch (error) {
       console.error("Lỗi khi update chuyến đi:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
   const removeTrip = async () => {
     const tripId = tripToDelete.id;
 
     try {
+      setIsLoading(true);
       await sendRequest(`http://localhost:8081/api/trip/${tripId}`, "DELETE");
 
       setRecords((prev) => prev.filter((record) => record.id !== tripId));
@@ -247,6 +258,8 @@ const AdminTrip = () => {
       setIsDeleteConfirmVisible(false);
     } catch (error) {
       console.error("Lỗi khi xóa chuyến đi:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
   const handleRemoveClick = (trip) => {
@@ -293,6 +306,7 @@ const AdminTrip = () => {
   return (
     <>
       <div className="main-container">
+        <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
         <GenericAdminHeader
           title="Quản lý chuyến đi"
           breadcrumbLinks={[

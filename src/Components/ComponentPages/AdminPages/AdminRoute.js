@@ -172,6 +172,8 @@ const AdminRoute = () => {
     } catch (error) {
       console.error("Lỗi khi update tuyến:", error);
     } finally {
+      // setIsLoading(false);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setIsLoading(false);
     }
   };

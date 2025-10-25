@@ -8,6 +8,7 @@ import AddModal from "../../ComponentParts/ModelComponents/AddModal";
 import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
 import { seatColumn, seatFields } from "../../../Utils/bookingUtils";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 
 const AdminSeat = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -16,6 +17,7 @@ const AdminSeat = () => {
   const [isAdd, setIsAdd] = useState(false);
   const [records, setRecords] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [kindVehicles, setKindVehicles] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
@@ -53,6 +55,7 @@ const AdminSeat = () => {
   const fetchSeats = useCallback(
     async (searchDebounce, searchCriteria) => {
       try {
+        setIsLoading(true);
         const response = await fetch(
           `http://localhost:8081/api/seat/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
         );
@@ -61,6 +64,8 @@ const AdminSeat = () => {
       } catch (error) {
         console.error("Error fetching seats:", error);
         return null;
+      } finally {
+        setIsLoading(false);
       }
     },
     [page]
@@ -105,6 +110,7 @@ const AdminSeat = () => {
       status: newSeat.status,
     };
     try {
+      setIsLoading(true);
       // Gửi request tạo loại xe
       const created = await sendRequest(
         "http://localhost:8081/api/seat",
@@ -118,6 +124,8 @@ const AdminSeat = () => {
       setIsAdd(false);
     } catch (error) {
       console.error("Lỗi khi tạo ghế ngồi:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -137,6 +145,7 @@ const AdminSeat = () => {
     };
 
     try {
+      setIsLoading(true);
       const updated = await sendRequest(
         `http://localhost:8081/api/seat/${updateSeat.id}`,
         "PUT",
@@ -150,6 +159,8 @@ const AdminSeat = () => {
       setIsEditing(false);
     } catch (error) {
       console.error("Lỗi khi update ghế ngồi:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -157,6 +168,7 @@ const AdminSeat = () => {
     const seatId = seatToDelete.id;
 
     try {
+      setIsLoading(true);
       await sendRequest(`http://localhost:8081/api/seat/${seatId}`, "DELETE");
 
       setRecords((prev) => prev.filter((record) => record.id !== seatId));
@@ -164,6 +176,8 @@ const AdminSeat = () => {
       setIsDeleteConfirmVisible(false);
     } catch (error) {
       console.error("Lỗi khi xóa ghế ngồi:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -193,6 +207,7 @@ const AdminSeat = () => {
 
   return (
     <div className="main-container">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       <GenericAdminHeader
         title="Quản lý ghế ngồi"
         breadcrumbLinks={[
