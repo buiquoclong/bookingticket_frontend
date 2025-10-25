@@ -5,16 +5,19 @@ import { Link, useLocation } from "react-router-dom";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import BookingTicketInfo from "../../ComponentParts/TicketInfoComponents/BookingTicketInfo";
 import "../../../Assets/scss/Clients/Paysuccess.scss";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 
 const Paysuccess = () => {
   const location = useLocation();
   const { bookingId, kind } = location.state || {};
   const [data, setData] = useState(null);
   const [bookingData, setBookingData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchBookingDetail = useCallback(async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(
         `http://localhost:8081/api/booking_detail/booking/${bookingId}`
       );
@@ -22,11 +25,14 @@ const Paysuccess = () => {
       setData(result);
     } catch (error) {
       console.error("Error fetching booking details:", error);
+    } finally {
+      setIsLoading(false);
     }
   }, [bookingId]);
 
   const fetchBooking = useCallback(async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(
         `http://localhost:8081/api/booking/${bookingId}`
       );
@@ -34,26 +40,17 @@ const Paysuccess = () => {
       setBookingData(result);
     } catch (error) {
       console.error("Error fetching booking data:", error);
+    } finally {
+      setIsLoading(false);
     }
   }, [bookingId]);
 
   useEffect(() => {
-    setLoading(true);
+    setIsLoading(true);
     Promise.all([fetchBooking(), fetchBookingDetail()]).finally(() =>
-      setLoading(false)
+      setIsLoading(false)
     );
   }, [fetchBooking, fetchBookingDetail]);
-
-  if (loading) {
-    return (
-      <section className="pay-success container section">
-        <div className="loading">
-          <div className="spinner"></div>
-          <p>Đang tải thông tin vé...</p>
-        </div>
-      </section>
-    );
-  }
 
   if (!bookingData) {
     return (
@@ -65,6 +62,7 @@ const Paysuccess = () => {
 
   return (
     <section className="pay-success container section">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       <div className="success-card">
         <div className="success-content">
           <div className="icon-wrapper">

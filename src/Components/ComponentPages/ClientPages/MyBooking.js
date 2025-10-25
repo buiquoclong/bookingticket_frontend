@@ -10,7 +10,8 @@ import {
   FormControl,
 } from "@mui/material";
 import BookingTicketInfo from "../../ComponentParts/TicketInfoComponents/BookingTicketInfo";
-
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 const MyBooking = () => {
   const userId = localStorage.getItem("userId");
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const MyBooking = () => {
   const [searchValue, setSearchValue] = useState("");
   const [isCancelConfirmVisible, setIsCancelConfirmVisible] = useState(false);
   const [bookingToCancel, setBookingToCancel] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const roundTrip = { 0: "Một chiều", 1: "Khứ hồi" };
   const isPaid = { 0: "Chưa thanh toán", 1: "Đã thanh toán", 2: "Đã hủy" };
@@ -34,6 +36,7 @@ const MyBooking = () => {
 
   const fetchBookings = useCallback(async () => {
     try {
+      setIsLoading(true);
       const res = await fetch(
         `http://localhost:8081/api/booking/page?page=${page}&size=5&userId=${userId}&isPaid=${searchValue}`
       );
@@ -42,6 +45,8 @@ const MyBooking = () => {
       setTotalPages(data.totalPages);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   }, [page, userId, searchValue]);
 
@@ -61,6 +66,7 @@ const MyBooking = () => {
 
   const handlePayBookingClick = async (booking) => {
     try {
+      setIsLoading(true);
       const res = await fetch(
         `http://localhost:8081/api/payment/pay-boooking?total=${booking.total}&bookingId=${booking.id}`
       );
@@ -70,6 +76,8 @@ const MyBooking = () => {
     } catch (error) {
       console.error(error);
       toast.error("Lỗi khi nhận URL thanh toán từ máy chủ.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -105,6 +113,7 @@ const MyBooking = () => {
 
   const handleViewDetailClick = async (booking) => {
     try {
+      setIsLoading(true);
       const response = await fetch(
         `http://localhost:8081/api/booking_detail/booking/${booking.id}`
       );
@@ -115,6 +124,8 @@ const MyBooking = () => {
     } catch (error) {
       console.error("Error fetching booking detail:", error);
       toast.error("Không thể tải chi tiết vé.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -125,6 +136,7 @@ const MyBooking = () => {
 
   return (
     <div className="mybooking-container">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       <div className="filter-section">
         <FormControl sx={{ minWidth: 200 }} size="small">
           <InputLabel>Trạng thái thanh toán</InputLabel>

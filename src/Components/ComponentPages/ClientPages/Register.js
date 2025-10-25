@@ -3,9 +3,12 @@ import "../../../Assets/scss/Clients/Register.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import PasswordInput from "../../ComponentParts/PasswordInput";
+import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 
 const Register = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [form, setForm] = useState({
     email: "",
@@ -88,7 +91,7 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    // Kiểm tra lại validation trước khi submit
+    // 🔹 Kiểm tra hợp lệ trước khi gửi
     const newErrors = {
       email: validateEmail(form.email),
       userName: validateUserName(form.userName),
@@ -100,8 +103,12 @@ const Register = () => {
     setErrors(newErrors);
 
     const hasError = Object.values(newErrors).some((e) => e);
-    if (hasError) return;
+    if (hasError) {
+      toast.error("Vui lòng kiểm tra lại thông tin đăng ký!");
+      return;
+    }
 
+    // 🔹 Dữ liệu gửi đi
     const registerUser = {
       name: form.userName,
       password: form.password,
@@ -112,33 +119,46 @@ const Register = () => {
       type: "Đăng ký",
     };
 
+    // 🔹 Kiểm tra field trống (sử dụng validateFields helper)
+    const valid = validateFields({
+      email: form.email,
+      userName: form.userName,
+      password: form.password,
+    });
+    if (!valid) return;
+
     try {
-      const response = await fetch("http://localhost:8081/api/user/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(registerUser),
-      });
+      setIsLoading(true);
+      const url = "http://localhost:8081/api/user/register";
+      const result = await sendRequest(url, "POST", registerUser);
 
-      if (!response.ok) {
-        console.error("Failed to register:", response.statusText);
-        return;
+      // 🔹 Một số API trả về text, nên kiểm tra kết quả thủ công nếu cần
+      if (typeof result === "string") {
+        if (result === "Email đã tồn tại") {
+          toast.error("Email đã tồn tại");
+          return;
+        }
+        if (isNaN(parseInt(result))) {
+          toast.error(result);
+          return;
+        }
+
+        navigate("/confirm-account", {
+          state: { userId: parseInt(result) },
+        });
+      } else {
+        // Nếu API trả JSON object
+        if (result?.id) {
+          navigate("/confirm-account", { state: { userId: result.id } });
+        } else {
+          toast.success("Đăng ký thành công! Vui lòng xác nhận email.");
+        }
       }
-
-      const data = await response.text();
-
-      if (data === "Email đã tồn tại") {
-        toast.error("Email đã tồn tại");
-        return;
-      }
-
-      if (isNaN(parseInt(data))) {
-        toast.error(data);
-        return;
-      }
-
-      navigate("/confirm-account", { state: { userId: parseInt(data) } });
     } catch (err) {
-      console.error("Error register:", err);
+      console.error("❌ Register error:", err);
+      // sendRequest đã tự toast lỗi, không cần thêm ở đây
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -149,6 +169,7 @@ const Register = () => {
 
   return (
     <section className="register-section">
+      <LoadingBackdrop open={isLoading} message="Đang xử lý yêu cầu..." />
       <div className="register-container">
         <form className="register-form" onSubmit={handleRegister}>
           <h1 className="register-title">Đăng ký</h1>

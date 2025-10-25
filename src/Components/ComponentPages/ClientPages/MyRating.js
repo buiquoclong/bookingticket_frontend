@@ -14,6 +14,8 @@ import {
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 
 const MyRating = () => {
   const [records, setRecords] = useState([]);
@@ -27,10 +29,12 @@ const MyRating = () => {
   const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState(null);
   const userId = localStorage.getItem("userId");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const fetchReviews = useCallback(async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(
         `http://localhost:8081/api/review/page?page=${page}&size=10&userId=${userId}&rating=${searchValue}`
       );
@@ -39,6 +43,8 @@ const MyRating = () => {
       setTotalPages(data.totalPages);
     } catch (error) {
       console.error("Error fetching reviews:", error);
+    } finally {
+      setIsLoading(false);
     }
   }, [page, searchValue, userId]);
 
@@ -61,75 +67,68 @@ const MyRating = () => {
     setIsEditing(true);
   };
 
+  // ✅ Cập nhật đánh giá
   const handleUpdateRating = async (e) => {
     e.preventDefault();
-    const reviewId = selectedReview.id;
-    if (!rating) {
-      toast.error("Vui lòng chọn mức đánh giá!");
-      return;
-    }
+    const reviewId = selectedReview?.id;
+
+    // 🔹 Kiểm tra dữ liệu bắt buộc
+    const isValid = validateFields({
+      rating,
+      reviewId,
+    });
+    if (!isValid) return;
+
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:8081/api/review/${reviewId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ rating, content }),
-        }
+      const url = `http://localhost:8081/api/review/${reviewId}`;
+      const updatedReview = await sendRequest(url, "PUT", { rating, content });
+
+      // 🔹 Cập nhật lại danh sách review trong state
+      setRecords((prev) =>
+        prev.map((r) => (r.id === updatedReview.id ? updatedReview : r))
       );
-      if (response.ok) {
-        const updatedReview = await response.json();
-        setRecords((prev) =>
-          prev.map((r) => (r.id === updatedReview.id ? updatedReview : r))
-        );
-        toast.success("Cập nhật đánh giá thành công!");
-        setIsEditing(false);
-      } else {
-        toast.error("Có lỗi khi cập nhật đánh giá!");
-      }
-    } catch (err) {
-      console.error("Error:", err);
-      toast.error("Lỗi hệ thống!");
+
+      toast.success("Cập nhật đánh giá thành công!");
+      setIsEditing(false);
+    } catch (error) {
+      console.error("❌ Update rating error:", error);
+      // sendRequest đã tự toast lỗi nên không cần lặp lại ở đây
     }
   };
 
-  // Xử lý xóa
+  // ✅ Xử lý xóa review
   const handleDelete = (id) => {
     const review = records.find((r) => r.id === id);
     setReviewToDelete(review);
     setIsDeleteConfirmVisible(true);
   };
 
+  // ✅ Gửi request xóa review
   const removeReview = async () => {
-    const reviewId = reviewToDelete.id;
+    const reviewId = reviewToDelete?.id;
+
+    if (!reviewId) {
+      toast.error("Không tìm thấy đánh giá để xóa!");
+      return;
+    }
+
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:8081/api/review/${reviewId}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      if (response.ok) {
-        setRecords((prev) => prev.filter((r) => r.id !== reviewId));
-        toast.success("Xóa đánh giá thành công!");
-        setIsDeleteConfirmVisible(false);
-      } else {
-        toast.error("Không thể xóa đánh giá!");
-      }
-    } catch (err) {
-      console.error("Error:", err);
-      toast.error("Lỗi kết nối!");
+      const url = `http://localhost:8081/api/review/${reviewId}`;
+      await sendRequest(url, "DELETE");
+
+      // 🔹 Cập nhật lại danh sách sau khi xóa
+      setRecords((prev) => prev.filter((r) => r.id !== reviewId));
+      setIsDeleteConfirmVisible(false);
+      toast.success("Xóa đánh giá thành công!");
+    } catch (error) {
+      console.error("❌ Delete review error:", error);
+      // sendRequest đã tự toast lỗi
     }
   };
 
   return (
     <div className="my-rating-wrapper">
+      <LoadingBackdrop open={isLoading} message="Đang xử lý yêu cầu..." />
       <div className="HisContent">
         {/* Bộ lọc đánh giá */}
         <div className="searchIn">
