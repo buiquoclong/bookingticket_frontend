@@ -12,18 +12,11 @@ import {
   userFieldQuery,
 } from "../../../Utils/bookingUtils";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 
 const AdminUser = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [currentUser, setcurrentUser] = useState({
-    name: "",
-    password: "",
-    email: "",
-    phone: "",
-    role: "",
-    status: "",
-    type: "",
-  });
+  const [currentUser, setcurrentUser] = useState({});
 
   const [isAdd, setIsAdd] = useState(false);
   const [records, setRecords] = useState([]);
@@ -32,6 +25,7 @@ const AdminUser = () => {
   const [searchCriteria, setSearchCriteria] = useState("email");
   const [searchValue, setSearchValue] = useState("");
   const searchDebounce = useDebounce(searchValue.trim(), 500);
+  const [isLoading, setIsLoading] = useState(false);
 
   const roleMap = {
     1: "Người dùng",
@@ -51,6 +45,7 @@ const AdminUser = () => {
   const fetchUsers = useCallback(
     async (searchDebounce) => {
       try {
+        setIsLoading(true);
         const response = await fetch(
           `http://localhost:8081/api/user/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
         );
@@ -59,6 +54,8 @@ const AdminUser = () => {
       } catch (error) {
         console.error("Error fetching users:", error);
         return null;
+      } finally {
+        setIsLoading(false);
       }
     },
     [page, searchCriteria]
@@ -104,6 +101,7 @@ const AdminUser = () => {
       role: newUser.role,
     };
     try {
+      setIsLoading(true);
       // Gửi request tạo người dùng
       await sendRequest(
         "http://localhost:8081/api/user/create-by-admin",
@@ -117,6 +115,8 @@ const AdminUser = () => {
       setIsAdd(false);
     } catch (error) {
       console.error("Lỗi khi tạo người dùng:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -134,6 +134,7 @@ const AdminUser = () => {
     };
 
     try {
+      setIsLoading(true);
       const updated = await sendRequest(
         `http://localhost:8081/api/user/${updateUser.id}`,
         "PUT",
@@ -147,6 +148,8 @@ const AdminUser = () => {
       setIsEditing(false);
     } catch (error) {
       console.error("Lỗi khi update người dùng:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -196,6 +199,7 @@ const AdminUser = () => {
   });
   return (
     <div className="main-container">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       <GenericAdminHeader
         title="Quản lý ghế ngồi"
         breadcrumbLinks={[

@@ -3,10 +3,12 @@ import "../../../Assets/scss/Clients/ChangePass.scss";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import PasswordInput from "../../ComponentParts/PasswordInput";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 
 const ChangePass = () => {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
+  const [isLoading, setIsLoading] = useState(false);
 
   const [form, setForm] = useState({
     nowPass: "",
@@ -63,6 +65,7 @@ const ChangePass = () => {
     }
 
     try {
+      setIsLoading(true);
       const response = await fetch(
         `http://localhost:8081/api/user/${userId}/change-password`,
         {
@@ -98,11 +101,14 @@ const ChangePass = () => {
     } catch (error) {
       console.error("Error updating password:", error);
       toast.error("Có lỗi xảy ra. Vui lòng thử lại!");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <section className="change-password container section">
+      <LoadingBackdrop open={isLoading} message="Đang xử lý yêu cầu..." />
       <div className="change-password__content">
         <div className="change-password__header">
           <h3 data-aos="fade-right" className="change-password__title">

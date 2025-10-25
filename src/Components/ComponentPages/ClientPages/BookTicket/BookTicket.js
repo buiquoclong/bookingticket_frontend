@@ -3,7 +3,7 @@ import "../../../../Assets/scss/Clients/BookTicket.scss";
 import { toast } from "react-toastify";
 import TripList from "../../../ComponentParts/TripResultComponents/TripList";
 import SearchResultsHeader from "../../../ComponentParts/TripResultComponents/SearchResultsHeader";
-
+import LoadingBackdrop from "../../../ComponentParts/LoadingBackdrop";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const BookTicket = () => {
@@ -27,6 +27,7 @@ const BookTicket = () => {
   const [timeStartTo, setTimeStartTo] = useState("");
   const [kindVehicleId, setKindVehicleId] = useState("");
   const [sort, setSort] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const handleTimeChange = (event) => {
     const selectedValue = event.target.value;
     switch (selectedValue) {
@@ -63,31 +64,37 @@ const BookTicket = () => {
   const navigate = useNavigate();
 
   const fetchTrip = useCallback(async () => {
+    setIsLoading(true); // ✅ Bắt đầu hiển thị loading
+
     const postData = {
-      diemDiId: diemDiId,
-      diemDenId: diemDenId,
-      dayStart: dayStart,
-      timeStartFrom: timeStartFrom,
-      timeStartTo: timeStartTo,
-      kindVehicleId: kindVehicleId,
-      sort: sort,
+      diemDiId,
+      diemDenId,
+      dayStart,
+      timeStartFrom,
+      timeStartTo,
+      kindVehicleId,
+      sort,
     };
 
-    fetch("http://localhost:8081/api/trip/search", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(postData),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("data", data);
-        setData(data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+    try {
+      const response = await fetch("http://localhost:8081/api/trip/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(postData),
       });
+
+      if (!response.ok) {
+        throw new Error("Không thể tải danh sách chuyến đi!");
+      }
+
+      const data = await response.json();
+      console.log("data", data);
+      setData(data);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   }, [
     diemDiId,
     diemDenId,
@@ -206,6 +213,7 @@ const BookTicket = () => {
   return (
     <>
       <section className="trip-results section">
+        <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
         <div className="container">
           <div className="results-wrapper">
             {/* Header */}

@@ -3,7 +3,7 @@ import "../../../../Assets/scss/Clients/BookTicket.scss";
 import { toast } from "react-toastify";
 import TripList from "../../../ComponentParts/TripResultComponents/TripList";
 import SearchResultsHeader from "../../../ComponentParts/TripResultComponents/SearchResultsHeader";
-
+import LoadingBackdrop from "../../../ComponentParts/LoadingBackdrop";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const BookTicketReturn = () => {
@@ -30,6 +30,7 @@ const BookTicketReturn = () => {
   const [timeStartFrom, setTimeStartFrom] = useState("");
   const [timeStartTo, setTimeStartTo] = useState("");
   const [kindVehicleId, setKindVehicleId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [sort, setSort] = useState("");
   const handleTimeChange = (event) => {
     const selectedValue = event.target.value;
@@ -67,31 +68,37 @@ const BookTicketReturn = () => {
   const navigate = useNavigate();
 
   const fetchTrip = useCallback(async () => {
+    setIsLoading(true); // ✅ Bắt đầu hiển thị loading
+
     const postData = {
-      diemDiId: diemDenId,
+      diemDiId: diemDenId, // 🔁 Điểm đi và điểm đến đảo ngược
       diemDenId: diemDiId,
       dayStart: dayReturn,
-      timeStartFrom: timeStartFrom,
-      timeStartTo: timeStartTo,
-      kindVehicleId: kindVehicleId,
-      sort: sort,
+      timeStartFrom,
+      timeStartTo,
+      kindVehicleId,
+      sort,
     };
 
-    fetch("http://localhost:8081/api/trip/search", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(postData),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setData(data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+    try {
+      const response = await fetch("http://localhost:8081/api/trip/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(postData),
       });
+
+      if (!response.ok) {
+        throw new Error("Không thể tải danh sách chuyến về!");
+      }
+
+      const data = await response.json();
+      console.log("data", data);
+      setData(data);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   }, [
     diemDiId,
     diemDenId,
@@ -101,6 +108,7 @@ const BookTicketReturn = () => {
     sort,
     kindVehicleId,
   ]);
+
   const fetchKindVehicles = useCallback(async () => {
     try {
       const response = await fetch("http://localhost:8081/api/kindVehicle");
@@ -207,6 +215,7 @@ const BookTicketReturn = () => {
   return (
     <>
       <section className="trip-results section">
+        <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
         <div className="container">
           <div className="results-wrapper">
             {/* Header */}

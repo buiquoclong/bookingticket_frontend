@@ -8,6 +8,7 @@ import AddModal from "../../ComponentParts/ModelComponents/AddModal";
 import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
 import { vehicleColumn, vehicleFields } from "../../../Utils/bookingUtils";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 
 const AdminVehicle = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -16,6 +17,7 @@ const AdminVehicle = () => {
   const [isAdd, setIsAdd] = useState(false);
   const [records, setRecords] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [kindVehicleData, setKindVehicleData] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -29,6 +31,7 @@ const AdminVehicle = () => {
   );
   const fetchKindVehicles = useCallback(async () => {
     try {
+      setIsLoading(true);
       const response = await fetch("http://localhost:8081/api/kindVehicle");
       const data = await response.json();
       setKindVehicleData(data);
@@ -36,6 +39,8 @@ const AdminVehicle = () => {
     } catch (error) {
       console.error("Error fetching routes:", error);
       return null;
+    } finally {
+      setIsLoading(false);
     }
   }, []);
   const statusMap = {
@@ -51,6 +56,7 @@ const AdminVehicle = () => {
   const fetchVehicles = useCallback(
     async (searchDebounce, searchCriteria) => {
       try {
+        setIsLoading(true);
         const response = await fetch(
           `http://localhost:8081/api/vehicle/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
         );
@@ -59,6 +65,8 @@ const AdminVehicle = () => {
         return data;
       } catch (error) {
         return null;
+      } finally {
+        setIsLoading(false);
       }
     },
     [page]
@@ -111,6 +119,7 @@ const AdminVehicle = () => {
       status: newVehicle.status,
     };
     try {
+      setIsLoading(true);
       // Gửi request tạo phương tiện
       const created = await sendRequest(
         "http://localhost:8081/api/vehicle",
@@ -124,6 +133,8 @@ const AdminVehicle = () => {
       setIsAdd(false);
     } catch (error) {
       console.error("Lỗi khi tạo phương tiện:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -148,6 +159,7 @@ const AdminVehicle = () => {
 
     console.log(updateVehicleData);
     try {
+      setIsLoading(true);
       const updated = await sendRequest(
         `http://localhost:8081/api/vehicle/${updateVehicle.id}`,
         "PUT",
@@ -161,6 +173,8 @@ const AdminVehicle = () => {
       setIsEditing(false);
     } catch (error) {
       console.error("Lỗi khi update phương tiện:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -168,6 +182,7 @@ const AdminVehicle = () => {
     const vehicleId = vehicleToDelete.id;
 
     try {
+      setIsLoading(true);
       await sendRequest(
         `http://localhost:8081/api/vehicle/${vehicleId}`,
         "DELETE"
@@ -178,6 +193,8 @@ const AdminVehicle = () => {
       setIsDeleteConfirmVisible(false);
     } catch (error) {
       console.error("Lỗi khi xóa phương tiện:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -208,6 +225,7 @@ const AdminVehicle = () => {
   });
   return (
     <div className="main-container">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       <GenericAdminHeader
         title="Quản lý ghế ngồi"
         breadcrumbLinks={[
