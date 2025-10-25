@@ -12,6 +12,7 @@ import {
   kindVehicleFields,
 } from "../../../Utils/bookingUtils";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 
 const AdminKindVehicle = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -19,6 +20,7 @@ const AdminKindVehicle = () => {
   const [currentKindVehicle, setcurrentKindVehicle] = useState();
   const [records, setRecords] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
@@ -28,6 +30,7 @@ const AdminKindVehicle = () => {
   const fetchKindVehicle = useCallback(
     async (searchDebounce) => {
       try {
+        setIsLoading(true);
         const response = await fetch(
           `http://localhost:8081/api/kindVehicle/page?page=${page}&size=10&name=${searchDebounce}`
         );
@@ -36,6 +39,8 @@ const AdminKindVehicle = () => {
       } catch (error) {
         console.error("Error fetching kind vehicles:", error);
         return null;
+      } finally {
+        setIsLoading(false);
       }
     },
     [page]
@@ -68,6 +73,7 @@ const AdminKindVehicle = () => {
     if (!validateFields({ "Loại xe": newKindVehicle.name })) return;
 
     try {
+      setIsLoading(true);
       // Gửi request tạo loại xe
       const created = await sendRequest(
         "http://localhost:8081/api/kindVehicle",
@@ -81,6 +87,8 @@ const AdminKindVehicle = () => {
       setIsAdd(false);
     } catch (error) {
       console.error("Lỗi khi tạo loại xe:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -89,6 +97,7 @@ const AdminKindVehicle = () => {
     if (!validateFields({ "Loại xe": updateKindVehicle.name })) return;
 
     try {
+      setIsLoading(true);
       const updated = await sendRequest(
         `http://localhost:8081/api/kindVehicle/${updateKindVehicle.id}`,
         "PUT",
@@ -102,6 +111,8 @@ const AdminKindVehicle = () => {
       setIsEditing(false);
     } catch (error) {
       console.error("Lỗi khi update loại xe:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -110,6 +121,7 @@ const AdminKindVehicle = () => {
     const kindVehicleId = kindVehicleToDelete.id;
 
     try {
+      setIsLoading(true);
       await sendRequest(
         `http://localhost:8081/api/kindVehicle/${kindVehicleId}`,
         "DELETE"
@@ -122,6 +134,8 @@ const AdminKindVehicle = () => {
       setIsDeleteConfirmVisible(false);
     } catch (error) {
       console.error("Lỗi khi xóa loại xe:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -131,6 +145,7 @@ const AdminKindVehicle = () => {
   };
   return (
     <div className="main-container">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       <GenericAdminHeader
         title="Quản lý loại xe"
         breadcrumbLinks={[

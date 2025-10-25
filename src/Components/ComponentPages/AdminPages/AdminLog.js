@@ -3,6 +3,7 @@ import useDebounce from "./useDebounce";
 import AdminTable from "../../ComponentParts/AdminComponents/AdminTable";
 import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
 import { logColumn } from "../../../Utils/bookingUtils";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 
 const AdminLog = () => {
   const [records, setRecords] = useState([]);
@@ -11,6 +12,7 @@ const AdminLog = () => {
   const [searchCriteria, setSearchCriteria] = useState("userName");
   const [searchValue, setSearchValue] = useState("");
   const searchDebounce = useDebounce(searchValue.trim(), 500);
+  const [isLoading, setIsLoading] = useState(false);
   const LevelMap = {
     1: "INFO",
     2: "WARNING",
@@ -24,6 +26,7 @@ const AdminLog = () => {
   const fetchLogs = useCallback(
     async (searchDebounce, searchCriteria) => {
       try {
+        setIsLoading(true);
         const response = await fetch(
           `http://localhost:8081/api/log/page?page=${page}&${searchCriteria}=${searchDebounce}`
         );
@@ -32,6 +35,8 @@ const AdminLog = () => {
       } catch (error) {
         console.error("Error fetching logs:", error);
         return null;
+      } finally {
+        setIsLoading(false);
       }
     },
     [page]
@@ -56,6 +61,7 @@ const AdminLog = () => {
   };
   return (
     <div className="main-container">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       <GenericAdminHeader
         title="Quản lý nhật ký"
         breadcrumbLinks={[

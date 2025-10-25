@@ -7,6 +7,8 @@ import EditModal from "../../ComponentParts/ModelComponents/EditModal";
 import AddModal from "../../ComponentParts/ModelComponents/AddModal";
 import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
 import { promotionColumn, promotionFields } from "../../../Utils/bookingUtils";
+import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 
 const AdminPromotion = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -20,6 +22,7 @@ const AdminPromotion = () => {
   const [searchCriteria, setSearchCriteria] = useState("code");
   const [searchValue, setSearchValue] = useState("");
   const searchDebounce = useDebounce(searchValue.trim(), 500);
+  const [isLoading, setIsLoading] = useState(false);
   const fetchPromotions = useCallback(
     async (searchDebounce, searchCriteria) => {
       try {
@@ -69,139 +72,95 @@ const AdminPromotion = () => {
     setSearchValue(""); // Reset input mỗi khi đổi tiêu chí
   };
 
-  // Hàm kiểm tra thông tin thiếu
-  const checkMissingInfo = (promo, requiredFields) => {
-    const missingInfo = requiredFields
-      .filter((field) => !promo[field.key])
-      .map((field) => field.label);
+  // ✅ Tạo Promotion
+  const handleCreatePromotion = async (newPromo) => {
+    if (
+      !validateFields({
+        "Mô tả": newPromo.description,
+        "Ngày bắt đầu": newPromo.startDay,
+        "Ngày kết thúc": newPromo.endDay,
+        "Giảm giá": newPromo.discount,
+      })
+    )
+      return;
 
-    if (missingInfo.length > 0) {
-      toast.error(
-        `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(",  ")}`
-      );
-      return true; // Có missing info
-    }
-    return false; // Không có missing info
-  };
-
-  // Hàm gửi request chung
-  const sendPromotionRequest = async (
-    url,
-    method,
-    promo,
-    successMessage,
-    resetStateCallback
-  ) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          code: promo.code,
-          description: promo.description,
-          startDay: promo.startDay,
-          endDay: promo.endDay,
-          discount: promo.discount,
-        }),
-      });
+      setIsLoading(true);
+      const created = await sendRequest(
+        "http://localhost:8081/api/promotion",
+        "POST",
+        newPromo
+      );
 
-      if (!response.ok) {
-        throw new Error(
-          `Có lỗi xảy ra khi ${method === "POST" ? "tạo" : "cập nhật"} mã!`
-        );
-      }
-
-      const result = await response.json();
-
-      if (method === "POST") {
-        setRecords((prev) => [...prev, result]);
-      } else if (method === "PUT") {
-        setRecords((prev) =>
-          prev.map((p) => (p.id === result.id ? result : p))
-        );
-      }
-
-      toast.success(successMessage);
-      resetStateCallback && resetStateCallback();
+      toast.success("Mã giảm giá đã được tạo thành công!");
+      setRecords((prev) => [...prev, created]);
+      setIsAdd(false);
     } catch (error) {
-      console.error("Lỗi:", error);
-      toast.error(`Lỗi: ${error.message}`);
+      console.error("Lỗi khi tạo mã giảm giá:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Create Promotion
-  const handleCreatePromotion = (newPromo) => {
+  // ✅ Cập nhật Promotion
+  const handleUpdatePromotion = async (updatePromo) => {
     if (
-      checkMissingInfo(newPromo, [
-        { key: "description", label: "Mô tả" },
-        { key: "startDay", label: "Ngày bắt đầu" },
-        { key: "endDay", label: "Ngày kết thúc" },
-        { key: "discount", label: "Giảm giá" },
-      ])
+      !validateFields({
+        "Mã giảm giá": updatePromo.code,
+        "Mô tả": updatePromo.description,
+        "Ngày bắt đầu": updatePromo.startDay,
+        "Ngày kết thúc": updatePromo.endDay,
+        "Giảm giá": updatePromo.discount,
+      })
     )
       return;
 
-    sendPromotionRequest(
-      "http://localhost:8081/api/promotion",
-      "POST",
-      newPromo,
-      "Mã giảm giá đã được tạo thành công!",
-      () => setIsAdd(false)
-    );
-  };
-
-  // Update Promotion
-  const handleUpdatePromotion = (updatePromo) => {
-    if (
-      checkMissingInfo(updatePromo, [
-        { key: "code", label: "Mã giảm giá" },
-        { key: "description", label: "Mô tả" },
-        { key: "startDay", label: "Ngày bắt đầu" },
-        { key: "endDay", label: "Ngày kết thúc" },
-        { key: "discount", label: "Giảm giá" },
-      ])
-    )
-      return;
-
-    sendPromotionRequest(
-      `http://localhost:8081/api/promotion/${updatePromo.id}`,
-      "PUT",
-      updatePromo,
-      "Mã giảm giá đã được cập nhật thành công!",
-      () => setIsEditing(false)
-    );
-  };
-
-  // Delete Promotion
-  const removePromotion = async () => {
-    const promotionId = promotionToDelete.id;
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:8081/api/promotion/${promotionId}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      setIsLoading(true);
+      const updated = await sendRequest(
+        `http://localhost:8081/api/promotion/${updatePromo.id}`,
+        "PUT",
+        updatePromo
       );
 
-      if (!response.ok) throw new Error("Có lỗi xảy ra khi xóa Promotion!");
+      toast.success("Mã giảm giá đã được cập nhật thành công!");
+      setRecords((prev) =>
+        prev.map((promo) => (promo.id === updated.id ? updated : promo))
+      );
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Lỗi khi cập nhật mã giảm giá:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ✅ Xóa Promotion
+  const removePromotion = async () => {
+    if (!promotionToDelete) return;
+
+    const promotionId = promotionToDelete.id;
+
+    try {
+      setIsLoading(true);
+      await sendRequest(
+        `http://localhost:8081/api/promotion/${promotionId}`,
+        "DELETE"
+      );
 
       setRecords((prev) => prev.filter((record) => record.id !== promotionId));
       toast.success("Promotion đã được xóa thành công!");
       setIsDeleteConfirmVisible(false);
     } catch (error) {
-      console.error("Lỗi:", error);
-      toast.error(`Lỗi: ${error.message}`);
+      console.error("Lỗi khi xóa Promotion:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="main-container">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       <GenericAdminHeader
         title="Quản lý mã giảm giá"
         breadcrumbLinks={[

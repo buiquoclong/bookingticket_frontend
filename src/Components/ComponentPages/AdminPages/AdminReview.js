@@ -4,6 +4,7 @@ import useDebounce from "./useDebounce";
 import { reviewColumn, searchReviewOptions } from "../../../Utils/bookingUtils";
 import AdminTable from "../../ComponentParts/AdminComponents/AdminTable";
 import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 const AdminReview = () => {
   const [records, setRecords] = useState([]);
   const [page, setPage] = useState(1);
@@ -11,9 +12,11 @@ const AdminReview = () => {
   const [searchCriteria, setSearchCriteria] = useState("userName");
   const [searchValue, setSearchValue] = useState("");
   const searchDebounce = useDebounce(searchValue.trim(), 500);
+  const [isLoading, setIsLoading] = useState(false);
   const fetchReviews = useCallback(
     async (searchDebounce, searchCriteria) => {
       try {
+        setIsLoading(true);
         const response = await fetch(
           `http://localhost:8081/api/review/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
         );
@@ -22,10 +25,12 @@ const AdminReview = () => {
       } catch (error) {
         console.error("Error fetching reviews:", error);
         return null;
+      } finally {
+        setIsLoading(false);
       }
     },
     [page]
-  ); // Chỉ phụ thuộc vào page và searchCriteria vì searchDebounce được truyền trực tiếp vào hàm
+  );
 
   // Dùng useEffect để gọi API khi page, searchDebounce hoặc searchCriteria thay đổi
   useEffect(() => {
@@ -47,6 +52,7 @@ const AdminReview = () => {
   };
   return (
     <div className="main-container">
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
       <GenericAdminHeader
         title="Quản lý tuyến"
         breadcrumbLinks={[
