@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import PasswordInput from "../../ComponentParts/PasswordInput";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { CHANGE_PASSWORD } from "../../../Utils/apiUrls";
+import { sendRequest } from "../../../Utils/apiHelper";
 
 const ChangePass = () => {
   const navigate = useNavigate();
@@ -45,9 +47,10 @@ const ChangePass = () => {
     /[0-9]/.test(password);
 
   const handleUpdatePass = async () => {
-    // Reset errors
+    // Reset lỗi cũ
     setErrors({ nowPass: "", newPass: "", reNewPass: "" });
 
+    // ✅ Kiểm tra xác nhận mật khẩu
     if (form.newPass !== form.reNewPass) {
       setErrors((prev) => ({
         ...prev,
@@ -56,41 +59,31 @@ const ChangePass = () => {
       return;
     }
 
+    // ✅ Kiểm tra định dạng mật khẩu
     if (!validatePassword(form.newPass)) {
       setErrors((prev) => ({
         ...prev,
-        newPass: "Mật khẩu không đúng định dạng",
+        newPass: "Mật khẩu không đúng định dạng.",
       }));
       return;
     }
 
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `http://localhost:8081/api/user/${userId}/change-password`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            oldPassword: form.nowPass,
-            newPassword: form.newPass,
-          }),
-        }
-      );
 
-      const data = await response.text();
+      // 📨 Gọi API đổi mật khẩu bằng sendRequest
+      const response = await sendRequest(CHANGE_PASSWORD(userId), "PUT", {
+        oldPassword: form.nowPass,
+        newPassword: form.newPass,
+      });
 
-      if (!response.ok) {
-        toast.error("Có lỗi xảy ra. Vui lòng thử lại!");
-        console.error("Failed to update password:", data);
-        return;
-      }
-
-      if (data === "Mật khẩu cũ không đúng") {
+      // 🧩 Nếu backend trả text “Mật khẩu cũ không đúng”
+      if (response === "Mật khẩu cũ không đúng") {
         toast.error("Mật khẩu cũ không đúng");
         return;
       }
 
+      // ✅ Thành công
       toast.success("Bạn đã đổi mật khẩu thành công");
       setTimeout(() => {
         ["token", "userId", "userRole", "googleLogin"].forEach((item) =>
