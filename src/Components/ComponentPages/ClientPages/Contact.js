@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import { CREATE_CONTACT } from "../../../Utils/apiUrls";
 
 const Contact = () => {
   const [name, setName] = useState("");
@@ -34,7 +35,7 @@ const Contact = () => {
   const handleCreateContact = async (e) => {
     e.preventDefault();
 
-    // ✅ Kiểm tra các field bắt buộc
+    // 🧩 Kiểm tra các field bắt buộc
     if (
       !validateFields({
         "Họ tên": name,
@@ -45,7 +46,7 @@ const Contact = () => {
     )
       return;
 
-    // ✅ Kiểm tra lỗi email riêng
+    // ⚠️ Kiểm tra lỗi email riêng
     if (emailErrorMessage) {
       toast.error(emailErrorMessage);
       return;
@@ -56,19 +57,19 @@ const Contact = () => {
     try {
       setIsLoading(true);
 
-      await sendRequest(
-        "http://localhost:8081/api/contact",
-        "POST",
-        newContactData
-      );
+      // 📨 Gọi API tạo contact
+      await sendRequest(CREATE_CONTACT, "POST", newContactData);
 
+      // ✅ Thông báo thành công
       toast.success("Contact đã được tạo thành công!");
+
+      // 🔄 Reset form
       setName("");
       setEmail("");
       setTitle("");
       setContent("");
 
-      // ✅ Điều hướng sau 1 giây
+      // 🕒 Điều hướng sau 1 giây
       setTimeout(() => {
         navigate("/");
       }, 1000);
