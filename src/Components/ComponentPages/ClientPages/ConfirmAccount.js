@@ -3,6 +3,12 @@ import "../../../Assets/scss/Clients/ConfirmAccount.scss";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { sendRequest } from "../../../Utils/apiHelper";
+import {
+  GET_USER_BY_ID,
+  CONFIRM_ACCOUNT,
+  CHANGE_CONFIRM_CODE,
+} from "../../../Utils/apiUrls";
 
 const ConfirmAccount = () => {
   const [confirmCode, setConfirmCode] = useState("");
@@ -17,13 +23,9 @@ const ConfirmAccount = () => {
     if (!userId) return;
 
     try {
-      const response = await fetch(`http://localhost:8081/api/user/${userId}`);
-      const data = await response.json();
-
-      if (response.ok) {
-        setData(data);
-      } else {
-        console.error("Error fetching user data:", data.message);
+      const response = await sendRequest(GET_USER_BY_ID(userId), "GET");
+      if (response) {
+        setData(response);
       }
     } catch (error) {
       console.error("Error fetching user info:", error);
@@ -37,8 +39,8 @@ const ConfirmAccount = () => {
   const handleConfirmAccount = async (event) => {
     event.preventDefault();
 
-    // Kiểm tra đầu vào
-    if (!confirmCode) {
+    // 🧩 Kiểm tra đầu vào
+    if (!confirmCode?.trim()) {
       toast.error("Vui lòng nhập mã xác nhận");
       return;
     }
@@ -50,33 +52,37 @@ const ConfirmAccount = () => {
 
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `http://localhost:8081/api/user/confirm-account`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: userId,
-            token: confirmCode,
-          }),
-        }
-      );
 
-      const result = await response.text();
+      // 📨 Gọi API xác nhận tài khoản
+      const response = await sendRequest(CONFIRM_ACCOUNT(), "POST", {
+        userId,
+        token: confirmCode.trim(),
+      });
 
-      if (response.ok) {
-        toast.success("Xác thực tài khoản thành công 🎉");
-        setTimeout(() => {
-          navigate("/login");
-        }, 2000);
-      } else {
-        toast.error(result || "Mã xác nhận không hợp lệ");
+      // 🧾 Xử lý phản hồi
+      const message =
+        typeof response === "string"
+          ? response
+          : response?.message || "Không có phản hồi từ máy chủ";
+
+      if (message.toLowerCase().includes("không hợp lệ")) {
+        toast.error("❌ Mã xác nhận không hợp lệ hoặc đã hết hạn");
+        return;
       }
+
+      if (message.toLowerCase().includes("thành công")) {
+        toast.success("✅ Xác thực tài khoản thành công 🎉");
+        setTimeout(() => navigate("/login"), 2000);
+        return;
+      }
+
+      // Nếu có thông điệp khác (ví dụ lỗi hệ thống)
+      toast.warning(message);
     } catch (error) {
       console.error("Error confirming account:", error);
-      toast.error("Đã xảy ra lỗi khi xác thực tài khoản");
+      toast.error(
+        "⚠️ Đã xảy ra lỗi khi xác thực tài khoản. Vui lòng thử lại sau."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -87,37 +93,34 @@ const ConfirmAccount = () => {
 
     try {
       setIsLoading(true);
-      const response = await fetch(
-        "http://localhost:8081/api/user/change-confirmCode",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId }),
-        }
-      );
 
-      if (!response.ok) {
-        toast.error("Không thể gửi mã xác thực. Vui lòng thử lại sau!");
-        console.error("HTTP error:", response.statusText);
+      // 📨 Gửi yêu cầu xin mã xác thực mới
+      const response = await sendRequest(CHANGE_CONFIRM_CODE(), "POST", {
+        userId,
+      });
+
+      // 🧾 Xử lý phản hồi từ backend
+      const message =
+        typeof response === "string"
+          ? response
+          : response?.message || "Không có phản hồi từ máy chủ";
+
+      if (message.toUpperCase() === "FAIL") {
+        toast.error("❌ Lỗi khi gửi mã xác thực. Vui lòng thử lại!");
         return;
       }
 
-      const result = await response.text();
-
-      if (result === "FAIL") {
-        toast.error("Lỗi khi gửi mã xác thực. Vui lòng thử lại!");
+      if (message.toLowerCase().includes("thành công")) {
+        toast.success("✅ Mã xác thực mới đã được gửi đến email của bạn");
+        setTimeout(fetchUserInfo, 1000);
         return;
       }
 
-      toast.success("Mã xác thực mới đã được gửi đến email của bạn");
-
-      // Cập nhật lại thông tin user sau khi gửi thành công (không reload trang)
-      setTimeout(() => {
-        fetchUserInfo();
-      }, 1000);
+      // Nếu backend trả về thông điệp khác
+      toast.warning(message);
     } catch (error) {
       console.error("Error while sending confirm code:", error);
-      toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau!");
+      toast.error("⚠️ Đã xảy ra lỗi. Vui lòng thử lại sau!");
     } finally {
       setIsLoading(false);
     }
