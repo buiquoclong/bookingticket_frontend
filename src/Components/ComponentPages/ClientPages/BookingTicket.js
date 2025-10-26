@@ -12,6 +12,16 @@ import CircularProgress from "@mui/material/CircularProgress";
 import InfoTicket from "../../ComponentParts/TicketInfoComponents/InfoTicket";
 import PolicyInfo from "../../ComponentParts/PolicyComponents/PolicyInfo";
 import BookingSummary from "../../ComponentParts/BookingSummary";
+import {
+  GET_TRIP_BY_ID,
+  GET_USER_BY_ID,
+  GET_CATCH_POINT_BY_ROUTE_ID,
+  CHECK_SEAT_ROUNDTRIP,
+  CREATE_BOOKING,
+  PAY_VNPAY,
+  CHECK_PROMOTION,
+} from "../../../Utils/apiUrls";
+import { sendRequest } from "../../../Utils/apiHelper";
 
 const BookingTicket = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -154,7 +164,7 @@ const BookingTicket = () => {
 
   const fetchTripInfo = useCallback(async () => {
     try {
-      const response = await fetch(`http://localhost:8081/api/trip/${tripId}`);
+      const response = await fetch(GET_TRIP_BY_ID(tripId));
       const data = await response.json();
       setData(data);
       setRouteId(data.route.id);
@@ -164,9 +174,7 @@ const BookingTicket = () => {
   }, [tripId]);
   const fetchTripReturnInfo = useCallback(async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8081/api/trip/${tripIdReturn}`
-      );
+      const response = await fetch(GET_TRIP_BY_ID(tripIdReturn));
       const dataReturn = await response.json();
       setDataReturn(dataReturn);
       setRouteReturnId(dataReturn.route.id);
@@ -175,93 +183,82 @@ const BookingTicket = () => {
     }
   }, [tripIdReturn]);
 
-  // Lấy thông tin chuyến và thông tin người dùng khi component được tải
   useEffect(() => {
-    // Call the API to fetch cities
     if (kind === "Một chiều") {
       fetchTripInfo();
     } else if (kind === "Khứ hồi") {
       fetchTripInfo();
       fetchTripReturnInfo();
     }
-    // const userId = localStorage.getItem("userId");
-    if (userId) {
-      // Nếu có userId, thực hiện gọi API để lấy thông tin người dùng
-      fetch(`http://localhost:8081/api/user/${userId}`)
-        .then((response) => response.json())
-        .then((userData) => {
-          // Cập nhật thông tin người dùng vào các trường nhập liệu
-          setUserName(userData.name);
-          setPhone(userData.phone);
-          setEmail(userData.email);
-        })
-        .catch((error) => console.error("Error fetching user data:", error));
-    }
+
+    const loadUser = async () => {
+      if (!userId) return;
+      try {
+        const userData = await sendRequest(GET_USER_BY_ID(userId), "GET");
+        setUserName(userData.name);
+        setPhone(userData.phone);
+        setEmail(userData.email);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    loadUser();
   }, [kind, fetchTripInfo, fetchTripReturnInfo, userId]);
 
   // Lấy danh sách điểm đón khi chọn nhập điểm đón
   useEffect(() => {
-    if (showLocationInput) {
-      const fetchCatchPoints = async () => {
-        try {
-          const response = await fetch(
-            `http://localhost:8081/api/catch-point/route/${routeId}`
+    const loadCatchPoints = async () => {
+      try {
+        if (showLocationInput) {
+          const data = await sendRequest(
+            GET_CATCH_POINT_BY_ROUTE_ID(routeId),
+            "GET"
           );
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          const data = await response.json();
-          console.log(data);
           setCatchPoints(data);
-        } catch (error) {
-          console.error("Error fetching catch points:", error);
         }
-      };
-      fetchCatchPoints();
-    }
-    if (showLocationReturnInput) {
-      const fetchCatchPointsReturn = async () => {
-        try {
-          const response = await fetch(
-            `http://localhost:8081/api/catch-point/route/${routeReturnId}`
+
+        if (showLocationReturnInput) {
+          const dataReturn = await sendRequest(
+            GET_CATCH_POINT_BY_ROUTE_ID(routeReturnId),
+            "GET"
           );
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          const dataReturn = await response.json();
           setCatchPointsReturn(dataReturn);
-        } catch (error) {
-          console.error("Error fetching catch points:", error);
         }
-      };
-      fetchCatchPointsReturn();
-    }
+      } catch (error) {
+        console.error("Error fetching catch points:", error);
+      }
+    };
+
+    loadCatchPoints();
   }, [showLocationInput, showLocationReturnInput, routeId, routeReturnId]);
 
   const checkSeatsBeforeBooking = async () => {
     const requestBody = {
-      tripId: tripId,
+      tripId,
       seatIds: selectedSeatIds,
-      tripIdReturn: tripIdReturn,
+      tripIdReturn,
       seatIdsReturn: selectedSeatIdsReturn,
     };
 
-    const response = await fetch(
-      "http://localhost:8081/api/seat/check-roundtrip",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
+    try {
+      const result = await sendRequest(
+        CHECK_SEAT_ROUNDTRIP,
+        "POST",
+        requestBody
+      );
+
+      if (result.conflicted) {
+        toast.error(result.message);
+        return false;
       }
-    );
 
-    const result = await response.json();
-
-    if (result.conflicted) {
-      toast.error(result.message);
+      return true;
+    } catch (error) {
+      console.error("Error checking seats:", error);
+      toast.error("Lỗi hệ thống. Vui lòng thử lại sau!");
       return false;
     }
-    return true;
   };
 
   // Build request gửi lên backend
@@ -300,30 +297,23 @@ const BookingTicket = () => {
   const handlePayment = async (method) => {
     console.log(method);
     try {
-      // 1. Kiểm tra ghế trước khi booking
+      // 1️⃣ Kiểm tra ghế trước khi booking
       const isSeatsAvailable = await checkSeatsBeforeBooking();
       if (!isSeatsAvailable) return;
 
       setIsLoading(true);
       setShowPaymentPopup(false);
 
+      // 2️⃣ Nếu chọn thanh toán khi lên xe (COD)
       if (method === "COD") {
-        // Thanh toán khi lên xe
         const bookingRequest = buildBookingRequest("CASH");
-        console.log("abc ", bookingRequest);
 
-        const response = await fetch(
-          "http://localhost:8081/api/booking/create",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(bookingRequest),
-          }
+        const createdBooking = await sendRequest(
+          CREATE_BOOKING,
+          "POST",
+          bookingRequest
         );
 
-        if (!response.ok) throw new Error("Lỗi khi tạo booking!");
-
-        const createdBooking = await response.json();
         toast.success("Đặt vé thành công! Mail xác nhận đã được gửi.");
 
         setTimeout(() => {
@@ -331,41 +321,34 @@ const BookingTicket = () => {
             state: { bookingId: createdBooking.id, kind },
           });
         }, 1500);
-      } else if (method === "VNPAY") {
-        // Thanh toán online VNPAY
+      }
+
+      // 3️⃣ Nếu chọn thanh toán online qua VNPAY
+      else if (method === "VNPAY") {
         const bookingRequest = buildBookingRequest("VNPAY");
 
-        // Lưu booking tạm vào backend trước khi redirect VNPay
-        const responseBooking = await fetch(
-          "http://localhost:8081/api/booking/create",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(bookingRequest),
-          }
+        // 📝 Gửi request tạo booking tạm
+        const createdBooking = await sendRequest(
+          CREATE_BOOKING,
+          "POST",
+          bookingRequest
         );
 
-        if (!responseBooking.ok) throw new Error("Lỗi khi tạo booking!");
-        const createdBooking = await responseBooking.json();
-
-        // Lưu booking ID để callback
+        // 🧠 Lưu dữ liệu để xử lý callback
         localStorage.setItem("bookingId", createdBooking.id);
-        // Lưu booking tạm để xử lý khi callback
         localStorage.setItem("bookingDetails", JSON.stringify(bookingRequest));
 
-        // Gọi backend lấy URL thanh toán
-        const response = await fetch(
-          `http://localhost:8081/api/payment/pay?total=${finalPrice}&bookingId=${createdBooking.id}`
+        // 💳 Gọi API tạo URL thanh toán
+        const paymentUrl = await sendRequest(
+          PAY_VNPAY(finalPrice, createdBooking.id),
+          "GET"
         );
-        if (!response.ok) throw new Error("Lỗi khi gọi API thanh toán!");
 
-        const paymentUrl = await response.text();
-
-        // Chuyển hướng tới cổng thanh toán
+        // 🚀 Chuyển hướng tới cổng VNPay
         window.location.href = paymentUrl;
       }
     } catch (error) {
-      console.error("Error during payment:", error);
+      console.error("❌ Error during payment:", error);
       toast.error(error.message || "Lỗi khi xử lý thanh toán");
     } finally {
       setIsLoading(false);
@@ -374,9 +357,7 @@ const BookingTicket = () => {
 
   const handleApplyDiscount = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8081/api/promotion/check?code=${discountCode}`
-      );
+      const response = await fetch(CHECK_PROMOTION(discountCode));
       const result = await response.text(); // Assuming the API returns text
 
       if (result === "NULL") {
