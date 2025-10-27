@@ -11,10 +11,14 @@ import { FiChevronRight } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
+import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { sendRequest } from "../../../Utils/apiHelper";
+import { CREATE_CONTACT } from "../../../Utils/apiUrls";
 import Aos from "aos";
 import "aos/dist/aos.css";
 
 const Footer = () => {
+  const [isLoading, setIsLoading] = useState(false);
   // add a scroll animation
   useEffect(() => {
     Aos.init({ duration: 2000 });
@@ -37,55 +41,46 @@ const Footer = () => {
   };
   const handleCreateContact = async (e) => {
     e.preventDefault();
-    let missingInfo = [];
+
+    // 🧩 Kiểm tra email bắt buộc
     if (!email) {
-      missingInfo.push("Email");
-    } else if (emailErrorMessage) {
-      // Kiểm tra nếu có errorMessage cho email
-      toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
-      return; // Dừng xử lý tiếp theo nếu có lỗi
+      toast.error("Vui lòng nhập Email");
+      return;
     }
-    if (missingInfo.length > 0) {
-      const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
-        ",  "
-      )}`;
-      toast.error(message);
-    } else {
-      try {
-        const newContactData = {
-          content: "Cần liên hệ",
-          email: email,
-          name: "Cần liên hệ",
-          title: "Cần liên hệ",
-        };
 
-        const response = await fetch("http://localhost:8081/api/contact", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newContactData),
-        });
+    // ⚠️ Kiểm tra lỗi định dạng email
+    if (emailErrorMessage) {
+      toast.error(emailErrorMessage);
+      return;
+    }
 
-        if (response.ok) {
-          // Xử lý thành công
-          toast.success("Chúng tôi đã nhận được email cần liên hệ của bạn!");
+    try {
+      setIsLoading(true);
 
-          // Reset form hoặc làm gì đó khác
-          setEmail("");
-        } else {
-          console.error("Có lỗi xảy ra khi tạo contact!");
-          toast.error("Có lỗi xảy ra khi tạo liên hệ!");
-        }
-      } catch (error) {
-        console.error("Lỗi:", error);
-        toast.error("Lỗi:", error);
-      }
+      const newContactData = {
+        name: "Cần liên hệ",
+        email,
+        title: "Cần liên hệ",
+        content: "Cần liên hệ",
+      };
+
+      // 📨 Gửi request qua sendRequest
+      await sendRequest(CREATE_CONTACT, "POST", newContactData);
+
+      // ✅ Thành công
+      toast.success("Chúng tôi đã nhận được email cần liên hệ của bạn!");
+      setEmail("");
+    } catch (error) {
+      console.error("❌ Lỗi khi tạo contact:", error);
+      toast.error("Có lỗi xảy ra khi gửi yêu cầu liên hệ!");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <section className="footer">
+      <LoadingBackdrop open={isLoading} message="Đang xử lý yêu cầu..." />
       <div className="footerBackground">
         <img src={background} alt="footer background" />
         <div className="overlay"></div>
