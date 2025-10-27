@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import { UPDATE_USER_CLIENT, GET_USER_BY_ID } from "../../../Utils/apiUrls";
 
 const InfoUser = () => {
   const [userData, setUserData] = useState({ name: "", email: "", phone: "" });
@@ -11,25 +12,23 @@ const InfoUser = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
+
   const fetchUserInfo = useCallback(async () => {
     if (!userId) return;
 
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:8081/api/user/${userId}`);
-      const data = await response.json();
 
-      if (response.ok) {
-        setUserData({
-          name: data.name || "",
-          email: data.email || "",
-          phone: data.phone || "",
-        });
-      } else {
-        console.error("Error fetching user data:", data.message);
-      }
+      const data = await sendRequest(GET_USER_BY_ID(userId));
+
+      setUserData({
+        name: data.name || "",
+        email: data.email || "",
+        phone: data.phone || "",
+      });
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("❌ Error fetching user data:", error);
+      toast.error("Không thể tải thông tin người dùng!");
     } finally {
       setIsLoading(false);
     }
@@ -69,20 +68,17 @@ const InfoUser = () => {
 
   // Submit/cập nhật user
   const handleUpdateUser = async () => {
-    // ✅ Kiểm tra lỗi từng field bằng validateField (giữ nguyên logic cũ)
     const newErrors = {};
     Object.keys(userData).forEach((key) => {
       newErrors[key] = validateField(key, userData[key]);
     });
     setErrors(newErrors);
 
-    const hasErrors = Object.values(newErrors).some((e) => e);
-    if (hasErrors) {
+    if (Object.values(newErrors).some((e) => e)) {
       toast.error("Vui lòng điền đúng và đầy đủ thông tin!");
       return;
     }
 
-    // ✅ Kiểm tra các field bắt buộc có giá trị (dùng helper)
     if (
       !validateFields({
         "Họ và tên": userData.name,
@@ -95,12 +91,7 @@ const InfoUser = () => {
     try {
       setIsLoading(true);
 
-      // ✅ Gửi request PUT bằng helper sendRequest
-      await sendRequest(
-        `http://localhost:8081/api/user/update/${userId}`,
-        "PUT",
-        userData
-      );
+      await sendRequest(UPDATE_USER_CLIENT(userId), "PUT", userData);
 
       toast.success("Bạn đã cập nhật thông tin thành công!");
     } catch (error) {
