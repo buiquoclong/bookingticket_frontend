@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import { FORGOT_PASSWORD } from "../../../Utils/apiUrls";
 
 const ForgetPass = () => {
   const [email, setEmail] = useState("");
@@ -54,11 +55,7 @@ const ForgetPass = () => {
       setIsLoading(true);
 
       // ✅ Gọi API bằng helper chung
-      const result = await sendRequest(
-        "http://localhost:8081/api/user/forgot-password",
-        "POST",
-        { email }
-      );
+      const result = await sendRequest(FORGOT_PASSWORD, "POST", { email });
 
       // Trường hợp API trả text thay vì JSON (ví dụ: “Đã gửi mail khôi phục”)
       if (typeof result === "string") {
