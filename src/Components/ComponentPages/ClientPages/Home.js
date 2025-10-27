@@ -14,6 +14,8 @@ import Aos from "aos";
 import "aos/dist/aos.css";
 import RouteCard from "../../ComponentParts/RouteCard";
 import SearchTripForm from "../../ComponentParts/SearchTripForm";
+import { GET_ALL_CITIES, GET_ACTIVE_ROUTES } from "../../../Utils/apiUrls";
+import { sendRequest } from "../../../Utils/apiHelper";
 
 const Home = () => {
   // add a scroll animation
@@ -47,21 +49,23 @@ const Home = () => {
 
   const fetchCities = async () => {
     try {
-      const res = await fetch("http://localhost:8081/api/city");
-      const data = await res.json();
+      // 🏙️ Lấy danh sách thành phố
+      const data = await sendRequest(GET_ALL_CITIES, "GET");
       setCities(data);
     } catch (e) {
-      console.error("Error fetching cities:", e);
+      console.error("❌ Lỗi khi lấy danh sách thành phố:", e);
+      toast.error("Không thể tải danh sách thành phố!");
     }
   };
 
   const fetchRoutes = async () => {
     try {
-      const res = await fetch("http://localhost:8081/api/route/active");
-      const data = await res.json();
+      // 🛣️ Lấy danh sách tuyến đường hoạt động
+      const data = await sendRequest(GET_ACTIVE_ROUTES, "GET");
       setData(data);
     } catch (e) {
-      console.error("Error fetching routes:", e);
+      console.error("❌ Lỗi khi lấy danh sách tuyến đường:", e);
+      toast.error("Không thể tải danh sách tuyến đường!");
     }
   };
 
