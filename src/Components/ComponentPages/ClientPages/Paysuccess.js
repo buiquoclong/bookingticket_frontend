@@ -2,11 +2,16 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
+import { toast } from "react-toastify";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import BookingTicketInfo from "../../ComponentParts/TicketInfoComponents/BookingTicketInfo";
 import "../../../Assets/scss/Clients/Paysuccess.scss";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
-import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import { sendRequest } from "../../../Utils/apiHelper";
+import {
+  GET_BOOKING_DETAIL_BY_BOOKING_ID,
+  GET_BOOKING_BY_ID,
+} from "../../../Utils/apiUrls";
 
 const Paysuccess = () => {
   const location = useLocation();
@@ -16,30 +21,37 @@ const Paysuccess = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchBookingDetail = useCallback(async () => {
+    if (!bookingId) return;
+
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `http://localhost:8081/api/booking_detail/booking/${bookingId}`
+
+      const result = await sendRequest(
+        GET_BOOKING_DETAIL_BY_BOOKING_ID(bookingId),
+        "GET"
       );
-      const result = await response.json();
+
       setData(result);
     } catch (error) {
-      console.error("Error fetching booking details:", error);
+      console.error("❌ Error fetching booking details:", error);
+      toast.error("Không thể tải chi tiết vé!");
     } finally {
       setIsLoading(false);
     }
   }, [bookingId]);
 
   const fetchBooking = useCallback(async () => {
+    if (!bookingId) return;
+
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `http://localhost:8081/api/booking/${bookingId}`
-      );
-      const result = await response.json();
+
+      const result = await sendRequest(GET_BOOKING_BY_ID(bookingId), "GET");
+
       setBookingData(result);
     } catch (error) {
-      console.error("Error fetching booking data:", error);
+      console.error("❌ Error fetching booking data:", error);
+      toast.error("Không thể tải thông tin vé!");
     } finally {
       setIsLoading(false);
     }

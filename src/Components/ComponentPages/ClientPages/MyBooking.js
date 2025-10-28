@@ -11,7 +11,15 @@ import {
 } from "@mui/material";
 import BookingTicketInfo from "../../ComponentParts/TicketInfoComponents/BookingTicketInfo";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
-import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import { sendRequest } from "../../../Utils/apiHelper";
+import {
+  GET_BOOKING_PAGE,
+  CANCEL_BOOKING,
+  GET_BOOKING_DETAIL_BY_BOOKING,
+  PAY_BOOKING,
+} from "../../../Utils/apiUrls";
+import ConfirmDeleteModal from "../../ComponentParts/ModelComponents/ConfirmDeleteModal";
+
 const MyBooking = () => {
   const userId = localStorage.getItem("userId");
   const navigate = useNavigate();
@@ -37,14 +45,16 @@ const MyBooking = () => {
   const fetchBookings = useCallback(async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(
-        `http://localhost:8081/api/booking/page?page=${page}&size=5&userId=${userId}&isPaid=${searchValue}`
+      const data = await sendRequest(
+        GET_BOOKING_PAGE(page, 5, userId, searchValue),
+        "GET"
       );
-      const data = await res.json();
+
       setRecords(data.bookings);
       setTotalPages(data.totalPages);
     } catch (error) {
-      console.error(error);
+      console.error("❌ Lỗi khi lấy danh sách booking:", error);
+      toast.error("Không thể tải danh sách hóa đơn!");
     } finally {
       setIsLoading(false);
     }
@@ -67,15 +77,21 @@ const MyBooking = () => {
   const handlePayBookingClick = async (booking) => {
     try {
       setIsLoading(true);
-      const res = await fetch(
-        `http://localhost:8081/api/payment/pay-boooking?total=${booking.total}&bookingId=${booking.id}`
+
+      const paymentURL = await sendRequest(
+        PAY_BOOKING(booking.total, booking.id),
+        "GET"
       );
-      if (!res.ok) throw new Error("Failed to get payment URL");
-      const paymentURL = await res.text();
-      window.location.href = paymentURL;
+      console.log("Payment URL:", paymentURL);
+
+      // Nếu server trả về text (URL), chuyển hướng trực tiếp
+      const url = paymentURL.url;
+      if (!url) throw new Error("Không nhận được URL thanh toán!");
+
+      window.location.href = url;
     } catch (error) {
-      console.error(error);
-      toast.error("Lỗi khi nhận URL thanh toán từ máy chủ.");
+      console.error("❌ Lỗi khi nhận URL thanh toán:", error);
+      toast.error("Không thể tạo URL thanh toán từ máy chủ!");
     } finally {
       setIsLoading(false);
     }
@@ -84,20 +100,20 @@ const MyBooking = () => {
   const cancelBooking = async () => {
     if (!bookingToCancel) return;
     const bookingId = bookingToCancel.id;
+
     try {
-      const res = await fetch(
-        `http://localhost:8081/api/seat_reservation/booking/${bookingId}`,
-        { method: "DELETE" }
-      );
-      if (!res.ok) throw new Error("Failed to delete booking");
-      toast.success("Bạn đã hủy hóa đơn thành công");
+      await sendRequest(CANCEL_BOOKING(bookingId), "DELETE");
+
+      toast.success("Bạn đã hủy hóa đơn thành công!");
       setIsCancelConfirmVisible(false);
+
+      // Cập nhật trạng thái booking trên UI
       setRecords((prev) =>
         prev.map((b) => (b.id === bookingId ? { ...b, isPaid: 2 } : b))
       );
     } catch (error) {
-      console.error(error);
-      toast.error("Không thể hủy hóa đơn");
+      console.error("❌ Lỗi khi hủy hóa đơn:", error);
+      toast.error("Không thể hủy hóa đơn. Vui lòng thử lại!");
     }
   };
 
@@ -114,16 +130,18 @@ const MyBooking = () => {
   const handleViewDetailClick = async (booking) => {
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `http://localhost:8081/api/booking_detail/booking/${booking.id}`
+
+      const result = await sendRequest(
+        GET_BOOKING_DETAIL_BY_BOOKING(booking.id),
+        "GET"
       );
-      const result = await response.json();
+
       setSelectedBookingDetail(result);
       setSelectedBookingKind(booking.roundTrip); // 0 hoặc 1
       setIsDetailVisible(true);
     } catch (error) {
-      console.error("Error fetching booking detail:", error);
-      toast.error("Không thể tải chi tiết vé.");
+      console.error("❌ Lỗi khi tải chi tiết vé:", error);
+      toast.error("Không thể tải chi tiết vé!");
     } finally {
       setIsLoading(false);
     }
@@ -248,25 +266,13 @@ const MyBooking = () => {
         />
       </div>
 
-      {isCancelConfirmVisible && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Xác nhận hủy</h2>
-            <p>Bạn có chắc chắn muốn hủy hóa đơn này?</p>
-            <div className="modal-actions">
-              <button
-                className="btn-cancel"
-                onClick={() => setIsCancelConfirmVisible(false)}
-              >
-                Hủy
-              </button>
-              <button className="btn-confirm" onClick={cancelBooking}>
-                Xác nhận hủy
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDeleteModal
+        visible={isCancelConfirmVisible}
+        message="Bạn có chắc chắn muốn hủy hóa đơn này?"
+        onConfirm={cancelBooking} // khi xác nhận
+        onCancel={() => setIsCancelConfirmVisible(false)} // khi hủy
+        type="delete"
+      />
 
       {isDetailVisible && selectedBookingDetail && (
         <div className="modal-detail">

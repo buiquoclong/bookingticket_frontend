@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import PasswordInput from "../../ComponentParts/PasswordInput";
+import { USER_GOOGLE_LOGIN, USER_LOGIN } from "../../../Utils/apiUrls";
+import { sendRequest } from "../../../Utils/apiHelper";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -66,39 +68,44 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Validate toàn bộ form trước submit
+    // ✅ Validate form
     const newErrors = {
       email: validateEmail(form.email),
       password: validatePassword(form.password),
     };
     setErrors(newErrors);
 
-    if (Object.values(newErrors).some(Boolean))
-      return toast.error("Vui lòng điền thông tin đúng định dạng.");
+    if (Object.values(newErrors).some(Boolean)) {
+      toast.error("Vui lòng điền thông tin đúng định dạng.");
+      return;
+    }
 
     try {
-      const response = await fetch("http://localhost:8081/api/user/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email, pass: form.password }),
+      // ✅ Gửi request login
+      const token = await sendRequest(USER_LOGIN, "POST", {
+        email: form.email,
+        pass: form.password,
       });
 
-      if (!response.ok) return toast.error(`Failed: ${response.status}`);
+      // Nếu server trả về text thay vì JSON
+      const tokenValue =
+        typeof token === "string" ? token : token?.token || token;
 
-      const token = await response.text();
-
-      if (["NULL", "LOCK", "PASSWORD"].includes(token) || token.includes(",")) {
-        handleError(token);
+      if (
+        ["NULL", "LOCK", "PASSWORD"].includes(tokenValue) ||
+        tokenValue.includes(",")
+      ) {
+        handleError(tokenValue);
         return;
       }
 
-      // Lưu token và thông tin user
-      localStorage.setItem("token", token);
-      const decodedToken = jwtDecode(token);
+      // ✅ Lưu token & user info
+      localStorage.setItem("token", tokenValue);
+      const decodedToken = jwtDecode(tokenValue);
       localStorage.setItem("userId", decodedToken.userId);
       localStorage.setItem("userRole", decodedToken.role);
 
-      // Chuyển hướng
+      // ✅ Điều hướng sau đăng nhập
       const redirectPath = sessionStorage.getItem("redirectPath");
       if (redirectPath) {
         navigate(redirectPath);
@@ -110,14 +117,14 @@ const Login = () => {
         navigate("/");
       }
     } catch (err) {
-      console.error(err);
-      toast.error(`Failed: ${err.message}`);
+      console.error("❌ Login error:", err);
+      toast.error(err.message || "Đăng nhập thất bại!");
     }
   };
 
   const googleLogin = () => {
     localStorage.setItem("googleLogin", "true");
-    window.location.href = "http://localhost:8081/oauth2/authorization/google";
+    window.location.href = USER_GOOGLE_LOGIN;
   };
 
   return (

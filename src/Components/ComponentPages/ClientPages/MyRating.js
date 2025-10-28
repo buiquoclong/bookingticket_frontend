@@ -16,6 +16,11 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import {
+  GET_REVIEW_PAGE,
+  UPDATE_REVIEW,
+  DELETE_REVIEW,
+} from "../../../Utils/apiUrls";
 
 const MyRating = () => {
   const [records, setRecords] = useState([]);
@@ -35,14 +40,16 @@ const MyRating = () => {
   const fetchReviews = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `http://localhost:8081/api/review/page?page=${page}&size=10&userId=${userId}&rating=${searchValue}`
+      const data = await sendRequest(
+        GET_REVIEW_PAGE(page, 10, userId, searchValue),
+        "GET"
       );
-      const data = await response.json();
+
       setRecords(data.reviews);
       setTotalPages(data.totalPages);
     } catch (error) {
-      console.error("Error fetching reviews:", error);
+      console.error("❌ Error fetching reviews:", error);
+      toast.error("Không thể tải danh sách đánh giá!");
     } finally {
       setIsLoading(false);
     }
@@ -74,14 +81,16 @@ const MyRating = () => {
 
     // 🔹 Kiểm tra dữ liệu bắt buộc
     const isValid = validateFields({
-      rating,
-      reviewId,
+      "Mức đánh giá": rating,
+      "ID đánh giá": reviewId,
     });
     if (!isValid) return;
 
     try {
-      const url = `http://localhost:8081/api/review/${reviewId}`;
-      const updatedReview = await sendRequest(url, "PUT", { rating, content });
+      const updatedReview = await sendRequest(UPDATE_REVIEW(reviewId), "PUT", {
+        rating,
+        content,
+      });
 
       // 🔹 Cập nhật lại danh sách review trong state
       setRecords((prev) =>
@@ -91,8 +100,8 @@ const MyRating = () => {
       toast.success("Cập nhật đánh giá thành công!");
       setIsEditing(false);
     } catch (error) {
-      console.error("❌ Update rating error:", error);
-      // sendRequest đã tự toast lỗi nên không cần lặp lại ở đây
+      console.error("❌ Lỗi khi cập nhật đánh giá:", error);
+      // sendRequest tự xử lý toast lỗi
     }
   };
 
@@ -113,16 +122,15 @@ const MyRating = () => {
     }
 
     try {
-      const url = `http://localhost:8081/api/review/${reviewId}`;
-      await sendRequest(url, "DELETE");
+      await sendRequest(DELETE_REVIEW(reviewId), "DELETE");
 
       // 🔹 Cập nhật lại danh sách sau khi xóa
       setRecords((prev) => prev.filter((r) => r.id !== reviewId));
       setIsDeleteConfirmVisible(false);
       toast.success("Xóa đánh giá thành công!");
     } catch (error) {
-      console.error("❌ Delete review error:", error);
-      // sendRequest đã tự toast lỗi
+      console.error("❌ Lỗi khi xóa đánh giá:", error);
+      // sendRequest đã tự xử lý toast lỗi
     }
   };
 
