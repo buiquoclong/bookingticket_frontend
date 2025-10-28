@@ -5,6 +5,8 @@ import TripList from "../../../ComponentParts/TripResultComponents/TripList";
 import SearchResultsHeader from "../../../ComponentParts/TripResultComponents/SearchResultsHeader";
 import LoadingBackdrop from "../../../ComponentParts/LoadingBackdrop";
 import { useNavigate, useLocation } from "react-router-dom";
+import { sendRequest } from "../../../../Utils/apiHelper";
+import { SEARCH_TRIP, GET_ALL_KIND_VEHICLE } from "../../../../Utils/apiUrls";
 
 const BookTicket = () => {
   const location = useLocation();
@@ -64,7 +66,7 @@ const BookTicket = () => {
   const navigate = useNavigate();
 
   const fetchTrip = useCallback(async () => {
-    setIsLoading(true); // ✅ Bắt đầu hiển thị loading
+    setIsLoading(true);
 
     const postData = {
       diemDiId,
@@ -77,21 +79,19 @@ const BookTicket = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:8081/api/trip/search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(postData),
-      });
+      const data = await sendRequest(SEARCH_TRIP, "POST", postData);
 
-      if (!response.ok) {
-        throw new Error("Không thể tải danh sách chuyến đi!");
+      if (!data || data.length === 0) {
+        toast.info("Không tìm thấy chuyến đi phù hợp!");
+        setData([]);
+        return;
       }
 
-      const data = await response.json();
-      console.log("data", data);
+      console.log("✅ Trip data:", data);
       setData(data);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("❌ Lỗi khi tải danh sách chuyến đi:", error);
+      toast.error("Không thể tải danh sách chuyến đi!");
     } finally {
       setIsLoading(false);
     }
@@ -107,11 +107,10 @@ const BookTicket = () => {
 
   const fetchKindVehicles = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:8081/api/kindVehicle");
-      const data = await response.json();
+      const data = await sendRequest(GET_ALL_KIND_VEHICLE, "GET");
       setKindVehicledata(data);
     } catch (error) {
-      console.error("Error fetching trips:", error);
+      console.error("Error fetching kind vehicles:", error);
     }
   }, []);
   useEffect(() => {
