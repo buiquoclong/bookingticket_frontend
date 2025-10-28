@@ -19,8 +19,20 @@ import {
   //   PieChart,
   //   Pie,
 } from "recharts";
+import { toast } from "react-toastify";
 import "./AdminHome.scss";
 import LoadingBackdrop from "../../../ComponentParts/LoadingBackdrop";
+import {
+  GET_TOTAL_BY_DAY,
+  GET_TOTAL_BY_MONTH,
+  GET_TOTAL_USER,
+  GET_TOTAL_BOOKINGS,
+  GET_TOTAL_ALL,
+  GET_TOTAL_LAST_NINE_MONTHS,
+  GET_COUNT_PAID_BY_MONTH,
+  GET_COUNT_CANCELLED_BY_MONTH,
+} from "../../../../Utils/apiUrls";
+import { sendRequest } from "../../../../Utils/apiHelper";
 
 function AdminHome() {
   // ------------------- State -------------------
@@ -59,7 +71,7 @@ function AdminHome() {
   // ------------------- useEffect fetch tất cả -------------------
   useEffect(() => {
     const fetchAllData = async () => {
-      setIsLoading(true); // 🔹 Bắt đầu loading
+      setIsLoading(true);
 
       try {
         const [
@@ -72,22 +84,14 @@ function AdminHome() {
           paidCount,
           cancelledCount,
         ] = await Promise.all([
-          fetchData(
-            `http://localhost:8081/api/booking/total-by-day?date=${currentDate}`
-          ),
-          fetchData(
-            `http://localhost:8081/api/booking/total-by-month?yearMonth=${currentMonth}`
-          ),
-          fetchData(`http://localhost:8081/api/user/totalUser`),
-          fetchData(`http://localhost:8081/api/booking/total-bookings`),
-          fetchData(`http://localhost:8081/api/booking/totalAll`),
-          fetchData(`http://localhost:8081/api/booking/total/lastNineMonths`),
-          fetchData(
-            `http://localhost:8081/api/booking/count-paid-by-month?yearMonth=${currentMonth}`
-          ),
-          fetchData(
-            `http://localhost:8081/api/booking/count-cancelled-by-month?yearMonth=${currentMonth}`
-          ),
+          sendRequest(GET_TOTAL_BY_DAY(currentDate)),
+          sendRequest(GET_TOTAL_BY_MONTH(currentMonth)),
+          sendRequest(GET_TOTAL_USER),
+          sendRequest(GET_TOTAL_BOOKINGS),
+          sendRequest(GET_TOTAL_ALL),
+          sendRequest(GET_TOTAL_LAST_NINE_MONTHS),
+          sendRequest(GET_COUNT_PAID_BY_MONTH(currentMonth)),
+          sendRequest(GET_COUNT_CANCELLED_BY_MONTH(currentMonth)),
         ]);
 
         setTotalDay(dayData);
@@ -100,15 +104,15 @@ function AdminHome() {
         setCancelledBookingsCount(cancelledCount);
       } catch (error) {
         console.error("❌ Lỗi khi tải dữ liệu Dashboard:", error);
+        toast.error("Không thể tải dữ liệu Dashboard!");
       } finally {
-        // ⏳ Nếu muốn chờ 1–2 giây cho hiệu ứng mượt hơn
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        setIsLoading(false); // 🔹 Dừng loading
+        setIsLoading(false);
       }
     };
 
     fetchAllData();
-  }, [currentDate, currentMonth, fetchData]);
+  }, [currentDate, currentMonth]);
 
   // ------------------- transformData cho chart -------------------
   const transformedData = useMemo(() => {

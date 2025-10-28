@@ -1,9 +1,12 @@
 import React, { useCallback, useState, useEffect } from "react";
 import "./AdminPaySuccess.scss";
+import { toast } from "react-toastify";
 import { Link, useLocation } from "react-router-dom";
 import BookingTicketInfo from "../../../ComponentParts/TicketInfoComponents/BookingTicketInfo";
 import LoadingBackdrop from "../../../ComponentParts/LoadingBackdrop";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { sendRequest } from "../../../../Utils/apiHelper";
+import { GET_BOOKING_DETAIL_BY_BOOKING_ID } from "../../../../Utils/apiUrls";
 function AdminPaySuccess() {
   const location = useLocation();
   const { bookingId } = location.state || {};
@@ -11,20 +14,20 @@ function AdminPaySuccess() {
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchBookingDetail = useCallback(async () => {
-    setIsLoading(true); // 🔹 Bắt đầu loading
+    if (!bookingId) return;
 
     try {
-      const response = await fetch(
-        `http://localhost:8081/api/booking_detail/booking/${bookingId}`
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      setIsLoading(true);
 
-      const result = await response.json();
+      const result = await sendRequest(
+        GET_BOOKING_DETAIL_BY_BOOKING_ID(bookingId),
+        "GET"
+      );
+
       setData(result);
     } catch (error) {
-      console.error("Error fetching booking details:", error);
+      console.error("❌ Error fetching booking details:", error);
+      toast.error("Không thể tải chi tiết vé!");
     } finally {
       setIsLoading(false);
     }

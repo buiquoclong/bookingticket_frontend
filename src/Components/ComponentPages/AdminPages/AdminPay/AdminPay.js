@@ -4,12 +4,20 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import InfoTicket from "../../../ComponentParts/TicketInfoComponents/InfoTicket";
 import PolicyInfo from "../../../ComponentParts/PolicyComponents/PolicyInfo";
 import BookingSummary from "../../../ComponentParts/BookingSummary";
+import { sendRequest } from "../../../../Utils/apiHelper";
+import LoadingBackdrop from "../../../ComponentParts/LoadingBackdrop";
+import {
+  GET_TRIP_BY_ID,
+  GET_USER_BY_ID,
+  GET_CATCH_POINT_BY_ROUTE_ID,
+  CHECK_SEAT_ROUNDTRIP,
+  CREATE_BOOKING_FOR_EMPLOYEE,
+  CHECK_PROMOTION,
+} from "../../../../Utils/apiUrls";
 
 const AdminPay = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -153,8 +161,7 @@ const AdminPay = () => {
 
   const fetchTripInfo = useCallback(async () => {
     try {
-      const response = await fetch(`http://localhost:8081/api/trip/${tripId}`);
-      const data = await response.json();
+      const data = await sendRequest(GET_TRIP_BY_ID(tripId), "GET");
       setData(data);
       setRouteId(data.route.id);
     } catch (error) {
@@ -163,10 +170,7 @@ const AdminPay = () => {
   }, [tripId]);
   const fetchTripReturnInfo = useCallback(async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8081/api/trip/${tripIdReturn}`
-      );
-      const dataReturn = await response.json();
+      const dataReturn = await sendRequest(GET_TRIP_BY_ID(tripIdReturn), "GET");
       setDataReturn(dataReturn);
       setRouteReturnId(dataReturn.route.id);
     } catch (error) {
@@ -174,26 +178,36 @@ const AdminPay = () => {
     }
   }, [tripIdReturn]);
   useEffect(() => {
-    // Call the API to fetch cities
-    if (kind === "Một chiều") {
-      fetchTripInfo();
-    } else if (kind === "Khứ hồi") {
-      fetchTripInfo();
-      fetchTripReturnInfo();
-    }
-    // const userId = localStorage.getItem("userId");
-    if (userId) {
-      // Nếu có userId, thực hiện gọi API để lấy thông tin người dùng
-      fetch(`http://localhost:8081/api/user/${userId}`)
-        .then((response) => response.json())
-        .then((userData) => {
-          // Cập nhật thông tin người dùng vào các trường nhập liệu
-          setUserName(userData.name);
-          setPhone(userData.phone);
-          setEmail(userData.email);
-        })
-        .catch((error) => console.error("Error fetching user data:", error));
-    }
+    const fetchData = async () => {
+      try {
+        // 🔹 Bắt đầu loading
+        setIsLoading(true);
+
+        // 🔹 Gọi API chuyến đi (một chiều hoặc khứ hồi)
+        if (kind === "Khứ hồi") {
+          await Promise.all([fetchTripInfo(), fetchTripReturnInfo()]);
+        } else {
+          await fetchTripInfo();
+        }
+
+        // 🔹 Gọi API người dùng (nếu có userId)
+        if (userId) {
+          const data = await sendRequest(GET_USER_BY_ID(userId), "GET");
+
+          setUserName(data.name);
+          setPhone(data.phone);
+          setEmail(data.email);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching data:", error);
+        toast.error("Không thể tải thông tin từ máy chủ!");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // ✅ Gọi hàm async
+    fetchData();
   }, [kind, fetchTripInfo, fetchTripReturnInfo, userId]);
 
   // Lấy danh sách điểm đón khi chọn nhập điểm đón
@@ -201,13 +215,10 @@ const AdminPay = () => {
     if (showLocationInput) {
       const fetchCatchPoints = async () => {
         try {
-          const response = await fetch(
-            `http://localhost:8081/api/catch-point/route/${routeId}`
+          const data = await sendRequest(
+            GET_CATCH_POINT_BY_ROUTE_ID(routeId),
+            "GET"
           );
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          const data = await response.json();
           console.log(data);
           setCatchPoints(data);
         } catch (error) {
@@ -219,13 +230,10 @@ const AdminPay = () => {
     if (showLocationReturnInput) {
       const fetchCatchPointsReturn = async () => {
         try {
-          const response = await fetch(
-            `http://localhost:8081/api/catch-point/route/${routeReturnId}`
+          const dataReturn = await sendRequest(
+            GET_CATCH_POINT_BY_ROUTE_ID(routeReturnId),
+            "GET"
           );
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          const dataReturn = await response.json();
           setCatchPointsReturn(dataReturn);
         } catch (error) {
           console.error("Error fetching catch points:", error);
@@ -243,22 +251,24 @@ const AdminPay = () => {
       seatIdsReturn: selectedSeatIdsReturn,
     };
 
-    const response = await fetch(
-      "http://localhost:8081/api/seat/check-roundtrip",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
+    try {
+      const result = await sendRequest(
+        CHECK_SEAT_ROUNDTRIP,
+        "POST",
+        requestBody
+      );
+
+      if (result.conflicted) {
+        toast.error(result.message);
+        return false;
       }
-    );
 
-    const result = await response.json();
-
-    if (result.conflicted) {
-      toast.error(result.message);
+      return true;
+    } catch (error) {
+      console.error("Error checking seats:", error);
+      toast.error("Lỗi hệ thống. Vui lòng thử lại sau!");
       return false;
     }
-    return true;
   };
 
   // Build request gửi lên backend
@@ -294,39 +304,29 @@ const AdminPay = () => {
   };
 
   const handlePayment = async (method) => {
-    console.log(method);
-    const token = localStorage.getItem("token");
     try {
-      // 1. Kiểm tra ghế trước khi booking
+      // 1️⃣ Kiểm tra ghế trước khi booking
       const isSeatsAvailable = await checkSeatsBeforeBooking();
       if (!isSeatsAvailable) return;
 
       setIsLoading(true);
       setShowPaymentPopup(false);
 
+      // 2️⃣ Nếu là thanh toán khi lên xe (COD)
       if (method === "COD") {
-        // Thanh toán khi lên xe
         const bookingRequest = buildBookingRequest("CASH");
-        console.log("abc ", bookingRequest);
+        console.log("📦 Booking request:", bookingRequest);
 
-        console.log(token);
-        const response = await fetch(
-          "http://localhost:8081/api/booking/for-emp",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(bookingRequest),
-          }
+        // 3️⃣ Gửi request tạo booking bằng sendRequest
+        const createdBooking = await sendRequest(
+          CREATE_BOOKING_FOR_EMPLOYEE,
+          "POST",
+          bookingRequest
         );
 
-        if (!response.ok) throw new Error("Lỗi khi tạo booking!");
+        toast.success("🎉 Đặt vé thành công!");
 
-        const createdBooking = await response.json();
-        toast.success("Đặt vé thành công!");
-
+        // 4️⃣ Chuyển sang trang thanh toán tiền mặt
         setTimeout(() => {
           navigate("/admin/book-cash-payment", {
             state: { bookingId: createdBooking.id, kind },
@@ -334,17 +334,15 @@ const AdminPay = () => {
         }, 1500);
       }
     } catch (error) {
-      console.error("Error during payment:", error);
-      toast.error(error.message || "Lỗi khi xử lý thanh toán");
+      console.error("❌ Error during payment:", error);
+      toast.error(error.message || "Lỗi khi xử lý thanh toán!");
     } finally {
       setIsLoading(false);
     }
   };
   const handleApplyDiscount = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8081/api/promotion/check?code=${discountCode}`
-      );
+      const response = await fetch(CHECK_PROMOTION(discountCode));
       const result = await response.text(); // Assuming the API returns text
 
       if (result === "NULL") {
@@ -379,42 +377,7 @@ const AdminPay = () => {
   };
   return (
     <>
-      {isLoading && (
-        <Backdrop
-          sx={{
-            color: "#fff",
-            zIndex: (theme) => theme.zIndex.drawer + 1,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            backdropFilter: "blur(4px)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1rem",
-            transition: "all 0.3s ease",
-          }}
-          open={isLoading}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              animation: "pulse 1.2s infinite ease-in-out",
-            }}
-          >
-            <CircularProgress
-              thickness={5}
-              size={60}
-              sx={{
-                color: "#00e676",
-                filter: "drop-shadow(0 0 8px rgba(0, 230, 118, 0.8))",
-              }}
-            />
-            <span style={{ fontSize: "1.2rem", fontWeight: 500 }}>
-              Đang tải dữ liệu...
-            </span>
-          </div>
-        </Backdrop>
-      )}
+      <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
 
       {showPaymentPopup && (
         <div className="payment-modal">
