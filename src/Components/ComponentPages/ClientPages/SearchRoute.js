@@ -5,6 +5,8 @@ import { GiTakeMyMoney } from "react-icons/gi";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import "../../../Assets/scss/Clients/SearchRoute.scss";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { GET_ACTIVE_ROUTES } from "../../../Utils/apiUrls";
+import { sendRequest } from "../../../Utils/apiHelper";
 
 const SearchRoute = () => {
   const [data, setData] = useState([]);
@@ -21,8 +23,7 @@ const SearchRoute = () => {
   const fetchRoutes = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("http://localhost:8081/api/route/active");
-      const routes = await response.json();
+      const routes = await sendRequest(GET_ACTIVE_ROUTES, "GET");
       const routesWithPrice = routes.map((r) => ({
         ...r,
         price: Math.floor(Math.random() * 200000) + 50000,

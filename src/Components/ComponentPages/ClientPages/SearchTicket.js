@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 import BookingTicketInfo from "../../ComponentParts/TicketInfoComponents/BookingTicketInfo";
 import { FaSearch } from "react-icons/fa";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { sendRequest } from "../../../Utils/apiHelper";
+import { GET_BOOKING_DETAIL_BY_ID } from "../../../Utils/apiUrls";
 
 const SearchTicket = () => {
   const [ticketCode, setTicketCode] = useState("");
@@ -40,24 +42,25 @@ const SearchTicket = () => {
     }
 
     try {
-      setIsLoading(true); // bắt đầu loading
+      setIsLoading(true);
       setIsSearch(false);
       setData([]);
 
-      const response = await fetch(
-        `http://localhost:8081/api/booking_detail/${ticketCode}`
+      const result = await sendRequest(
+        GET_BOOKING_DETAIL_BY_ID(ticketCode),
+        "GET"
       );
-      if (!response.ok) {
-        if (response.status === 404)
-          toast.error("Không tìm thấy vé xe có mã tương ứng");
-        else toast.error("Đã xảy ra lỗi khi tìm kiếm vé");
+
+      // 🔹 Kiểm tra kết quả trả về có hợp lệ không
+      if (!result || (Array.isArray(result) && result.length === 0)) {
+        toast.error("Không tìm thấy vé xe có mã tương ứng");
         return;
       }
 
-      const result = await response.json();
-      // Nếu API trả về object thì bọc vào mảng, nếu là array thì giữ nguyên
+      // 🔹 Đảm bảo dữ liệu luôn là mảng
       const formattedData = Array.isArray(result) ? result : [result];
 
+      // (Tùy chọn) thêm delay để tạo hiệu ứng loading nhẹ
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       setData(formattedData);

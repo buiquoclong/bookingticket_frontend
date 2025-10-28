@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import PasswordInput from "../../ComponentParts/PasswordInput";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { REGISTER, USER_GOOGLE_LOGIN } from "../../../Utils/apiUrls";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -129,8 +130,7 @@ const Register = () => {
 
     try {
       setIsLoading(true);
-      const url = "http://localhost:8081/api/user/register";
-      const result = await sendRequest(url, "POST", registerUser);
+      const result = await sendRequest(REGISTER, "POST", registerUser);
 
       // 🔹 Một số API trả về text, nên kiểm tra kết quả thủ công nếu cần
       if (typeof result === "string") {
@@ -164,7 +164,7 @@ const Register = () => {
 
   const googleLogin = () => {
     localStorage.setItem("googleLogin", "true");
-    window.location.href = "http://localhost:8081/oauth2/authorization/google";
+    window.location.href = USER_GOOGLE_LOGIN;
   };
 
   return (

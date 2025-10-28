@@ -8,6 +8,10 @@ import TicketCard from "../../ComponentParts/TicketInfoComponents/TicketCard";
 import RatingModal from "../../ComponentParts/ModelComponents/RatingModal";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
+import {
+  GET_BOOKING_DETAILS_BY_USER,
+  CREATE_REVIEW,
+} from "../../../Utils/apiUrls";
 
 const TicketHistory = () => {
   const [tickets, setTickets] = useState([]);
@@ -32,14 +36,22 @@ const TicketHistory = () => {
   const fetchBookingDetails = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `http://localhost:8081/api/booking_detail/user/${userId}/booking_details/page?page=${page}&size=9&id=${ticketId}`
+
+      const data = await sendRequest(
+        GET_BOOKING_DETAILS_BY_USER(userId, page, 9, ticketId),
+        "GET"
       );
-      const data = await response.json();
+
+      if (!data || !data.bookingDetails) {
+        toast.error("Không tìm thấy chi tiết vé.");
+        return;
+      }
+
       setTickets(data.bookingDetails);
-      setTotalPages(data.totalPages);
+      setTotalPages(data.totalPages || 1);
     } catch (error) {
-      console.error("Error fetching detail:", error);
+      console.error("❌ Lỗi khi tải chi tiết vé:", error);
+      // sendRequest đã tự hiển thị toast lỗi
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +98,7 @@ const TicketHistory = () => {
 
     try {
       // ✅ Gọi API qua helper
-      await sendRequest("http://localhost:8081/api/review", "POST", newRating);
+      await sendRequest(CREATE_REVIEW, "POST", newRating);
 
       // ✅ Xử lý khi thành công
       toast.success("Đánh giá thành công!");
