@@ -3,6 +3,8 @@ import { Avatar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Person, PowerSettingsNew } from "@mui/icons-material";
 import "./AdminHeader.scss";
+import { sendRequest } from "../../../../Utils/apiHelper";
+import { GET_USER_BY_ID } from "../../../../Utils/apiUrls";
 
 function AdminHeader({ OpenSidebar }) {
   const [userData, setUserData] = useState(null);
@@ -13,8 +15,7 @@ function AdminHeader({ OpenSidebar }) {
   const fetchUserInfo = useCallback(async () => {
     if (!userId) return;
     try {
-      const res = await fetch(`http://localhost:8081/api/user/${userId}`);
-      const data = await res.json();
+      const data = await sendRequest(GET_USER_BY_ID(userId));
       setUserData(data);
     } catch (error) {
       console.error("Error fetching user info:", error);

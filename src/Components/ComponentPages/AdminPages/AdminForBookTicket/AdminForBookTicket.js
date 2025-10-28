@@ -4,6 +4,8 @@ import { Breadcrumbs, Link } from "@mui/material";
 import { toast } from "react-toastify";
 import { FaBus, FaSearchLocation } from "react-icons/fa";
 import SearchTripForm from "../../../ComponentParts/SearchTripForm";
+import { sendRequest } from "../../../../Utils/apiHelper";
+import { GET_ALL_CITIES } from "../../../../Utils/apiUrls";
 
 function AdminForBookTicket() {
   const [cities, setCities] = useState([]);
@@ -26,9 +28,8 @@ function AdminForBookTicket() {
 
   const fetchCities = async () => {
     try {
-      const response = await fetch("http://localhost:8081/api/city");
-      const data = await response.json();
-      setCities(data);
+      const response = await sendRequest(GET_ALL_CITIES, "GET");
+      setCities(response);
     } catch (error) {
       console.error("Error fetching cities:", error);
       toast.error("Không thể tải danh sách thành phố!");
