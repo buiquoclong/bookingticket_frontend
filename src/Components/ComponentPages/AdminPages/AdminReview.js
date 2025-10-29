@@ -5,6 +5,8 @@ import { reviewColumn, searchReviewOptions } from "../../../Utils/bookingUtils";
 import AdminTable from "../../ComponentParts/AdminComponents/AdminTable";
 import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { sendRequest } from "../../../Utils/apiHelper";
+import { GET_REVIEW_PAGE } from "../../../Utils/apiUrls";
 const AdminReview = () => {
   const [records, setRecords] = useState([]);
   const [page, setPage] = useState(1);
@@ -17,10 +19,10 @@ const AdminReview = () => {
     async (searchDebounce, searchCriteria) => {
       try {
         setIsLoading(true);
-        const response = await fetch(
-          `http://localhost:8081/api/review/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
+        const data = await sendRequest(
+          GET_REVIEW_PAGE(page, 10, searchCriteria, searchDebounce),
+          "GET"
         );
-        const data = await response.json();
         return data;
       } catch (error) {
         console.error("Error fetching reviews:", error);

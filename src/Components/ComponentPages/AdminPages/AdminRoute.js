@@ -9,6 +9,12 @@ import AddModal from "../../ComponentParts/ModelComponents/AddModal";
 import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import {
+  CREATE_ROUTE,
+  GET_ALL_CITIES,
+  GET_ROUTE_BY_ID,
+  GET_ROUTE_PAGE,
+} from "../../../Utils/apiUrls";
 
 const AdminRoute = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -42,10 +48,10 @@ const AdminRoute = () => {
   const fetchRoutes = useCallback(
     async (searchDebounce, searchCriteria) => {
       try {
-        const response = await fetch(
-          `http://localhost:8081/api/route/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
+        const data = await sendRequest(
+          GET_ROUTE_PAGE(page, 10, searchCriteria, searchDebounce),
+          "GET"
         );
-        const data = await response.json();
         return data;
       } catch (error) {
         console.error("Error fetching routes:", error);
@@ -58,8 +64,7 @@ const AdminRoute = () => {
   // Dùng useCallback để tối ưu hóa hàm fetchCities
   const fetchCities = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:8081/api/city");
-      const data = await response.json();
+      const data = await sendRequest(GET_ALL_CITIES, "GET");
       return data;
     } catch (error) {
       console.error("Error fetching cities:", error);
@@ -118,11 +123,7 @@ const AdminRoute = () => {
     try {
       setIsLoading(true);
       // Gửi request tạo loại xe
-      const created = await sendRequest(
-        "http://localhost:8081/api/route",
-        "POST",
-        newRouteData
-      );
+      const created = await sendRequest(CREATE_ROUTE, "POST", newRouteData);
 
       // Hiển thị thông báo & cập nhật danh sách
       toast.success("Tuyến mới đã được tạo thành công!");
@@ -159,7 +160,7 @@ const AdminRoute = () => {
     try {
       setIsLoading(true);
       const updated = await sendRequest(
-        `http://localhost:8081/api/route/${updateRoute.id}`,
+        GET_ROUTE_BY_ID(updateRoute.id),
         "PUT",
         updateRouteData
       );
@@ -182,7 +183,7 @@ const AdminRoute = () => {
 
     try {
       setIsLoading(true);
-      await sendRequest(`http://localhost:8081/api/route/${routeId}`, "DELETE");
+      await sendRequest(GET_ROUTE_BY_ID(routeId), "DELETE");
 
       setRecords((prev) => prev.filter((record) => record.id !== routeId));
       toast.success("Tuyến đã được xóa thành công!");

@@ -9,6 +9,12 @@ import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdmi
 import { seatColumn, seatFields } from "../../../Utils/bookingUtils";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import {
+  CREATE_SEAT,
+  GET_ALL_KIND_VEHICLE,
+  GET_SEAT_BY_ID,
+  GET_SEAT_PAGE,
+} from "../../../Utils/apiUrls";
 
 const AdminSeat = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -43,8 +49,7 @@ const AdminSeat = () => {
   };
   const fetchKindVehicles = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:8081/api/kindVehicle");
-      const data = await response.json();
+      const data = await sendRequest(GET_ALL_KIND_VEHICLE, "GET");
       setKindVehicles(data);
       return data;
     } catch (error) {
@@ -56,10 +61,10 @@ const AdminSeat = () => {
     async (searchDebounce, searchCriteria) => {
       try {
         setIsLoading(true);
-        const response = await fetch(
-          `http://localhost:8081/api/seat/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
+        const data = await sendRequest(
+          GET_SEAT_PAGE(page, 10, searchCriteria, searchDebounce),
+          "GET"
         );
-        const data = await response.json();
         return data;
       } catch (error) {
         console.error("Error fetching seats:", error);
@@ -100,7 +105,7 @@ const AdminSeat = () => {
       !validateFields({
         "Loại xe": newSeat.kindVehicleId,
         "Tên ghế": newSeat.name,
-        "Địa chỉ": newSeat.status,
+        "Trạng thái": newSeat.status,
       })
     )
       return;
@@ -112,11 +117,7 @@ const AdminSeat = () => {
     try {
       setIsLoading(true);
       // Gửi request tạo loại xe
-      const created = await sendRequest(
-        "http://localhost:8081/api/seat",
-        "POST",
-        newSeatData
-      );
+      const created = await sendRequest(CREATE_SEAT, "POST", newSeatData);
 
       // Hiển thị thông báo & cập nhật danh sách
       toast.success("Ghế ngồi mới đã được tạo thành công!");
@@ -147,7 +148,7 @@ const AdminSeat = () => {
     try {
       setIsLoading(true);
       const updated = await sendRequest(
-        `http://localhost:8081/api/seat/${updateSeat.id}`,
+        GET_SEAT_BY_ID(updateSeat.id),
         "PUT",
         updateSeatData
       );
@@ -169,7 +170,7 @@ const AdminSeat = () => {
 
     try {
       setIsLoading(true);
-      await sendRequest(`http://localhost:8081/api/seat/${seatId}`, "DELETE");
+      await sendRequest(GET_SEAT_BY_ID(seatId), "DELETE");
 
       setRecords((prev) => prev.filter((record) => record.id !== seatId));
       toast.success("Ghế ngồi đã được xóa thành công!");
