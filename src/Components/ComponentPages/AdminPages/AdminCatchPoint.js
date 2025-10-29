@@ -13,6 +13,12 @@ import {
 } from "../../../Utils/bookingUtils";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import {
+  GET_CATCH_POINT_PAGE,
+  GET_ALL_ROUTES,
+  CREATE_CATCH_POINT,
+  GET_CATCH_POINT_BY_ID,
+} from "../../../Utils/apiUrls";
 const AdminCatchPoint = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentPoint, setCurrentPoint] = useState({});
@@ -39,10 +45,10 @@ const AdminCatchPoint = () => {
   const fetchCatchPoint = useCallback(
     async (searchDebounce, searchCriteria) => {
       try {
-        const response = await fetch(
-          `http://localhost:8081/api/catch-point/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
+        const data = await sendRequest(
+          GET_CATCH_POINT_PAGE(page, 10, searchCriteria, searchDebounce),
+          "GET"
         );
-        const data = await response.json();
         return data;
       } catch (error) {
         console.error("Error fetching catch points:", error);
@@ -54,8 +60,7 @@ const AdminCatchPoint = () => {
 
   const fetchRoutes = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:8081/api/route");
-      const data = await response.json();
+      const data = await sendRequest(GET_ALL_ROUTES, "GET");
       return data;
     } catch (error) {
       console.error("Error fetching routes:", error);
@@ -118,7 +123,7 @@ const AdminCatchPoint = () => {
       setIsLoading(true);
       // Gửi request tạo loại xe
       const created = await sendRequest(
-        "http://localhost:8081/api/catch-point",
+        CREATE_CATCH_POINT,
         "POST",
         newPointData
       );
@@ -152,7 +157,7 @@ const AdminCatchPoint = () => {
     try {
       setIsLoading(true);
       const updated = await sendRequest(
-        `http://localhost:8081/api/catch-point/${updateCatchPoint.id}`,
+        GET_CATCH_POINT_BY_ID(updateCatchPoint.id),
         "PUT",
         updatePointData
       );
@@ -173,10 +178,7 @@ const AdminCatchPoint = () => {
 
     try {
       setIsLoading(true);
-      await sendRequest(
-        `http://localhost:8081/api/catch-point/${pointId}`,
-        "DELETE"
-      );
+      await sendRequest(GET_CATCH_POINT_BY_ID(pointId), "DELETE");
 
       setRecords((prev) => prev.filter((record) => record.id !== pointId));
       toast.success("Điểm đón đã được xóa thành công!");

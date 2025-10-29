@@ -8,6 +8,12 @@ import ConfirmDeleteModal from "../../ComponentParts/ModelComponents/ConfirmDele
 import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
 import { sendRequest } from "../../../Utils/apiHelper";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import {
+  GET_BOOKING_BY_ID,
+  GET_BOOKING_DETAIL_BY_BOOKING,
+  CANCEL_BOOKING,
+  GET_BOOKINGS_PAGE,
+} from "../../../Utils/apiUrls";
 
 const AdminBooking = () => {
   const [isDetail, setIsDetail] = useState(false);
@@ -36,15 +42,19 @@ const AdminBooking = () => {
 
   const fetchBookings = useCallback(async () => {
     setIsLoading(true);
+
     try {
-      const response = await fetch(
-        `http://localhost:8081/api/booking/page?page=${page}&size=5&${searchCriteria}=${searchValue}`
+      const data = await sendRequest(
+        GET_BOOKINGS_PAGE(page, 5, searchCriteria, searchValue),
+        "GET"
       );
-      const data = await response.json();
-      setRecords(data.bookings);
-      setTotalPages(data.totalPages);
+
+      // ✅ Gán dữ liệu trả về
+      setRecords(data.bookings || []);
+      setTotalPages(data.totalPages || 1);
     } catch (error) {
-      console.error("Error fetching cities:", error);
+      console.error("❌ Error fetching bookings:", error);
+      toast.error("Không thể tải danh sách đặt vé!");
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +73,7 @@ const AdminBooking = () => {
 
       // Gọi API qua sendRequest
       const updatedBooking = await sendRequest(
-        `http://localhost:8081/api/booking/${booking.id}`,
+        GET_BOOKING_BY_ID,
         "PUT",
         newBookingData
       );
@@ -90,14 +100,10 @@ const AdminBooking = () => {
     setIsLoading(true); // 🔹 Bắt đầu loading
 
     try {
-      const response = await fetch(
-        `http://localhost:8081/api/booking_detail/booking/${bookingId}`
+      const data = await sendRequest(
+        GET_BOOKING_DETAIL_BY_BOOKING(bookingId),
+        "GET"
       );
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
       setBookingDetails(data);
       console.log("Booking details:", data);
 
@@ -126,10 +132,7 @@ const AdminBooking = () => {
 
     setIsLoading(true);
     try {
-      const canceled = await sendRequest(
-        `http://localhost:8081/api/booking/cancel/${bookingId}`,
-        "PUT"
-      );
+      const canceled = await sendRequest(CANCEL_BOOKING(bookingId), "PUT");
 
       // setRecords((prev) => prev.filter((record) => record.id !== bookingId));
       toast.success("Đặt chỗ đã được hủy thành công!");

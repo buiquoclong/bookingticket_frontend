@@ -18,6 +18,8 @@ import {
   AirportShuttle,
 } from "@mui/icons-material";
 import "./AdminSidebar.scss";
+import { GET_USER_BY_ID } from "../../../../Utils/apiUrls";
+import { sendRequest } from "../../../../Utils/apiHelper";
 
 // Menu chung
 const MENU_ITEMS = [
@@ -53,8 +55,7 @@ function AdminSidebar({ openSidebarToggle, OpenSidebar }) {
   const fetchUserInfo = useCallback(async () => {
     if (!userId) return;
     try {
-      const res = await fetch(`http://localhost:8081/api/user/${userId}`);
-      const data = await res.json();
+      const data = await sendRequest(GET_USER_BY_ID(userId));
       setUserData(data);
     } catch (error) {
       console.error("Error fetching user info:", error);
