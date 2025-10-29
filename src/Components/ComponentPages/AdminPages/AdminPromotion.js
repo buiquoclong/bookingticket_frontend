@@ -9,6 +9,11 @@ import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdmi
 import { promotionColumn, promotionFields } from "../../../Utils/bookingUtils";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import {
+  CREATE_PROMOTION,
+  GET_PROMOTION_BY_ID,
+  GET_PROMOTION_PAGE,
+} from "../../../Utils/apiUrls";
 
 const AdminPromotion = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -26,10 +31,10 @@ const AdminPromotion = () => {
   const fetchPromotions = useCallback(
     async (searchDebounce, searchCriteria) => {
       try {
-        const response = await fetch(
-          `http://localhost:8081/api/promotion/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
+        const data = await sendRequest(
+          GET_PROMOTION_PAGE(page, 10, searchCriteria, searchDebounce),
+          "GET"
         );
-        const data = await response.json();
         return data;
       } catch (error) {
         console.error("Error fetching promotions:", error);
@@ -86,11 +91,7 @@ const AdminPromotion = () => {
 
     try {
       setIsLoading(true);
-      const created = await sendRequest(
-        "http://localhost:8081/api/promotion",
-        "POST",
-        newPromo
-      );
+      const created = await sendRequest(CREATE_PROMOTION, "POST", newPromo);
 
       toast.success("Mã giảm giá đã được tạo thành công!");
       setRecords((prev) => [...prev, created]);
@@ -118,7 +119,7 @@ const AdminPromotion = () => {
     try {
       setIsLoading(true);
       const updated = await sendRequest(
-        `http://localhost:8081/api/promotion/${updatePromo.id}`,
+        GET_PROMOTION_BY_ID(updatePromo.id),
         "PUT",
         updatePromo
       );
@@ -143,10 +144,7 @@ const AdminPromotion = () => {
 
     try {
       setIsLoading(true);
-      await sendRequest(
-        `http://localhost:8081/api/promotion/${promotionId}`,
-        "DELETE"
-      );
+      await sendRequest(GET_PROMOTION_BY_ID(promotionId), "DELETE");
 
       setRecords((prev) => prev.filter((record) => record.id !== promotionId));
       toast.success("Promotion đã được xóa thành công!");

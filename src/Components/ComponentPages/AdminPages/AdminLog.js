@@ -4,6 +4,8 @@ import AdminTable from "../../ComponentParts/AdminComponents/AdminTable";
 import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
 import { logColumn } from "../../../Utils/bookingUtils";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { GET_LOG_PAGE } from "../../../Utils/apiUrls";
+import { sendRequest } from "../../../Utils/apiHelper";
 
 const AdminLog = () => {
   const [records, setRecords] = useState([]);
@@ -27,10 +29,10 @@ const AdminLog = () => {
     async (searchDebounce, searchCriteria) => {
       try {
         setIsLoading(true);
-        const response = await fetch(
-          `http://localhost:8081/api/log/page?page=${page}&${searchCriteria}=${searchDebounce}`
+        const data = await sendRequest(
+          GET_LOG_PAGE(page, 10, searchCriteria, searchDebounce),
+          "GET"
         );
-        const data = await response.json();
         return data;
       } catch (error) {
         console.error("Error fetching logs:", error);
@@ -71,8 +73,8 @@ const AdminLog = () => {
         searchValue={searchValue}
         setSearchValue={setSearchValue}
         searchOptions={[
-          { value: "userName", label: "Người thực hiện" },
-          { value: "level", label: "Mức độ cảnh báo" },
+          { key: "userName", label: "Người thực hiện" },
+          { key: "level", label: "Mức độ cảnh báo" },
         ]}
         searchCriteria={searchCriteria}
         handleCriteriaChange={handleCriteriaChange}

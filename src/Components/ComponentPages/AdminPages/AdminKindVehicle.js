@@ -13,6 +13,11 @@ import {
 } from "../../../Utils/bookingUtils";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import {
+  CREATE_KIND_VEHICLE,
+  GET_KIND_VEHICLE_BY_ID,
+  GET_KIND_VEHICLE_PAGE,
+} from "../../../Utils/apiUrls";
 
 const AdminKindVehicle = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -31,10 +36,10 @@ const AdminKindVehicle = () => {
     async (searchDebounce) => {
       try {
         setIsLoading(true);
-        const response = await fetch(
-          `http://localhost:8081/api/kindVehicle/page?page=${page}&size=10&name=${searchDebounce}`
+        const data = await sendRequest(
+          GET_KIND_VEHICLE_PAGE(page, 10, searchDebounce),
+          "GET"
         );
-        const data = await response.json();
         return data;
       } catch (error) {
         console.error("Error fetching kind vehicles:", error);
@@ -75,11 +80,9 @@ const AdminKindVehicle = () => {
     try {
       setIsLoading(true);
       // Gửi request tạo loại xe
-      const created = await sendRequest(
-        "http://localhost:8081/api/kindVehicle",
-        "POST",
-        { name: newKindVehicle.name }
-      );
+      const created = await sendRequest(CREATE_KIND_VEHICLE, "POST", {
+        name: newKindVehicle.name,
+      });
 
       // Hiển thị thông báo & cập nhật danh sách
       toast.success("Loại xe mới đã được tạo thành công!");
@@ -99,7 +102,7 @@ const AdminKindVehicle = () => {
     try {
       setIsLoading(true);
       const updated = await sendRequest(
-        `http://localhost:8081/api/kindVehicle/${updateKindVehicle.id}`,
+        GET_KIND_VEHICLE_BY_ID(updateKindVehicle.id),
         "PUT",
         { name: updateKindVehicle.name }
       );
@@ -122,10 +125,7 @@ const AdminKindVehicle = () => {
 
     try {
       setIsLoading(true);
-      await sendRequest(
-        `http://localhost:8081/api/kindVehicle/${kindVehicleId}`,
-        "DELETE"
-      );
+      await sendRequest(GET_KIND_VEHICLE_BY_ID(kindVehicleId), "DELETE");
 
       setRecords((prev) =>
         prev.filter((record) => record.id !== kindVehicleId)
