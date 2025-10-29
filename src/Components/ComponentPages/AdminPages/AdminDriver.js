@@ -10,6 +10,11 @@ import { driverFields } from "../../../Utils/bookingUtils";
 import { driverColumn } from "../../../Utils/bookingUtils";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import {
+  CREATE_DRIVER,
+  GET_DRIVER_BY_ID,
+  GET_DRIVER_PAGE,
+} from "../../../Utils/apiUrls";
 const AdminDriver = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isAdd, setIsAdd] = useState(false);
@@ -39,10 +44,10 @@ const AdminDriver = () => {
       console.log("Fetching drivers with:", { searchDebounce, searchCriteria });
       try {
         setIsLoading(true);
-        const response = await fetch(
-          `http://localhost:8081/api/driver/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
+        const data = await sendRequest(
+          GET_DRIVER_PAGE(page, 10, searchCriteria, searchDebounce),
+          "GET"
         );
-        const data = await response.json();
         return data;
       } catch (error) {
         console.error("Error fetching drivers:", error);
@@ -92,11 +97,7 @@ const AdminDriver = () => {
 
     try {
       setIsLoading(true);
-      const created = await sendRequest(
-        "http://localhost:8081/api/driver",
-        "POST",
-        newDriver
-      );
+      const created = await sendRequest(CREATE_DRIVER, "POST", newDriver);
 
       toast.success("Tài xế đã được tạo thành công!");
       setRecords((prev) => [...prev, created]);
@@ -122,7 +123,7 @@ const AdminDriver = () => {
     try {
       setIsLoading(true);
       const updated = await sendRequest(
-        `http://localhost:8081/api/driver/${updateDriver.id}`,
+        GET_DRIVER_BY_ID(updateDriver.id),
         "PUT",
         updateDriver
       );
@@ -147,10 +148,7 @@ const AdminDriver = () => {
 
     try {
       setIsLoading(true);
-      await sendRequest(
-        `http://localhost:8081/api/driver/${driverId}`,
-        "DELETE"
-      );
+      await sendRequest(GET_DRIVER_BY_ID(driverId), "DELETE");
 
       setRecords((prev) => prev.filter((d) => d.id !== driverId));
       toast.success("Tài xế đã được xóa thành công!");

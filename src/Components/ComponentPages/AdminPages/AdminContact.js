@@ -9,6 +9,11 @@ import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdmi
 import { contactColumn, contactField } from "../../../Utils/bookingUtils";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import {
+  CREATE_CONTACT,
+  GET_CONTACT_BY_ID,
+  GET_CONTACT_PAGE,
+} from "../../../Utils/apiUrls";
 
 const AdminContact = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -29,10 +34,10 @@ const AdminContact = () => {
     async (searchDebounce, searchCriteria) => {
       try {
         setIsLoading(true);
-        const response = await fetch(
-          `http://localhost:8081/api/contact/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
+        const data = await sendRequest(
+          GET_CONTACT_PAGE(page, 10, searchCriteria, searchDebounce),
+          "GET"
         );
-        const data = await response.json();
         return data;
       } catch (error) {
         console.error("Error fetching contacts:", error);
@@ -85,11 +90,7 @@ const AdminContact = () => {
     try {
       setIsLoading(true);
       // Gửi request tạo loại xe
-      const created = await sendRequest(
-        "http://localhost:8081/api/contact",
-        "POST",
-        newContactData
-      );
+      const created = await sendRequest(CREATE_CONTACT, "POST", newContactData);
 
       // Hiển thị thông báo & cập nhật danh sách
       toast.success("Liên hệ mới đã được tạo thành công!");
@@ -121,7 +122,7 @@ const AdminContact = () => {
 
     try {
       const updated = await sendRequest(
-        `http://localhost:8081/api/contact/${updateContact.id}`,
+        GET_CONTACT_BY_ID(updateContact.id),
         "PUT",
         updateContactData
       );
@@ -141,10 +142,7 @@ const AdminContact = () => {
 
     try {
       setIsLoading(true);
-      await sendRequest(
-        `http://localhost:8081/api/contact/${contactId}`,
-        "DELETE"
-      );
+      await sendRequest(GET_CONTACT_BY_ID(contactId), "DELETE");
 
       setRecords((prev) => prev.filter((record) => record.id !== contactId));
       toast.success("Liên hệ đã được xóa thành công!");

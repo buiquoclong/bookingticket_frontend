@@ -9,6 +9,11 @@ import AddModal from "../../ComponentParts/ModelComponents/AddModal";
 import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import {
+  CREATE_CITY,
+  GET_CITY_BY_ID,
+  GET_CITY_PAGE,
+} from "../../../Utils/apiUrls";
 const AdminCity = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isAdd, setIsAdd] = useState(false);
@@ -25,10 +30,10 @@ const AdminCity = () => {
     async (searchDebounce) => {
       setIsLoading(true);
       try {
-        const response = await fetch(
-          `http://localhost:8081/api/city/page?page=${page}&size=10&name=${searchDebounce}`
+        const data = await sendRequest(
+          GET_CITY_PAGE(page, 10, searchDebounce),
+          "GET"
         );
-        const data = await response.json();
         return data;
       } catch (error) {
         console.error("Error fetching cities:", error);
@@ -86,11 +91,7 @@ const AdminCity = () => {
     try {
       setIsLoading(true);
       // Gửi request tạo loại xe
-      const created = await sendRequest(
-        "http://localhost:8081/api/city",
-        "POST",
-        formData
-      );
+      const created = await sendRequest(CREATE_CITY, "POST", formData);
 
       // Hiển thị thông báo & cập nhật danh sách
       toast.success("Thành phố mới đã được tạo thành công!");
@@ -125,7 +126,7 @@ const AdminCity = () => {
       setIsLoading(true);
       // Gửi request tạo loại xe
       const updated = await sendRequest(
-        `http://localhost:8081/api/city/${updatedCity.id}`,
+        GET_CITY_BY_ID(updatedCity.id),
         "PUT",
         formData
       );
@@ -148,7 +149,7 @@ const AdminCity = () => {
 
     try {
       setIsLoading(true);
-      await sendRequest(`http://localhost:8081/api/city/${cityId}`, "DELETE");
+      await sendRequest(GET_CITY_BY_ID(cityId), "DELETE");
 
       setRecords((prev) => prev.filter((record) => record.id !== cityId));
       toast.success("Thành phố đã được xóa thành công!");
