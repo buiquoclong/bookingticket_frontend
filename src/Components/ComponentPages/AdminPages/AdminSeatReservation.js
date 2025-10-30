@@ -3,6 +3,8 @@ import AdminTable from "../../ComponentParts/AdminComponents/AdminTable";
 import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdminHeader";
 import { seatReservationColumn } from "../../../Utils/bookingUtils";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import { sendRequest } from "../../../Utils/apiHelper";
+import { GET_SEAT_RESERVATION_PAGE } from "../../../Utils/apiUrls";
 
 const AdminSeatReservation = () => {
   const [records, setRecords] = useState([]);
@@ -13,10 +15,10 @@ const AdminSeatReservation = () => {
     async (searchDebounce) => {
       try {
         setIsLoading(true);
-        const response = await fetch(
-          `http://localhost:8081/api/seat_reservation/page?page=${page}&size=10`
+        const data = await sendRequest(
+          GET_SEAT_RESERVATION_PAGE(page, 10),
+          "GET"
         );
-        const data = await response.json();
         return data;
       } catch (error) {
         console.error("Error fetching seat reservations:", error);
