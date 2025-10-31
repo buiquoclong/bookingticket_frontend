@@ -37,15 +37,15 @@ const AdminSeat = () => {
   );
 
   const statusMap = {
-    0: "Đang hoạt động",
-    1: "Tạm dừng hoạt động",
-    2: "Ngừng hoạt động",
+    1: "Đang hoạt động",
+    2: "Tạm dừng hoạt động",
+    3: "Ngừng hoạt động",
   };
 
   const statusColorMap = {
-    0: "#008000b3", // Đang làm
-    1: "#ffa9008a", // Tạm nghỉ
-    2: "#ff0000c2", // Tạm khóa
+    1: "#008000b3", // Đang làm
+    2: "#ffa9008a", // Tạm nghỉ
+    3: "#ff0000c2", // Tạm khóa
   };
   const fetchKindVehicles = useCallback(async () => {
     try {
@@ -100,6 +100,7 @@ const AdminSeat = () => {
   };
 
   const handleCreateSeat = async (newSeat) => {
+    console.log("newSeat", newSeat);
     // Validate dữ liệu đầu vào
     if (
       !validateFields({
@@ -114,6 +115,7 @@ const AdminSeat = () => {
       name: newSeat.name,
       status: newSeat.status,
     };
+    console.log(newSeatData);
     try {
       setIsLoading(true);
       // Gửi request tạo loại xe
@@ -254,7 +256,7 @@ const AdminSeat = () => {
         visible={isAdd}
         title="Thêm ghế ngồi"
         fields={searchOptions}
-        defaultValues={{ status: 0 }} // mặc định status = 1
+        defaultValues={{ status: 1 }} // mặc định status = 1
         onSave={handleCreateSeat}
         onCancel={() => setIsAdd(false)}
       />

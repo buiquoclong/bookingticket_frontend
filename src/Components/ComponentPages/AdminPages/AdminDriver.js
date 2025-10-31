@@ -41,7 +41,6 @@ const AdminDriver = () => {
   };
   const fetchDrivers = useCallback(
     async (searchDebounce, searchCriteria) => {
-      console.log("Fetching drivers with:", { searchDebounce, searchCriteria });
       try {
         setIsLoading(true);
         const data = await sendRequest(
