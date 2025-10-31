@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "react-toastify";
 
 import {
   tripColumn,
   tripFields,
   tripDetailColumns,
+  tripFieldSearch,
 } from "../../../Utils/bookingUtils";
+import useDebounce from "./useDebounce";
 import AdminTable from "../../ComponentParts/AdminComponents/AdminTable";
 import ConfirmDeleteModal from "../../ComponentParts/ModelComponents/ConfirmDeleteModal";
 import EditModal from "../../ComponentParts/ModelComponents/EditModal";
@@ -14,13 +16,22 @@ import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdmi
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 import DetailModal from "../../ComponentParts/ModelComponents/DetailModal";
+import {
+  CREATE_TRIP,
+  GET_ALL_KIND_VEHICLE,
+  GET_ALL_ROUTES,
+  GET_DRIVER_AVAILABLE_FOR_DAYSTART,
+  GET_SEAT_RESERVATION_BY_TRIP_ID,
+  GET_TRIP_BY_ID,
+  GET_TRIP_PAGE,
+  GET_VEHICLE_AVAILABLE_BY_KIND_AND_DAYSTART,
+} from "../../../Utils/apiUrls";
 
 const AdminTrip = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [currentTrip, setcurrentTrip] = useState({});
+  const [currentTrip, setCurrentTrip] = useState({});
   const [isAdd, setIsAdd] = useState(false);
   const [kindVehicledata, setKindVehicledata] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
   const [vehicleOfKind, setVehicleOfKind] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [routes, setRoutes] = useState([]);
@@ -28,7 +39,13 @@ const AdminTrip = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [searchCriteria, setSearchCriteria] = useState("dayStart");
+  const [searchValue, setSearchValue] = useState("");
+  const searchDebounce = useDebounce(
+    typeof searchValue === "string" ? searchValue.trim() : searchValue,
+    500
+  );
+  const prevCriteriaRef = useRef(searchCriteria);
   // const [dayStart, setDayStart] = useState("");
   const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
   const [tripToDelete, setTripToDelete] = useState(null);
@@ -47,38 +64,37 @@ const AdminTrip = () => {
   const [seatData, setSeatData] = useState([]);
 
   const [isDetail, setIsDetail] = useState(false);
-  const handleDetailClick = (trip) => {
+  const handleDetailClick = async (trip) => {
     const tripId = trip.id;
-    fetch(`http://localhost:8081/api/seat_reservation/trip/${tripId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setSeatData(data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    const data = await sendRequest(
+      GET_SEAT_RESERVATION_BY_TRIP_ID(tripId),
+      "GET"
+    );
+    setSeatData(data);
     setIsDetail(true);
   };
-  const fetchTrips = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch(
-        `http://localhost:8081/api/trip/page?page=${page}&size=10&routeId=&dayStart=${searchValue}`
-      );
-      const data = await response.json();
-      setRecords(data.trips);
-      setTotalPages(data.totalPages);
-    } catch (error) {
-      console.error("Error fetching trips:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [page, searchValue]);
+  const fetchTrips = useCallback(
+    async (searchDebounce, searchCriteria) => {
+      try {
+        setIsLoading(true);
+        const data = await sendRequest(
+          GET_TRIP_PAGE(page, 10, searchCriteria, searchDebounce),
+          "GET"
+        );
+        setRecords(data.trips);
+        setTotalPages(data.totalPages);
+      } catch (error) {
+        console.error("Error fetching trips:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [page]
+  );
 
   const fetchRoutes = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:8081/api/route");
-      const data = await response.json();
+      const data = await sendRequest(GET_ALL_ROUTES, "GET");
       setRoutes(data);
     } catch (error) {
       console.error("Error fetching routes:", error);
@@ -87,8 +103,7 @@ const AdminTrip = () => {
 
   const fetchKindVehicles = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:8081/api/kindVehicle");
-      const data = await response.json();
+      const data = await sendRequest(GET_ALL_KIND_VEHICLE, "GET");
       setKindVehicledata(data);
     } catch (error) {
       console.error("Error fetching kind vehicles:", error);
@@ -97,10 +112,10 @@ const AdminTrip = () => {
 
   const fetchDrivers = useCallback(async (dayStart) => {
     try {
-      const response = await fetch(
-        `http://localhost:8081/api/driver/available?dayStart=${dayStart}`
+      const data = await sendRequest(
+        GET_DRIVER_AVAILABLE_FOR_DAYSTART(dayStart),
+        "GET"
       );
-      const data = await response.json();
       setDrivers(data);
     } catch (error) {
       console.error("Error fetching drivers:", error);
@@ -109,10 +124,18 @@ const AdminTrip = () => {
 
   // Dùng useEffect để gọi các API khi page hoặc daySearch thay đổi
   useEffect(() => {
+    if (prevCriteriaRef.current !== searchCriteria && searchValue === "") {
+      prevCriteriaRef.current = searchCriteria;
+      console.log("🔸 Criteria changed, skipping fetch with empty searchValue");
+      return; // ❌ KHÔNG FETCH
+    }
+
+    prevCriteriaRef.current = searchCriteria;
     const fetchData = async () => {
+      // if (!searchDebounce) return;
       // Gọi các API đồng thời để tiết kiệm thời gian
       const [tripsData, routesData, kindVehicleData] = await Promise.all([
-        fetchTrips(),
+        fetchTrips(searchDebounce, searchCriteria),
         fetchRoutes(),
         fetchKindVehicles(),
       ]);
@@ -123,9 +146,18 @@ const AdminTrip = () => {
       }
     };
     fetchData();
-  }, [page, fetchTrips, fetchRoutes, fetchKindVehicles, fetchDrivers]);
+  }, [
+    page,
+    searchValue,
+    searchDebounce,
+    searchCriteria,
+    fetchTrips,
+    fetchRoutes,
+    fetchKindVehicles,
+    fetchDrivers,
+  ]);
   const handleEditClick = (trip) => {
-    setcurrentTrip(trip);
+    setCurrentTrip(trip);
     setIsEditing(true);
 
     // Gọi API lấy xe sẵn cho kindVehicle và dayStart hiện tại của trip
@@ -143,17 +175,13 @@ const AdminTrip = () => {
 
   const fetchVehiclesByKind = async (kindVehicleId, dayStart) => {
     try {
-      const response = await fetch(
-        `http://localhost:8081/api/vehicle/available/${kindVehicleId}?dayStart=${dayStart}`
+      const data = await sendRequest(
+        GET_VEHICLE_AVAILABLE_BY_KIND_AND_DAYSTART(kindVehicleId, dayStart),
+        "GET"
       );
-      const data = await response.json();
-      console.log(data);
       setVehicleOfKind(data);
     } catch (error) {
-      console.error(
-        `Error fetching vehicles for kind vehicle ID ${kindVehicleId}:`,
-        error
-      );
+      console.error("Error fetching vehicles for kind vehicle ID:", error);
     }
   };
   const handleCreateClick = () => {
@@ -187,11 +215,7 @@ const AdminTrip = () => {
     try {
       setIsLoading(true);
       // Gửi request tạo chuyến đi
-      const created = await sendRequest(
-        "http://localhost:8081/api/trip",
-        "POST",
-        newTripData
-      );
+      const created = await sendRequest(CREATE_TRIP, "POST", newTripData);
 
       // Hiển thị thông báo & cập nhật danh sách
       toast.success("Chuyến đi mới đã được tạo thành công!");
@@ -230,7 +254,7 @@ const AdminTrip = () => {
     try {
       setIsLoading(true);
       const updated = await sendRequest(
-        `http://localhost:8081/api/trip/${updateTrip.id}`,
+        GET_TRIP_BY_ID(updateTrip.id),
         "PUT",
         updateTripData
       );
@@ -251,7 +275,7 @@ const AdminTrip = () => {
 
     try {
       setIsLoading(true);
-      await sendRequest(`http://localhost:8081/api/trip/${tripId}`, "DELETE");
+      await sendRequest(GET_TRIP_BY_ID(tripId), "DELETE");
 
       setRecords((prev) => prev.filter((record) => record.id !== tripId));
       toast.success("Chuyến đi đã được xóa thành công!");
@@ -296,11 +320,23 @@ const AdminTrip = () => {
     return { ...field, value: field.key };
   });
   const handleFieldChange = (key, value, dayStart) => {
-    console.log(dayStart);
+    setCurrentTrip((prev) => ({ ...prev, [key]: value }));
     if (key === "kindVehicleId" && dayStart) {
       fetchVehiclesByKind(value, dayStart);
     }
     if (key === "dayStart") fetchDrivers(value);
+  };
+
+  const tripFilterOptions = tripFieldSearch.map((field) => {
+    if (field.type === "select" && field.key === "routeId") {
+      return { ...field, value: field.key, options: routes };
+    }
+    return { ...field, value: field.key };
+  });
+  const handleCriteriaChange = (event) => {
+    const newCriteria = event.target.value;
+    setSearchCriteria(newCriteria);
+    setSearchValue(""); // ✅ reset ngay khi đổi dropdown
   };
 
   return (
@@ -315,9 +351,9 @@ const AdminTrip = () => {
           ]}
           searchValue={searchValue}
           setSearchValue={setSearchValue}
-          searchOptions={[
-            { key: "dayStart", label: "Ngày bắt đầu", type: "date" }, // có thể thêm nhiều option khác
-          ]}
+          searchOptions={tripFilterOptions}
+          searchCriteria={searchCriteria}
+          handleCriteriaChange={handleCriteriaChange}
           addButtonLabel="Thêm chuyến đi"
           onAddClick={handleCreateClick}
         />
