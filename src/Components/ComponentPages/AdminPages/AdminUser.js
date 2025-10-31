@@ -13,6 +13,11 @@ import {
 } from "../../../Utils/bookingUtils";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import {
+  CREATE_USER_ADMIN,
+  GET_USER_BY_ID,
+  GET_USER_PAGE,
+} from "../../../Utils/apiUrls";
 
 const AdminUser = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -46,10 +51,10 @@ const AdminUser = () => {
     async (searchDebounce) => {
       try {
         setIsLoading(true);
-        const response = await fetch(
-          `http://localhost:8081/api/user/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
+        const data = await sendRequest(
+          GET_USER_PAGE(page, 10, searchCriteria, searchDebounce),
+          "GET"
         );
-        const data = await response.json();
         return data;
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -103,11 +108,7 @@ const AdminUser = () => {
     try {
       setIsLoading(true);
       // Gửi request tạo người dùng
-      await sendRequest(
-        "http://localhost:8081/api/user/create-by-admin",
-        "POST",
-        newUserData
-      );
+      await sendRequest(CREATE_USER_ADMIN, "POST", newUserData);
 
       // Hiển thị thông báo & cập nhật danh sách
       toast.success("Người dùng mới đã được tạo thành công!");
@@ -136,7 +137,7 @@ const AdminUser = () => {
     try {
       setIsLoading(true);
       const updated = await sendRequest(
-        `http://localhost:8081/api/user/${updateUser.id}`,
+        GET_USER_BY_ID(updateUser.id),
         "PUT",
         updateUserData
       );
