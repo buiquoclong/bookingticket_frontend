@@ -9,6 +9,12 @@ import GenericAdminHeader from "../../ComponentParts/AdminComponents/GenericAdmi
 import { vehicleColumn, vehicleFields } from "../../../Utils/bookingUtils";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
+import {
+  CREATE_VEHICLE,
+  GET_ALL_KIND_VEHICLE,
+  GET_VEHICLE_BY_ID,
+  GET_VEHICLE_PAGE,
+} from "../../../Utils/apiUrls";
 
 const AdminVehicle = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -32,8 +38,7 @@ const AdminVehicle = () => {
   const fetchKindVehicles = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("http://localhost:8081/api/kindVehicle");
-      const data = await response.json();
+      const data = await sendRequest(GET_ALL_KIND_VEHICLE, "GET");
       setKindVehicleData(data);
       return data;
     } catch (error) {
@@ -57,10 +62,10 @@ const AdminVehicle = () => {
     async (searchDebounce, searchCriteria) => {
       try {
         setIsLoading(true);
-        const response = await fetch(
-          `http://localhost:8081/api/vehicle/page?page=${page}&size=10&${searchCriteria}=${searchDebounce}`
+        const data = await sendRequest(
+          GET_VEHICLE_PAGE(page, 10, searchCriteria, searchDebounce),
+          "GET"
         );
-        const data = await response.json();
         // Cập nhật state sau khi lấy dữ liệu
         return data;
       } catch (error) {
@@ -121,11 +126,7 @@ const AdminVehicle = () => {
     try {
       setIsLoading(true);
       // Gửi request tạo phương tiện
-      const created = await sendRequest(
-        "http://localhost:8081/api/vehicle",
-        "POST",
-        newVehicleData
-      );
+      const created = await sendRequest(CREATE_VEHICLE, "POST", newVehicleData);
 
       // Hiển thị thông báo & cập nhật danh sách
       toast.success("Phương tiện mới đã được tạo thành công!");
@@ -161,7 +162,7 @@ const AdminVehicle = () => {
     try {
       setIsLoading(true);
       const updated = await sendRequest(
-        `http://localhost:8081/api/vehicle/${updateVehicle.id}`,
+        GET_VEHICLE_BY_ID(updateVehicle.id),
         "PUT",
         updateVehicleData
       );
@@ -183,10 +184,7 @@ const AdminVehicle = () => {
 
     try {
       setIsLoading(true);
-      await sendRequest(
-        `http://localhost:8081/api/vehicle/${vehicleId}`,
-        "DELETE"
-      );
+      await sendRequest(GET_VEHICLE_BY_ID(vehicleId), "DELETE");
 
       setRecords((prev) => prev.filter((record) => record.id !== vehicleId));
       toast.success("Phương tiện đã được xóa thành công!");
