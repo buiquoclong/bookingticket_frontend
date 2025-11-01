@@ -17,9 +17,8 @@ import { useNavigate } from "react-router-dom";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
 import { validateFields, sendRequest } from "../../../Utils/apiHelper";
 import {
-  GET_REVIEW_PAGE,
-  UPDATE_REVIEW,
-  DELETE_REVIEW,
+  GET_REVIEW_OF_USER_PAGE,
+  GET_REVIEW_BY_ID,
 } from "../../../Utils/apiUrls";
 
 const MyRating = () => {
@@ -41,7 +40,7 @@ const MyRating = () => {
     try {
       setIsLoading(true);
       const data = await sendRequest(
-        GET_REVIEW_PAGE(page, 10, userId, searchValue),
+        GET_REVIEW_OF_USER_PAGE(page, 10, userId, searchValue),
         "GET"
       );
 
@@ -87,10 +86,14 @@ const MyRating = () => {
     if (!isValid) return;
 
     try {
-      const updatedReview = await sendRequest(UPDATE_REVIEW(reviewId), "PUT", {
-        rating,
-        content,
-      });
+      const updatedReview = await sendRequest(
+        GET_REVIEW_BY_ID(reviewId),
+        "PUT",
+        {
+          rating,
+          content,
+        }
+      );
 
       // 🔹 Cập nhật lại danh sách review trong state
       setRecords((prev) =>
@@ -122,7 +125,7 @@ const MyRating = () => {
     }
 
     try {
-      await sendRequest(DELETE_REVIEW(reviewId), "DELETE");
+      await sendRequest(GET_REVIEW_BY_ID(reviewId), "DELETE");
 
       // 🔹 Cập nhật lại danh sách sau khi xóa
       setRecords((prev) => prev.filter((r) => r.id !== reviewId));

@@ -102,7 +102,7 @@ const MyBooking = () => {
     const bookingId = bookingToCancel.id;
 
     try {
-      await sendRequest(CANCEL_BOOKING(bookingId), "DELETE");
+      await sendRequest(CANCEL_BOOKING(bookingId), "PUT");
 
       toast.success("Bạn đã hủy hóa đơn thành công!");
       setIsCancelConfirmVisible(false);
