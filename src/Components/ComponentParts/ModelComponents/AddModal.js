@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./ModelComponents.scss";
 import { getCurrentDateTimeLocal } from "../../../Utils/bookingUtils";
+import { BASE_URL } from "../../../Utils/apiUrls";
 
 const AddModal = ({
   visible,
@@ -39,6 +40,7 @@ const AddModal = ({
           newData[field.key] = val ?? "";
         }
       });
+      console.log("🔍 formData sau khi set defaultValues:", newData);
       setFormData(newData);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,10 +94,13 @@ const AddModal = ({
     e.preventDefault();
     const finalData = { ...formData };
     // Nếu status không có, mặc định là 1
-    if (!finalData.status) finalData.status = 1;
+    if (finalData.status == null || finalData.status === "") {
+      finalData.status = 1;
+    }
     if (formData.newImage) {
       finalData.file = formData.newImage; // thêm file mới
     }
+    console.log("finalData", finalData);
     onSave(finalData);
   };
   const formatPrice = (value) => {
@@ -124,7 +129,9 @@ const AddModal = ({
                           src={
                             formData.imgUrl.startsWith("http")
                               ? formData.imgUrl
-                              : `http://localhost:8081${formData.imgUrl}`
+                              : `${BASE_URL.replace("/api", "")}${
+                                  formData.imgUrl
+                                }`
                           }
                           alt="Current"
                           className="current-image"
