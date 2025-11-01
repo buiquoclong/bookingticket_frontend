@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import {
   Link as MuiLink,
   FormControl,
@@ -21,6 +21,7 @@ const GenericAdminHeader = ({
   onAddClick,
 }) => {
   const dateInputRef = useRef();
+  const prevCriteriaRef = useRef(searchCriteria); // 🔹 Track criteria trước đó
 
   // 🔹 Xác định searchCriteria hiệu quả
   const effectiveCriteria =
@@ -32,6 +33,24 @@ const GenericAdminHeader = ({
   );
   const optionLabel = selectedOption ? selectedOption.label : "";
   const fieldType = selectedOption ? selectedOption.type : "text";
+
+  // 🔹 Xử lý thay đổi criteria - reset searchValue NGAY LẬP TỨC
+  const handleCriteriaChangeInternal = (event) => {
+    // ✅ Reset searchValue TRƯỚC KHI gọi handleCriteriaChange
+    setSearchValue?.("");
+
+    // ✅ Gọi parent để update searchCriteria SAU khi đã reset
+    handleCriteriaChange?.(event);
+  };
+
+  // 🔹 Effect để đảm bảo searchValue được reset khi criteria thay đổi
+  useEffect(() => {
+    // Nếu criteria thay đổi và searchValue vẫn còn giá trị cũ
+    if (prevCriteriaRef.current !== effectiveCriteria && searchValue) {
+      setSearchValue?.("");
+    }
+    prevCriteriaRef.current = effectiveCriteria;
+  }, [effectiveCriteria, searchValue, setSearchValue]);
 
   return (
     <div className="generic-admin-header">
@@ -90,7 +109,7 @@ const GenericAdminHeader = ({
                               value={key}
                               sx={{
                                 display: "flex",
-                                justifyContent: "center", // căn giữa
+                                justifyContent: "center",
                                 color: "gold",
                                 fontSize: "18px",
                               }}
@@ -111,6 +130,8 @@ const GenericAdminHeader = ({
                     label={optionLabel}
                     variant="outlined"
                     size="small"
+                    // 🔹 Key để force re-render khi đổi criteria
+                    key={effectiveCriteria}
                     value={
                       searchValue
                         ? fieldType === "datetime"
@@ -145,6 +166,8 @@ const GenericAdminHeader = ({
               ) : (
                 <TextField
                   type="text"
+                  // 🔹 Key để force re-render khi đổi criteria
+                  key={effectiveCriteria}
                   label={`Tìm kiếm bằng ${optionLabel}`}
                   variant="outlined"
                   size="small"
@@ -178,8 +201,8 @@ const GenericAdminHeader = ({
                   <InputLabel id="criteria-label">Tìm kiếm bằng</InputLabel>
                   <Select
                     labelId="criteria-label"
-                    value={effectiveCriteria}
-                    onChange={handleCriteriaChange}
+                    value={searchCriteria || ""}
+                    onChange={handleCriteriaChangeInternal}
                     label="Tìm kiếm bằng"
                   >
                     {searchOptions.map((option) => (
