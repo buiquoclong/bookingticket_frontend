@@ -4,6 +4,8 @@ import SeatInfo from "../SeatComponents/SeatInfo";
 import PolicyTab from "../PolicyComponents/PolicyTab";
 
 import "./TripResultComponents.scss";
+import { sendRequest } from "../../../Utils/apiHelper";
+import { GET_SEAT_BY_TRIP_AND_KIND } from "../../../Utils/apiUrls";
 
 const TripTabs = ({
   trip,
@@ -18,7 +20,7 @@ const TripTabs = ({
   activeTab,
   onOpenTripTab,
 }) => {
-  const handleTabClick = (tab, tripId, kindVehicleId) => {
+  const handleTabClick = async (tab, tripId, kindVehicleId) => {
     onOpenTripTab(tripId, tab);
 
     // ✅ Gọi scroll khi click tab chọn ghế
@@ -31,22 +33,15 @@ const TripTabs = ({
       console.log("tripId", tripId);
       console.log("kindVehicleId", kindVehicleId);
 
-      fetch(
-        `http://localhost:8081/api/seat/trip/${tripId}/kindVehicle/${kindVehicleId}`
-      )
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Failed to fetch seats");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          console.log("Seats:", data);
-          setSeats(data); // data đã có status từ backend
-        })
-        .catch((error) => {
-          console.error("Error fetching seats:", error);
-        });
+      try {
+        const data = await sendRequest(
+          GET_SEAT_BY_TRIP_AND_KIND(tripId, kindVehicleId)
+        );
+        console.log("Seats:", data);
+        setSeats(data); // dữ liệu có sẵn status từ backend
+      } catch (error) {
+        console.error("Error fetching seats:", error);
+      }
     }
   };
 
