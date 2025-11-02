@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { sendRequest } from "../../Utils/apiHelper";
+import { GET_USER_BY_ID, GET_USER_TOKEN } from "../../Utils/apiUrls";
 
 const useNavbar = () => {
   const [isActive, setIsActive] = useState(false);
@@ -24,12 +26,15 @@ const useNavbar = () => {
 
   const fetchToken = useCallback(async () => {
     try {
-      const res = await fetch("http://localhost:8081/api/user/token", {
-        method: "GET",
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error("Failed to fetch token");
-      const token = await res.text();
+      const res = await sendRequest(
+        GET_USER_TOKEN,
+        "GET",
+        { includeCredentials: true } // ✅ Thêm tùy chọn này
+      );
+
+      const token = res?.token || (typeof res === "string" ? res : null);
+      if (!token) throw new Error("Token không hợp lệ");
+
       localStorage.setItem("token", token);
 
       const { userId, role: userRole } = jwtDecode(token);
@@ -48,9 +53,8 @@ const useNavbar = () => {
   const fetchUserInfo = useCallback(async () => {
     if (!userId) return;
     try {
-      const res = await fetch(`http://localhost:8081/api/user/${userId}`);
-      if (!res.ok) throw new Error("Failed to fetch user info");
-      setData(await res.json());
+      const data = await sendRequest(GET_USER_BY_ID(userId));
+      setData(data);
     } catch (err) {
       console.error(err);
     }
