@@ -27,7 +27,12 @@ export const validateFields = (fields) => {
  * @param {Object|null} body - dữ liệu gửi đi (nếu có)
  * @returns {Promise<any>} dữ liệu phản hồi từ server
  */
-export const sendRequest = async (url, method = "GET", body = null) => {
+export const sendRequest = async (
+  url,
+  method = "GET",
+  body = null,
+  options = {}
+) => {
   const token = localStorage.getItem("token");
 
   try {
@@ -44,6 +49,7 @@ export const sendRequest = async (url, method = "GET", body = null) => {
     const response = await fetch(url, {
       method,
       headers,
+      credentials: options.includeCredentials ? "include" : "same-origin", // ✅ CHỈ include khi cần
       body:
         body instanceof FormData ? body : body ? JSON.stringify(body) : null,
     });
