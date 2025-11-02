@@ -335,6 +335,10 @@ export const tripDetailColumns = [
   { key: "booking.email", label: "Địa chỉ Email" },
   { key: "booking.phone", label: "Số điện thoại" },
 ];
+export const tripFieldSearch = [
+  { key: "routeId", label: "Tên chuyến đi", type: "select" },
+  { key: "dayStart", label: "Ngày khởi hành", type: "date" },
+];
 
 /* ============ COLUMN BOOKING ============ */
 const roundTrip = {
