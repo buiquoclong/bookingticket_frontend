@@ -69,13 +69,13 @@ const AddModal = ({
           cities.find((c) => c.id === parseInt(updated.diemden))?.name ?? "";
         updated.name = `${diemDiName} - ${diemDenName}`;
       }
-      if (key === "price") {
-        // Loại bỏ tất cả ký tự không phải số
-        const numericValue = value.toString().replace(/\D/g, "");
-        updated[key] = numericValue;
-      } else {
-        updated[key] = value;
-      }
+      // if (key === "price") {
+      //   // Loại bỏ tất cả ký tự không phải số
+      //   const numericValue = value.toString().replace(/\D/g, "");
+      //   updated[key] = numericValue;
+      // } else {
+      //   updated[key] = value;
+      // }
       if (onFieldChange) {
         // lấy dayStart hiện tại: nếu key đang thay đổi là "dayStart" thì lấy value mới, còn không lấy formData.dayStart
         const currentDayStart = key === "dayStart" ? value : formData.dayStart;
@@ -103,9 +103,13 @@ const AddModal = ({
     console.log("finalData", finalData);
     onSave(finalData);
   };
-  const formatPrice = (value) => {
-    if (!value) return "";
-    return new Intl.NumberFormat("vi-VN").format(value);
+  // const formatPrice = (value) => {
+  //   if (!value) return "";
+  //   return new Intl.NumberFormat("vi-VN").format(value);
+  // };
+  const handlePriceInput = (value) => {
+    const numericValue = value.replace(/\D/g, ""); // chỉ giữ số
+    setFormData((prev) => ({ ...prev, price: numericValue }));
   };
   return (
     <div className="edit-modal-overlay">
@@ -219,8 +223,14 @@ const AddModal = ({
                 ) : field.key === "price" ? (
                   <input
                     type="text"
-                    value={formatPrice(formData.price)}
-                    onChange={(e) => handleChange("price", e.target.value)}
+                    value={formData.price ?? ""}
+                    onChange={(e) => handlePriceInput(e.target.value)}
+                    onBlur={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        price: prev.price ? Number(prev.price) : "",
+                      }))
+                    }
                   />
                 ) : (
                   <input
