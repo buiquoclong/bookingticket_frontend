@@ -99,10 +99,10 @@ const EditModal = ({
       }
 
       // --- Logic price
-      if (key === "price") {
-        const numericValue = value.toString().replace(/\D/g, "");
-        updated[key] = numericValue;
-      }
+      // if (key === "price") {
+      //   const numericValue = value.toString().replace(/\D/g, "");
+      //   updated[key] = numericValue;
+      // }
 
       return updated;
     });
@@ -119,9 +119,13 @@ const EditModal = ({
     }
     onSave(finalData);
   };
-  const formatPrice = (value) => {
-    if (!value) return "";
-    return new Intl.NumberFormat("vi-VN").format(value);
+  // const formatPrice = (value) => {
+  //   if (!value) return "";
+  //   return new Intl.NumberFormat("vi-VN").format(value);
+  // };
+  const handlePriceInput = (value) => {
+    const numericValue = value.replace(/\D/g, ""); // chỉ giữ số
+    setFormData((prev) => ({ ...prev, price: numericValue }));
   };
   return (
     <div className="edit-modal-overlay">
@@ -235,8 +239,14 @@ const EditModal = ({
                 ) : field.key === "price" ? (
                   <input
                     type="text"
-                    value={formatPrice(formData.price)}
-                    onChange={(e) => handleChange("price", e.target.value)}
+                    value={formData.price ?? ""}
+                    onChange={(e) => handlePriceInput(e.target.value)}
+                    onBlur={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        price: prev.price ? Number(prev.price) : "",
+                      }))
+                    }
                   />
                 ) : (
                   <input
