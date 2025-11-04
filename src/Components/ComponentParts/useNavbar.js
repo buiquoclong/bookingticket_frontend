@@ -24,20 +24,37 @@ const useNavbar = () => {
   const showNav = () => setIsActive(true);
   const removeNavbar = () => setIsActive(false);
 
+  const handleLogoutClick = useCallback(() => {
+    ["token", "userId", "userRole", "googleLogin"].forEach((k) =>
+      localStorage.removeItem(k)
+    );
+    // ✅ Reset lại state user
+    setData(null);
+    navigate("/");
+  }, [navigate]);
+
   const fetchToken = useCallback(async () => {
+    console.log("Kiểm tra token");
     try {
-      const res = await sendRequest(
-        GET_USER_TOKEN,
-        "GET",
-        { includeCredentials: true } // ✅ Thêm tùy chọn này
-      );
+      const res = await sendRequest(GET_USER_TOKEN, "GET", {
+        includeCredentials: true,
+      });
 
       const token = res?.token || (typeof res === "string" ? res : null);
       if (!token) throw new Error("Token không hợp lệ");
 
-      localStorage.setItem("token", token);
+      const { exp, userId, role: userRole } = jwtDecode(token);
 
-      const { userId, role: userRole } = jwtDecode(token);
+      // ✅ Kiểm tra token hết hạn
+      const isExpired = exp * 1000 < Date.now();
+      if (isExpired) {
+        console.warn("⛔ Token expired (decoded)");
+        handleLogoutClick();
+        return;
+      }
+
+      // ✅ Nếu hợp lệ, lưu token & thông tin xuống localStorage
+      localStorage.setItem("token", token);
       localStorage.setItem("userId", userId);
       localStorage.setItem("userRole", userRole);
       setUserId(userId);
@@ -48,7 +65,7 @@ const useNavbar = () => {
       console.error(err);
       navigate("/login");
     }
-  }, [navigate]);
+  }, [navigate, handleLogoutClick]);
 
   const fetchUserInfo = useCallback(async () => {
     if (!userId) return;
@@ -86,15 +103,6 @@ const useNavbar = () => {
   }, []);
 
   const handleNavigation = useCallback((path) => navigate(path), [navigate]);
-
-  const handleLogoutClick = () => {
-    ["token", "userId", "userRole", "googleLogin"].forEach((k) =>
-      localStorage.removeItem(k)
-    );
-    // ✅ Reset lại state user
-    setData(null);
-    navigate("/");
-  };
 
   return {
     isActive,
