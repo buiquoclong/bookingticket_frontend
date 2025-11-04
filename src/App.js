@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./app.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import { toast } from "react-toastify";
 
 import NotFoundPage from "./page/Admin/NotFoundPage";
 import CustomToastContainer from "./Components/ComponentParts/CustomToastContainer";
@@ -50,6 +53,13 @@ import AdminCatchPoint from "./Components/ComponentPages/AdminPages/AdminCatchPo
 import AdminKindVehicle from "./Components/ComponentPages/AdminPages/AdminKindVehicle";
 
 const App = () => {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  );
+};
+const AppContent = () => {
   const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
@@ -67,8 +77,37 @@ const App = () => {
     }
   }, []);
 
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkToken = () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const { exp } = jwtDecode(token);
+        if (exp * 1000 < Date.now()) {
+          // Token hết hạn
+          toast.error("⛔ Token đã hết hạn, vui lòng đăng nhập lại!");
+          localStorage.removeItem("token");
+          localStorage.removeItem("userId");
+          localStorage.removeItem("userRole");
+          setTimeout(() => navigate("/login"), 1500); // delay để toast hiện
+        }
+      } catch (err) {
+        console.error("Token không hợp lệ:", err);
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("userRole");
+        navigate("/login");
+      }
+    };
+
+    checkToken();
+  }, [navigate]);
+
   return (
-    <BrowserRouter>
+    <>
       <CustomToastContainer />
       <Routes>
         <Route element={<Layout />}>
@@ -157,7 +196,7 @@ const App = () => {
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </>
   );
 };
 
