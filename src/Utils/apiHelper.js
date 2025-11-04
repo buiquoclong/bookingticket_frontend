@@ -17,6 +17,15 @@ export const validateFields = (fields) => {
     toast.error(message);
     return false;
   }
+
+  // Kiểm tra email nếu có
+  if (fields["Địa chỉ Email"]) {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9]+$/;
+    if (!emailRegex.test(fields["Địa chỉ Email"])) {
+      toast.error("Email không đúng định dạng!");
+      return false;
+    }
+  }
   return true;
 };
 
