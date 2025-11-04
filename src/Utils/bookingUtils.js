@@ -36,6 +36,14 @@ export function formatDate1(dateString) {
 
   return `${formattedHours}:${formattedMinutes} ${formattedDay}/${formattedMonth}/${year}`;
 }
+
+export const formatCurrency = (value) => {
+  if (!value) return "0 ₫";
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(value);
+};
 /* ============ COLUMN DATA TABLE ============ */
 /* ============ COLUMN DRIVER ============ */
 const statusDriverMap = {
@@ -315,7 +323,15 @@ export const tripColumn = [
       </div>
     ),
   },
-  { key: "price", label: "Giá vé" },
+  {
+    key: "price",
+    label: "Giá vé",
+    cell: (row) => (
+      <span style={{ fontWeight: "bold", color: "#0d6efd" }}>
+        {formatCurrency(row.price)}
+      </span>
+    ),
+  },
   { key: "driver.name", label: "Tài xế" },
   { key: "status", label: "Trạng thái" },
 ];
