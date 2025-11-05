@@ -23,7 +23,6 @@ const AdminBookTicketReturn = () => {
     totalPrice,
   } = location.state || {};
 
-  console.log(kind);
   const [selectedSeatsById, setSelectedSeatsById] = useState({});
   const [kindVehicledata, setKindVehicledata] = useState([]);
   const [data, setData] = useState(null);
@@ -90,7 +89,6 @@ const AdminBookTicketReturn = () => {
         return;
       }
 
-      console.log("✅ Trip data:", data);
       setData(data);
     } catch (error) {
       console.error("❌ Lỗi khi tải danh sách chuyến đi:", error);
@@ -122,7 +120,6 @@ const AdminBookTicketReturn = () => {
   }, [fetchTrip, fetchKindVehicles]);
 
   const handleClick = (seatId, tuyenId) => {
-    console.log(seatId);
     const tuyen = data.find((tuyen) => tuyen.id === tuyenId);
     if (tuyen) {
       const clickedSeat = seats?.find((seat) => seat.id === seatId);
