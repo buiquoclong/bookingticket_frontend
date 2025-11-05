@@ -105,7 +105,6 @@ const AdminBooking = () => {
         "GET"
       );
       setBookingDetails(data);
-      console.log("Booking details:", data);
 
       // 🔹 Đặt thông tin lượt đi/lượt về và hiển thị modal
       setSelectedBookingKind(booking.roundTrip); // 0 hoặc 1

@@ -219,7 +219,6 @@ const AdminPay = () => {
             GET_CATCH_POINT_BY_ROUTE_ID(routeId),
             "GET"
           );
-          console.log(data);
           setCatchPoints(data);
         } catch (error) {
           console.error("Error fetching catch points:", error);
@@ -315,7 +314,6 @@ const AdminPay = () => {
       // 2️⃣ Nếu là thanh toán khi lên xe (COD)
       if (method === "COD") {
         const bookingRequest = buildBookingRequest("CASH");
-        console.log("📦 Booking request:", bookingRequest);
 
         // 3️⃣ Gửi request tạo booking bằng sendRequest
         const createdBooking = await sendRequest(
