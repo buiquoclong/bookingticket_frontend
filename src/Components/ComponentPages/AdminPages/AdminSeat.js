@@ -100,7 +100,6 @@ const AdminSeat = () => {
   };
 
   const handleCreateSeat = async (newSeat) => {
-    console.log("newSeat", newSeat);
     // Validate dữ liệu đầu vào
     if (
       !validateFields({
@@ -115,7 +114,6 @@ const AdminSeat = () => {
       name: newSeat.name,
       status: newSeat.status,
     };
-    console.log(newSeatData);
     try {
       setIsLoading(true);
       // Gửi request tạo loại xe
