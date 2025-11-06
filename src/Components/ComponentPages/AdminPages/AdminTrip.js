@@ -126,7 +126,6 @@ const AdminTrip = () => {
   useEffect(() => {
     if (prevCriteriaRef.current !== searchCriteria && searchValue === "") {
       prevCriteriaRef.current = searchCriteria;
-      console.log("🔸 Criteria changed, skipping fetch with empty searchValue");
       return; // ❌ KHÔNG FETCH
     }
 
