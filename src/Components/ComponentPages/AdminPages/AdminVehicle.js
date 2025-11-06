@@ -158,7 +158,6 @@ const AdminVehicle = () => {
       status: updateVehicle.status,
     };
 
-    console.log(updateVehicleData);
     try {
       setIsLoading(true);
       const updated = await sendRequest(
