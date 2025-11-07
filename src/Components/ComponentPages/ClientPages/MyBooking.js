@@ -82,7 +82,6 @@ const MyBooking = () => {
         PAY_BOOKING(booking.total, booking.id),
         "GET"
       );
-      console.log("Payment URL:", paymentURL);
 
       // Nếu server trả về text (URL), chuyển hướng trực tiếp
       const url = paymentURL.url;
