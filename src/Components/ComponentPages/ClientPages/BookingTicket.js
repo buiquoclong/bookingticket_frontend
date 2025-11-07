@@ -295,7 +295,6 @@ const BookingTicket = () => {
   };
 
   const handlePayment = async (method) => {
-    console.log(method);
     try {
       // 1️⃣ Kiểm tra ghế trước khi booking
       const isSeatsAvailable = await checkSeatsBeforeBooking();
