@@ -40,7 +40,6 @@ const AddModal = ({
           newData[field.key] = val ?? "";
         }
       });
-      console.log("🔍 formData sau khi set defaultValues:", newData);
       setFormData(newData);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -100,7 +99,6 @@ const AddModal = ({
     if (formData.newImage) {
       finalData.file = formData.newImage; // thêm file mới
     }
-    console.log("finalData", finalData);
     onSave(finalData);
   };
   // const formatPrice = (value) => {
