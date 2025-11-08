@@ -29,15 +29,10 @@ const TripTabs = ({
     }
 
     if (tab === 1) {
-      console.log("tab1");
-      console.log("tripId", tripId);
-      console.log("kindVehicleId", kindVehicleId);
-
       try {
         const data = await sendRequest(
           GET_SEAT_BY_TRIP_AND_KIND(tripId, kindVehicleId)
         );
-        console.log("Seats:", data);
         setSeats(data); // dữ liệu có sẵn status từ backend
       } catch (error) {
         console.error("Error fetching seats:", error);
