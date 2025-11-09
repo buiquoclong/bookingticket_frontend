@@ -34,7 +34,6 @@ const useNavbar = () => {
   }, [navigate]);
 
   const fetchToken = useCallback(async () => {
-    console.log("Kiểm tra token");
     try {
       const res = await sendRequest(GET_USER_TOKEN, "GET", {
         includeCredentials: true,
