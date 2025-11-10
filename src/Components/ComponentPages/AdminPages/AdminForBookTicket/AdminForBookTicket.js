@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./AdminForBookTicket.scss";
+import "../../../../Assets/scss/Admins/AdminForBookTicket.scss";
 import { Breadcrumbs, Link } from "@mui/material";
 import { toast } from "react-toastify";
 import { FaBus, FaSearchLocation } from "react-icons/fa";
