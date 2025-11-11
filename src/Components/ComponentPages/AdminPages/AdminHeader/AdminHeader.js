@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Avatar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Person, PowerSettingsNew } from "@mui/icons-material";
-import "./AdminHeader.scss";
+import "../../../../Assets/scss/Admins/AdminHeader.scss";
 import { sendRequest } from "../../../../Utils/apiHelper";
 import { GET_USER_BY_ID } from "../../../../Utils/apiUrls";
 
