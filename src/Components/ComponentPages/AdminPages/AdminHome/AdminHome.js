@@ -20,7 +20,7 @@ import {
   //   Pie,
 } from "recharts";
 import { toast } from "react-toastify";
-import "./AdminHome.scss";
+import "../../../../Assets/scss/Admins/AdminHome.scss";
 import LoadingBackdrop from "../../../ComponentParts/LoadingBackdrop";
 import {
   GET_TOTAL_BY_DAY,
