@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from "react";
-import "./AdminPay.scss";
+import "../../../../Assets/scss/Admins/AdminPay.scss";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import TextField from "@mui/material/TextField";
