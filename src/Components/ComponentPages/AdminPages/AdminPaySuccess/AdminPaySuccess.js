@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from "react";
-import "./AdminPaySuccess.scss";
+import "../../../../Assets/scss/Admins/AdminPaySuccess.scss";
 import { toast } from "react-toastify";
 import { Link, useLocation } from "react-router-dom";
 import BookingTicketInfo from "../../../ComponentParts/TicketInfoComponents/BookingTicketInfo";
