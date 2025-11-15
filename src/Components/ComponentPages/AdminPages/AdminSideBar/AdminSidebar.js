@@ -17,7 +17,7 @@ import {
   Map,
   AirportShuttle,
 } from "@mui/icons-material";
-import "./AdminSidebar.scss";
+import "../../../../Assets/scss/Admins/AdminSidebar.scss";
 import { GET_USER_BY_ID } from "../../../../Utils/apiUrls";
 import { sendRequest } from "../../../../Utils/apiHelper";
 
