@@ -49,7 +49,6 @@ const AdminBooking = () => {
         "GET"
       );
 
-      // ✅ Gán dữ liệu trả về
       setRecords(data.bookings || []);
       setTotalPages(data.totalPages || 1);
     } catch (error) {
@@ -71,14 +70,12 @@ const AdminBooking = () => {
         isPaid: 1,
       };
 
-      // Gọi API qua sendRequest
       const updatedBooking = await sendRequest(
         GET_BOOKING_BY_ID,
         "PUT",
         newBookingData
       );
 
-      // ✅ Nếu không lỗi, cập nhật state
       toast.success("Hóa đơn đã được cập nhật thành công!");
 
       const updatedBookings = records.map((b) =>
@@ -97,7 +94,7 @@ const AdminBooking = () => {
   const handleDetailClick = async (booking) => {
     const bookingId = booking.id;
 
-    setIsLoading(true); // 🔹 Bắt đầu loading
+    setIsLoading(true);
 
     try {
       const data = await sendRequest(
@@ -106,7 +103,6 @@ const AdminBooking = () => {
       );
       setBookingDetails(data);
 
-      // 🔹 Đặt thông tin lượt đi/lượt về và hiển thị modal
       setSelectedBookingKind(booking.roundTrip); // 0 hoặc 1
       setIsDetail(true);
     } catch (error) {
@@ -116,7 +112,6 @@ const AdminBooking = () => {
     }
   };
   const handleOutsideClick = (e) => {
-    // Đóng modal khi click vào phần tử có class 'modal'
     if (e.target.classList.contains("modal-detail")) {
       setIsDetail(false);
     }
@@ -133,7 +128,6 @@ const AdminBooking = () => {
     try {
       const canceled = await sendRequest(CANCEL_BOOKING(bookingId), "PUT");
 
-      // setRecords((prev) => prev.filter((record) => record.id !== bookingId));
       toast.success("Đặt chỗ đã được hủy thành công!");
       setRecords((prev) =>
         prev.map((item) => (item.id === canceled.id ? canceled : item))
@@ -198,7 +192,6 @@ const AdminBooking = () => {
         {isDetail && bookingDetails && (
           <div className="modal-detail" onClick={handleOutsideClick}>
             <div className="modal-content-detail">
-              {/* Header chỉ để tiêu đề và nút đóng */}
               <div className="modal-header">
                 <h3>Chi tiết vé</h3>
                 <button className="close-btn" onClick={handleCloseDetail}>
@@ -208,7 +201,6 @@ const AdminBooking = () => {
 
               {/* Body */}
               <div className="modal-body">
-                {/* ✅ Đưa phần “Một chiều / Khứ hồi” vào trong body */}
                 <div className="ticket-kind">
                   <strong>Loại vé:</strong>{" "}
                   <span className="kind-label">
