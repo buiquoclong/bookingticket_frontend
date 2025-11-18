@@ -175,25 +175,23 @@ const AdminBookTicketReturn = () => {
   const handleContinueAdminClick = (tuyenId) => {
     const totalPriceReturn = calculateTotalPriceById(tuyenId);
     const selectedSeatsNamesReturn = formatSelectedSeatsById(tuyenId);
-    const selectedSeatIdsReturn = getSelectedSeatIds(tuyenId); // Lấy danh sách ID của các ghế đã chọn
+    const selectedSeatIdsReturn = getSelectedSeatIds(tuyenId);
 
-    // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
     navigate("/admin/booking-trip", {
       state: {
         tripId: tripId,
         selectedSeatsNames: selectedSeatsNames,
-        selectedSeatIds: selectedSeatIds, // Thêm ID của các ghế vào state để gửi đi
+        selectedSeatIds: selectedSeatIds,
         totalPrice: totalPrice,
         tripIdReturn: tuyenId,
         selectedSeatsNamesReturn: selectedSeatsNamesReturn,
-        selectedSeatIdsReturn: selectedSeatIdsReturn, // Thêm ID của các ghế vào state để gửi đi
+        selectedSeatIdsReturn: selectedSeatIdsReturn,
         totalPriceReturn: totalPriceReturn,
         kind: kind,
       },
     });
   };
   const handleBackClick = () => {
-    // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
     navigate("/admin/find-trips", {
       state: {
         diemDiId: diemDiId,
@@ -213,7 +211,6 @@ const AdminBookTicketReturn = () => {
         <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
         <div className="container">
           <div className="results-wrapper">
-            {/* Header */}
             <SearchResultsHeader
               diemDiName={diemDenName}
               diemDenName={diemDiName}
@@ -227,7 +224,6 @@ const AdminBookTicketReturn = () => {
               onBackClick={handleBackClick}
             />
 
-            {/* Danh sách chuyến */}
             <TripList
               data={data}
               selectedSeatsById={selectedSeatsById}

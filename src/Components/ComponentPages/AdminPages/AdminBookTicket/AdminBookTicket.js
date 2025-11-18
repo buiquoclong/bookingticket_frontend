@@ -172,22 +172,20 @@ const AdminBookTicket = () => {
   const handleContinueAdminClick = (tuyenId) => {
     const totalPrice = calculateTotalPriceById(tuyenId);
     const selectedSeatsNames = formatSelectedSeatsById(tuyenId);
-    const selectedSeatIds = getSelectedSeatIds(tuyenId); // Lấy danh sách ID của các ghế đã chọn
+    const selectedSeatIds = getSelectedSeatIds(tuyenId);
 
     if (kind === "Một chiều") {
-      // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
       navigate("/admin/booking-trip", {
         state: {
           tripId: tuyenId,
           selectedSeatsNames: selectedSeatsNames,
-          selectedSeatIds: selectedSeatIds, // Thêm ID của các ghế vào state để gửi đi
+          selectedSeatIds: selectedSeatIds,
           totalPrice: totalPrice,
           dayReturn: dayReturn,
           kind: kind,
         },
       });
     } else if (kind === "Khứ hồi") {
-      // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
       navigate("/admin/find-trips-return", {
         state: {
           diemDiId: diemDiId,
@@ -199,7 +197,7 @@ const AdminBookTicket = () => {
           kind: kind,
           tripId: tuyenId,
           selectedSeatsNames: selectedSeatsNames,
-          selectedSeatIds: selectedSeatIds, // Thêm ID của các ghế vào state để gửi đi
+          selectedSeatIds: selectedSeatIds,
           totalPrice: totalPrice,
         },
       });
@@ -212,7 +210,6 @@ const AdminBookTicket = () => {
         <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
         <div className="container">
           <div className="results-wrapper">
-            {/* Header */}
             <SearchResultsHeader
               diemDiName={diemDiName}
               diemDenName={diemDenName}
@@ -225,7 +222,6 @@ const AdminBookTicket = () => {
               onBackClick={() => navigate("/admin/book-ticket")}
             />
 
-            {/* Danh sách chuyến */}
             <TripList
               data={data}
               selectedSeatsById={selectedSeatsById}
