@@ -40,7 +40,6 @@ function AdminHeader({ OpenSidebar }) {
 
   return (
     <header className="admin-header">
-      {/* Bên trái */}
       <div className="header-left">
         <div className="menu-toggle" onClick={OpenSidebar}>
           ☰
@@ -48,7 +47,6 @@ function AdminHeader({ OpenSidebar }) {
         <div className="logo">BOOKING</div>
       </div>
 
-      {/* Bên phải */}
       <div className="header-right">
         <div
           className={`user-menu ${isDropdownOpen ? "open" : ""}`}

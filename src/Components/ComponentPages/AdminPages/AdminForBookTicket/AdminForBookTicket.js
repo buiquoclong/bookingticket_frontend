@@ -10,7 +10,6 @@ import { GET_ALL_CITIES } from "../../../../Utils/apiUrls";
 function AdminForBookTicket() {
   const [cities, setCities] = useState([]);
 
-  // form values chung cho SearchTripForm
   const [formValues, setFormValues] = useState({
     kind: "Một chiều",
     origin: "",
@@ -59,7 +58,6 @@ function AdminForBookTicket() {
         </div>
       </section>
 
-      {/* Nội dung */}
       <section className="admin-booking-content">
         <div className="booking-card">
           <div className="card-header">
