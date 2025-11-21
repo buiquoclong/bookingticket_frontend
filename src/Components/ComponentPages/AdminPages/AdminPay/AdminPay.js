@@ -98,30 +98,26 @@ const AdminPay = () => {
 
   // Xử lý thay đổi cho input số điện thoại
   const handlePhoneChange = (event) => {
-    // setPhone(event.target.value);
     const phoneNumber = event.target.value;
-    const phonePattern = /^(0\d{9,10})$/; // Biểu thức chính quy kiểm tra số điện thoại
+    const phonePattern = /^(0\d{9,10})$/;
 
-    // Kiểm tra xem số điện thoại nhập vào có khớp với biểu thức chính quy không
     if (!phonePattern.test(phoneNumber)) {
       setPhoneErrorMessage("Số điện thoại không hợp lệ.");
     } else {
-      setPhoneErrorMessage(""); // Nếu hợp lệ, xóa thông báo lỗi
+      setPhoneErrorMessage("");
     }
     setPhone(phoneNumber);
   };
 
   // Xử lý thay đổi cho input email
   const handleEmailChange = (event) => {
-    // setEmail(event.target.value);
     const emailAddress = event.target.value;
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Biểu thức chính quy kiểm tra email
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    // Kiểm tra xem email nhập vào có khớp với biểu thức chính quy không
     if (!emailPattern.test(emailAddress)) {
       setEmailErrorMessage("Email không hợp lệ.");
     } else {
-      setEmailErrorMessage(""); // Nếu hợp lệ, xóa thông báo lỗi
+      setEmailErrorMessage("");
     }
     setEmail(emailAddress);
   };
@@ -134,16 +130,14 @@ const AdminPay = () => {
     if (!phone) {
       missingInfo.push("Số điện thoại");
     } else if (phoneErrorMessage) {
-      // Kiểm tra nếu có errorMessage cho phone
-      toast.error(phoneErrorMessage); // Hiển thị errorMessage nếu có
-      return; // Dừng xử lý tiếp theo nếu có lỗi
+      toast.error(phoneErrorMessage);
+      return;
     }
     if (!email) {
       missingInfo.push("Email");
     } else if (emailErrorMessage) {
-      // Kiểm tra nếu có errorMessage cho email
-      toast.error(emailErrorMessage); // Hiển thị errorMessage nếu có
-      return; // Dừng xử lý tiếp theo nếu có lỗi
+      toast.error(emailErrorMessage);
+      return;
     }
     if (missingInfo.length > 0) {
       const message = `Vui lòng điền thông tin còn thiếu:\n- ${missingInfo.join(
@@ -180,17 +174,14 @@ const AdminPay = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 🔹 Bắt đầu loading
         setIsLoading(true);
 
-        // 🔹 Gọi API chuyến đi (một chiều hoặc khứ hồi)
         if (kind === "Khứ hồi") {
           await Promise.all([fetchTripInfo(), fetchTripReturnInfo()]);
         } else {
           await fetchTripInfo();
         }
 
-        // 🔹 Gọi API người dùng (nếu có userId)
         if (userId) {
           const data = await sendRequest(GET_USER_BY_ID(userId), "GET");
 
@@ -206,11 +197,9 @@ const AdminPay = () => {
       }
     };
 
-    // ✅ Gọi hàm async
     fetchData();
   }, [kind, fetchTripInfo, fetchTripReturnInfo, userId]);
 
-  // Lấy danh sách điểm đón khi chọn nhập điểm đón
   useEffect(() => {
     if (showLocationInput) {
       const fetchCatchPoints = async () => {
@@ -341,7 +330,7 @@ const AdminPay = () => {
   const handleApplyDiscount = async () => {
     try {
       const response = await fetch(CHECK_PROMOTION(discountCode));
-      const result = await response.text(); // Assuming the API returns text
+      const result = await response.text();
 
       if (result === "NULL") {
         toast.error("Mã giảm giá không hợp lệ hoặc đã hết hạn");
