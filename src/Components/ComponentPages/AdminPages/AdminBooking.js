@@ -172,7 +172,7 @@ const AdminBooking = () => {
               data={records}
               onPay={handlePayClick}
               onCancel={handleCancelBookingClick}
-              onDetail={handleDetailClick} // 👉 thêm dòng này
+              onDetail={handleDetailClick}
               currentPage={page}
               totalPages={totalPages}
               onPageChange={setPage}
@@ -185,8 +185,8 @@ const AdminBooking = () => {
         <ConfirmDeleteModal
           visible={isCancelConfirmVisible}
           message="Bạn có chắc chắn muốn hủy hóa đơn này?"
-          onConfirm={cancelBooking} // khi xác nhận
-          onCancel={() => setIsCancelConfirmVisible(false)} // khi hủy
+          onConfirm={cancelBooking}
+          onCancel={() => setIsCancelConfirmVisible(false)}
           type="delete"
         />
         {isDetail && bookingDetails && (

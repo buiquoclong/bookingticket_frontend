@@ -72,13 +72,11 @@ const AdminCatchPoint = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        // Sử dụng Promise.all để gọi đồng thời
         const [catchPointsData, routesData] = await Promise.all([
           fetchCatchPoint(searchDebounce, searchCriteria),
           fetchRoutes(),
         ]);
 
-        // Cập nhật trạng thái chỉ khi component còn mounted
         if (catchPointsData) {
           setRecords(catchPointsData.catchPoints);
           setTotalPages(catchPointsData.totalPages);
@@ -104,7 +102,6 @@ const AdminCatchPoint = () => {
   };
 
   const handleCreateCatchPoint = async (newCatchPoint) => {
-    // Validate dữ liệu đầu vào
     if (
       !validateFields({
         Tuyến: newCatchPoint.routeId,
@@ -121,14 +118,12 @@ const AdminCatchPoint = () => {
 
     try {
       setIsLoading(true);
-      // Gửi request tạo loại xe
       const created = await sendRequest(
         CREATE_CATCH_POINT,
         "POST",
         newPointData
       );
 
-      // Hiển thị thông báo & cập nhật danh sách
       toast.success("Điểm đón mới đã được tạo thành công!");
       setRecords((prev) => [...prev, created]);
       setIsAdd(false);
@@ -195,7 +190,7 @@ const AdminCatchPoint = () => {
   };
   const handleCriteriaChange = (event) => {
     setSearchCriteria(event.target.value);
-    setSearchValue(""); // reset value khi đổi tiêu chí
+    setSearchValue("");
   };
   const searchOptions = catchPointFields.map((field) => {
     if (field.type === "select" && field.key === "routeId") {
@@ -249,7 +244,7 @@ const AdminCatchPoint = () => {
         visible={isAdd}
         title="Thêm điểm đón"
         fields={searchOptions}
-        defaultValues={{ status: 1 }} // mặc định status = 1
+        defaultValues={{ status: 1 }}
         onSave={handleCreateCatchPoint}
         onCancel={() => setIsAdd(false)}
       />
@@ -257,8 +252,8 @@ const AdminCatchPoint = () => {
       <ConfirmDeleteModal
         visible={isDeleteConfirmVisible}
         message="Bạn có chắc chắn muốn xóa điểm đón này?"
-        onConfirm={removeCatchPoint} // khi xác nhận
-        onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+        onConfirm={removeCatchPoint}
+        onCancel={() => setIsDeleteConfirmVisible(false)}
         type="delete"
       />
     </div>

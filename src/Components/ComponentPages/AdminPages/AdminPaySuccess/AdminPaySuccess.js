@@ -34,7 +34,6 @@ function AdminPaySuccess() {
   }, [bookingId]);
 
   useEffect(() => {
-    // Call the API to fetch cities
     fetchBookingDetail();
   }, [fetchBookingDetail]);
 
