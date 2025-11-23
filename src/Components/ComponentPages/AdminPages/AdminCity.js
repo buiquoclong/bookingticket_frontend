@@ -45,12 +45,10 @@ const AdminCity = () => {
     [page]
   );
 
-  // Dùng useEffect để gọi API khi page hoặc searchDebounce thay đổi
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchCities(searchDebounce);
 
-      // Cập nhật trạng thái nếu dữ liệu có
       if (data) {
         setRecords(data.cities);
         setTotalPages(data.totalPages);
@@ -70,7 +68,6 @@ const AdminCity = () => {
   };
 
   const handleCreateCity = async (newCity) => {
-    // Validate dữ liệu đầu vào
     if (
       !validateFields({
         "Tên thành phố": newCity.name,
@@ -90,10 +87,8 @@ const AdminCity = () => {
     }
     try {
       setIsLoading(true);
-      // Gửi request tạo loại xe
       const created = await sendRequest(CREATE_CITY, "POST", formData);
 
-      // Hiển thị thông báo & cập nhật danh sách
       toast.success("Thành phố mới đã được tạo thành công!");
       setRecords((prev) => [...prev, created]);
       setIsAdd(false);
@@ -104,7 +99,6 @@ const AdminCity = () => {
     }
   };
   const handleUpdateCity = async (updatedCity) => {
-    // Validate dữ liệu đầu vào
     if (
       !validateFields({
         "Tên thành phố": updatedCity.name,
@@ -124,14 +118,12 @@ const AdminCity = () => {
     }
     try {
       setIsLoading(true);
-      // Gửi request tạo loại xe
       const updated = await sendRequest(
         GET_CITY_BY_ID(updatedCity.id),
         "PUT",
         formData
       );
 
-      // Hiển thị thông báo & cập nhật danh sách
       toast.success("Thành phố đã được cập nhật thành công!");
       setRecords((prev) =>
         prev.map((item) => (item.id === updated.id ? updated : item))
@@ -185,9 +177,7 @@ const AdminCity = () => {
         ]}
         searchValue={searchValue}
         setSearchValue={setSearchValue}
-        searchOptions={[
-          { key: "name", label: "Tên thành phố", type: "text" }, // có thể thêm nhiều option khác
-        ]}
+        searchOptions={[{ key: "name", label: "Tên thành phố", type: "text" }]}
         addButtonLabel="Thêm thành phố"
         onAddClick={handleCreateClick}
       />
@@ -220,7 +210,7 @@ const AdminCity = () => {
         visible={isAdd}
         title="Thêm thành phố"
         fields={cityField}
-        defaultValues={{ status: 0 }} // mặc định status = 1
+        defaultValues={{ status: 0 }}
         onSave={handleCreateCity}
         onCancel={() => setIsAdd(false)}
       />
@@ -228,8 +218,8 @@ const AdminCity = () => {
       <ConfirmDeleteModal
         visible={isDeleteConfirmVisible}
         message="Bạn có chắc chắn muốn xóa thành phố này?"
-        onConfirm={removeCity} // khi xác nhận
-        onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+        onConfirm={removeCity}
+        onCancel={() => setIsDeleteConfirmVisible(false)}
         type="delete"
       />
     </div>

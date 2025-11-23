@@ -49,12 +49,10 @@ const AdminContact = () => {
     [page]
   );
 
-  // Dùng useEffect để gọi API khi page hoặc searchDebounce thay đổi
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchContacts(searchDebounce, searchCriteria);
 
-      // Cập nhật trạng thái nếu dữ liệu có
       if (data) {
         setRecords(data.contacts);
         setTotalPages(data.totalPages);
@@ -71,7 +69,6 @@ const AdminContact = () => {
     setIsAdd(true);
   };
   const handleCreateContact = async (newContact) => {
-    // Validate dữ liệu đầu vào
     if (
       !validateFields({
         "Người liên hệ": newContact.name,
@@ -89,10 +86,8 @@ const AdminContact = () => {
     };
     try {
       setIsLoading(true);
-      // Gửi request tạo loại xe
       const created = await sendRequest(CREATE_CONTACT, "POST", newContactData);
 
-      // Hiển thị thông báo & cập nhật danh sách
       toast.success("Liên hệ mới đã được tạo thành công!");
       setRecords((prev) => [...prev, created]);
       setIsAdd(false);
@@ -206,7 +201,6 @@ const AdminContact = () => {
         visible={isAdd}
         title="Thêm liên hệ"
         fields={contactField}
-        // defaultValues={{ status: 0 }} // mặc định status = 1
         onSave={handleCreateContact}
         onCancel={() => setIsAdd(false)}
       />
@@ -214,8 +208,8 @@ const AdminContact = () => {
       <ConfirmDeleteModal
         visible={isDeleteConfirmVisible}
         message="Bạn có chắc chắn muốn xóa liên hệ này?"
-        onConfirm={removeContact} // khi xác nhận
-        onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+        onConfirm={removeContact}
+        onCancel={() => setIsDeleteConfirmVisible(false)}
         type="delete"
       />
     </div>
