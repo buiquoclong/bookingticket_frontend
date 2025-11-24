@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-// import "../AdminContact/AdminContact.scss"
 import { toast } from "react-toastify";
 import useDebounce from "./useDebounce";
 import AdminTable from "../../ComponentParts/AdminComponents/AdminTable";
@@ -49,14 +48,12 @@ const AdminKindVehicle = () => {
       }
     },
     [page]
-  ); // Chỉ tái tạo khi page thay đổi
+  );
 
-  // Dùng useEffect để gọi API khi page hoặc searchDebounce thay đổi
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchKindVehicle(searchDebounce);
 
-      // Cập nhật trạng thái nếu dữ liệu có
       if (data) {
         setRecords(data.kindVehicles);
         setTotalPages(data.totalPages);
@@ -74,17 +71,14 @@ const AdminKindVehicle = () => {
   };
 
   const handleCreateKindVehicle = async (newKindVehicle) => {
-    // Validate dữ liệu đầu vào
     if (!validateFields({ "Loại xe": newKindVehicle.name })) return;
 
     try {
       setIsLoading(true);
-      // Gửi request tạo loại xe
       const created = await sendRequest(CREATE_KIND_VEHICLE, "POST", {
         name: newKindVehicle.name,
       });
 
-      // Hiển thị thông báo & cập nhật danh sách
       toast.success("Loại xe mới đã được tạo thành công!");
       setRecords((prev) => [...prev, created]);
       setIsAdd(false);
@@ -95,7 +89,6 @@ const AdminKindVehicle = () => {
     }
   };
 
-  // 🎯 Cập nhật loại xe
   const handleUpdateKindVehicle = async (updateKindVehicle) => {
     if (!validateFields({ "Loại xe": updateKindVehicle.name })) return;
 
@@ -119,7 +112,6 @@ const AdminKindVehicle = () => {
     }
   };
 
-  // 🎯 Xóa loại xe
   const removeKindVehicle = async () => {
     const kindVehicleId = kindVehicleToDelete.id;
 
@@ -187,7 +179,7 @@ const AdminKindVehicle = () => {
         visible={isAdd}
         title="Thêm loại xe"
         fields={kindVehicleFields}
-        defaultValues={{ status: 1 }} // mặc định status = 1
+        defaultValues={{ status: 1 }}
         onSave={handleCreateKindVehicle}
         onCancel={() => setIsAdd(false)}
       />
@@ -195,8 +187,8 @@ const AdminKindVehicle = () => {
       <ConfirmDeleteModal
         visible={isDeleteConfirmVisible}
         message="Bạn có chắc chắn muốn xóa loại xe này?"
-        onConfirm={removeKindVehicle} // khi xác nhận
-        onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+        onConfirm={removeKindVehicle}
+        onCancel={() => setIsDeleteConfirmVisible(false)}
         type="delete"
       />
     </div>

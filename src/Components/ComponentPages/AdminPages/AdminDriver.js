@@ -56,14 +56,12 @@ const AdminDriver = () => {
       }
     },
     [page]
-  ); // Chỉ tái tạo khi page thay đổi
+  );
 
-  // Dùng useEffect để gọi API khi page, searchCriteria, hoặc searchDebounce thay đổi
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchDrivers(searchDebounce, searchCriteria);
 
-      // Cập nhật trạng thái nếu dữ liệu có
       if (data) {
         setRecords(data.drivers);
         setTotalPages(data.totalPages);
@@ -81,7 +79,6 @@ const AdminDriver = () => {
     setIsAdd(true);
   };
 
-  // ✅ Tạo Driver
   const handleCreateDriver = async (newDriver) => {
     if (
       !validateFields({
@@ -92,7 +89,7 @@ const AdminDriver = () => {
     )
       return;
 
-    if (!newDriver.status) newDriver.status = 1; // mặc định status
+    if (!newDriver.status) newDriver.status = 1;
 
     try {
       setIsLoading(true);
@@ -108,7 +105,6 @@ const AdminDriver = () => {
     }
   };
 
-  // ✅ Cập nhật Driver
   const handleUpdateDriver = async (updateDriver) => {
     if (
       !validateFields({
@@ -139,7 +135,6 @@ const AdminDriver = () => {
     }
   };
 
-  // ✅ Xóa Driver
   const removeDriver = async () => {
     if (!driverToDelete) return;
 
@@ -219,7 +214,7 @@ const AdminDriver = () => {
         visible={isAdd}
         title="Thêm tài xế"
         fields={driverFields}
-        defaultValues={{ status: 1 }} // mặc định status = 1
+        defaultValues={{ status: 1 }}
         onSave={handleCreateDriver}
         onCancel={() => setIsAdd(false)}
       />
@@ -227,8 +222,8 @@ const AdminDriver = () => {
       <ConfirmDeleteModal
         visible={isDeleteConfirmVisible}
         message="Bạn có chắc chắn muốn xóa tài xế này?"
-        onConfirm={removeDriver} // khi xác nhận
-        onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+        onConfirm={removeDriver}
+        onCancel={() => setIsDeleteConfirmVisible(false)}
         type="delete"
       />
     </div>
