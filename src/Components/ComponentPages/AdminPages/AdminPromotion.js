@@ -44,12 +44,10 @@ const AdminPromotion = () => {
     [page]
   );
 
-  // Dùng useEffect để gọi API khi page hoặc searchDebounce thay đổi
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchPromotions(searchDebounce, searchCriteria);
 
-      // Cập nhật trạng thái nếu dữ liệu có
       if (data) {
         setRecords(data.promotions);
         setTotalPages(data.totalPages);
@@ -74,10 +72,9 @@ const AdminPromotion = () => {
 
   const handleCriteriaChange = (event) => {
     setSearchCriteria(event.target.value);
-    setSearchValue(""); // Reset input mỗi khi đổi tiêu chí
+    setSearchValue("");
   };
 
-  // ✅ Tạo Promotion
   const handleCreatePromotion = async (newPromo) => {
     if (
       !validateFields({
@@ -103,7 +100,6 @@ const AdminPromotion = () => {
     }
   };
 
-  // ✅ Cập nhật Promotion
   const handleUpdatePromotion = async (updatePromo) => {
     if (
       !validateFields({
@@ -136,7 +132,6 @@ const AdminPromotion = () => {
     }
   };
 
-  // ✅ Xóa Promotion
   const removePromotion = async () => {
     if (!promotionToDelete) return;
 
@@ -202,16 +197,16 @@ const AdminPromotion = () => {
         visible={isAdd}
         title="Tạo mã giảm giá"
         fields={promotionFields}
-        defaultValues={{ status: 1 }} // mặc định status = 1
+        defaultValues={{ status: 1 }}
         onSave={handleCreatePromotion}
         onCancel={() => setIsAdd(false)}
       />
 
       <ConfirmDeleteModal
         visible={isDeleteConfirmVisible}
-        message="Bạn có chắc chắn muốn xóa tài xế này?"
-        onConfirm={removePromotion} // khi xác nhận
-        onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+        message="Bạn có chắc chắn muốn xóa mã giảm giá này?"
+        onConfirm={removePromotion}
+        onCancel={() => setIsDeleteConfirmVisible(false)}
         type="delete"
       />
     </div>

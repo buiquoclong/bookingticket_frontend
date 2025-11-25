@@ -42,14 +42,12 @@ const AdminLog = () => {
       }
     },
     [page]
-  ); // Dùng useCallback để hàm này không bị tái tạo lại trừ khi page hoặc searchCriteria thay đổi
+  );
 
-  // Dùng useEffect để gọi API khi page, searchDebounce, hoặc searchCriteria thay đổi
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchLogs(searchDebounce, searchCriteria);
 
-      // Cập nhật trạng thái nếu dữ liệu có
       if (data) {
         setRecords(data.logs);
         setTotalPages(data.totalPages);
