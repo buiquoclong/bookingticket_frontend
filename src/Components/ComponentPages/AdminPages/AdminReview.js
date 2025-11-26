@@ -34,12 +34,10 @@ const AdminReview = () => {
     [page]
   );
 
-  // Dùng useEffect để gọi API khi page, searchDebounce hoặc searchCriteria thay đổi
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchReviews(searchDebounce, searchCriteria);
 
-      // Cập nhật trạng thái nếu dữ liệu có
       if (data) {
         setRecords(data.reviews);
         setTotalPages(data.totalPages);
@@ -67,7 +65,6 @@ const AdminReview = () => {
         searchCriteria={searchCriteria}
         handleCriteriaChange={handleCriteriaChange}
         addButtonLabel="Thêm tuyến"
-        // onAddClick={handleCreateClick}
       />
 
       <div className="HisContent">

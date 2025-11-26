@@ -59,9 +59,8 @@ const AdminRoute = () => {
       }
     },
     [page]
-  ); // Phụ thuộc vào page
+  );
 
-  // Dùng useCallback để tối ưu hóa hàm fetchCities
   const fetchCities = useCallback(async () => {
     try {
       const data = await sendRequest(GET_ALL_CITIES, "GET");
@@ -70,9 +69,8 @@ const AdminRoute = () => {
       console.error("Error fetching cities:", error);
       return null;
     }
-  }, []); // Không phụ thuộc vào gì, vì dữ liệu thành phố không thay đổi theo page hay searchDebounce
+  }, []);
 
-  // Dùng useEffect để gọi API khi page hoặc searchDebounce thay đổi
   useEffect(() => {
     const fetchData = async () => {
       const [routesData, citiesData] = await Promise.all([
@@ -80,7 +78,6 @@ const AdminRoute = () => {
         fetchCities(),
       ]);
 
-      // Cập nhật state nếu dữ liệu có
       if (routesData) {
         setRecords(routesData.routes);
         setTotalPages(routesData.totalPages);
@@ -100,7 +97,6 @@ const AdminRoute = () => {
     setIsAdd(true);
   };
   const handleCreateRoute = async (newRoute) => {
-    // Validate dữ liệu đầu vào
     if (
       !validateFields({
         "Tên tuyến": newRoute.name,
@@ -122,10 +118,8 @@ const AdminRoute = () => {
     };
     try {
       setIsLoading(true);
-      // Gửi request tạo loại xe
       const created = await sendRequest(CREATE_ROUTE, "POST", newRouteData);
 
-      // Hiển thị thông báo & cập nhật danh sách
       toast.success("Tuyến mới đã được tạo thành công!");
       setRecords((prev) => [...prev, created]);
       setIsAdd(false);
@@ -173,7 +167,6 @@ const AdminRoute = () => {
     } catch (error) {
       console.error("Lỗi khi update tuyến:", error);
     } finally {
-      // setIsLoading(false);
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setIsLoading(false);
     }
@@ -202,21 +195,18 @@ const AdminRoute = () => {
   const searchOptions = routeField.map((field) => {
     if (field.type === "select") {
       if (field.key === "status") {
-        // 🔹 Gắn danh sách trạng thái từ statusMap (object)
         return { ...field, value: field.key, options: statusMap };
       }
     }
     if (field.key === "diemdi" || field.key === "diemden") {
-      // 🔹 Gắn danh sách thành phố
       return { ...field, value: field.key, options: cities };
     }
 
-    // Các field còn lại
     return { ...field, value: field.key };
   });
   const handleCriteriaChange = (event) => {
     setSearchCriteria(event.target.value);
-    setSearchValue(""); // Reset input mỗi khi đổi tiêu chí
+    setSearchValue("");
   };
   return (
     <div className="main-container">
@@ -266,7 +256,7 @@ const AdminRoute = () => {
         visible={isAdd}
         title="Thêm tuyến"
         fields={searchOptions}
-        defaultValues={{ status: 1 }} // mặc định status = 1
+        defaultValues={{ status: 1 }}
         onSave={handleCreateRoute}
         onCancel={() => setIsAdd(false)}
       />
@@ -274,8 +264,8 @@ const AdminRoute = () => {
       <ConfirmDeleteModal
         visible={isDeleteConfirmVisible}
         message="Bạn có chắc chắn muốn xóa tuyến này?"
-        onConfirm={removeRoute} // khi xác nhận
-        onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+        onConfirm={removeRoute}
+        onCancel={() => setIsDeleteConfirmVisible(false)}
         type="delete"
       />
     </div>
