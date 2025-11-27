@@ -74,14 +74,12 @@ const AdminSeat = () => {
       }
     },
     [page]
-  ); // Chỉ tái tạo khi `page` hoặc `searchCriteria` thay đổi
+  );
 
-  // Dùng useEffect để gọi API khi page hoặc searchDebounce thay đổi
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchSeats(searchDebounce, searchCriteria);
 
-      // Cập nhật state nếu dữ liệu có
       if (data) {
         setRecords(data.seats);
         setTotalPages(data.totalPages);
@@ -100,7 +98,6 @@ const AdminSeat = () => {
   };
 
   const handleCreateSeat = async (newSeat) => {
-    // Validate dữ liệu đầu vào
     if (
       !validateFields({
         "Loại xe": newSeat.kindVehicleId,
@@ -116,10 +113,8 @@ const AdminSeat = () => {
     };
     try {
       setIsLoading(true);
-      // Gửi request tạo loại xe
       const created = await sendRequest(CREATE_SEAT, "POST", newSeatData);
 
-      // Hiển thị thông báo & cập nhật danh sách
       toast.success("Ghế ngồi mới đã được tạo thành công!");
       setRecords((prev) => [...prev, created]);
       setIsAdd(false);
@@ -192,17 +187,14 @@ const AdminSeat = () => {
   const searchOptions = seatFields.map((field) => {
     if (field.type === "select") {
       if (field.key === "kindVehicleId") {
-        // 🔹 Gắn danh sách loại xe
         return { ...field, value: field.key, options: kindVehicles };
       }
 
       if (field.key === "status") {
-        // 🔹 Gắn danh sách trạng thái từ statusMap (object)
         return { ...field, value: field.key, options: statusMap };
       }
     }
 
-    // Các field còn lại
     return { ...field, value: field.key };
   });
 
@@ -254,7 +246,7 @@ const AdminSeat = () => {
         visible={isAdd}
         title="Thêm ghế ngồi"
         fields={searchOptions}
-        defaultValues={{ status: 1 }} // mặc định status = 1
+        defaultValues={{ status: 1 }}
         onSave={handleCreateSeat}
         onCancel={() => setIsAdd(false)}
       />
@@ -262,8 +254,8 @@ const AdminSeat = () => {
       <ConfirmDeleteModal
         visible={isDeleteConfirmVisible}
         message="Bạn có chắc chắn muốn xóa ghế ngồi này?"
-        onConfirm={removeSeat} // khi xác nhận
-        onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+        onConfirm={removeSeat}
+        onCancel={() => setIsDeleteConfirmVisible(false)}
         type="delete"
       />
     </div>

@@ -28,14 +28,12 @@ const AdminSeatReservation = () => {
       }
     },
     [page]
-  ); // Chỉ tái tạo khi `page` thay đổi
+  );
 
-  // Dùng useEffect để gọi API khi page hoặc searchDebounce thay đổi
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchSeatReservations();
 
-      // Cập nhật state nếu dữ liệu có
       if (data) {
         setRecords(data.seatReservations);
         setTotalPages(data.totalPages);
