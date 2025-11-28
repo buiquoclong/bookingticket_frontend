@@ -46,7 +46,6 @@ const AdminTrip = () => {
     500
   );
   const prevCriteriaRef = useRef(searchCriteria);
-  // const [dayStart, setDayStart] = useState("");
   const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
   const [tripToDelete, setTripToDelete] = useState(null);
 
@@ -122,26 +121,21 @@ const AdminTrip = () => {
     }
   }, []);
 
-  // Dùng useEffect để gọi các API khi page hoặc daySearch thay đổi
   useEffect(() => {
     if (prevCriteriaRef.current !== searchCriteria && searchValue === "") {
       prevCriteriaRef.current = searchCriteria;
-      return; // ❌ KHÔNG FETCH
+      return;
     }
 
     prevCriteriaRef.current = searchCriteria;
     const fetchData = async () => {
-      // if (!searchDebounce) return;
-      // Gọi các API đồng thời để tiết kiệm thời gian
       const [tripsData, routesData, kindVehicleData] = await Promise.all([
         fetchTrips(searchDebounce, searchCriteria),
         fetchRoutes(),
         fetchKindVehicles(),
       ]);
 
-      // Nếu cần, có thể xử lý dữ liệu trả về ở đây
       if (tripsData && routesData && kindVehicleData) {
-        // Dữ liệu đã được xử lý và set ở trên
       }
     };
     fetchData();
@@ -159,14 +153,12 @@ const AdminTrip = () => {
     setCurrentTrip(trip);
     setIsEditing(true);
 
-    // Gọi API lấy xe sẵn cho kindVehicle và dayStart hiện tại của trip
     const kindVehicleId = trip.vehicle.kindVehicle.id;
-    const dayStart = trip.dayStart; // đã có sẵn
+    const dayStart = trip.dayStart;
     if (kindVehicleId && dayStart) {
       fetchVehiclesByKind(kindVehicleId, dayStart);
     }
 
-    // Lấy danh sách driver theo dayStart
     if (dayStart) {
       fetchDrivers(dayStart);
     }
@@ -188,7 +180,6 @@ const AdminTrip = () => {
   };
 
   const handleCreateTrip = async (newTrip) => {
-    // Validate dữ liệu đầu vào
     if (
       !validateFields({
         "Tên chuyến đi": newTrip.routeId,
@@ -213,10 +204,8 @@ const AdminTrip = () => {
     };
     try {
       setIsLoading(true);
-      // Gửi request tạo chuyến đi
       const created = await sendRequest(CREATE_TRIP, "POST", newTripData);
 
-      // Hiển thị thông báo & cập nhật danh sách
       toast.success("Chuyến đi mới đã được tạo thành công!");
       setRecords((prev) => [...prev, created]);
       setIsAdd(false);
@@ -335,7 +324,7 @@ const AdminTrip = () => {
   const handleCriteriaChange = (event) => {
     const newCriteria = event.target.value;
     setSearchCriteria(newCriteria);
-    setSearchValue(""); // ✅ reset ngay khi đổi dropdown
+    setSearchValue("");
   };
 
   return (
@@ -365,7 +354,7 @@ const AdminTrip = () => {
               data={records}
               onEdit={handleEditClick}
               onDelete={handleRemoveClick}
-              onDetail={handleDetailClick} // 👉 thêm dòng này
+              onDetail={handleDetailClick}
               currentPage={page}
               totalPages={totalPages}
               onPageChange={setPage}
@@ -388,7 +377,7 @@ const AdminTrip = () => {
           visible={isAdd}
           title="Thêm chuyến đi"
           fields={searchOptions}
-          defaultValues={{ status: 1 }} // mặc định status = 1
+          defaultValues={{ status: 1 }}
           onSave={handleCreateTrip}
           onCancel={() => setIsAdd(false)}
           onFieldChange={handleFieldChange}
@@ -397,8 +386,8 @@ const AdminTrip = () => {
         <ConfirmDeleteModal
           visible={isDeleteConfirmVisible}
           message="Bạn có chắc chắn muốn xóa chuyến đi này?"
-          onConfirm={removeTrip} // khi xác nhận
-          onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+          onConfirm={removeTrip}
+          onCancel={() => setIsDeleteConfirmVisible(false)}
           type="delete"
         />
       </div>

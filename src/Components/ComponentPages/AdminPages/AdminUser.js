@@ -64,9 +64,8 @@ const AdminUser = () => {
       }
     },
     [page, searchCriteria]
-  ); // Duy trì các dependencies cần thiết
+  );
 
-  // useEffect để gọi API khi thay đổi searchDebounce, page, hoặc searchCriteria
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchUsers(searchDebounce);
@@ -78,7 +77,6 @@ const AdminUser = () => {
 
     fetchData();
 
-    // Cleanup function để tránh cập nhật state nếu component đã unmount
     return () => {};
   }, [searchDebounce, page, searchCriteria, fetchUsers]);
   const handleEditClick = (user) => {
@@ -89,7 +87,6 @@ const AdminUser = () => {
     setIsAdd(true);
   };
   const handleCreateUser = async (newUser) => {
-    // Validate dữ liệu đầu vào
     if (
       !validateFields({
         "Tên người dùng": newUser.name,
@@ -107,10 +104,8 @@ const AdminUser = () => {
     };
     try {
       setIsLoading(true);
-      // Gửi request tạo người dùng
       await sendRequest(CREATE_USER_ADMIN, "POST", newUserData);
 
-      // Hiển thị thông báo & cập nhật danh sách
       toast.success("Người dùng mới đã được tạo thành công!");
       window.location.reload();
       setIsAdd(false);
@@ -160,42 +155,35 @@ const AdminUser = () => {
   const searchOptionQueries = userFieldQuery.map((field) => {
     if (field.type === "select") {
       if (field.key === "role") {
-        // 🔹 Gắn danh sách loại xe
         return { ...field, value: field.key, options: roleMap };
       }
 
       if (field.key === "status") {
-        // 🔹 Gắn danh sách loại xe
         return { ...field, value: field.key, options: statusMap };
       }
     }
 
-    // Các field còn lại
     return { ...field, value: field.key };
   });
   const searchOptions = userFieldCreate.map((field) => {
     if (field.type === "select") {
       if (field.key === "role") {
-        // Gắn danh sách quyền
         return { ...field, options: roleMap };
       }
     }
-    return { ...field }; // ❌ bỏ value: field.key đi
+    return { ...field };
   });
 
   const searchOptionUsers = userFields.map((field) => {
     if (field.type === "select") {
       if (field.key === "role") {
-        // 🔹 Gắn danh sách loại xe
         return { ...field, value: field.key, options: roleMap };
       }
       if (field.key === "status") {
-        // 🔹 Gắn danh sách loại xe
         return { ...field, value: field.key, options: statusMap };
       }
     }
 
-    // Các field còn lại
     return { ...field, value: field.key };
   });
   return (
