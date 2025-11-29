@@ -66,7 +66,6 @@ const AdminVehicle = () => {
           GET_VEHICLE_PAGE(page, 10, searchCriteria, searchDebounce),
           "GET"
         );
-        // Cập nhật state sau khi lấy dữ liệu
         return data;
       } catch (error) {
         return null;
@@ -75,14 +74,12 @@ const AdminVehicle = () => {
       }
     },
     [page]
-  ); // Hàm này sẽ được tạo lại khi `page`, `searchCriteria`, hoặc `searchValue` thay đổi
+  );
 
-  // Dùng useEffect để gọi fetchVehicles khi page, searchCriteria hoặc searchValue thay đổi
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchVehicles(searchDebounce, searchCriteria);
 
-      // Cập nhật state nếu dữ liệu có
       if (data) {
         setRecords(data.vehicles);
         setTotalPages(data.totalPages);
@@ -105,7 +102,6 @@ const AdminVehicle = () => {
   };
 
   const handleCreateVehicle = async (newVehicle) => {
-    // Validate dữ liệu đầu vào
     if (
       !validateFields({
         "Loại xe": newVehicle.kindVehicleId,
@@ -125,10 +121,8 @@ const AdminVehicle = () => {
     };
     try {
       setIsLoading(true);
-      // Gửi request tạo phương tiện
       const created = await sendRequest(CREATE_VEHICLE, "POST", newVehicleData);
 
-      // Hiển thị thông báo & cập nhật danh sách
       toast.success("Phương tiện mới đã được tạo thành công!");
       setRecords((prev) => [...prev, created]);
       setIsAdd(false);
@@ -207,17 +201,14 @@ const AdminVehicle = () => {
   const searchOptions = vehicleFields.map((field) => {
     if (field.type === "select") {
       if (field.key === "kindVehicleId") {
-        // 🔹 Gắn danh sách loại xe
         return { ...field, value: field.key, options: kindVehicleData };
       }
 
       if (field.key === "status") {
-        // 🔹 Gắn danh sách trạng thái từ statusMap (object)
         return { ...field, value: field.key, options: statusMap };
       }
     }
 
-    // Các field còn lại
     return { ...field, value: field.key };
   });
   return (
@@ -268,7 +259,7 @@ const AdminVehicle = () => {
         visible={isAdd}
         title="Thêm phương tiện"
         fields={searchOptions}
-        defaultValues={{ status: 1 }} // mặc định status = 1
+        defaultValues={{ status: 1 }}
         onSave={handleCreateVehicle}
         onCancel={() => setIsAdd(false)}
       />
@@ -276,8 +267,8 @@ const AdminVehicle = () => {
       <ConfirmDeleteModal
         visible={isDeleteConfirmVisible}
         message="Bạn có chắc chắn muốn xóa phương tiện này?"
-        onConfirm={removeVehicle} // khi xác nhận
-        onCancel={() => setIsDeleteConfirmVisible(false)} // khi hủy
+        onConfirm={removeVehicle}
+        onCancel={() => setIsDeleteConfirmVisible(false)}
         type="delete"
       />
     </div>

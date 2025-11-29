@@ -178,23 +178,21 @@ const BookTicketReturn = () => {
     const selectedSeatsNamesReturn = formatSelectedSeatsById(tuyenId);
     const selectedSeatIdsReturn = getSelectedSeatIds(tuyenId); // Lấy danh sách ID của các ghế đã chọn
 
-    // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
     navigate("/booking-ticket", {
       state: {
         tripId: tripId,
         selectedSeatsNames: selectedSeatsNames,
-        selectedSeatIds: selectedSeatIds, // Thêm ID của các ghế vào state để gửi đi
+        selectedSeatIds: selectedSeatIds,
         totalPrice: totalPrice,
         tripIdReturn: tuyenId,
         selectedSeatsNamesReturn: selectedSeatsNamesReturn,
-        selectedSeatIdsReturn: selectedSeatIdsReturn, // Thêm ID của các ghế vào state để gửi đi
+        selectedSeatIdsReturn: selectedSeatIdsReturn,
         totalPriceReturn: totalPriceReturn,
         kind: kind,
       },
     });
   };
   const handleBackClick = () => {
-    // Chuyển hướng đến trang mới và truyền thông tin cần thiết thông qua state của location
     navigate("/book-ticket", {
       state: {
         diemDiId: diemDiId,
@@ -214,7 +212,6 @@ const BookTicketReturn = () => {
         <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
         <div className="container">
           <div className="results-wrapper">
-            {/* Header */}
             <SearchResultsHeader
               diemDiName={diemDenName}
               diemDenName={diemDiName}
@@ -228,7 +225,6 @@ const BookTicketReturn = () => {
               onBackClick={handleBackClick}
             />
 
-            {/* Danh sách chuyến */}
             <TripList
               data={data}
               selectedSeatsById={selectedSeatsById}
