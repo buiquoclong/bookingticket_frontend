@@ -47,10 +47,8 @@ const ChangePass = () => {
     /[0-9]/.test(password);
 
   const handleUpdatePass = async () => {
-    // Reset lỗi cũ
     setErrors({ nowPass: "", newPass: "", reNewPass: "" });
 
-    // ✅ Kiểm tra xác nhận mật khẩu
     if (form.newPass !== form.reNewPass) {
       setErrors((prev) => ({
         ...prev,
@@ -59,7 +57,6 @@ const ChangePass = () => {
       return;
     }
 
-    // ✅ Kiểm tra định dạng mật khẩu
     if (!validatePassword(form.newPass)) {
       setErrors((prev) => ({
         ...prev,
@@ -71,19 +68,16 @@ const ChangePass = () => {
     try {
       setIsLoading(true);
 
-      // 📨 Gọi API đổi mật khẩu bằng sendRequest
       const response = await sendRequest(CHANGE_PASSWORD(userId), "PUT", {
         oldPassword: form.nowPass,
         newPassword: form.newPass,
       });
 
-      // 🧩 Nếu backend trả text “Mật khẩu cũ không đúng”
       if (response === "Mật khẩu cũ không đúng") {
         toast.error("Mật khẩu cũ không đúng");
         return;
       }
 
-      // ✅ Thành công
       toast.success("Bạn đã đổi mật khẩu thành công");
       setTimeout(() => {
         ["token", "userId", "userRole", "googleLogin"].forEach((item) =>

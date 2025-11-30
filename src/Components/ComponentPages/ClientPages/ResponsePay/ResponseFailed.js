@@ -24,7 +24,6 @@ const ResponseFailed = () => {
       <div className="response-card failure">
         <div className="icon-wrapper">
           <CancelIcon className="failure-icon" />{" "}
-          {/* icon đỏ, bạn có thể dùng Material UI hoặc bất kỳ icon nào */}
         </div>
 
         <div className="response-content">

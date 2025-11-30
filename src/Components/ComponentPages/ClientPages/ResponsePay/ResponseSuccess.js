@@ -7,7 +7,6 @@ const ResponseSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Lấy dữ liệu từ localStorage một lần, fallback về null nếu không có
   const bookingDetails = (() => {
     try {
       return JSON.parse(localStorage.getItem("bookingDetails"));
@@ -30,13 +29,12 @@ const ResponseSuccess = () => {
     if (bookingId && kind) {
       navigate("/pay-success", { state: { bookingId, kind } });
       localStorage.removeItem("bookingDetails");
-      localStorage.removeItem("bookingId"); // Nếu muốn dọn luôn bookingId
+      localStorage.removeItem("bookingId");
     } else {
       console.error("BookingId hoặc kind không hợp lệ");
     }
   };
 
-  // Tự động redirect nếu truy cập trực tiếp vào page thành công mà không có bookingId
   useEffect(() => {
     if (location.pathname === "/payment-success" && !bookingId) {
       navigate("/");
