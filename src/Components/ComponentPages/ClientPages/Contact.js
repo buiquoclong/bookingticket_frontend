@@ -19,15 +19,13 @@ const Contact = () => {
   const navigate = useNavigate();
 
   const handleEmailChange = (event) => {
-    // setEmail(event.target.value);
     const emailAddress = event.target.value;
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Biểu thức chính quy kiểm tra email
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    // Kiểm tra xem email nhập vào có khớp với biểu thức chính quy không
     if (!emailPattern.test(emailAddress)) {
       setEmailErrorMessage("Email không hợp lệ.");
     } else {
-      setEmailErrorMessage(""); // Nếu hợp lệ, xóa thông báo lỗi
+      setEmailErrorMessage("");
     }
     setEmail(emailAddress);
   };
@@ -35,7 +33,6 @@ const Contact = () => {
   const handleCreateContact = async (e) => {
     e.preventDefault();
 
-    // 🧩 Kiểm tra các field bắt buộc
     if (
       !validateFields({
         "Họ tên": name,
@@ -46,7 +43,6 @@ const Contact = () => {
     )
       return;
 
-    // ⚠️ Kiểm tra lỗi email riêng
     if (emailErrorMessage) {
       toast.error(emailErrorMessage);
       return;
@@ -57,19 +53,15 @@ const Contact = () => {
     try {
       setIsLoading(true);
 
-      // 📨 Gọi API tạo contact
       await sendRequest(CREATE_CONTACT, "POST", newContactData);
 
-      // ✅ Thông báo thành công
       toast.success("Contact đã được tạo thành công!");
 
-      // 🔄 Reset form
       setName("");
       setEmail("");
       setTitle("");
       setContent("");
 
-      // 🕒 Điều hướng sau 1 giây
       setTimeout(() => {
         navigate("/");
       }, 1000);
@@ -81,12 +73,11 @@ const Contact = () => {
   };
   useEffect(() => {
     Aos.init({ duration: 1500, once: true });
-    Aos.refresh(); // đảm bảo AOS kiểm tra lại tất cả phần tử
+    Aos.refresh();
   }, []);
   return (
     <div className="contact-form container">
       <LoadingBackdrop open={isLoading} message="Đang xử lý yêu cầu..." />
-      {/* Info */}
       <div className="contact-info" data-aos="fade-right" data-aos-offset="0">
         <h2>LIÊN HỆ VỚI CHÚNG TÔI</h2>
         <h3>RoadLines</h3>
@@ -102,7 +93,6 @@ const Contact = () => {
         </p>
       </div>
 
-      {/* Form */}
       <div
         className="contact-form-container"
         data-aos="fade-left"
@@ -124,7 +114,7 @@ const Contact = () => {
                 type="email"
                 placeholder="Email"
                 value={email}
-                onChange={handleEmailChange} // chỉ email dùng handler riêng
+                onChange={handleEmailChange}
                 required
               />
               {emailErrorMessage && (

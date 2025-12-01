@@ -30,7 +30,7 @@ const ConfirmAccount = () => {
     } catch (error) {
       console.error("Error fetching user info:", error);
     }
-  }, [userId]); // ✅ useCallback chỉ thay đổi khi userId thay đổi
+  }, [userId]);
 
   useEffect(() => {
     fetchUserInfo();
@@ -39,7 +39,6 @@ const ConfirmAccount = () => {
   const handleConfirmAccount = async (event) => {
     event.preventDefault();
 
-    // 🧩 Kiểm tra đầu vào
     if (!confirmCode?.trim()) {
       toast.error("Vui lòng nhập mã xác nhận");
       return;
@@ -53,13 +52,11 @@ const ConfirmAccount = () => {
     try {
       setIsLoading(true);
 
-      // 📨 Gọi API xác nhận tài khoản
       const response = await sendRequest(CONFIRM_ACCOUNT(), "POST", {
         userId,
         token: confirmCode.trim(),
       });
 
-      // 🧾 Xử lý phản hồi
       const message =
         typeof response === "string"
           ? response
@@ -76,7 +73,6 @@ const ConfirmAccount = () => {
         return;
       }
 
-      // Nếu có thông điệp khác (ví dụ lỗi hệ thống)
       toast.warning(message);
     } catch (error) {
       console.error("Error confirming account:", error);
@@ -94,12 +90,10 @@ const ConfirmAccount = () => {
     try {
       setIsLoading(true);
 
-      // 📨 Gửi yêu cầu xin mã xác thực mới
       const response = await sendRequest(CHANGE_CONFIRM_CODE(), "POST", {
         userId,
       });
 
-      // 🧾 Xử lý phản hồi từ backend
       const message =
         typeof response === "string"
           ? response
@@ -116,7 +110,6 @@ const ConfirmAccount = () => {
         return;
       }
 
-      // Nếu backend trả về thông điệp khác
       toast.warning(message);
     } catch (error) {
       console.error("Error while sending confirm code:", error);
