@@ -42,10 +42,8 @@ const ForgetPass = () => {
   const forgetPass = async (event) => {
     event.preventDefault();
 
-    // ✅ Kiểm tra email rỗng
     if (!validateFields({ Email: email })) return;
 
-    // ✅ Kiểm tra lỗi định dạng email
     if (emailErrorMessage) {
       toast.error(emailErrorMessage);
       return;
@@ -54,10 +52,8 @@ const ForgetPass = () => {
     try {
       setIsLoading(true);
 
-      // ✅ Gọi API bằng helper chung
       const result = await sendRequest(FORGOT_PASSWORD, "POST", { email });
 
-      // Trường hợp API trả text thay vì JSON (ví dụ: “Đã gửi mail khôi phục”)
       if (typeof result === "string") {
         handleForgetResponse(result);
       } else if (result?.message) {

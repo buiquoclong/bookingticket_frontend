@@ -19,7 +19,6 @@ import "aos/dist/aos.css";
 
 const Footer = () => {
   const [isLoading, setIsLoading] = useState(false);
-  // add a scroll animation
   useEffect(() => {
     Aos.init({ duration: 2000 });
   }, []);
@@ -27,28 +26,24 @@ const Footer = () => {
   const [email, setEmail] = useState("");
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
   const handleEmailChange = (event) => {
-    // setEmail(event.target.value);
     const emailAddress = event.target.value;
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Biểu thức chính quy kiểm tra email
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    // Kiểm tra xem email nhập vào có khớp với biểu thức chính quy không
     if (!emailPattern.test(emailAddress)) {
       setEmailErrorMessage("Email không hợp lệ.");
     } else {
-      setEmailErrorMessage(""); // Nếu hợp lệ, xóa thông báo lỗi
+      setEmailErrorMessage("");
     }
     setEmail(emailAddress);
   };
   const handleCreateContact = async (e) => {
     e.preventDefault();
 
-    // 🧩 Kiểm tra email bắt buộc
     if (!email) {
       toast.error("Vui lòng nhập Email");
       return;
     }
 
-    // ⚠️ Kiểm tra lỗi định dạng email
     if (emailErrorMessage) {
       toast.error(emailErrorMessage);
       return;
@@ -64,10 +59,8 @@ const Footer = () => {
         content: "Cần liên hệ",
       };
 
-      // 📨 Gửi request qua sendRequest
       await sendRequest(CREATE_CONTACT, "POST", newContactData);
 
-      // ✅ Thành công
       toast.success("Chúng tôi đã nhận được email cần liên hệ của bạn!");
       setEmail("");
     } catch (error) {
