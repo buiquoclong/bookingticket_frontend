@@ -34,11 +34,9 @@ const InfoUser = () => {
     }
   }, [userId]);
 
-  // useEffect để gọi fetch khi userId thay đổi
   useEffect(() => {
     fetchUserInfo();
   }, [fetchUserInfo]);
-  // Hàm kiểm tra dữ liệu
   const validateField = (name, value) => {
     switch (name) {
       case "name":
@@ -58,7 +56,6 @@ const InfoUser = () => {
     return "";
   };
 
-  // Xử lý thay đổi input
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -66,7 +63,6 @@ const InfoUser = () => {
     setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
   };
 
-  // Submit/cập nhật user
   const handleUpdateUser = async () => {
     const newErrors = {};
     Object.keys(userData).forEach((key) => {

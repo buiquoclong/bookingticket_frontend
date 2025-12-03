@@ -18,7 +18,6 @@ import { GET_ALL_CITIES, GET_ACTIVE_ROUTES } from "../../../Utils/apiUrls";
 import { sendRequest } from "../../../Utils/apiHelper";
 
 const Home = () => {
-  // add a scroll animation
   useEffect(() => {
     Aos.init({ duration: 2000 });
   }, []);
@@ -31,7 +30,6 @@ const Home = () => {
 
   const selectRef = useRef(null);
 
-  // State của chuyến đi (gửi xuống form)
   const [formValues, setFormValues] = useState({
     kind: "Một chiều",
     origin: "",
@@ -49,7 +47,6 @@ const Home = () => {
 
   const fetchCities = async () => {
     try {
-      // 🏙️ Lấy danh sách thành phố
       const data = await sendRequest(GET_ALL_CITIES, "GET");
       setCities(data);
     } catch (e) {
@@ -60,7 +57,6 @@ const Home = () => {
 
   const fetchRoutes = async () => {
     try {
-      // 🛣️ Lấy danh sách tuyến đường hoạt động
       const data = await sendRequest(GET_ACTIVE_ROUTES, "GET");
       setData(data);
     } catch (e) {
@@ -95,7 +91,6 @@ const Home = () => {
     }
   }, [diemdiId, diemdenId, citiesLoaded, updateOriginAndDestination]);
 
-  // Khi click "Đặt vé" ở RouteCard → cập nhật form + scroll
   const handleBookingClick = (diemdiId, diemdenId) => {
     updateOriginAndDestination(diemdiId, diemdenId);
     if (selectRef.current) {
