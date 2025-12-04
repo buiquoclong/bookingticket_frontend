@@ -16,7 +16,6 @@ const Login = () => {
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
-  // Validation
   const validateEmail = (email) => {
     const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return pattern.test(email) ? "" : "Email không hợp lệ.";
@@ -34,19 +33,16 @@ const Login = () => {
     return "";
   };
 
-  // Xử lý input chung
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
 
-    // Validate ngay khi nhập
     if (name === "email")
       setErrors((prev) => ({ ...prev, email: validateEmail(value) }));
     if (name === "password")
       setErrors((prev) => ({ ...prev, password: validatePassword(value) }));
   };
 
-  // Xử lý lỗi token
   const handleError = (token) => {
     if (token.includes(",")) {
       const [userId, status] = token.split(",");
@@ -68,7 +64,6 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // ✅ Validate form
     const newErrors = {
       email: validateEmail(form.email),
       password: validatePassword(form.password),
@@ -81,13 +76,11 @@ const Login = () => {
     }
 
     try {
-      // ✅ Gửi request login
       const token = await sendRequest(USER_LOGIN, "POST", {
         email: form.email,
         pass: form.password,
       });
 
-      // Nếu server trả về text thay vì JSON
       const tokenValue =
         typeof token === "string" ? token : token?.token || token;
 
@@ -99,13 +92,11 @@ const Login = () => {
         return;
       }
 
-      // ✅ Lưu token & user info
       localStorage.setItem("token", tokenValue);
       const decodedToken = jwtDecode(tokenValue);
       localStorage.setItem("userId", decodedToken.userId);
       localStorage.setItem("userRole", decodedToken.role);
 
-      // ✅ Điều hướng sau đăng nhập
       const redirectPath = sessionStorage.getItem("redirectPath");
       if (redirectPath) {
         navigate(redirectPath);
@@ -133,7 +124,6 @@ const Login = () => {
         <form className="login-card" onSubmit={handleLogin}>
           <h1>Đăng nhập</h1>
 
-          {/* Email Field */}
           <div className="form-group">
             <input
               type="email"

@@ -83,7 +83,6 @@ const MyBooking = () => {
         "GET"
       );
 
-      // Nếu server trả về text (URL), chuyển hướng trực tiếp
       const url = paymentURL.url;
       if (!url) throw new Error("Không nhận được URL thanh toán!");
 
@@ -106,7 +105,6 @@ const MyBooking = () => {
       toast.success("Bạn đã hủy hóa đơn thành công!");
       setIsCancelConfirmVisible(false);
 
-      // Cập nhật trạng thái booking trên UI
       setRecords((prev) =>
         prev.map((b) => (b.id === bookingId ? { ...b, isPaid: 2 } : b))
       );
@@ -136,7 +134,7 @@ const MyBooking = () => {
       );
 
       setSelectedBookingDetail(result);
-      setSelectedBookingKind(booking.roundTrip); // 0 hoặc 1
+      setSelectedBookingKind(booking.roundTrip);
       setIsDetailVisible(true);
     } catch (error) {
       console.error("❌ Lỗi khi tải chi tiết vé:", error);
@@ -268,15 +266,14 @@ const MyBooking = () => {
       <ConfirmDeleteModal
         visible={isCancelConfirmVisible}
         message="Bạn có chắc chắn muốn hủy hóa đơn này?"
-        onConfirm={cancelBooking} // khi xác nhận
-        onCancel={() => setIsCancelConfirmVisible(false)} // khi hủy
+        onConfirm={cancelBooking}
+        onCancel={() => setIsCancelConfirmVisible(false)}
         type="delete"
       />
 
       {isDetailVisible && selectedBookingDetail && (
         <div className="modal-detail">
           <div className="modal-content-detail">
-            {/* Header chỉ để tiêu đề và nút đóng */}
             <div className="modal-header">
               <h3>Chi tiết vé</h3>
               <button className="close-btn" onClick={handleCloseDetail}>
@@ -286,7 +283,6 @@ const MyBooking = () => {
 
             {/* Body */}
             <div className="modal-body">
-              {/* ✅ Đưa phần “Một chiều / Khứ hồi” vào trong body */}
               <div className="ticket-kind">
                 <strong>Loại vé:</strong>{" "}
                 <span className="kind-label">
