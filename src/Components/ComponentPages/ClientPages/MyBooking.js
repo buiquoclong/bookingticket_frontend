@@ -281,7 +281,6 @@ const MyBooking = () => {
               </button>
             </div>
 
-            {/* Body */}
             <div className="modal-body">
               <div className="ticket-kind">
                 <strong>Loại vé:</strong>{" "}

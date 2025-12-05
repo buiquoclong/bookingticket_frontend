@@ -41,8 +41,8 @@ const Navbar = React.forwardRef((props, ref) => {
     { name: "VỀ CHÚNG TÔI", path: "/aboutUs" },
   ];
   const handleItemClick = (path) => {
-    setActiveItem(path); // cập nhật item active
-    handleNavigation(path); // navigate
+    setActiveItem(path);
+    handleNavigation(path);
   };
 
   const location = useLocation();
@@ -63,7 +63,6 @@ const Navbar = React.forwardRef((props, ref) => {
         className={`navbar-header flex ${scrolling ? "shadow" : ""}`}
         ref={ref}
       >
-        {/* Logo */}
         <div className="logo-div">
           <Link to="/" className="logo flex">
             <MdTravelExplore className="icon" />
@@ -71,7 +70,6 @@ const Navbar = React.forwardRef((props, ref) => {
           </Link>
         </div>
 
-        {/* Navbar menu */}
         <div
           className={`navbar-menu ${isActive ? "active" : ""}`}
           ref={navbarMenuRef}
@@ -89,7 +87,6 @@ const Navbar = React.forwardRef((props, ref) => {
               </li>
             ))}
 
-            {/* User info / Login */}
             <div className="user-info">
               {data ? (
                 <div className="dropdown-container" ref={dropdownRef}>
@@ -137,13 +134,11 @@ const Navbar = React.forwardRef((props, ref) => {
             </div>
           </ul>
 
-          {/* Close button (mobile) */}
           <div onClick={removeNavbar} className="close-navbar">
             <AiFillCloseCircle className="icon" />
           </div>
         </div>
 
-        {/* Toggle icon (mobile) */}
         <div
           onClick={showNav}
           className={`toggle-navbar ${isActive ? "hidden" : ""}`}

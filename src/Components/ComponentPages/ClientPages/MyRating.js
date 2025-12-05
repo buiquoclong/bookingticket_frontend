@@ -65,7 +65,6 @@ const MyRating = () => {
 
   const handleChangePage = (event, newPage) => setPage(newPage);
 
-  // Xử lý chỉnh sửa
   const handleEdit = (review) => {
     setSelectedReview(review);
     setRating(review.rating);
@@ -73,12 +72,10 @@ const MyRating = () => {
     setIsEditing(true);
   };
 
-  // ✅ Cập nhật đánh giá
   const handleUpdateRating = async (e) => {
     e.preventDefault();
     const reviewId = selectedReview?.id;
 
-    // 🔹 Kiểm tra dữ liệu bắt buộc
     const isValid = validateFields({
       "Mức đánh giá": rating,
       "ID đánh giá": reviewId,
@@ -95,7 +92,6 @@ const MyRating = () => {
         }
       );
 
-      // 🔹 Cập nhật lại danh sách review trong state
       setRecords((prev) =>
         prev.map((r) => (r.id === updatedReview.id ? updatedReview : r))
       );
@@ -104,18 +100,16 @@ const MyRating = () => {
       setIsEditing(false);
     } catch (error) {
       console.error("❌ Lỗi khi cập nhật đánh giá:", error);
-      // sendRequest tự xử lý toast lỗi
+      toast.error("Không thể cập nhật đánh giá!");
     }
   };
 
-  // ✅ Xử lý xóa review
   const handleDelete = (id) => {
     const review = records.find((r) => r.id === id);
     setReviewToDelete(review);
     setIsDeleteConfirmVisible(true);
   };
 
-  // ✅ Gửi request xóa review
   const removeReview = async () => {
     const reviewId = reviewToDelete?.id;
 
@@ -126,14 +120,12 @@ const MyRating = () => {
 
     try {
       await sendRequest(GET_REVIEW_BY_ID(reviewId), "DELETE");
-
-      // 🔹 Cập nhật lại danh sách sau khi xóa
       setRecords((prev) => prev.filter((r) => r.id !== reviewId));
       setIsDeleteConfirmVisible(false);
       toast.success("Xóa đánh giá thành công!");
     } catch (error) {
       console.error("❌ Lỗi khi xóa đánh giá:", error);
-      // sendRequest đã tự xử lý toast lỗi
+      toast.error("Không thể xóa đánh giá!");
     }
   };
 
@@ -141,7 +133,6 @@ const MyRating = () => {
     <div className="my-rating-wrapper">
       <LoadingBackdrop open={isLoading} message="Đang xử lý yêu cầu..." />
       <div className="HisContent">
-        {/* Bộ lọc đánh giá */}
         <div className="searchIn">
           <FormControl sx={{ minWidth: 150 }} variant="outlined" size="small">
             <InputLabel id="search-criteria-label">Đánh giá</InputLabel>
@@ -171,13 +162,11 @@ const MyRating = () => {
           </FormControl>
         </div>
 
-        {/* Tiêu đề */}
         <div className="contentTicket">
           <div className="title">Đánh giá của tôi</div>
         </div>
         <div className="devide"></div>
 
-        {/* Danh sách đánh giá */}
         <div className="rating-list">
           {records.length > 0 ? (
             records.map((item) => (
@@ -240,7 +229,6 @@ const MyRating = () => {
           )}
         </div>
 
-        {/* Phân trang */}
         <div className="center-pagination">
           <Pagination
             count={totalPages}
@@ -254,7 +242,6 @@ const MyRating = () => {
           />
         </div>
 
-        {/* Hộp xác nhận xóa */}
         <ConfirmDeleteModal
           visible={isDeleteConfirmVisible}
           message="Bạn có chắc muốn xóa đánh giá này không?"
@@ -263,7 +250,6 @@ const MyRating = () => {
           type="delete"
         />
 
-        {/* Hộp chỉnh sửa */}
         {isEditing && (
           <RatingModal
             isOpen={isEditing}
