@@ -92,7 +92,6 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    // 🔹 Kiểm tra hợp lệ trước khi gửi
     const newErrors = {
       email: validateEmail(form.email),
       userName: validateUserName(form.userName),
@@ -109,7 +108,6 @@ const Register = () => {
       return;
     }
 
-    // 🔹 Dữ liệu gửi đi
     const registerUser = {
       name: form.userName,
       password: form.password,
@@ -120,7 +118,6 @@ const Register = () => {
       type: "Đăng ký",
     };
 
-    // 🔹 Kiểm tra field trống (sử dụng validateFields helper)
     const valid = validateFields({
       email: form.email,
       userName: form.userName,
@@ -132,7 +129,6 @@ const Register = () => {
       setIsLoading(true);
       const result = await sendRequest(REGISTER, "POST", registerUser);
 
-      // 🔹 Một số API trả về text, nên kiểm tra kết quả thủ công nếu cần
       if (typeof result === "string") {
         if (result === "Email đã tồn tại") {
           toast.error("Email đã tồn tại");
@@ -147,7 +143,6 @@ const Register = () => {
           state: { userId: parseInt(result) },
         });
       } else {
-        // Nếu API trả JSON object
         if (result?.id) {
           navigate("/confirm-account", { state: { userId: result.id } });
         } else {
@@ -156,7 +151,6 @@ const Register = () => {
       }
     } catch (err) {
       console.error("❌ Register error:", err);
-      // sendRequest đã tự toast lỗi, không cần thêm ở đây
     } finally {
       setIsLoading(false);
     }
@@ -228,16 +222,6 @@ const Register = () => {
           >
             Đăng ký
           </button>
-          {/* <div className="buttonSave">
-            <button
-              className={canRegister ? "btn save" : " disabled"}
-              type="submit"
-              disabled={!canRegister}
-              onClick={handleRegister}
-            >
-              Đăng ký
-            </button>
-          </div> */}
         </form>
 
         <div className="divider">
