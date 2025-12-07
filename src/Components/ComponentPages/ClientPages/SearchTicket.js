@@ -21,7 +21,6 @@ const SearchTicket = () => {
     if (!value) {
       setTicketCodeErrorMessage("Mã vé không được để trống");
     } else if (!/^[A-Za-z0-9-]+$/.test(value)) {
-      // 🔹 Regex kiểm tra ký tự hợp lệ (chữ, số, hoặc "-")
       setTicketCodeErrorMessage("Mã vé không hợp lệ");
     } else {
       setTicketCodeErrorMessage("");
@@ -51,26 +50,22 @@ const SearchTicket = () => {
         "GET"
       );
 
-      // 🔹 Kiểm tra kết quả trả về có hợp lệ không
       if (!result || (Array.isArray(result) && result.length === 0)) {
         toast.error("Không tìm thấy vé xe có mã tương ứng");
         return;
       }
 
-      // 🔹 Đảm bảo dữ liệu luôn là mảng
       const formattedData = Array.isArray(result) ? result : [result];
 
-      // (Tùy chọn) thêm delay để tạo hiệu ứng loading nhẹ
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       setData(formattedData);
       setIsSearch(true);
-      // toast.success("Tìm thấy thông tin vé!");
     } catch (error) {
       console.error(error);
       toast.error("Không thể kết nối đến máy chủ");
     } finally {
-      setIsLoading(false); // dừng loading
+      setIsLoading(false);
     }
   };
   return (

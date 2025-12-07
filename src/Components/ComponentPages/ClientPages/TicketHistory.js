@@ -27,12 +27,10 @@ const TicketHistory = () => {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
 
-  // --- MAPS ---
   const kindTrip = { 0: "Lượt đi", 1: "Lượt về" };
   const statusMap = { 1: "Đã xác nhận", 2: "Đã hoàn thành" };
   const statusColorMap = { 1: "#efcf7f", 2: "green" };
 
-  // --- FETCH DATA ---
   const fetchBookingDetails = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -51,7 +49,6 @@ const TicketHistory = () => {
       setTotalPages(data.totalPages || 1);
     } catch (error) {
       console.error("❌ Lỗi khi tải chi tiết vé:", error);
-      // sendRequest đã tự hiển thị toast lỗi
     } finally {
       setIsLoading(false);
     }
@@ -68,7 +65,6 @@ const TicketHistory = () => {
 
   const handleChangePage = (e, newPage) => setPage(newPage);
 
-  // --- RATING ---
   const handleRating = (trip) => {
     setSelectedTrip(trip);
     setIsRating(true);
@@ -79,7 +75,6 @@ const TicketHistory = () => {
   const handleCreateRating = async (e) => {
     e.preventDefault();
 
-    // ✅ Kiểm tra dữ liệu đầu vào
     const valid = validateFields({
       rating,
       content,
@@ -97,16 +92,13 @@ const TicketHistory = () => {
     };
 
     try {
-      // ✅ Gọi API qua helper
       await sendRequest(CREATE_REVIEW, "POST", newRating);
 
-      // ✅ Xử lý khi thành công
       toast.success("Đánh giá thành công!");
       setRating(0);
       setContent("");
       setIsRating(false);
     } catch (error) {
-      // ❌ sendRequest() đã hiển thị toast lỗi, nên chỉ log thêm nếu cần
       console.error("❌ Lỗi khi tạo đánh giá:", error);
     }
   };
@@ -120,7 +112,6 @@ const TicketHistory = () => {
   return (
     <div className="ticket-history-wrapper">
       <LoadingBackdrop open={isLoading} message="Đang tải dữ liệu..." />
-      {/* Search luôn hiện */}
       <div className="search-area">
         <input
           type="text"
@@ -132,7 +123,6 @@ const TicketHistory = () => {
 
       <h2 className="ticket-history-title">Danh sách vé đã đặt</h2>
 
-      {/* Nếu không có data */}
       {!tickets || tickets.length === 0 ? (
         <div className="emptyData">
           Bạn chưa có vé nào đã đặt. Vui lòng tìm kiếm mã vé khác.
@@ -167,7 +157,6 @@ const TicketHistory = () => {
         </>
       )}
 
-      {/* Rating modal */}
       {isRating && (
         <RatingModal
           isOpen={isRating}
