@@ -21,31 +21,23 @@ const GenericAdminHeader = ({
   onAddClick,
 }) => {
   const dateInputRef = useRef();
-  const prevCriteriaRef = useRef(searchCriteria); // 🔹 Track criteria trước đó
+  const prevCriteriaRef = useRef(searchCriteria);
 
-  // 🔹 Xác định searchCriteria hiệu quả
   const effectiveCriteria =
     searchOptions.length === 1 ? searchOptions[0].key : searchCriteria || "";
 
-  // 🔹 Tìm option hiện tại dựa trên effectiveCriteria
   const selectedOption = searchOptions.find(
     (opt) => opt.key === effectiveCriteria
   );
   const optionLabel = selectedOption ? selectedOption.label : "";
   const fieldType = selectedOption ? selectedOption.type : "text";
 
-  // 🔹 Xử lý thay đổi criteria - reset searchValue NGAY LẬP TỨC
   const handleCriteriaChangeInternal = (event) => {
-    // ✅ Reset searchValue TRƯỚC KHI gọi handleCriteriaChange
     setSearchValue?.("");
-
-    // ✅ Gọi parent để update searchCriteria SAU khi đã reset
     handleCriteriaChange?.(event);
   };
 
-  // 🔹 Effect để đảm bảo searchValue được reset khi criteria thay đổi
   useEffect(() => {
-    // Nếu criteria thay đổi và searchValue vẫn còn giá trị cũ
     if (prevCriteriaRef.current !== effectiveCriteria && searchValue) {
       setSearchValue?.("");
     }
@@ -74,7 +66,6 @@ const GenericAdminHeader = ({
         <div className="actions">
           {searchOptions.length > 0 && (
             <div className="search-group">
-              {/* 🔸 Hiển thị input phù hợp theo type */}
               {fieldType === "select" ? (
                 <FormControl
                   size="small"
@@ -130,7 +121,7 @@ const GenericAdminHeader = ({
                     label={optionLabel}
                     variant="outlined"
                     size="small"
-                    // 🔹 Key để force re-render khi đổi criteria
+                    // Key để force re-render khi đổi criteria
                     key={effectiveCriteria}
                     value={
                       searchValue
@@ -166,7 +157,7 @@ const GenericAdminHeader = ({
               ) : (
                 <TextField
                   type="text"
-                  // 🔹 Key để force re-render khi đổi criteria
+                  // Key để force re-render khi đổi criteria
                   key={effectiveCriteria}
                   label={`Tìm kiếm bằng ${optionLabel}`}
                   variant="outlined"
@@ -184,7 +175,7 @@ const GenericAdminHeader = ({
                 />
               )}
 
-              {/* 🔹 Chỉ hiển thị dropdown "Tìm kiếm bằng" nếu có >1 option */}
+              {/* Key để force re-render khi đổi criteria */}
               {searchOptions.length > 1 && (
                 <FormControl
                   variant="outlined"

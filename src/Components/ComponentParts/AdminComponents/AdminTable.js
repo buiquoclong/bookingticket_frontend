@@ -1,5 +1,4 @@
 import React from "react";
-// import { FaEdit, FaTrash, FaList } from "react-icons/fa";
 import {
   FaEdit,
   FaTrash,
@@ -71,12 +70,9 @@ const AdminTable = ({
                 {columns.map((col) => {
                   let cellValue = getValueByKey(item, col.key);
 
-                  // 👉 Format datetime
                   if (col.key === "startDay" || col.key === "endDay") {
                     cellValue = formatDateTime(cellValue);
                   }
-
-                  // 👉 Hiển thị status/level với màu
                   if (
                     col.key === "status" ||
                     col.key === "level" ||
@@ -119,42 +115,6 @@ const AdminTable = ({
                   );
                 })}
 
-                {/* {showActions && (
-                  <td className="action-buttons">
-                    {onDetail && (
-                      <Tooltip title="Chi tiết" arrow>
-                        <button
-                          className="btn detail"
-                          onClick={() => onDetail(item)}
-                        >
-                          <FaList />
-                        </button>
-                      </Tooltip>
-                    )}
-
-                    {onEdit && (
-                      <Tooltip title="Sửa" arrow>
-                        <button
-                          className="btn edit"
-                          onClick={() => onEdit(item)}
-                        >
-                          <FaEdit />
-                        </button>
-                      </Tooltip>
-                    )}
-
-                    {onDelete && (
-                      <Tooltip title="Xóa" arrow>
-                        <button
-                          className="btn delete"
-                          onClick={() => onDelete(item)}
-                        >
-                          <FaTrash />
-                        </button>
-                      </Tooltip>
-                    )}
-                  </td>
-                )} */}
                 {showActions && (
                   <td className="action-buttons">
                     <div className="action-container">
