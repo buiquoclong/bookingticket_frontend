@@ -6,10 +6,10 @@ import { BASE_URL } from "../../../Utils/apiUrls";
 const AddModal = ({
   visible,
   title,
-  fields = [], // [{ key: "name", label: "Tên" }, { key: "startDay", label: "Ngày bắt đầu", type: "datetime" }, ...]
+  fields = [],
   onSave,
   onCancel,
-  defaultValues = {}, // { status: 1 }
+  defaultValues = {},
   onFieldChange,
 }) => {
   const [formData, setFormData] = useState({});
@@ -68,13 +68,6 @@ const AddModal = ({
           cities.find((c) => c.id === parseInt(updated.diemden))?.name ?? "";
         updated.name = `${diemDiName} - ${diemDenName}`;
       }
-      // if (key === "price") {
-      //   // Loại bỏ tất cả ký tự không phải số
-      //   const numericValue = value.toString().replace(/\D/g, "");
-      //   updated[key] = numericValue;
-      // } else {
-      //   updated[key] = value;
-      // }
       if (onFieldChange) {
         // lấy dayStart hiện tại: nếu key đang thay đổi là "dayStart" thì lấy value mới, còn không lấy formData.dayStart
         const currentDayStart = key === "dayStart" ? value : formData.dayStart;
@@ -101,10 +94,6 @@ const AddModal = ({
     }
     onSave(finalData);
   };
-  // const formatPrice = (value) => {
-  //   if (!value) return "";
-  //   return new Intl.NumberFormat("vi-VN").format(value);
-  // };
   const handlePriceInput = (value) => {
     const numericValue = value.replace(/\D/g, ""); // chỉ giữ số
     setFormData((prev) => ({ ...prev, price: numericValue }));
@@ -121,10 +110,8 @@ const AddModal = ({
               <div className="form-group" key={field.key}>
                 <label>{field.label}</label>
 
-                {/* 🔹 Nếu là file ảnh */}
                 {field.type === "file" ? (
                   <>
-                    {/* Hiển thị ảnh hiện tại nếu có */}
                     {formData.imgUrl && !formData.newImage && (
                       <div className="image-preview">
                         <img
@@ -141,7 +128,6 @@ const AddModal = ({
                       </div>
                     )}
 
-                    {/* Hiển thị ảnh mới nếu người dùng đã chọn */}
                     {formData.newImage && (
                       <div className="image-preview">
                         <img
@@ -152,7 +138,6 @@ const AddModal = ({
                       </div>
                     )}
 
-                    {/* Input chọn ảnh mới */}
                     <input
                       type="file"
                       accept="image/*"
