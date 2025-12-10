@@ -7,7 +7,7 @@ const EditModal = ({
   visible,
   title = "Chỉnh sửa",
   data,
-  fields = [], // [{ key: "name", label: "Tên", type: "text" }, { key: "startDay", label: "Ngày bắt đầu", type: "datetime" }, ...]
+  fields = [],
   onSave,
   onCancel,
   onFieldChange,
@@ -68,7 +68,6 @@ const EditModal = ({
     setFormData((prev) => {
       const updated = { ...prev, [key]: value };
 
-      // --- Logic startDay/endDay
       if (key === "startDay" && updated.endDay && updated.endDay < value) {
         updated.endDay = "";
       }
@@ -76,20 +75,17 @@ const EditModal = ({
         updated.startDay = "";
       }
 
-      // --- Xử lý dayStart
       if (key === "dayStart") {
         const today = getCurrentDateTimeLocal().split("T")[0];
         if (value < today) {
           alert("Ngày khởi hành không được nhỏ hơn ngày hiện tại!");
           return prev;
         }
-        updated.timeStart = ""; // reset timeStart khi đổi ngày
+        updated.timeStart = "";
 
-        // --- CHỈ GỌI CALLBACK 1 LẦN VỚI GIÁ TRỊ MỚI
         if (onFieldChange) onFieldChange(key, value, value);
       }
 
-      // --- Logic diemdi/diemden
       if (key === "diemdi" || key === "diemden") {
         const diemDiName =
           cities.find((c) => c.id === parseInt(updated.diemdi))?.name ?? "";
@@ -98,12 +94,6 @@ const EditModal = ({
         updated.name = `${diemDiName} - ${diemDenName}`;
       }
 
-      // --- Logic price
-      // if (key === "price") {
-      //   const numericValue = value.toString().replace(/\D/g, "");
-      //   updated[key] = numericValue;
-      // }
-
       return updated;
     });
   };
@@ -111,20 +101,14 @@ const EditModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     const finalData = { ...formData };
-    // Nếu status không có, mặc định 1
     if (!finalData.status) finalData.status = 1;
-    // Gửi ISO 8601 trực tiếp, backend Spring Boot parse được LocalDateTime
     if (formData.newImage) {
-      finalData.file = formData.newImage; // thêm file mới
+      finalData.file = formData.newImage;
     }
     onSave(finalData);
   };
-  // const formatPrice = (value) => {
-  //   if (!value) return "";
-  //   return new Intl.NumberFormat("vi-VN").format(value);
-  // };
   const handlePriceInput = (value) => {
-    const numericValue = value.replace(/\D/g, ""); // chỉ giữ số
+    const numericValue = value.replace(/\D/g, "");
     setFormData((prev) => ({ ...prev, price: numericValue }));
   };
   return (
@@ -139,10 +123,8 @@ const EditModal = ({
               <div className="form-group" key={field.key}>
                 <label>{field.label}</label>
 
-                {/* 🔹 Nếu là file ảnh */}
                 {field.type === "file" ? (
                   <>
-                    {/* Hiển thị ảnh hiện tại nếu có */}
                     {formData.imgUrl && !formData.newImage && (
                       <div className="image-preview">
                         <img
@@ -159,7 +141,6 @@ const EditModal = ({
                       </div>
                     )}
 
-                    {/* Hiển thị ảnh mới nếu người dùng đã chọn */}
                     {formData.newImage && (
                       <div className="image-preview">
                         <img
@@ -170,7 +151,6 @@ const EditModal = ({
                       </div>
                     )}
 
-                    {/* Input chọn ảnh mới */}
                     <input
                       type="file"
                       accept="image/*"
