@@ -26,7 +26,6 @@ const RatingModal = ({
       <div className="rating-modal">
         <h2 className="modal-title">{headerTitle}</h2>
 
-        {/* Thông tin chuyến đi chỉ hiển thị nếu có */}
         {selectedTrip && (
           <div className="trip-info">
             {selectedTrip.route && (
@@ -48,7 +47,6 @@ const RatingModal = ({
           </div>
         )}
 
-        {/* Đánh giá sao */}
         <div className="rating-stars">
           <StarRatings
             rating={rating}
@@ -63,7 +61,6 @@ const RatingModal = ({
           )}
         </div>
 
-        {/* Nội dung đánh giá */}
         <textarea
           className="rating-textarea"
           placeholder="Nhập nội dung đánh giá..."
