@@ -15,13 +15,13 @@ const SeatTable = ({ seats, selectedSeatsById, trip, handleClick }) => {
   }
   const getSeatDisplayProps = (status, isSelected) => {
     switch (status) {
-      case SEAT_STATUS.SOLD: // đã bán
+      case SEAT_STATUS.SOLD:
         return {
           src: seat_disabled,
           tdStyle: { cursor: "not-allowed" },
           spanStyle: { color: "#A2ABB3" },
         };
-      case SEAT_STATUS.RESERVED: // Được chọn
+      case SEAT_STATUS.RESERVED:
         return {
           src: seat_selecting,
           tdStyle: {},
@@ -39,7 +39,7 @@ const SeatTable = ({ seats, selectedSeatsById, trip, handleClick }) => {
               src: seat_active,
               tdStyle: {},
               spanStyle: {},
-            }; // Default case
+            };
     }
   };
   return (
