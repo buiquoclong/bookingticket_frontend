@@ -20,7 +20,6 @@ const InfoTicket = ({
   const [editing, setEditing] = useState(false);
   const [tempNote, setTempNote] = useState(note || "");
 
-  // Đồng bộ khi note ở parent thay đổi
   useEffect(() => {
     setTempNote(note || "");
   }, [note]);
