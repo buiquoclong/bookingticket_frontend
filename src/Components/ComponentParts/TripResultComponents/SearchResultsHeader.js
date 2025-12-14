@@ -33,7 +33,6 @@ const SearchResultsHeader = ({
     ...kindVehicledata.map((kind) => ({ value: kind.id, text: kind.name })),
   ];
 
-  // Tập hợp các filter để map dễ dàng
   const filters = [
     {
       label: "Chọn khung giờ đi:",
@@ -49,7 +48,6 @@ const SearchResultsHeader = ({
 
   return (
     <div className="results-header">
-      {/* Back link */}
       <button className="back-link" onClick={onBackClick}>
         <span className="icon-wrapper">
           <FaAngleLeft className="icon" />
@@ -57,7 +55,6 @@ const SearchResultsHeader = ({
         <span className="link-text">Trở lại</span>
       </button>
 
-      {/* Trip info */}
       <div className="trip-info">
         <h1>
           Chuyến: {displayDiName} - {displayDenName}
@@ -67,7 +64,6 @@ const SearchResultsHeader = ({
         <h1>Ngày: {formatDate(dayStart)}</h1>
       </div>
 
-      {/* Filters */}
       <div className="filters">
         {filters.map((filter, index) => (
           <div className="filter-item" key={index}>
