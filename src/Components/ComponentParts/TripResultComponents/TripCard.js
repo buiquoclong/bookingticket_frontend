@@ -21,7 +21,7 @@ const TripCard = ({
     <div className="cardOneResult">
       <TripCardMain trip={trip} />
 
-      {/* Tabs */}
+      {/* Tabs in TripCard */}
       <div className="choseRoute">
         <TripTabs
           trip={trip}
