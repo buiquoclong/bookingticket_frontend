@@ -49,7 +49,7 @@ const TripCardMain = ({ trip }) => {
         </div>
       </div>
 
-      {/* Thông tin xe, chỗ, giá */}
+      {/* Thông tin chi tiết xe, chỗ, giá */}
       <div className="trip-right">
         <div className="vehicle-info">
           <span className="dot"></span>
