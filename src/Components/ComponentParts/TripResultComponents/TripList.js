@@ -15,8 +15,8 @@ const TripList = ({
   handleContinueClick,
 }) => {
   const cardRefs = useRef({}); // chứa ref theo trip.id
-  const [activeTripId, setActiveTripId] = useState(null); // 👈 quản lý trip nào đang mở
-  const [activeTab, setActiveTab] = useState(null); // 1: chọn ghế, 3: chính sách
+  const [activeTripId, setActiveTripId] = useState(null); // quản lý trip đang mở
+  const [activeTab, setActiveTab] = useState(null); // quản lý tab đang mở { tripId, tab }
 
   const handleScrollToTrip = (tripId) => {
     const card = cardRefs.current[tripId];
