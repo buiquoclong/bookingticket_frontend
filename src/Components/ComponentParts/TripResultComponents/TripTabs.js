@@ -23,7 +23,7 @@ const TripTabs = ({
   const handleTabClick = async (tab, tripId, kindVehicleId) => {
     onOpenTripTab(tripId, tab);
 
-    // ✅ Gọi scroll khi click tab chọn ghế
+    // Gọi scroll khi click tab chọn ghế
     if (tab === 1 && onScrollToTrip) {
       onScrollToTrip();
     }
@@ -33,7 +33,7 @@ const TripTabs = ({
         const data = await sendRequest(
           GET_SEAT_BY_TRIP_AND_KIND(tripId, kindVehicleId)
         );
-        setSeats(data); // dữ liệu có sẵn status từ backend
+        setSeats(data);
       } catch (error) {
         console.error("Error fetching seats:", error);
       }
@@ -90,7 +90,6 @@ const TripTabs = ({
       {activeTab?.tripId === trip.id && activeTab.tab === 1 && (
         <div className="choose-seats">
           <div className="seats-container">
-            {/* Left: SeatNote + SeatTable */}
             <div className="left-seats">
               <div className="note-wrapper">
                 <SeatNote />
@@ -106,10 +105,8 @@ const TripTabs = ({
               </div>
             </div>
 
-            {/* Divider */}
             <div className="seats-divider"></div>
 
-            {/* Right: SeatInfo */}
             <div className="seats-right">
               <SeatInfo
                 tripId={trip.id}
