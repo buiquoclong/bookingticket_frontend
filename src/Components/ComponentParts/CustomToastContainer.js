@@ -12,7 +12,7 @@ const CustomToastContainer = () => {
       progressClassName="toast-progress"
       theme="colored"
       transition={Slide}
-      autoClose={1500} // chỉnh lại thời gian nếu muốn
+      autoClose={1500}
       hideProgressBar={false}
       pauseOnHover
     />
