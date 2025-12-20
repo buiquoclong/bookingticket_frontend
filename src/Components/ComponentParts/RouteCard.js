@@ -4,7 +4,6 @@ import "./ComponentParts.scss";
 
 const RouteCard = ({ route, handleBookingClick }) => {
   return (
-    // <div key={route.id} className="singleDestination routeCard">
     <div
       key={route.id}
       className="routeCard"
