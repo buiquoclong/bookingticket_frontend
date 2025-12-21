@@ -136,11 +136,7 @@ const SearchTripForm = (
     }
   }, [kind]);
   return (
-    <div
-      className="cardDiv"
-      data-aos="fade-up" // hiệu ứng từ dưới lên
-      data-aos-duration="1000" // thời gian animation
-    >
+    <div className="cardDiv" data-aos="fade-up" data-aos-duration="1000">
       <div className="trip-type-card">
         <h3 className="trip-type-title">Loại chuyến đi</h3>
 
@@ -176,11 +172,9 @@ const SearchTripForm = (
           ></div>
         </div>
       </div>
-      {/* Form chọn chuyến đi */}
       <div
         className={`trip-form ${kind === "Khứ hồi" ? "round-trip" : "one-way"}`}
       >
-        {/* Điểm xuất phát */}
         <div className="trip-field">
           <label>Điểm xuất phát</label>
           <select
@@ -197,7 +191,6 @@ const SearchTripForm = (
           </select>
         </div>
 
-        {/* Điểm đến */}
         <div className="trip-field">
           <label>Điểm đến</label>
           <select
@@ -214,7 +207,6 @@ const SearchTripForm = (
           </select>
         </div>
 
-        {/* Ngày đi */}
         <div className="trip-field">
           <label>Ngày đi</label>
           <input
@@ -227,7 +219,6 @@ const SearchTripForm = (
           />
         </div>
 
-        {/* Ngày về (chỉ hiển thị khi là Khứ hồi) */}
         {kind === "Khứ hồi" && (
           <div
             className={`trip-field return-field ${
@@ -246,7 +237,6 @@ const SearchTripForm = (
           </div>
         )}
       </div>
-      {/* Nút tìm chuyến */}
       <div className="searchOption" onClick={sendData}>
         <HiFilter className="icon" />
         <span>Tìm chuyến</span>
