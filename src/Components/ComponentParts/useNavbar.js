@@ -28,7 +28,6 @@ const useNavbar = () => {
     ["token", "userId", "userRole", "googleLogin"].forEach((k) =>
       localStorage.removeItem(k)
     );
-    // ✅ Reset lại state user
     setData(null);
     navigate("/");
   }, [navigate]);
@@ -88,7 +87,6 @@ const useNavbar = () => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target))
         setShowDropdown(false);
-      // Navbar mobile: bỏ qua toggle-navbar
       if (
         navbarMenuRef.current &&
         !navbarMenuRef.current.contains(e.target) &&
