@@ -32,7 +32,7 @@ export const validateFields = (fields) => {
 /**
  * ✅ Hàm gửi request API chung cho POST, PUT, DELETE, GET
  * @param {string} url - endpoint đầy đủ
- * @param {"GET"|"POST"|"PUT"|"DELETE"} method - phương thức
+ * @param {"GET"|"POST"|"PUT"|"DELETE"} method - phương thức hàm
  * @param {Object|null} body - dữ liệu gửi đi (nếu có)
  * @returns {Promise<any>} dữ liệu phản hồi từ server
  */
