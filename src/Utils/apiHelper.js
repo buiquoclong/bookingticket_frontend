@@ -58,7 +58,7 @@ export const sendRequest = async (
     const response = await fetch(url, {
       method,
       headers,
-      credentials: options.includeCredentials ? "include" : "same-origin", // ✅ CHỈ include khi cần
+      credentials: options.includeCredentials ? "include" : "same-origin", // ✅ chỉ include khi cần
       body:
         body instanceof FormData ? body : body ? JSON.stringify(body) : null,
     });
