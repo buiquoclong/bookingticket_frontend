@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 
 /**
  * ✅ Kiểm tra các field bắt buộc có giá trị
- * @param {Object} fields - Ví dụ: { name: "Loại xe", startDay: "Ngày bắt đầu" }
+ * @param {Object} fields - đối tượng key-value của các field cần kiểm tra
  * @returns {boolean} true nếu hợp lệ, false nếu thiếu
  */
 export const validateFields = (fields) => {
