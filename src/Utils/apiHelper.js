@@ -18,7 +18,7 @@ export const validateFields = (fields) => {
     return false;
   }
 
-  // Kiểm tra email nếu có
+  // Kiểm tra định dạng email nếu có
   if (fields["Địa chỉ Email"]) {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9]+$/;
     if (!emailRegex.test(fields["Địa chỉ Email"])) {
