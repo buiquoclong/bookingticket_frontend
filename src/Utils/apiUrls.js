@@ -125,7 +125,7 @@ export const GET_ROUTE_PAGE = (page, size, searchCriteria, searchValue) =>
 export const CREATE_ROUTE = `${BASE_URL}/route`;
 export const GET_ROUTE_BY_ID = (id) => `${BASE_URL}/route/${id}`;
 
-// 📝 Review APIs
+// Review APIs
 export const GET_REVIEW_OF_USER_PAGE = (page, size, userId, rating) =>
   `${BASE_URL}/review/page?page=${page}&size=${size}&userId=${userId}&rating=${rating}`;
 
