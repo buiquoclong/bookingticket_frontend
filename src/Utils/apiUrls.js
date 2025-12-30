@@ -180,7 +180,7 @@ export const GET_VEHICLE_PAGE = (page, size, searchCriteria, searchValue) =>
 export const CREATE_VEHICLE = `${BASE_URL}/vehicle`;
 export const GET_VEHICLE_BY_ID = (id) => `${BASE_URL}/vehicle/${id}`;
 
-// ================== 📊 DASHBOARD API ==================
+// ================== DASHBOARD API ==================
 export const GET_TOTAL_BY_DAY = (date) =>
   `${BASE_URL}/booking/total-by-day?date=${date}`;
 
