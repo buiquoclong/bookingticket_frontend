@@ -44,7 +44,7 @@ export const formatCurrency = (value) => {
     currency: "VND",
   }).format(value);
 };
-/* ============ COLUMN DATA TABLE ============ */
+/* ============ COLUMN DATABASE TABLE ============ */
 /* ============ COLUMN DRIVER ============ */
 const statusDriverMap = {
   1: "Đang làm",
