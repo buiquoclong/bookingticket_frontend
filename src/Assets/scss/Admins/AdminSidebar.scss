@@ -7,11 +7,11 @@ $transition-speed: 0.3s;
 
 .admin-sidebar {
   position: fixed;
-  top: 70px; // start dưới header
+  top: 70px;
   left: 0;
   width: 280px;
   height: calc(100vh - 70px);
-  z-index: 200; // thấp hơn header
+  z-index: 200;
   background-color: $sidebar-bg;
   color: $sidebar-text;
   display: flex;
