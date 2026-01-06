@@ -69,7 +69,6 @@
               box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
             }
 
-            // label nằm trên border khi focus hoặc có text
             &:focus + .form-label,
             &:not(:placeholder-shown) + .form-label {
               top: 0;
