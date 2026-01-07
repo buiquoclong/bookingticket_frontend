@@ -3,7 +3,7 @@
 .forget-password-section {
   width: 100%;
   min-height: 50vh;
-  background: #f4f6f8; // nền sáng, dễ nhìn
+  background: #f4f6f8;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -32,15 +32,15 @@
 
         /* CHÉO DẦN SANG PHẢI */
         display: inline-block;
-        transform: skewX(12deg); // Nghiêng chữ chéo sang phải
+        transform: skewX(12deg);
         background: linear-gradient(
           90deg,
           var(--PrimaryColor),
           var(--SecondaryColor)
         );
 
-        background-clip: text; // standard
-        -webkit-background-clip: text; // webkit
+        background-clip: text;
+        -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         color: transparent;
       }

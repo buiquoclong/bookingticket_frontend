@@ -26,12 +26,11 @@
       box-shadow: 0 3px 6px rgba(2, 15, 29, 0.2);
     }
 
-    /* LOGO */
     .logo-div {
       .logo {
         display: flex;
         align-items: center;
-        gap: 0.2rem; // khoảng cách hợp lý giữa icon và chữ
+        gap: 0.2rem;
         color: var(--blackColor);
         font-weight: 700;
         text-decoration: none;
@@ -61,7 +60,6 @@
       }
     }
 
-    /* MENU CHÍNH */
     .navbar-menu {
       display: flex;
       align-items: center;
@@ -69,14 +67,14 @@
 
       .nav-list {
         display: flex;
-        justify-content: center; // căn giữa toàn bộ menu
+        justify-content: center;
         align-items: center;
         gap: 1.5rem;
 
         .nav-item {
-          flex: 1 1 auto; // cho item tự co dãn
-          min-width: 40px; // giới hạn nhỏ nhất
-          max-width: 200px; // giới hạn lớn nhất (tuỳ ý)
+          flex: 1 1 auto;
+          min-width: 40px;
+          max-width: 200px;
 
           position: relative;
           font-weight: 600;
@@ -85,10 +83,8 @@
           cursor: pointer;
           padding: 0.25rem 0;
           transition: all 0.3s ease;
-          // white-space: nowrap; // giữ chữ không bị xuống dòng
           text-align: center;
 
-          // Underline animation gradient
           &::after {
             content: "";
             position: absolute;
@@ -123,7 +119,6 @@
             }
           }
 
-          // Optional: subtle shadow effect on hover
           &:hover::before {
             content: "";
             position: absolute;
@@ -131,7 +126,7 @@
             bottom: -6px;
             width: 100%;
             height: 6px;
-            background: rgba(25, 118, 210, 0.1); // subtle glow
+            background: rgba(25, 118, 210, 0.1);
             border-radius: 3px;
           }
         }
@@ -158,7 +153,6 @@
             }
           }
 
-          /* Dropdown container */
           .dropdown-container {
             position: relative;
             cursor: pointer;
@@ -188,8 +182,6 @@
               .chevron-icon {
                 color: var(--PrimaryColor);
                 transition: color 0.25s ease, transform 0.25s ease;
-                /* nếu SVG không đổi màu, bật dòng này */
-                /* svg { fill: currentColor; } */
               }
 
               .chevron-icon {
@@ -219,7 +211,6 @@
               }
             }
 
-            /* Dropdown menu */
             .dropdown-menu {
               position: absolute;
               right: 0;
@@ -230,8 +221,8 @@
               min-width: 200px;
               z-index: 999;
               animation: slideDown 0.25s ease forwards;
-              overflow: hidden; /* giữ item đều, tránh lệch */
-              padding: 0; /* loại bỏ khoảng trắng thừa */
+              overflow: hidden;
+              padding: 0;
 
               ul {
                 list-style: none;
@@ -260,7 +251,6 @@
                     transform: translateX(4px);
                   }
 
-                  /* icon (nếu có) */
                   svg {
                     font-size: 1rem;
                   }
@@ -425,8 +415,8 @@
               }
 
               .dropdown-menu {
-                position: absolute; // quan trọng: không giãn navbar-menu
-                top: 100%; // ngay dưới dropdown-toggle
+                position: absolute;
+                top: 100%;
                 left: 0;
                 width: 100%;
                 background: var(--whiteColorDeam);
