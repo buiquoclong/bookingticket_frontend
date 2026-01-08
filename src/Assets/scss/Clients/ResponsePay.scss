@@ -24,13 +24,13 @@
       margin-bottom: 2rem;
       display: flex;
       justify-content: center;
-      align-items: flex-end; // căn bóng xuống đáy
+      align-items: flex-end;
 
       .success-icon {
         font-size: 5rem;
         color: #04aa6d;
         animation: bounce 1.2s infinite;
-        z-index: 1; // đảm bảo icon trên bóng
+        z-index: 1;
       }
 
       .icon-shadow {
@@ -144,9 +144,9 @@
 /* ============ Payment Failure ============ */
 .response-card {
   background: #fff;
-  border: 2px solid #ff4d4f; // màu xanh rõ nét
+  border: 2px solid #ff4d4f;
   border-radius: 1rem;
-  box-shadow: 0 6px 15px rgba(255, 77, 79, 0.2); // shadow nhẹ
+  box-shadow: 0 6px 15px rgba(255, 77, 79, 0.2);
   padding: 2rem 1.5rem;
   text-align: center;
   max-width: 500px;
@@ -164,7 +164,7 @@
 
       .failure-icon {
         font-size: 5rem;
-        color: #f44336; // đỏ nổi bật
+        color: #f44336;
         animation: shake 0.8s ease-in-out infinite;
       }
     }

@@ -52,13 +52,13 @@
         }
       }
       .error-text {
-        position: absolute; // giữ nguyên vị trí
-        bottom: -1.4rem; // cách input 0.4rem, không đẩy input xuống
+        position: absolute;
+        bottom: -1.4rem;
         left: 0.3rem;
         font-size: 12px;
         color: red;
         line-height: 1.5;
-        min-height: 1.2rem; // luôn dự trữ chiều cao cho error
+        min-height: 1.2rem;
       }
     }
 
