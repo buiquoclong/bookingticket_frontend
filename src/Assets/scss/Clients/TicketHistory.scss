@@ -69,17 +69,17 @@
 
   .ticket-history-grid {
     display: grid;
-    justify-content: center; // căn giữa các card
+    justify-content: center;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
     @media (max-width: 947px) {
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      justify-content: center; // vẫn căn giữa
+      justify-content: center;
     }
 
     @media (max-width: 600px) {
-      grid-template-columns: 1fr; // 1 card mỗi hàng
+      grid-template-columns: 1fr;
       gap: 1rem;
     }
   }
