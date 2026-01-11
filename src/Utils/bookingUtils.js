@@ -3,6 +3,7 @@ export const SEAT_STATUS = {
   RESERVED: 2,
   AVAILABLE: 0,
 };
+// Lấy ngày giờ hiện tại theo định dạng local datetime để gán giá trị mặc định cho input datetime-local
 export function getCurrentDateTimeLocal() {
   const now = new Date();
   const year = now.getFullYear();
