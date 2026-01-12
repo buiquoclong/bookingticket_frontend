@@ -12,7 +12,7 @@ export function getCurrentDateTimeLocal() {
   return `${year}-${month}-${day}`;
 }
 
-// Format ngày
+// Format ngày tháng năm thành dd/mm/yyyy
 export const formatDate = (dateString) => {
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, "0");
