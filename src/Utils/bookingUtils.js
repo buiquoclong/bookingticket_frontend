@@ -29,7 +29,7 @@ export function formatDate1(dateString) {
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
 
-  // Đảm bảo rằng các giá trị có hai chữ số
+  // Đảm bảo định dạng hai chữ số cho giờ, phút, ngày và tháng
   const formattedHours = hours < 10 ? "0" + hours : hours;
   const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
   const formattedDay = day < 10 ? "0" + day : day;
