@@ -38,6 +38,7 @@ export function formatDate1(dateString) {
   return `${formattedHours}:${formattedMinutes} ${formattedDay}/${formattedMonth}/${year}`;
 }
 
+// Format tiền tệ VND
 export const formatCurrency = (value) => {
   if (!value) return "0 ₫";
   return new Intl.NumberFormat("vi-VN", {
