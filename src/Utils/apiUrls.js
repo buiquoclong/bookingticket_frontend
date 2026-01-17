@@ -1,5 +1,6 @@
 export const BASE_URL = "http://localhost:8081/api";
 // Trip APIs
+// Lấy thông tin chuyến đi theo ID
 export const GET_TRIP_BY_ID = (id) => `${BASE_URL}/trip/${id}`;
 export const GET_ALL_TRIPS = `${BASE_URL}/trip/all`;
 export const SEARCH_TRIP = `${BASE_URL}/trip/search`;
@@ -30,6 +31,7 @@ export const GET_USER_PAGE = (page, size, searchCriteria, searchValue) =>
   )}`;
 
 // Catch Point APIs
+//
 export const GET_CATCH_POINT_BY_ROUTE_ID = (routeId) =>
   `${BASE_URL}/catch-point/route/${routeId}`;
 export const GET_CATCH_POINT_PAGE = (page, size, searchCriteria, searchValue) =>
