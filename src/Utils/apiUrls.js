@@ -4,12 +4,14 @@ export const BASE_URL = "http://localhost:8081/api";
 export const GET_TRIP_BY_ID = (id) => `${BASE_URL}/trip/${id}`;
 // Lấy tất cả chuyến đi
 export const GET_ALL_TRIPS = `${BASE_URL}/trip/all`;
+// Tìm kiếm chuyến đi theo tiêu chí
 export const SEARCH_TRIP = `${BASE_URL}/trip/search`;
+// Lấy trang chuyến đi với phân trang và tiêu chí tìm kiếm
 export const GET_TRIP_PAGE = (page, size, searchCriteria, searchValue) =>
   `${BASE_URL}/trip/page?page=${page}&size=${size}&${searchCriteria}=${encodeURIComponent(
     searchValue,
   )}`;
-
+// Tạo chuyến đi mới
 export const CREATE_TRIP = `${BASE_URL}/trip`;
 
 // User APIs
