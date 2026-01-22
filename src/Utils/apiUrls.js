@@ -15,19 +15,32 @@ export const GET_TRIP_PAGE = (page, size, searchCriteria, searchValue) =>
 export const CREATE_TRIP = `${BASE_URL}/trip`;
 
 // User APIs
+
+// Lấy thông tin người dùng theo ID
 export const GET_USER_BY_ID = (id) => `${BASE_URL}/user/${id}`;
+// Đăng ký người dùng mới
 export const REGISTER = `${BASE_URL}/user/register`;
+// Lấy token người dùng
 export const GET_USER_TOKEN = `${BASE_URL}/user/token`;
+// Tạo người dùng bởi admin
 export const CREATE_USER_ADMIN = `${BASE_URL}/user/create-by-admin`;
+// Thay đổi mật khẩu người dùng
 export const CHANGE_PASSWORD = (userId) =>
   `${BASE_URL}/user/${userId}/change-password`;
+// Xác nhận tài khoản người dùng
 export const CONFIRM_ACCOUNT = `${BASE_URL}/user/confirm-account`;
+// Thay đổi mã xác nhận
 export const CHANGE_CONFIRM_CODE = () => `${BASE_URL}/user/change-confirmCode`;
+// Quên mật khẩu
 export const FORGOT_PASSWORD = `${BASE_URL}/user/forgot-password`;
+// Cập nhật thông tin người dùng
 export const UPDATE_USER_CLIENT = (userId) =>
   `${BASE_URL}/user/update/${userId}`;
+// Đăng nhập người dùng
 export const USER_LOGIN = `${BASE_URL}/user/login`;
+// Đăng nhập người dùng bằng Google
 export const USER_GOOGLE_LOGIN = `${BASE_URL}/oauth2/authorization/google`;
+// Lấy trang người dùng với phân trang và tiêu chí tìm kiếm
 export const GET_USER_PAGE = (page, size, searchCriteria, searchValue) =>
   `${BASE_URL}/user/page?page=${page}&size=${size}&${searchCriteria}=${encodeURIComponent(
     searchValue,
