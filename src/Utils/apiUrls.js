@@ -47,15 +47,17 @@ export const GET_USER_PAGE = (page, size, searchCriteria, searchValue) =>
   )}`;
 
 // Catch Point APIs
-//
+// Lấy điểm đón trả theo routeId
 export const GET_CATCH_POINT_BY_ROUTE_ID = (routeId) =>
   `${BASE_URL}/catch-point/route/${routeId}`;
+// Lấy trang điểm đón trả với phân trang và tiêu chí tìm kiếm
 export const GET_CATCH_POINT_PAGE = (page, size, searchCriteria, searchValue) =>
   `${BASE_URL}/catch-point/page?page=${page}&size=${size}&${searchCriteria}=${encodeURIComponent(
     searchValue,
   )}`;
-
+// Tạo điểm đón trả mới
 export const CREATE_CATCH_POINT = `${BASE_URL}/catch-point`;
+// Lấy điểm đón trả theo ID
 export const GET_CATCH_POINT_BY_ID = (id) => `${BASE_URL}/catch-point/${id}`;
 
 // Seat APIs
