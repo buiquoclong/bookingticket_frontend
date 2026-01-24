@@ -61,13 +61,18 @@ export const CREATE_CATCH_POINT = `${BASE_URL}/catch-point`;
 export const GET_CATCH_POINT_BY_ID = (id) => `${BASE_URL}/catch-point/${id}`;
 
 // Seat APIs
+// Kiểm tra chỗ ngồi cho chuyến đi một chiều
 export const CHECK_SEAT_ROUNDTRIP = `${BASE_URL}/seat/check-roundtrip`;
+// Lấy trang chỗ ngồi với phân trang và tiêu chí tìm kiếm
 export const GET_SEAT_PAGE = (page, size, searchCriteria, searchValue) =>
   `${BASE_URL}/seat/page?page=${page}&size=${size}&${searchCriteria}=${encodeURIComponent(
     searchValue,
   )}`;
+// Tạo chỗ ngồi mới
 export const CREATE_SEAT = `${BASE_URL}/seat`;
+// Lấy chỗ ngồi theo ID
 export const GET_SEAT_BY_ID = (id) => `${BASE_URL}/seat/${id}`;
+// Lấy chỗ ngồi theo chuyến đi và loại xe
 export const GET_SEAT_BY_TRIP_AND_KIND = (tripId, kindVehicleId) =>
   `${BASE_URL}/seat/trip/${tripId}/kindVehicle/${kindVehicleId}`;
 
