@@ -77,20 +77,24 @@ export const GET_SEAT_BY_TRIP_AND_KIND = (tripId, kindVehicleId) =>
   `${BASE_URL}/seat/trip/${tripId}/kindVehicle/${kindVehicleId}`;
 
 // Booking APIs
+// Tạo đặt chỗ mới
 export const CREATE_BOOKING = `${BASE_URL}/booking/create`;
+// Tạo đặt chỗ cho nhân viên
 export const CREATE_BOOKING_FOR_EMPLOYEE = `${BASE_URL}/booking/for-emp`;
+// Lấy đặt chỗ theo ID
 export const GET_BOOKING_BY_ID = (id) => `${BASE_URL}/booking/${id}`;
+// Lấy trang đặt chỗ với phân trang và tiêu chí tìm kiếm
 export const GET_BOOKINGS_PAGE = (page, size, searchCriteria, searchValue) =>
   `${BASE_URL}/booking/page?page=${page}&size=${size}&${searchCriteria}=${encodeURIComponent(
     searchValue,
   )}`;
-
+// Lấy trang đặt chỗ của người dùng với phân trang và trạng thái thanh toán
 export const GET_BOOKING_PAGE = (page, size, userId, isPaid) =>
   `${BASE_URL}/booking/page?page=${page}&size=${size}&userId=${userId}&isPaid=${isPaid}`;
-
+// Hủy đặt chỗ
 export const CANCEL_BOOKING = (bookingId) =>
   `${BASE_URL}/booking/cancel/${bookingId}`;
-
+// Lấy chi tiết đặt chỗ theo đặt chỗ
 export const GET_BOOKING_DETAIL_BY_BOOKING = (bookingId) =>
   `${BASE_URL}/booking_detail/booking/${bookingId}`;
 
