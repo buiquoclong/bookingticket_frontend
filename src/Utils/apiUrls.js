@@ -99,9 +99,10 @@ export const GET_BOOKING_DETAIL_BY_BOOKING = (bookingId) =>
   `${BASE_URL}/booking_detail/booking/${bookingId}`;
 
 // Payment
+// Thanh toán qua VNPAY
 export const PAY_VNPAY = (total, bookingId) =>
   `${BASE_URL}/payment/pay?total=${total}&bookingId=${bookingId}`;
-
+// Thanh toán đặt chỗ
 export const PAY_BOOKING = (total, bookingId) =>
   `${BASE_URL}/payment/pay-booking?total=${total}&bookingId=${bookingId}`;
 
