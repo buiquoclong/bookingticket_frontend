@@ -107,13 +107,17 @@ export const PAY_BOOKING = (total, bookingId) =>
   `${BASE_URL}/payment/pay-booking?total=${total}&bookingId=${bookingId}`;
 
 // Promotion APIs
+// Kiểm tra mã khuyến mãi
 export const CHECK_PROMOTION = (code) =>
   `${BASE_URL}/promotion/check?code=${code}`;
+// Lấy trang khuyến mãi với phân trang và tiêu chí tìm kiếm
 export const GET_PROMOTION_PAGE = (page, size, searchCriteria, searchValue) =>
   `${BASE_URL}/promotion/page?page=${page}&size=${size}&${searchCriteria}=${encodeURIComponent(
     searchValue,
   )}`;
+// Tạo khuyến mãi mới
 export const CREATE_PROMOTION = `${BASE_URL}/promotion`;
+// Lấy khuyến mãi theo ID
 export const GET_PROMOTION_BY_ID = (id) => `${BASE_URL}/promotion/${id}`;
 
 // Contact APIs
