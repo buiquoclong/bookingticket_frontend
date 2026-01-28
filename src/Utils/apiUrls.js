@@ -121,12 +121,14 @@ export const CREATE_PROMOTION = `${BASE_URL}/promotion`;
 export const GET_PROMOTION_BY_ID = (id) => `${BASE_URL}/promotion/${id}`;
 
 // Contact APIs
+// Lấy tất cả liên hệ
 export const CREATE_CONTACT = `${BASE_URL}/contact`;
+// Lấy trang liên hệ với phân trang và tiêu chí tìm kiếm
 export const GET_CONTACT_PAGE = (page, size, searchCriteria, searchValue) =>
   `${BASE_URL}/contact/page?page=${page}&size=${size}&${searchCriteria}=${encodeURIComponent(
     searchValue,
   )}`;
-
+// Lấy liên hệ theo ID
 export const GET_CONTACT_BY_ID = (id) => `${BASE_URL}/contact/${id}`;
 
 // City APIs
