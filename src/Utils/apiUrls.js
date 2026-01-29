@@ -132,12 +132,16 @@ export const GET_CONTACT_PAGE = (page, size, searchCriteria, searchValue) =>
 export const GET_CONTACT_BY_ID = (id) => `${BASE_URL}/contact/${id}`;
 
 // City APIs
+// Lấy tất cả thành phố
 export const GET_ALL_CITIES = `${BASE_URL}/city`;
+// Lấy trang thành phố với phân trang và tiêu chí tìm kiếm
 export const GET_CITY_PAGE = (page, size, searchValue) =>
   `${BASE_URL}/city/page?page=${page}&size=${size}&name=${encodeURIComponent(
     searchValue,
   )}`;
+// Tạo thành phố mới
 export const CREATE_CITY = `${BASE_URL}/city`;
+// Lấy thành phố theo ID
 export const GET_CITY_BY_ID = (id) => `${BASE_URL}/city/${id}`;
 
 // Driver APIs
