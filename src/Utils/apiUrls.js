@@ -145,13 +145,18 @@ export const CREATE_CITY = `${BASE_URL}/city`;
 export const GET_CITY_BY_ID = (id) => `${BASE_URL}/city/${id}`;
 
 // Driver APIs
+// Lấy tất cả tài xế
 export const GET_ALL_DRIVERS = `${BASE_URL}/driver`;
+// Lấy trang tài xế với phân trang và tiêu chí tìm kiếm
 export const GET_DRIVER_PAGE = (page, size, searchCriteria, searchValue) =>
   `${BASE_URL}/driver/page?page=${page}&size=${size}&${searchCriteria}=${encodeURIComponent(
     searchValue,
   )}`;
+// Tạo tài xế mới
 export const CREATE_DRIVER = `${BASE_URL}/driver`;
+// Lấy tài xế theo ID
 export const GET_DRIVER_BY_ID = (id) => `${BASE_URL}/driver/${id}`;
+// Lấy tài xế có sẵn cho ngày bắt đầu
 export const GET_DRIVER_AVAILABLE_FOR_DAYSTART = (dayStart) =>
   `${BASE_URL}/driver/available?dayStart=${dayStart}`;
 
