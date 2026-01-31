@@ -161,13 +161,18 @@ export const GET_DRIVER_AVAILABLE_FOR_DAYSTART = (dayStart) =>
   `${BASE_URL}/driver/available?dayStart=${dayStart}`;
 
 // Route APIs
+// Lấy tất cả tuyến đường
 export const GET_ACTIVE_ROUTES = `${BASE_URL}/route/active`;
+// Lấy tất cả tuyến đường
 export const GET_ALL_ROUTES = `${BASE_URL}/route`;
+// Lấy trang tuyến đường với phân trang và tiêu chí tìm kiếm
 export const GET_ROUTE_PAGE = (page, size, searchCriteria, searchValue) =>
   `${BASE_URL}/route/page?page=${page}&size=${size}&${searchCriteria}=${encodeURIComponent(
     searchValue,
   )}`;
+// Tạo tuyến đường mới
 export const CREATE_ROUTE = `${BASE_URL}/route`;
+// Lấy tuyến đường theo ID
 export const GET_ROUTE_BY_ID = (id) => `${BASE_URL}/route/${id}`;
 
 // Review APIs
