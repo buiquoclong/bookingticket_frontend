@@ -176,14 +176,17 @@ export const CREATE_ROUTE = `${BASE_URL}/route`;
 export const GET_ROUTE_BY_ID = (id) => `${BASE_URL}/route/${id}`;
 
 // Review APIs
+// Lấy trang đánh giá của người dùng với phân trang và đánh giá
 export const GET_REVIEW_OF_USER_PAGE = (page, size, userId, rating) =>
   `${BASE_URL}/review/page?page=${page}&size=${size}&userId=${userId}&rating=${rating}`;
-
+// Lấy trang đánh giá với phân trang và tiêu chí tìm kiếm
 export const GET_REVIEW_PAGE = (page, size, searchCriteria, searchValue) =>
   `${BASE_URL}/review/page?page=${page}&size=${size}&${searchCriteria}=${encodeURIComponent(
     searchValue,
   )}`;
+// Tạo đánh giá mới
 export const CREATE_REVIEW = `${BASE_URL}/review`;
+// Lấy đánh giá theo ID
 export const GET_REVIEW_BY_ID = (id) => `${BASE_URL}/review/${id}`;
 
 // Booking Detail APIs
