@@ -190,11 +190,13 @@ export const CREATE_REVIEW = `${BASE_URL}/review`;
 export const GET_REVIEW_BY_ID = (id) => `${BASE_URL}/review/${id}`;
 
 // Booking Detail APIs
+// Lấy chi tiết đặt chỗ theo bookingId
 export const GET_BOOKING_DETAIL_BY_BOOKING_ID = (bookingId) =>
   `${BASE_URL}/booking_detail/booking/${bookingId}`;
+// Lấy chi tiết đặt chỗ theo ID
 export const GET_BOOKING_DETAIL_BY_ID = (id) =>
   `${BASE_URL}/booking_detail/${id}`;
-
+// Lấy trang chi tiết đặt chỗ của người dùng với phân trang và ticketId
 export const GET_BOOKING_DETAILS_BY_USER = (userId, page, size, ticketId) =>
   `${BASE_URL}/booking_detail/user/${userId}/booking_details/page?page=${page}&size=${size}&id=${ticketId}`;
 
