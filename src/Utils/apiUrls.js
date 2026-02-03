@@ -201,12 +201,16 @@ export const GET_BOOKING_DETAILS_BY_USER = (userId, page, size, ticketId) =>
   `${BASE_URL}/booking_detail/user/${userId}/booking_details/page?page=${page}&size=${size}&id=${ticketId}`;
 
 // kind Vehicle APIs
+// Lấy tất cả loại xe
 export const GET_ALL_KIND_VEHICLE = `${BASE_URL}/kindVehicle`;
+// Lấy trang loại xe với phân trang và tiêu chí tìm kiếm
 export const GET_KIND_VEHICLE_PAGE = (page, size, searchValue) =>
   `${BASE_URL}/kindVehicle/page?page=${page}&size=${size}&name=${encodeURIComponent(
     searchValue,
   )}`;
+// Tạo loại xe mới
 export const CREATE_KIND_VEHICLE = `${BASE_URL}/kindVehicle`;
+// Lấy loại xe theo ID
 export const GET_KIND_VEHICLE_BY_ID = (id) => `${BASE_URL}/kindVehicle/${id}`;
 
 // Seat Reservation APIs
