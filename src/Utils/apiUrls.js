@@ -214,9 +214,10 @@ export const CREATE_KIND_VEHICLE = `${BASE_URL}/kindVehicle`;
 export const GET_KIND_VEHICLE_BY_ID = (id) => `${BASE_URL}/kindVehicle/${id}`;
 
 // Seat Reservation APIs
+// Lấy trang đặt chỗ chỗ ngồi với phân trang
 export const GET_SEAT_RESERVATION_PAGE = (page, size) =>
   `${BASE_URL}/seat_reservation/page?page=${page}&size=${size}`;
-
+// Lấy đặt chỗ chỗ ngồi theo ID
 export const GET_SEAT_RESERVATION_BY_TRIP_ID = (id) =>
   `${BASE_URL}/seat_reservation/trip/${id}`;
 
