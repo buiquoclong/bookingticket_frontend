@@ -222,6 +222,7 @@ export const GET_SEAT_RESERVATION_BY_TRIP_ID = (id) =>
   `${BASE_URL}/seat_reservation/trip/${id}`;
 
 // Logs APIs
+// Lấy trang log với phân trang và tiêu chí tìm kiếm
 export const GET_LOG_PAGE = (page, size, searchCriteria, searchValue) =>
   `${BASE_URL}/log/page?page=${page}&size=${size}&${searchCriteria}=${encodeURIComponent(
     searchValue,
