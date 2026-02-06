@@ -229,16 +229,20 @@ export const GET_LOG_PAGE = (page, size, searchCriteria, searchValue) =>
   )}`;
 
 // Vehicle APIs
+// Lấy tất cả xe
 export const GET_VEHICLE_AVAILABLE_BY_KIND_AND_DAYSTART = (
   kindVehicleId,
   dayStart,
 ) => `${BASE_URL}/vehicle/available/${kindVehicleId}?dayStart=${dayStart}`;
+// Lấy trang xe với phân trang và tiêu chí tìm kiếm
 export const GET_VEHICLE_PAGE = (page, size, searchCriteria, searchValue) =>
   `${BASE_URL}/vehicle/page?page=${page}&size=${size}&${searchCriteria}=${encodeURIComponent(
     searchValue,
   )}`;
 
+// Tạo xe mới
 export const CREATE_VEHICLE = `${BASE_URL}/vehicle`;
+// Lấy xe theo ID
 export const GET_VEHICLE_BY_ID = (id) => `${BASE_URL}/vehicle/${id}`;
 
 // ================== DASHBOARD API ==================
