@@ -250,6 +250,7 @@ export const GET_VEHICLE_BY_ID = (id) => `${BASE_URL}/vehicle/${id}`;
 export const GET_TOTAL_BY_DAY = (date) =>
   `${BASE_URL}/booking/total-by-day?date=${date}`;
 
+// Tổng doanh thu theo tháng
 export const GET_TOTAL_BY_MONTH = (yearMonth) =>
   `${BASE_URL}/booking/total-by-month?yearMonth=${yearMonth}`;
 
