@@ -254,16 +254,22 @@ export const GET_TOTAL_BY_DAY = (date) =>
 export const GET_TOTAL_BY_MONTH = (yearMonth) =>
   `${BASE_URL}/booking/total-by-month?yearMonth=${yearMonth}`;
 
+// Tổng doanh thu theo năm
 export const GET_TOTAL_USER = `${BASE_URL}/user/totalUser`;
 
+// Tổng đặt chỗ
 export const GET_TOTAL_BOOKINGS = `${BASE_URL}/booking/total-bookings`;
 
+// Tổng tất cả doanh thu
 export const GET_TOTAL_ALL = `${BASE_URL}/booking/totalAll`;
 
+// Tổng doanh thu 9 tháng gần nhất
 export const GET_TOTAL_LAST_NINE_MONTHS = `${BASE_URL}/booking/total/lastNineMonths`;
 
+// Số lượng đặt chỗ đã thanh toán theo tháng
 export const GET_COUNT_PAID_BY_MONTH = (yearMonth) =>
   `${BASE_URL}/booking/count-paid-by-month?yearMonth=${yearMonth}`;
 
+// Số lượng đặt chỗ đã hủy theo tháng
 export const GET_COUNT_CANCELLED_BY_MONTH = (yearMonth) =>
   `${BASE_URL}/booking/count-cancelled-by-month?yearMonth=${yearMonth}`;
