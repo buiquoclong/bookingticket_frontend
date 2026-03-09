@@ -80,10 +80,8 @@ const Login = () => {
         email: form.email,
         pass: form.password,
       });
-
       const tokenValue =
         typeof token === "string" ? token : token?.token || token;
-
       if (
         ["NULL", "LOCK", "PASSWORD"].includes(tokenValue) ||
         tokenValue.includes(",")
