@@ -94,7 +94,8 @@ const Login = () => {
       const decodedToken = jwtDecode(tokenValue);
       localStorage.setItem("userId", decodedToken.userId);
       localStorage.setItem("userRole", decodedToken.role);
-
+      // 🔥 thông báo cho Navbar
+      window.dispatchEvent(new Event("login-success"));
       const redirectPath = sessionStorage.getItem("redirectPath");
       if (redirectPath) {
         navigate(redirectPath);

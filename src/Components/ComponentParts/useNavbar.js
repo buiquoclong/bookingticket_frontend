@@ -8,25 +8,25 @@ const useNavbar = () => {
   const [isActive, setIsActive] = useState(false);
   const [data, setData] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [userId, setUserId] = useState(localStorage.getItem("userId"));
+
   const navigate = useNavigate();
+  const location = useLocation();
+
   const dropdownRef = useRef(null);
   const navbarMenuRef = useRef(null);
 
-  const location = useLocation();
+  const toggleDropdown = () => setShowDropdown((prev) => !prev);
+  const showNav = () => setIsActive(true);
+  const removeNavbar = () => setIsActive(false);
 
   // Khi route thay đổi, đóng navbar mobile
   useEffect(() => {
     setIsActive(false);
   }, [location.pathname]);
 
-  const toggleDropdown = () => setShowDropdown((prev) => !prev);
-  const showNav = () => setIsActive(true);
-  const removeNavbar = () => setIsActive(false);
-
   const handleLogoutClick = useCallback(() => {
     ["token", "userId", "userRole", "googleLogin"].forEach((k) =>
-      localStorage.removeItem(k)
+      localStorage.removeItem(k),
     );
     setData(null);
     navigate("/");
@@ -55,7 +55,6 @@ const useNavbar = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("userId", userId);
       localStorage.setItem("userRole", userRole);
-      setUserId(userId);
 
       if (userRole === 1) navigate("/");
       else if (userRole === 2 || userRole === 3) navigate("/admin");
@@ -66,14 +65,20 @@ const useNavbar = () => {
   }, [navigate, handleLogoutClick]);
 
   const fetchUserInfo = useCallback(async () => {
-    if (!userId) return;
-    try {
-      const data = await sendRequest(GET_USER_BY_ID(userId));
-      setData(data);
-    } catch (err) {
-      console.error(err);
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) {
+      setData(null);
+      return;
     }
-  }, [userId]);
+
+    try {
+      const user = await sendRequest(GET_USER_BY_ID(userId));
+      setData(user);
+    } catch (err) {
+      console.error("Fetch user error:", err);
+    }
+  }, []);
 
   useEffect(() => {
     if (localStorage.getItem("googleLogin") === "true") fetchToken();
@@ -81,7 +86,7 @@ const useNavbar = () => {
 
   useEffect(() => {
     fetchUserInfo();
-  }, [userId, fetchUserInfo]);
+  }, [location.pathname, fetchUserInfo]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
