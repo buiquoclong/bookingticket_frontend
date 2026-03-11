@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaBus } from "react-icons/fa";
-import { GiTakeMyMoney } from "react-icons/gi";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import "../../../Assets/scss/Clients/SearchRoute.scss";
 import LoadingBackdrop from "../../ComponentParts/LoadingBackdrop";
@@ -24,12 +23,9 @@ const SearchRoute = () => {
     try {
       setIsLoading(true);
       const routes = await sendRequest(GET_ACTIVE_ROUTES, "GET");
-      const routesWithPrice = routes.map((r) => ({
-        ...r,
-        price: Math.floor(Math.random() * 200000) + 50000,
-      }));
-      setData(routesWithPrice);
-      setRecords(routesWithPrice);
+
+      setData(routes);
+      setRecords(routes);
     } catch (error) {
       console.error("Error fetching routes:", error);
     } finally {
@@ -67,7 +63,7 @@ const SearchRoute = () => {
         </span>
       ) : (
         part
-      )
+      ),
     );
   };
 
@@ -112,10 +108,6 @@ const SearchRoute = () => {
               <div className="col time">
                 <AiOutlineClockCircle style={{ marginRight: "0.25rem" }} />
                 {route.timeOfRoute} giờ
-              </div>
-              <div className="col price">
-                <GiTakeMyMoney style={{ marginRight: "0.25rem" }} />
-                {route.price.toLocaleString("vi-VN")} ₫
               </div>
               <div className="col action">
                 <button
