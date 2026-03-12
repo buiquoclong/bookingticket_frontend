@@ -18,7 +18,7 @@ const ForgetPass = () => {
 
     setEmail(emailAddress);
     setEmailErrorMessage(
-      emailPattern.test(emailAddress) ? "" : "Email không hợp lệ."
+      emailPattern.test(emailAddress) ? "" : "Email không hợp lệ.",
     );
   };
 
@@ -60,6 +60,9 @@ const ForgetPass = () => {
         handleForgetResponse(result.message);
       } else {
         toast.success("Yêu cầu đặt lại mật khẩu đã được gửi!");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
       }
     } catch (error) {
       console.error("❌ Lỗi khi gửi yêu cầu khôi phục mật khẩu:", error);

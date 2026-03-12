@@ -95,7 +95,7 @@ const Navbar = React.forwardRef((props, ref) => {
                     className="dropdown-toggle flex items-center"
                   >
                     <FaUserCircle className="user-icon" />
-                    <span>{data.name}</span>
+                    <span>{data?.name}</span>
                     <FaChevronDown
                       className={`chevron-icon ${
                         showDropdown ? "rotated" : ""
