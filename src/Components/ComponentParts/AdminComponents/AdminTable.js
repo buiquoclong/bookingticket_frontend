@@ -10,7 +10,7 @@ import Pagination from "@mui/material/Pagination";
 import Tooltip from "@mui/material/Tooltip";
 import "./TableComponent.scss";
 
-// 👉 Hàm định dạng thời gian
+// Hàm định dạng thời gian
 const formatDateTime = (dateString) => {
   if (!dateString) return "";
   const date = new Date(dateString);
@@ -25,7 +25,7 @@ const formatDateTime = (dateString) => {
   return `${formattedTime} ${formattedDate}`;
 };
 
-// 👉 Hàm lấy giá trị lồng nhau (nested)
+// Hàm lấy giá trị lồng nhau (nested)
 const getValueByKey = (obj, key) => {
   return key.split(".").reduce((acc, part) => acc && acc[part], obj);
 };
