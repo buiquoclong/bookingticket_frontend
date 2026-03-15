@@ -12,7 +12,7 @@ export const validateFields = (fields) => {
 
   if (missing.length > 0) {
     const message = `Vui lòng điền thông tin còn thiếu:\n- ${missing.join(
-      ", "
+      ", ",
     )}`;
     toast.error(message);
     return false;
@@ -40,7 +40,7 @@ export const sendRequest = async (
   url,
   method = "GET",
   body = null,
-  options = {}
+  options = {},
 ) => {
   const token = localStorage.getItem("token");
 
